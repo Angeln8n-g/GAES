@@ -1575,7 +1575,7 @@ export default function App() {
                       placeholder="Dejar vacío para imagen de stock corporativa automática"
                       value={formImageUrl}
                       onChange={(e) => setFormImageUrl(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 focus:bg-white text-sm text-slate-800 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:outline-none transition-all text-xs"
+                      className="w-full bg-slate-50 border border-slate-200 focus:bg-white text-sm text-slate-800 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:outline-none transition-all"
                     />
                   </div>
 

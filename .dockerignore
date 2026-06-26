@@ -1,0 +1,13 @@
+node_modules
+dist
+.git
+.github
+.vscode
+.env
+.env.local
+.env.development
+.env.production
+README.md
+Dockerfile
+nginx.conf
+schema.sql
