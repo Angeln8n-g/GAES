@@ -1,0 +1,80 @@
+# Resumen del Despliegue en Producción (Coolify)
+
+Hemos preparado y configurado exitosamente el proyecto para su despliegue en producción en **Coolify**.
+
+---
+
+## Cambios Realizados
+
+Se han creado los siguientes archivos en la raíz del proyecto:
+
+1. **[Dockerfile](file:///c:/Users/angel/Desktop/Develop/Web%20all%20projects/Gestion_de_reservas/Dockerfile)**:
+   - Configuración multi-etapa utilizando `node:20-alpine` para la instalación de dependencias y compilación de producción.
+   - Utiliza `nginx:alpine` para servir la carpeta `dist/` en producción de manera segura y eficiente.
+   - Expone el puerto `80`.
+   - Permite la configuración de variables de entorno mediante argumentos de construcción (`ARG VITE_API_URL` y `ARG VITE_API_MODE`).
+
+2. **[nginx.conf](file:///c:/Users/angel/Desktop/Develop/Web%20all%20projects/Gestion_de_reservas/nginx.conf)**:
+   - Soporte para enrutamiento SPA (redirección a `/index.html` para recursos no encontrados).
+   - Compresión Gzip activada para acelerar los tiempos de carga de archivos HTML, CSS y JS.
+   - Configuración de cabeceras de caché (`Cache-Control`) para optimizar el rendimiento:
+     - `expires 1y` para recursos estáticos con hash único (`js`, `css`, imágenes).
+     - Desactivación de caché para `index.html` para asegurar que el cliente siempre use la última versión disponible.
+
+3. **[.dockerignore](file:///c:/Users/angel/Desktop/Develop/Web%20all%20projects/Gestion_de_reservas/.dockerignore)**:
+   - Excluye del contexto de construcción archivos temporales y directorios locales pesados como `node_modules/`, `dist/`, `.git/`, `.env`, etc.
+
+4. **[.env.example](file:///c:/Users/angel/Desktop/Develop/Web%20all%20projects/Gestion_de_reservas/.env.example)**:
+   - Plantilla que detalla las variables de entorno de Vite disponibles (`VITE_API_MODE` y `VITE_API_URL`).
+
+---
+
+## Resultados de Verificación
+
+Se realizó una prueba de compilación en el entorno de desarrollo para validar que no existan errores de TypeScript o de configuración de Vite. La compilación se ejecutó de forma correcta y exitosa:
+
+```bash
+> gestion-de-reservas@0.1.0 build
+> tsc && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 1514 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.67 kB │ gzip:   0.44 kB
+dist/assets/index-ClxBdNql.css   40.12 kB │ gzip:   6.96 kB
+dist/assets/index-CJMF4x0B.js   604.99 kB │ gzip: 190.29 kB
+✓ built in 4.71s
+```
+
+---
+
+## Guía Paso a Paso para Desplegar en Coolify
+
+Sigue estos pasos en tu panel de Coolify para desplegar la aplicación:
+
+### Paso 1: Crear un Nuevo Recurso
+1. Ve a tu proyecto en Coolify y haz clic en **+ New**.
+2. Selecciona **Application**.
+3. Selecciona tu repositorio de Git (GitHub, GitLab, o repositorio público/privado).
+4. Elige la rama de la que deseas desplegar (por ejemplo, `main`).
+
+### Paso 2: Configurar el Build Pack
+1. Coolify detectará el proyecto. Asegúrate de configurar el **Build Pack** como **Dockerfile**.
+2. Coolify leerá automáticamente el archivo [Dockerfile](file:///c:/Users/angel/Desktop/Develop/Web%20all%20projects/Gestion_de_reservas/Dockerfile) que acabamos de crear.
+
+### Paso 3: Configurar Puertos
+1. En la configuración de red de la aplicación en Coolify, asegúrate de que el **Port** de destino sea el `80` (que es el puerto que expone Nginx en nuestro contenedor).
+
+### Paso 4: Configurar Variables de Entorno (Si aplica)
+Si deseas conectar la aplicación a un backend PostgreSQL en lugar de usar el almacenamiento local del navegador (`localStorage`), debes añadir las variables de entorno como **Build Arguments** en Coolify:
+1. Ve a la pestaña **Environment Variables** en Coolify.
+2. Agrega las siguientes variables:
+   - `VITE_API_MODE` = `true`
+   - `VITE_API_URL` = `https://tu-backend-api.com/api` (la dirección HTTPS de tu API)
+3. **Importante:** Asegúrate de marcar estas variables como **Build Variable** (o *Build-time Variable*), ya que Vite las necesita en el momento de compilar el contenedor Docker. Si no se marcan como Build Variables, no se inyectarán en los archivos estáticos.
+
+### Paso 5: Desplegar
+1. Haz clic en el botón **Deploy** de Coolify.
+2. Una vez completado, Coolify te asignará un dominio o subdominio HTTPS configurado automáticamente.

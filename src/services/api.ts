@@ -13,6 +13,9 @@ const MOCK_EVENTS = [
     instructor: "Ing. Sofía Martínez",
     imageUrl: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=800&q=80",
     status: "active",
+    modality: "Presencial",
+    location: "Sala de Juntas B (Piso 3)",
+    surveyUrl: "https://forms.office.com/r/react-ux-evaluation",
     notificationSettings: {
       sendEmail: true,
       sendTeams: true,
@@ -46,6 +49,9 @@ const MOCK_EVENTS = [
     instructor: "Dra. Carolina Herrera",
     imageUrl: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80",
     status: "active",
+    modality: "Presencial",
+    location: "Auditorio Principal",
+    surveyUrl: "",
     notificationSettings: {
       sendEmail: true,
       sendTeams: false,
@@ -69,6 +75,9 @@ const MOCK_EVENTS = [
     instructor: "Lic. Roberto Gómez",
     imageUrl: "https://images.unsplash.com/photo-1677442136019-21780efad99a?auto=format&fit=crop&w=800&q=80",
     status: "active",
+    modality: "Virtual",
+    location: "Enlace de Microsoft Teams",
+    surveyUrl: "",
     notificationSettings: {
       sendEmail: true,
       sendTeams: true,
@@ -84,7 +93,7 @@ const MOCK_EVENTS = [
       }
     ]
   }
-];
+]
 
 const MOCK_PARTICIPANTS = [
   { card: "2010", name: "LUIS ALBERTO ALMAZAN POOT", email: "luis.almazan@empresa.com" },
@@ -94,10 +103,11 @@ const MOCK_PARTICIPANTS = [
 ];
 
 const MOCK_USERS = [
-  { id: "usr_1", email: "sofia.ceo@empresa.com", name: "Sofía Martínez", role: "Super Administrador" },
-  { id: "usr_2", email: "admin.capacitacion@empresa.com", name: "Carlos Pérez (Tú)", role: "Administrador / Editor" },
-  { id: "usr_3", email: "juan.diez@empresa.com", name: "Juan Díez", role: "Colaborador (User)" },
-  { id: "usr_4", email: "marta.perez@empresa.com", name: "Marta Pérez", role: "Colaborador (User)" }
+  { id: "usr_super", email: "superadmin@empresa.com", name: "Superusuario Principal", role: "Super Administrador", password: "admin" },
+  { id: "usr_1", email: "sofia.ceo@empresa.com", name: "Sofía Martínez", role: "Super Administrador", password: "123" },
+  { id: "usr_2", email: "admin.capacitacion@empresa.com", name: "Carlos Pérez", role: "Administrador / Editor", password: "123" },
+  { id: "usr_3", email: "juan.diez@empresa.com", name: "Juan Díez", role: "Colaborador (User)", password: "123" },
+  { id: "usr_4", email: "marta.perez@empresa.com", name: "Marta Pérez", role: "Colaborador (User)", password: "123" }
 ];
 
 // URLs del Backend (Configurables)
@@ -106,14 +116,38 @@ const isApiMode = import.meta.env.VITE_API_MODE === 'true';
 
 // Inicializar almacenamiento local si no existe para el modo de prueba
 const initLocalStorage = () => {
-  if (!localStorage.getItem('ch_events')) {
+  const existingEvents = localStorage.getItem('ch_events');
+  if (!existingEvents) {
     localStorage.setItem('ch_events', JSON.stringify(MOCK_EVENTS));
+  } else {
+    try {
+      const parsed = JSON.parse(existingEvents);
+      const needsMigration = parsed.some((e: any) => e.id === 'evt_1' && e.surveyUrl === undefined && e.survey_url === undefined);
+      if (needsMigration) {
+        localStorage.setItem('ch_events', JSON.stringify(MOCK_EVENTS));
+      }
+    } catch (e) {
+      localStorage.setItem('ch_events', JSON.stringify(MOCK_EVENTS));
+    }
   }
   if (!localStorage.getItem('ch_participants')) {
     localStorage.setItem('ch_participants', JSON.stringify(MOCK_PARTICIPANTS));
   }
-  if (!localStorage.getItem('ch_users')) {
+  
+  const existingUsers = localStorage.getItem('ch_users');
+  if (!existingUsers) {
     localStorage.setItem('ch_users', JSON.stringify(MOCK_USERS));
+  } else {
+    // Migración: Si algún usuario no tiene contraseña, o falta el superusuario, sobrescribimos
+    try {
+      const parsed = JSON.parse(existingUsers);
+      const needsMigration = parsed.some((u: any) => !u.password) || !parsed.some((u: any) => u.email === 'superadmin@empresa.com');
+      if (needsMigration) {
+        localStorage.setItem('ch_users', JSON.stringify(MOCK_USERS));
+      }
+    } catch (e) {
+      localStorage.setItem('ch_users', JSON.stringify(MOCK_USERS));
+    }
   }
 };
 
@@ -249,11 +283,11 @@ export const apiService = {
     }
   },
 
-  // --- MÉTODOS DE SIMULACIÓN DE USUARIOS DE LA PLATAFORMA ---
+  // --- MÉTODOS DE USUARIOS DE LA PLATAFORMA ---
   async getUsers(): Promise<any[]> {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/users`);
-      if (!res.ok) throw new Error('Error al obtener usuarios de simulación');
+      if (!res.ok) throw new Error('Error al obtener usuarios de la base de datos');
       return res.json();
     } else {
       return JSON.parse(localStorage.getItem('ch_users') || '[]');
@@ -267,7 +301,7 @@ export const apiService = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ users })
       });
-      if (!res.ok) throw new Error('Error al actualizar usuarios de simulación en Postgres');
+      if (!res.ok) throw new Error('Error al actualizar usuarios en Postgres');
     } else {
       localStorage.setItem('ch_users', JSON.stringify(users));
     }

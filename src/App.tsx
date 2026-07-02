@@ -35,7 +35,10 @@ import {
   Printer,
   PartyPopper,
   PhoneCall,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Eye,
+  EyeOff,
+  MapPin
 } from 'lucide-react';
 
 // --- DATOS DE PRUEBA INICIALES (MOCK DATA) ---
@@ -48,6 +51,8 @@ const INITIAL_EVENTS = [
     instructor: "Ing. Sofía Martínez",
     imageUrl: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=800&q=80",
     status: "active",
+    modality: "Presencial",
+    location: "Sala de Juntas B (Piso 3)",
     notificationSettings: {
       sendEmail: true,
       sendTeams: true,
@@ -81,6 +86,8 @@ const INITIAL_EVENTS = [
     instructor: "Dra. Carolina Herrera",
     imageUrl: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80",
     status: "active",
+    modality: "Presencial",
+    location: "Auditorio Principal",
     notificationSettings: {
       sendEmail: true,
       sendTeams: false,
@@ -104,6 +111,8 @@ const INITIAL_EVENTS = [
     instructor: "Lic. Roberto Gómez",
     imageUrl: "https://images.unsplash.com/photo-1677442136019-21780efad99a?auto=format&fit=crop&w=800&q=80",
     status: "active",
+    modality: "Virtual",
+    location: "Enlace de Microsoft Teams",
     notificationSettings: {
       sendEmail: true,
       sendTeams: true,
@@ -147,10 +156,11 @@ const INITIAL_PARTICIPANTS = [
 ];
 
 const INITIAL_USERS = [
-  { id: "usr_1", email: "sofia.ceo@empresa.com", name: "Sofía Martínez", role: "Super Administrador" },
-  { id: "usr_2", email: "admin.capacitacion@empresa.com", name: "Carlos Pérez (Tú)", role: "Administrador / Editor" },
-  { id: "usr_3", email: "juan.diez@empresa.com", name: "Juan Díez", role: "Colaborador (User)" },
-  { id: "usr_4", email: "marta.perez@empresa.com", name: "Marta Pérez", role: "Colaborador (User)" }
+  { id: "usr_super", email: "superadmin@empresa.com", name: "Superusuario Principal", role: "Super Administrador", password: "admin" },
+  { id: "usr_1", email: "sofia.ceo@empresa.com", name: "Sofía Martínez", role: "Super Administrador", password: "123" },
+  { id: "usr_2", email: "admin.capacitacion@empresa.com", name: "Carlos Pérez", role: "Administrador / Editor", password: "123" },
+  { id: "usr_3", email: "juan.diez@empresa.com", name: "Juan Díez", role: "Colaborador (User)", password: "123" },
+  { id: "usr_4", email: "marta.perez@empresa.com", name: "Marta Pérez", role: "Colaborador (User)", password: "123" }
 ];
 
 const CATEGORIES = ["Todos", "Taller", "Curso", "Webinar", "Charla", "Cine Forum", "Evento"];
@@ -180,10 +190,19 @@ const getDaysInMonthForJuly2026 = () => {
 export default function App() {
   const [events, setEvents] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>(INITIAL_USERS);
-  const [currentUser, setCurrentUser] = useState(INITIAL_USERS[1]); 
+  const [currentUser, setCurrentUser] = useState<any | null>(() => {
+    const saved = localStorage.getItem('ch_logged_user');
+    return saved ? JSON.parse(saved) : null;
+  }); 
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [currentTab, setCurrentTab] = useState("landing"); 
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Estados de Login
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState("");
 
   // Controladores de Modales Públicos
   const [selectedEventForModal, setSelectedEventForModal] = useState(null);
@@ -208,6 +227,9 @@ export default function App() {
   const [formCategory, setFormCategory] = useState("Taller");
   const [formInstructor, setFormInstructor] = useState("");
   const [formImageUrl, setFormImageUrl] = useState("");
+  const [formModality, setFormModality] = useState("Presencial");
+  const [formLocation, setFormLocation] = useState("");
+  const [formSurveyUrl, setFormSurveyUrl] = useState("");
   const [formSchedule, setFormSchedule] = useState([]); 
   
   // Temporal para agregar fecha/hora en el creador
@@ -219,6 +241,7 @@ export default function App() {
   const [newUserName, setNewUserName] = useState("");
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserRole, setNewUserRole] = useState("Colaborador (User)");
+  const [newUserPassword, setNewUserPassword] = useState("");
   const [showAddUserForm, setShowAddUserForm] = useState(false);
 
   // Nuevos Estados para la Carga de Excel
@@ -249,7 +272,7 @@ export default function App() {
 
   const julyDays = getDaysInMonthForJuly2026();
 
-  // Autorelleno de Email de simulación en el modal cuando cambia de usuario o evento
+  // Autorelleno de Email en el modal cuando cambia de usuario o evento
   useEffect(() => {
     if (currentUser) {
       setUserEmailInput(currentUser.email);
@@ -283,9 +306,23 @@ export default function App() {
         setUsers(loadedUsers);
         setParticipants(loadedParticipants);
         
-        if (loadedUsers.length > 1) {
-          const simulatedUser = loadedUsers.find(u => u.id === currentUser.id) || loadedUsers[1];
-          setCurrentUser(simulatedUser);
+        // Mantener sincronizado el usuario logueado
+        const savedUserStr = localStorage.getItem('ch_logged_user');
+        if (savedUserStr) {
+          try {
+            const saved = JSON.parse(savedUserStr);
+            const fresh = loadedUsers.find(u => u.id === saved.id);
+            if (fresh) {
+              setCurrentUser(fresh);
+              localStorage.setItem('ch_logged_user', JSON.stringify(fresh));
+            } else {
+              setCurrentUser(null);
+              localStorage.removeItem('ch_logged_user');
+            }
+          } catch (e) {
+            setCurrentUser(null);
+            localStorage.removeItem('ch_logged_user');
+          }
         }
       } catch (err) {
         console.error("Error cargando datos:", err);
@@ -317,6 +354,87 @@ export default function App() {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
+  // Auto-registro de asistencia para el usuario logueado al escanear QR
+  useEffect(() => {
+    if (currentUser && currentTab === "attendance" && attendanceEventId && attendanceDate && attendanceTime) {
+      if (attendanceResult || attendanceProcessing) return;
+
+      // Esperar a que se carguen los eventos y participantes
+      if (events.length === 0 || participants.length === 0) return;
+
+      const processAutoCheckIn = async () => {
+        setAttendanceProcessing(true);
+        try {
+          let participant = participants.find(p => p.email.toLowerCase() === currentUser.email.toLowerCase());
+          
+          if (!participant) {
+            // Crear participante de forma automática si no existe en el padrón
+            let uniqueCard = (1000 + Math.floor(Math.random() * 9000)).toString();
+            while (participants.some(p => p.card === uniqueCard)) {
+              uniqueCard = (1000 + Math.floor(Math.random() * 9000)).toString();
+            }
+            participant = {
+              card: uniqueCard,
+              name: currentUser.name,
+              email: currentUser.email
+            };
+            const updatedParticipants = [...participants, participant];
+            await apiService.saveParticipants(updatedParticipants);
+            setParticipants(updatedParticipants);
+          }
+
+          setAttendanceVerified(participant);
+
+          const event = events.find(e => e.id === attendanceEventId);
+          if (!event) {
+            setAttendanceResult('invalid_card');
+            setAttendanceProcessing(false);
+            return;
+          }
+
+          const schedule = event.schedule.find(s => s.date === attendanceDate);
+          const slot = schedule?.slots.find(sl => sl.time === attendanceTime);
+          if (!slot) {
+            setAttendanceResult('invalid_card');
+            setAttendanceProcessing(false);
+            return;
+          }
+
+          const isRegistered = slot.attendees && slot.attendees.includes(participant.email);
+          const hasSpace = slot.registered < slot.capacity;
+          const alreadyAttended = slot.attendedList && slot.attendedList.includes(participant.email);
+
+          if (alreadyAttended) {
+            setAttendanceResult('already_confirmed');
+            setAttendanceProcessing(false);
+            return;
+          }
+
+          if (isRegistered) {
+            const updatedEvents = await apiService.confirmAttendance(attendanceEventId, attendanceDate, attendanceTime, participant.email);
+            setEvents(updatedEvents);
+            setAttendanceResult('confirmed');
+            setTimeout(() => launchConfetti(), 300);
+          } else if (hasSpace) {
+            const afterRegister = await apiService.registerToEvent(attendanceEventId, attendanceDate, attendanceTime, participant.email);
+            setEvents(afterRegister);
+            const afterAttendance = await apiService.confirmAttendance(attendanceEventId, attendanceDate, attendanceTime, participant.email);
+            setEvents(afterAttendance);
+            setAttendanceResult('registered_and_confirmed');
+            setTimeout(() => launchConfetti(), 300);
+          } else {
+            setAttendanceResult('no_space');
+          }
+        } catch (err) {
+          console.error("Auto check-in error:", err);
+          triggerToast("Error al registrar asistencia automáticamente.", "error");
+        }
+        setAttendanceProcessing(false);
+      };
+      processAutoCheckIn();
+    }
+  }, [currentUser, currentTab, attendanceEventId, attendanceDate, attendanceTime, events, participants, attendanceResult, attendanceProcessing]);
+
   // Búsqueda en tiempo real por tarjeta en vista de asistencia
   useEffect(() => {
     const cardTrimmed = attendanceCardInput.trim();
@@ -334,6 +452,43 @@ export default function App() {
     setTimeout(() => {
       setShowToast(null);
     }, 4000);
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('ch_logged_user');
+    triggerToast("Sesión cerrada correctamente", "info");
+    setCurrentTab("landing");
+  };
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError("");
+
+    const emailTrimmed = loginEmail.trim().toLowerCase();
+    const passwordTrimmed = loginPassword.trim();
+
+    if (!emailTrimmed || !passwordTrimmed) {
+      setLoginError("Por favor completa todos los campos.");
+      return;
+    }
+
+    const match = users.find(u => u.email.toLowerCase() === emailTrimmed);
+    if (!match) {
+      setLoginError("Usuario no encontrado.");
+      return;
+    }
+
+    if (match.password !== passwordTrimmed) {
+      setLoginError("Contraseña incorrecta.");
+      return;
+    }
+
+    setCurrentUser(match);
+    localStorage.setItem('ch_logged_user', JSON.stringify(match));
+    triggerToast(`¡Bienvenido de nuevo, ${match.name}!`, "success");
+    setLoginEmail("");
+    setLoginPassword("");
   };
 
   const handleDownloadAttendeesCSV = (event) => {
@@ -463,6 +618,51 @@ export default function App() {
       }).catch(err => {
         console.error(err);
         triggerToast("Error al registrar notificación en la base de datos.", "error");
+      });
+    }, 1200);
+  };
+
+  const handleSendSurveyNotification = (event, channel) => {
+    setSendingNotificationState(true);
+    
+    setTimeout(() => {
+      setSendingNotificationState(false);
+      
+      let totalRecipients = 0;
+      event.schedule.forEach(sch => {
+        sch.slots.forEach(slot => {
+          const list = (slot.attendedList && slot.attendedList.length > 0) 
+            ? slot.attendedList 
+            : (slot.attendees || []);
+          totalRecipients += list.length;
+        });
+      });
+
+      if (totalRecipients === 0) {
+        triggerToast("No hay destinatarios (asistentes o inscritos) en este evento para recibir la encuesta.", "error");
+        return;
+      }
+
+      const now = new Date();
+      const dateFormatted = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} ${now.getHours() >= 12 ? 'PM' : 'AM'}`;
+      
+      const history = event.notificationHistory || [];
+      const updatedEvent = {
+        ...event,
+        notificationHistory: [
+          { date: dateFormatted, channel: `${channel} (Encuesta)`, status: "Enviado", recipients: totalRecipients },
+          ...history
+        ]
+      };
+
+      apiService.saveEvent(updatedEvent).then(updatedList => {
+        setEvents(updatedList);
+        const refreshedEvent = updatedList.find(e => e.id === event.id);
+        setNotificationModalEvent(refreshedEvent);
+        triggerToast(`Enlace de encuesta enviado por ${channel} a ${totalRecipients} asistentes.`, "success");
+      }).catch(err => {
+        console.error(err);
+        triggerToast("Error al registrar el envío de la encuesta.", "error");
       });
     }, 1200);
   };
@@ -612,6 +812,7 @@ export default function App() {
 
     const finalInstructor = formInstructor.trim() || "Staff de Capacitación";
     const finalDescription = formDescription.trim() || "Actividad corporativa programada por el departamento de desarrollo. Regístrate para reservar tu lugar.";
+    const finalLocation = formLocation.trim() || (formModality === "Virtual" ? "Enlace Virtual" : "Instalaciones de la Empresa");
 
     const eventPayload: any = {
       id: isEditing ? editingEventId : `evt_${Date.now()}`,
@@ -621,6 +822,9 @@ export default function App() {
       instructor: finalInstructor,
       imageUrl: formImageUrl.trim() || FALLBACK_IMAGE,
       status: "active",
+      modality: formModality,
+      location: finalLocation,
+      surveyUrl: formSurveyUrl.trim(),
       notificationSettings: isEditing 
         ? events.find(e => e.id === editingEventId)?.notificationSettings 
         : { sendEmail: true, sendTeams: true, customMessage: `Estimado colaborador, te recordamos que mañana inicia el taller '[EVENT_TITLE]'. ¡Te esperamos!` },
@@ -648,6 +852,9 @@ export default function App() {
     setFormCategory(evt.category);
     setFormInstructor(evt.instructor);
     setFormImageUrl(evt.imageUrl);
+    setFormModality(evt.modality || "Presencial");
+    setFormLocation(evt.location || "");
+    setFormSurveyUrl(evt.surveyUrl || evt.survey_url || "");
     setFormSchedule(JSON.parse(JSON.stringify(evt.schedule))); 
   };
 
@@ -659,6 +866,9 @@ export default function App() {
     setFormCategory("Taller");
     setFormInstructor("");
     setFormImageUrl("");
+    setFormModality("Presencial");
+    setFormLocation("");
+    setFormSurveyUrl("");
     setFormSchedule([]);
   };
 
@@ -694,7 +904,8 @@ export default function App() {
       id: `usr_${Date.now()}`,
       name: newUserName.trim(),
       email: newUserEmail.trim().toLowerCase(),
-      role: newUserRole
+      role: newUserRole,
+      password: newUserPassword.trim() || "123456" // Contraseña por defecto si se deja vacía
     };
 
     const updatedUsers = [...users, newUser];
@@ -705,6 +916,7 @@ export default function App() {
       setNewUserName("");
       setNewUserEmail("");
       setNewUserRole("Colaborador (User)");
+      setNewUserPassword("");
       setShowAddUserForm(false);
     }).catch(err => {
       console.error(err);
@@ -714,7 +926,7 @@ export default function App() {
 
   const handleRemoveUser = (userId: string) => {
     if (userId === currentUser.id) {
-      triggerToast("No puedes eliminar a tu usuario actual de simulación.", "error");
+      triggerToast("No puedes eliminar tu propio usuario activo.", "error");
       return;
     }
 
@@ -790,6 +1002,8 @@ export default function App() {
         const category = findVal(["categoría", "categoria", "category"], "Taller").toString().trim();
         const instructor = findVal(["facilitador", "instructor", "ponente"], "Staff de Capacitación").toString().trim();
         const imageUrl = findVal(["imagenurl", "imageurl", "imagen", "image"]).toString().trim() || FALLBACK_IMAGE;
+        const modality = findVal(["modalidad", "modality"], "Presencial").toString().trim();
+        const location = findVal(["lugar", "location", "lugar_evento", "ubicacion", "ubicación"], "").toString().trim() || (modality === "Virtual" ? "Enlace Virtual" : "Instalaciones de la Empresa");
         
         const dateRaw = findVal(["fecha", "date"]);
         let date = "2026-07-15";
@@ -827,6 +1041,8 @@ export default function App() {
             instructor,
             imageUrl,
             status: "active",
+            modality,
+            location,
             notificationSettings: {
               sendEmail: true,
               sendTeams: true,
@@ -976,24 +1192,15 @@ export default function App() {
       return u;
     });
     setUsers(updatedUsers);
+    apiService.saveUsers(updatedUsers).catch(err => console.error("Error al actualizar rol en la base de datos:", err));
 
     const freshCurrentUser = updatedUsers.find(u => u.id === currentUser.id);
     if (freshCurrentUser) {
       setCurrentUser(freshCurrentUser);
+      localStorage.setItem('ch_logged_user', JSON.stringify(freshCurrentUser));
     }
 
     triggerToast("Rol de usuario actualizado");
-  };
-
-  const handleSwitchSimulatedUser = (userId) => {
-    const selected = users.find(u => u.id === userId);
-    if (selected) {
-      setCurrentUser(selected);
-      triggerToast(`Modo simulación: Ahora eres ${selected.name} (${selected.role})`, "info");
-      if (selected.role === "Colaborador (User)") {
-        setCurrentTab("landing");
-      }
-    }
   };
   // --- FUNCIONES DE ASISTENCIA POR QR ---
   const getAttendanceUrl = (eventId: string, date: string, time: string) => {
@@ -1143,6 +1350,144 @@ export default function App() {
     return matchesCategory && matchesSearch;
   });
 
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden font-sans select-none">
+        {/* Glow ambient effects */}
+        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-indigo-600/10 rounded-full blur-3xl -z-10 animate-pulse duration-[6000ms]"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl -z-10 animate-pulse duration-[8000ms]"></div>
+
+        {/* Outer Card */}
+        <div className="bg-slate-900/60 backdrop-blur-2xl border border-slate-800/80 p-8 rounded-3xl w-full max-w-md shadow-2xl space-y-6 relative z-10 animate-fadeIn">
+          {/* Logo & Header */}
+          <div className="flex flex-col items-center text-center space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-xl shadow-indigo-500/10">
+              <BookOpen size={24} className="stroke-[2.5]" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-extrabold text-white tracking-tight">
+                Capacita<span className="text-indigo-400">Hub</span>
+              </h2>
+              <p className="text-xs text-slate-400 font-medium mt-1">Desarrollo y Formación de Talento</p>
+            </div>
+          </div>
+
+          <div className="h-[1px] bg-slate-800"></div>
+
+          {/* Contexto de Asistencia QR */}
+          {currentTab === "attendance" && attendanceEventId && (() => {
+            const pendingEvent = events.find(e => e.id === attendanceEventId);
+            if (pendingEvent) {
+              return (
+                <div className="bg-indigo-500/10 border border-indigo-500/20 p-4 rounded-2xl text-indigo-300 text-xs text-center space-y-1.5 animate-fadeIn">
+                  <span className="font-bold uppercase tracking-wider text-[9px] text-indigo-400 block">Acceso de Asistencia</span>
+                  <p>Inicia sesión para registrar automáticamente tu asistencia al evento:</p>
+                  <p className="font-bold text-white text-sm mt-1">“{pendingEvent.title}”</p>
+                </div>
+              );
+            }
+            return null;
+          })()}
+
+          {/* Form */}
+          <form onSubmit={handleLogin} className="space-y-4">
+            {loginError && (
+              <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 text-rose-200 text-xs rounded-xl flex items-center gap-2.5 animate-shake">
+                <AlertTriangle size={16} className="text-rose-400 flex-shrink-0" />
+                <span className="font-semibold">{loginError}</span>
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-bold text-slate-400 tracking-wider uppercase block">Correo Corporativo</label>
+              <div className="relative">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500">
+                  <Mail size={16} />
+                </span>
+                <input
+                  type="email"
+                  required
+                  value={loginEmail}
+                  onChange={(e) => {
+                    setLoginEmail(e.target.value);
+                    if (loginError) setLoginError("");
+                  }}
+                  placeholder="ejemplo@empresa.com"
+                  className="w-full bg-slate-800/40 hover:bg-slate-800/60 focus:bg-slate-800 border border-slate-700/80 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-4 py-3 rounded-xl focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder:text-slate-500"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-bold text-slate-400 tracking-wider uppercase block">Contraseña</label>
+              <div className="relative">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500">
+                  <Lock size={16} />
+                </span>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={loginPassword}
+                  onChange={(e) => {
+                    setLoginPassword(e.target.value);
+                    if (loginError) setLoginError("");
+                  }}
+                  placeholder="••••••••"
+                  className="w-full bg-slate-800/40 hover:bg-slate-800/60 focus:bg-slate-800 border border-slate-700/80 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-10 py-3 rounded-xl focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all placeholder:text-slate-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-all cursor-pointer"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full mt-2 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white font-bold text-sm py-3 px-4 rounded-xl shadow-lg shadow-indigo-600/15 transition-all cursor-pointer flex items-center justify-center gap-2"
+            >
+              <span>Acceder al Sistema</span>
+              <ArrowRight size={16} />
+            </button>
+          </form>
+
+          {/* Quick Demo Accs */}
+          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 space-y-2">
+            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wide flex items-center gap-1.5">
+              <Info size={13} className="text-indigo-400" />
+              Cuentas de prueba (Clic para rellenar)
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
+              {users.map(u => (
+                <button
+                  key={u.id}
+                  type="button"
+                  onClick={() => {
+                    setLoginEmail(u.email);
+                    setLoginPassword(u.password);
+                    setLoginError("");
+                  }}
+                  className="text-left bg-slate-800/30 hover:bg-indigo-600/10 border border-slate-800 hover:border-indigo-500/30 p-2 rounded-xl transition-all text-[10px] cursor-pointer group"
+                >
+                  <div className="font-semibold text-slate-200 group-hover:text-indigo-300 leading-tight truncate">{u.name}</div>
+                  <div className="text-slate-400 text-[9px] truncate">{u.role}</div>
+                  <div className="text-slate-500 text-[8px] mt-0.5 font-mono">Pass: {u.password}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <p className="text-[10px] text-slate-500 mt-6 text-center">
+          © {new Date().getFullYear()} CapacitaHub — Todos los derechos reservados.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased selection:bg-indigo-500 selection:text-white">
       
@@ -1158,42 +1503,20 @@ export default function App() {
         </div>
       )}
 
-      {/* --- MENÚ DE SIMULACIÓN DE ROLES (PROTOTIPO) --- */}
-      <div className="bg-slate-900 text-slate-300 text-xs px-4 py-2 flex flex-wrap gap-4 items-center justify-between border-b border-slate-800">
-        <div className="flex items-center gap-2">
-          <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span className="font-semibold text-slate-400 uppercase tracking-wide">Entorno de Simulación:</span>
-          <span>Prueba las diferentes perspectivas cambiando tu perfil:</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <label className="text-slate-400 font-medium">Ver como:</label>
-          <select 
-            value={currentUser.id} 
-            onChange={(e) => handleSwitchSimulatedUser(e.target.value)}
-            className="bg-slate-800 border border-slate-700 text-white rounded px-2.5 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer text-xs"
-          >
-            {users.map(u => (
-              <option key={u.id} value={u.id}>
-                {u.name} — [{u.role}]
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
 
       {/* --- CABECERA PRINCIPAL (NAVBAR) --- */}
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-2">
           
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => setCurrentTab("landing")}>
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-200">
-              <BookOpen size={22} className="stroke-2" />
+          <div className="flex items-center gap-2 sm:gap-3 cursor-pointer flex-shrink-0" onClick={() => setCurrentTab("landing")}>
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 flex-shrink-0">
+              <BookOpen size={20} className="stroke-2 sm:w-[22px] sm:h-[22px]" />
             </div>
             <div>
-              <h1 className="text-lg font-extrabold text-slate-900 tracking-tight flex items-center gap-1.5">
+              <h1 className="text-sm sm:text-lg font-extrabold text-slate-900 tracking-tight flex items-center gap-1">
                 Capacita<span className="text-indigo-600">Hub</span>
               </h1>
-              <p className="text-xs text-slate-500 font-medium">Departamento de Desarrollo y Formación</p>
+              <p className="text-[9px] sm:text-xs text-slate-500 font-medium">Desarrollo y Formación</p>
             </div>
           </div>
 
@@ -1219,42 +1542,57 @@ export default function App() {
             </div>
           )}
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             <button 
               onClick={() => setCurrentTab("landing")}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+              className={`flex items-center gap-1 px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all ${
                 currentTab === "landing" 
                   ? "text-indigo-600 bg-indigo-50" 
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
-              Catálogo de Eventos
+              <BookOpen size={14} className="sm:hidden" />
+              <span className="hidden sm:inline">Catálogo de Eventos</span>
+              <span className="sm:hidden">Catálogo</span>
             </button>
 
             {(currentUser.role === "Super Administrador" || currentUser.role === "Administrador / Editor") && (
               <button 
                 onClick={() => setCurrentTab("admin")}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                className={`flex items-center gap-1 px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all ${
                   currentTab === "admin" 
                     ? "text-slate-950 bg-slate-100 border border-slate-300" 
                     : "text-white bg-slate-900 hover:bg-slate-800 shadow-md shadow-slate-900/10"
                 }`}
               >
-                <Sliders size={16} />
-                <span>Panel de Control</span>
+                <Sliders size={14} />
+                <span className="hidden sm:inline">Panel de Control</span>
+                <span className="sm:hidden">Panel</span>
               </button>
             )}
 
-            <div className="flex items-center gap-2 border-l border-slate-200 pl-3">
-              <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white ${
+            <div className="flex items-center gap-2.5 border-l border-slate-200 pl-3 flex-shrink-0">
+              <div className="hidden lg:flex flex-col text-right">
+                <span className="text-xs font-semibold text-slate-800 leading-tight">{currentUser.name}</span>
+                <span className="text-[10px] text-slate-400 font-medium">{currentUser.role}</span>
+              </div>
+              <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-white flex-shrink-0 ${
                 currentUser.role === "Super Administrador" ? "bg-purple-600" :
                 currentUser.role === "Administrador / Editor" ? "bg-amber-600" :
                 "bg-slate-600"
-              }`}>
-                {currentUser.role === "Super Administrador" ? <Shield size={16} /> : 
-                 currentUser.role === "Administrador / Editor" ? <UserCheck size={16} /> : 
-                 <User size={16} />}
+              }`} title={`${currentUser.name} (${currentUser.role})`}>
+                {currentUser.role === "Super Administrador" ? <Shield size={14} className="sm:w-[16px] sm:h-[16px]" /> : 
+                 currentUser.role === "Administrador / Editor" ? <UserCheck size={14} className="sm:w-[16px] sm:h-[16px]" /> : 
+                 <User size={14} className="sm:w-[16px] sm:h-[16px]" />}
               </div>
+              <button
+                onClick={handleLogout}
+                className="px-2.5 py-1.5 bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 hover:border-rose-100 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                title="Cerrar sesión"
+              >
+                <Lock size={12} />
+                <span className="hidden sm:inline">Salir</span>
+              </button>
             </div>
           </div>
         </div>
@@ -1302,13 +1640,23 @@ export default function App() {
 
             {/* Buscador móvil */}
             <div className="md:hidden">
-              <input
-                type="text"
-                placeholder="Buscar talleres, webinars..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white text-sm text-slate-800 pl-4 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-600 transition-all placeholder:text-slate-400"
-              />
+              <div className="relative w-full">
+                <input
+                  type="text"
+                  placeholder="Buscar talleres, webinars..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-white text-sm text-slate-800 pl-10 pr-10 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-600 transition-all placeholder:text-slate-400 shadow-xs"
+                />
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                </span>
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery("")} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-semibold">
+                    Limpiar
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Filtros por Categoría */}
@@ -1409,9 +1757,15 @@ export default function App() {
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/30 to-transparent"></div>
                           
-                          <div className="absolute top-4 left-4">
+                          <div className="absolute top-4 left-4 flex gap-2">
                             <span className="bg-white/95 text-slate-800 text-xs font-bold px-3 py-1 rounded-full shadow-xs">
                               {evt.category}
+                            </span>
+                            <span className={`text-white text-xs font-bold px-3 py-1 rounded-full shadow-xs ${
+                              evt.modality === "Virtual" ? "bg-cyan-600/90" :
+                              evt.modality === "Híbrido" ? "bg-amber-600/90" : "bg-emerald-600/90"
+                            }`}>
+                              {evt.modality || "Presencial"}
                             </span>
                           </div>
 
@@ -1433,10 +1787,15 @@ export default function App() {
                             </p>
                           </div>
 
-                          <div className="pt-3 border-t border-slate-100 space-y-3">
-                            <div className="flex items-center gap-2 text-xs text-slate-600">
+                          <div className="pt-3 border-t border-slate-100 space-y-2.5">
+                            <div className="flex items-center gap-2 text-xs text-slate-650">
                               <User size={13} className="text-slate-400" />
-                              <span className="font-semibold">{evt.instructor}</span>
+                              <span className="font-semibold text-slate-700">{evt.instructor}</span>
+                            </div>
+
+                            <div className="flex items-center gap-2 text-xs text-slate-500">
+                              <MapPin size={13} className="text-slate-400 flex-shrink-0" />
+                              <span className="truncate">{evt.location || "Instalaciones"}</span>
                             </div>
 
                             <div className="space-y-1">
@@ -1523,7 +1882,7 @@ export default function App() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
                       <div className="flex justify-between items-center">
                         <label className="text-xs font-bold text-slate-700 block">Facilitador</label>
@@ -1548,6 +1907,38 @@ export default function App() {
                           <option key={cat} value={cat}>{cat}</option>
                         ))}
                       </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-slate-700 block">Modalidad *</label>
+                      <select 
+                        value={formModality}
+                        onChange={(e) => setFormModality(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-200 text-sm text-slate-800 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:outline-none transition-all cursor-pointer"
+                      >
+                        <option value="Presencial">Presencial</option>
+                        <option value="Virtual">Virtual</option>
+                        <option value="Híbrido">Híbrido</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex justify-between items-center">
+                        <label className="text-xs font-bold text-slate-700 block">Lugar / Enlace</label>
+                        <span className="text-[10px] text-slate-400 font-medium">Opcional</span>
+                      </div>
+                      <input 
+                        type="text" 
+                        placeholder={
+                          formModality === "Virtual" ? "Ej. Enlace de Teams / Zoom" :
+                          formModality === "Híbrido" ? "Ej. Sala 102 y Enlace de Teams" :
+                          "Ej. Sala de Juntas B (Piso 3)"
+                        }
+                        value={formLocation}
+                        onChange={(e) => setFormLocation(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-200 focus:bg-white text-sm text-slate-800 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:outline-none transition-all"
+                      />
                     </div>
                   </div>
 
@@ -1579,10 +1970,24 @@ export default function App() {
                     />
                   </div>
 
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center">
+                      <label className="text-xs font-bold text-slate-700 block">Enlace de la Encuesta / Evaluación del Evento</label>
+                      <span className="text-[10px] text-slate-400 font-medium">Opcional</span>
+                    </div>
+                    <input 
+                      type="url" 
+                      placeholder="Ej. https://forms.office.com/r/codigoencuesta"
+                      value={formSurveyUrl}
+                      onChange={(e) => setFormSurveyUrl(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 focus:bg-white text-sm text-slate-800 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:outline-none transition-all"
+                    />
+                  </div>
+
                   <div className="border border-slate-200 rounded-xl p-4 bg-slate-50 space-y-3">
                     <h5 className="text-xs font-bold text-slate-800 uppercase tracking-wide">Planificador de Fechas y Cupos</h5>
                     
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                       <div className="space-y-1">
                         <label className="text-[10px] font-bold text-slate-500 block">Día</label>
                         <input 
@@ -1597,7 +2002,7 @@ export default function App() {
                         <select
                           value={tempTime}
                           onChange={(e) => setTempTime(e.target.value)}
-                          className="w-full bg-white border border-slate-200 text-xs text-slate-800 p-1.5 rounded focus:ring-1 focus:ring-indigo-500"
+                          className="w-full bg-white border border-slate-200 text-xs text-slate-800 p-1.5 rounded focus:ring-1 focus:ring-indigo-500 cursor-pointer"
                         >
                           <option value="08:00 AM">08:00 AM</option>
                           <option value="09:00 AM">09:00 AM</option>
@@ -1690,7 +2095,101 @@ export default function App() {
                     Eventos Activos en el Catálogo ({events.length})
                   </h4>
 
-                  <div className="overflow-x-auto">
+                  {/* Vista Mobile (Tarjetas) */}
+                  <div className="block md:hidden space-y-4">
+                    {events.length === 0 ? (
+                      <p className="text-xs text-slate-400 italic text-center py-4">No hay eventos activos en el catálogo.</p>
+                    ) : (
+                      events.map(evt => {
+                        let totalCapacity = 0;
+                        let totalRegistered = 0;
+                        evt.schedule.forEach(sch => {
+                          sch.slots.forEach(slot => {
+                            totalCapacity += slot.capacity;
+                            totalRegistered += slot.registered;
+                          });
+                        });
+
+                        return (
+                          <div 
+                            key={evt.id} 
+                            className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-4 hover:border-indigo-300 transition-all duration-200 animate-fadeIn"
+                          >
+                            <div className="space-y-1">
+                              <span className="inline-block bg-indigo-100 text-indigo-800 text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                                {evt.category}
+                              </span>
+                              <h5 className="text-sm font-bold text-slate-900 leading-snug">{evt.title}</h5>
+                              <p className="text-xs text-slate-500">Facilitador: <span className="font-semibold text-slate-700">{evt.instructor}</span></p>
+                              <p className="text-[11px] text-slate-500 mt-0.5">
+                                Modalidad: <span className="font-semibold text-slate-650">{evt.modality || "Presencial"}</span> • Lugar: <span className="text-slate-650 truncate inline-block max-w-[160px] align-bottom">{evt.location || "Instalaciones"}</span>
+                              </p>
+                            </div>
+
+                            <div className="flex items-center justify-between text-xs border-t border-b border-slate-150 py-2.5">
+                              <div>
+                                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Matrícula</span>
+                                <span className="font-semibold text-slate-800">{totalRegistered} / {totalCapacity} inscritos</span>
+                              </div>
+                              <div className="text-right">
+                                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Fechas</span>
+                                <span className="font-semibold text-slate-800">{evt.schedule.length} {evt.schedule.length === 1 ? 'Día' : 'Días'}</span>
+                              </div>
+                            </div>
+
+                            <div className="flex flex-wrap gap-2 pt-1">
+                              <button
+                                onClick={() => setAttendeesModalEvent(evt)}
+                                className="flex-1 min-w-[70px] flex items-center justify-center gap-1 py-2 px-2.5 bg-white hover:bg-indigo-50 hover:text-indigo-600 rounded-xl text-xs font-bold text-slate-700 transition-all border border-slate-200 hover:border-indigo-150 cursor-pointer"
+                              >
+                                <Users size={13} />
+                                <span>Inscritos</span>
+                              </button>
+
+                              <button
+                                onClick={() => setNotificationModalEvent(evt)}
+                                className="flex-1 min-w-[70px] flex items-center justify-center gap-1 py-2 px-2.5 bg-white hover:bg-indigo-50 hover:text-indigo-600 rounded-xl text-xs font-bold text-slate-700 transition-all border border-slate-200 hover:border-indigo-150 cursor-pointer"
+                              >
+                                <Bell size={13} />
+                                <span>Alertas</span>
+                              </button>
+
+                              <button
+                                onClick={() => {
+                                  setQrModalEvent(evt);
+                                  setQrSelectedDate(evt.schedule[0]?.date || null);
+                                  setQrSelectedSlot(evt.schedule[0]?.slots[0]?.time || null);
+                                }}
+                                className="flex-1 min-w-[70px] flex items-center justify-center gap-1 py-2 px-2.5 bg-white hover:bg-emerald-50 hover:text-emerald-600 rounded-xl text-xs font-bold text-slate-700 transition-all border border-slate-200 hover:border-emerald-150 cursor-pointer"
+                              >
+                                <QrCode size={13} />
+                                <span>QR</span>
+                              </button>
+
+                              <button
+                                onClick={() => startEditEvent(evt)}
+                                className="p-2 bg-white hover:bg-amber-50 hover:text-amber-600 rounded-xl text-slate-700 transition-all border border-slate-200 hover:border-amber-150 flex items-center justify-center cursor-pointer"
+                                title="Editar"
+                              >
+                                <Edit3 size={13} />
+                              </button>
+
+                              <button
+                                onClick={() => setDeleteConfirmationEvent(evt)}
+                                className="p-2 bg-white hover:bg-rose-50 hover:text-rose-600 rounded-xl text-slate-700 transition-all border border-slate-200 hover:border-rose-150 flex items-center justify-center cursor-pointer"
+                                title="Eliminar"
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+
+                  {/* Vista Desktop (Tabla) */}
+                  <div className="hidden md:block overflow-x-auto">
                     <table className="w-full text-left text-xs text-slate-600">
                       <thead className="bg-slate-50 uppercase text-slate-400 font-bold border-b border-slate-100">
                         <tr>
@@ -1714,14 +2213,16 @@ export default function App() {
                             <tr key={evt.id} className="hover:bg-slate-50/50 transition-all">
                               <td className="px-4 py-3 max-w-xs">
                                 <div className="font-bold text-slate-900 line-clamp-1">{evt.title}</div>
-                                <div className="text-slate-400 mt-0.5">{evt.instructor} • <span className="italic">{evt.category}</span></div>
+                                <div className="text-slate-400 mt-0.5">
+                                  {evt.instructor} • <span className="italic">{evt.category}</span> • <span className="font-medium text-slate-500">{evt.modality || "Presencial"}</span> <span className="text-slate-350">({evt.location || "Instalaciones"})</span>
+                                </div>
                               </td>
                               <td className="px-4 py-3">
                                 <div className="font-semibold text-slate-700">{totalRegistered} / {totalCapacity}</div>
                                 <div className="text-[10px] text-slate-400 mt-0.5">{evt.schedule.length} días programados</div>
                               </td>
                               <td className="px-4 py-3 text-right">
-                                <div className="flex justify-end gap-1.5">
+                                <div className="flex justify-end gap-1.5 flex-wrap">
                                   
                                   {/* Botón Ver Inscritos & Descargar CSV */}
                                   <button
@@ -1918,11 +2419,11 @@ export default function App() {
                         {showAddUserForm ? "Cerrar Formulario" : "+ Añadir Usuario"}
                       </button>
                     </div>
-                    <p className="text-xs text-slate-500">Como Super Administrador, puedes designar roles, añadir nuevos colaboradores y coordinar los accesos de simulación.</p>
+                    <p className="text-xs text-slate-500">Como Super Administrador, puedes designar roles, añadir nuevos colaboradores y coordinar los accesos del sistema.</p>
 
                     {showAddUserForm && (
                       <form onSubmit={handleAddUser} className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 animate-fadeIn">
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                           <div className="space-y-1">
                             <label className="text-[10px] font-bold text-slate-500 block">Nombre Completo</label>
                             <input
@@ -1942,6 +2443,16 @@ export default function App() {
                               value={newUserEmail}
                               onChange={(e) => setNewUserEmail(e.target.value)}
                               placeholder="Ej. ana.gomez@empresa.com"
+                              className="w-full bg-white border border-slate-200 text-xs px-2.5 py-1.5 rounded focus:ring-1 focus:ring-purple-500 focus:outline-none"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-bold text-slate-500 block">Contraseña</label>
+                            <input
+                              type="text"
+                              value={newUserPassword}
+                              onChange={(e) => setNewUserPassword(e.target.value)}
+                              placeholder="123456 (Defecto)"
                               className="w-full bg-white border border-slate-200 text-xs px-2.5 py-1.5 rounded focus:ring-1 focus:ring-purple-500 focus:outline-none"
                             />
                           </div>
@@ -2021,7 +2532,7 @@ export default function App() {
                     <div className="space-y-1">
                       <h5 className="text-xs font-bold text-amber-900">Módulo de Roles Protegido</h5>
                       <p className="text-[11px] text-amber-700 leading-relaxed">
-                        Solo los usuarios con el rol de <strong>Super Administrador</strong> pueden cambiar los niveles de privilegios. Simula ser Sofia Martínez desde la barra superior de desarrollo para probar esta función.
+                        Solo los usuarios con el rol de <strong>Super Administrador</strong> pueden cambiar los niveles de privilegios.
                       </p>
                     </div>
                   </div>
@@ -2193,13 +2704,45 @@ export default function App() {
                     </p>
                     <p className="text-xs text-emerald-600 mt-1">Tarjeta: {attendanceVerified?.card} • {attendanceVerified?.email}</p>
                   </div>
+
+                  {(() => {
+                    const surveyUrl = attEvent?.surveyUrl || attEvent?.survey_url;
+                    if (surveyUrl) {
+                      return (
+                        <div className="bg-indigo-50 border border-indigo-150 rounded-2xl p-4 mt-2 text-left animate-fadeIn space-y-2.5 mx-auto max-w-sm">
+                          <div className="flex items-center gap-2">
+                            <span className="p-1 bg-indigo-100 text-indigo-700 rounded-md">
+                              <FileSpreadsheet size={14} />
+                            </span>
+                            <p className="text-xs text-indigo-950 font-bold leading-tight">
+                              ¿Tienes 1 minuto? Evalúa el evento
+                            </p>
+                          </div>
+                          <p className="text-[11px] text-indigo-750 leading-normal">
+                            Tu opinión es de gran valor para ayudarnos a mejorar continuamente nuestras capacitaciones.
+                          </p>
+                          <a
+                            href={surveyUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full py-2 px-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all inline-flex items-center justify-center gap-1.5 shadow-sm shadow-indigo-600/10 cursor-pointer"
+                          >
+                            Completar Encuesta / Evaluación
+                            <ArrowRight size={12} className="stroke-[2.5]" />
+                          </a>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+
                   <button
                     onClick={() => {
                       setAttendanceResult(null);
                       setAttendanceCardInput("");
                       setAttendanceVerified(null);
                     }}
-                    className="mt-4 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold transition-all shadow-lg"
+                    className="mt-4 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold transition-all shadow-lg cursor-pointer"
                   >
                     Registrar otro colaborador
                   </button>
@@ -2213,13 +2756,45 @@ export default function App() {
                   <p className="text-sm text-slate-600 max-w-sm mx-auto">
                     {attendanceVerified?.name}, tu asistencia ya fue confirmada previamente para este horario.
                   </p>
+
+                  {(() => {
+                    const surveyUrl = attEvent?.surveyUrl || attEvent?.survey_url;
+                    if (surveyUrl) {
+                      return (
+                        <div className="bg-indigo-50 border border-indigo-150 rounded-2xl p-4 mt-2 text-left animate-fadeIn space-y-2.5 mx-auto max-w-sm">
+                          <div className="flex items-center gap-2">
+                            <span className="p-1 bg-indigo-100 text-indigo-700 rounded-md">
+                              <FileSpreadsheet size={14} />
+                            </span>
+                            <p className="text-xs text-indigo-950 font-bold leading-tight">
+                              ¿Tienes 1 minuto? Evalúa el evento
+                            </p>
+                          </div>
+                          <p className="text-[11px] text-indigo-750 leading-normal">
+                            Tu opinión es de gran valor para ayudarnos a mejorar continuamente nuestras capacitaciones.
+                          </p>
+                          <a
+                            href={surveyUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full py-2 px-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all inline-flex items-center justify-center gap-1.5 shadow-sm shadow-indigo-600/10 cursor-pointer"
+                          >
+                            Completar Encuesta / Evaluación
+                            <ArrowRight size={12} className="stroke-[2.5]" />
+                          </a>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+
                   <button
                     onClick={() => {
                       setAttendanceResult(null);
                       setAttendanceCardInput("");
                       setAttendanceVerified(null);
                     }}
-                    className="mt-4 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold transition-all shadow-lg"
+                    className="mt-4 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold transition-all shadow-lg cursor-pointer"
                   >
                     Registrar otro colaborador
                   </button>
@@ -2286,239 +2861,243 @@ export default function App() {
       {/* SECCIÓN DEL INTERACTIVE MODAL (CON CALENDARIO Y SLOTS)     */}
       {/* ========================================================= */}
       {selectedEventForModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full overflow-hidden border border-slate-200 flex flex-col md:flex-row transform scale-100 transition-all duration-300">
-            
-            <div className="md:w-5/12 bg-slate-950 text-white relative min-h-[250px] md:min-h-0 flex flex-col justify-between p-6">
-              <div className="absolute inset-0 z-0">
-                <img 
-                  src={selectedEventForModal.imageUrl} 
-                  alt={selectedEventForModal.title}
-                  className="w-full h-full object-cover opacity-35"
-                  onError={(e) => {
-                    if (e.currentTarget.src !== FALLBACK_IMAGE) {
-                      e.currentTarget.src = FALLBACK_IMAGE;
-                    }
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-950/40"></div>
-              </div>
-
-              <div className="relative z-10 space-y-3">
-                <span className="bg-indigo-600/90 text-white text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full">
-                  {selectedEventForModal.category}
-                </span>
-                <h3 className="text-xl sm:text-2xl font-black tracking-tight">{selectedEventForModal.title}</h3>
-              </div>
-
-              <div className="relative z-10 space-y-4 pt-6">
-                <p className="text-xs text-slate-300 leading-relaxed font-light">
-                  {selectedEventForModal.description}
-                </p>
-
-                <div className="pt-4 border-t border-white/10 space-y-2">
-                  <div className="flex items-center gap-2.5 text-xs text-slate-200">
-                    <User size={14} className="text-indigo-400" />
-                    <span>Facilitador: <strong>{selectedEventForModal.instructor}</strong></span>
-                  </div>
-                  <div className="flex items-center gap-2.5 text-xs text-slate-200">
-                    <Check size={14} className="text-indigo-400" />
-                    <span>Modalidad: Presencial / Online Híbrido</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="md:w-7/12 p-6 sm:p-8 space-y-6 flex flex-col justify-between">
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs overflow-y-auto animate-fadeIn">
+          <div className="flex min-h-full items-start justify-center p-4 text-center md:items-center">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full overflow-hidden border border-slate-200 flex flex-col md:flex-row transform scale-100 transition-all duration-300 my-auto text-left">
               
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <h4 className="text-sm font-bold text-slate-900">Agenda tus Fechas y Horas</h4>
-                    <p className="text-[11px] text-slate-400">Selecciona uno de los días marcados en azul para ver los cupos</p>
-                  </div>
-                  <button 
-                    onClick={() => {
-                      setSelectedEventForModal(null);
-                      setSelectedDateInModal(null);
-                      setSelectedSlotInModal(null);
+              <div className="md:w-5/12 bg-slate-950 text-white relative min-h-[250px] md:min-h-0 flex flex-col justify-between p-6">
+                <div className="absolute inset-0 z-0">
+                  <img 
+                    src={selectedEventForModal.imageUrl} 
+                    alt={selectedEventForModal.title}
+                    className="w-full h-full object-cover opacity-35"
+                    onError={(e) => {
+                      if (e.currentTarget.src !== FALLBACK_IMAGE) {
+                        e.currentTarget.src = FALLBACK_IMAGE;
+                      }
                     }}
-                    className="p-1.5 hover:bg-slate-100 rounded-full transition-colors text-slate-400 hover:text-slate-900 cursor-pointer"
-                  >
-                    <X size={18} />
-                  </button>
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-950/40"></div>
                 </div>
 
-                <div className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                  <div className="flex justify-between items-center px-1">
-                    <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Julio 2026</span>
-                    <div className="flex gap-1">
-                      <button className="p-1 rounded hover:bg-slate-200 text-slate-400 cursor-not-allowed" disabled>
-                        <ChevronLeft size={14} />
-                      </button>
-                      <button className="p-1 rounded hover:bg-slate-200 text-slate-400 cursor-not-allowed" disabled>
-                        <ChevronRight size={14} />
-                      </button>
+                <div className="relative z-10 space-y-3">
+                  <span className="bg-indigo-600/90 text-white text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full">
+                    {selectedEventForModal.category}
+                  </span>
+                  <h3 className="text-xl sm:text-2xl font-black tracking-tight">{selectedEventForModal.title}</h3>
+                </div>
+
+                <div className="relative z-10 space-y-4 pt-6">
+                  <p className="text-xs text-slate-300 leading-relaxed font-light">
+                    {selectedEventForModal.description}
+                  </p>
+
+                  <div className="pt-4 border-t border-white/10 space-y-2">
+                    <div className="flex items-center gap-2.5 text-xs text-slate-200">
+                      <User size={14} className="text-indigo-400 flex-shrink-0" />
+                      <span>Facilitador: <strong>{selectedEventForModal.instructor}</strong></span>
+                    </div>
+                    <div className="flex items-center gap-2.5 text-xs text-slate-200">
+                      <Sliders size={14} className="text-indigo-400 flex-shrink-0" />
+                      <span>Modalidad: <strong>{selectedEventForModal.modality || "Presencial"}</strong></span>
+                    </div>
+                    <div className="flex items-center gap-2.5 text-xs text-slate-200">
+                      <MapPin size={14} className="text-indigo-400 flex-shrink-0" />
+                      <span>Lugar: <strong>{selectedEventForModal.location || (selectedEventForModal.modality === "Virtual" ? "Enlace Virtual" : "Instalaciones")}</strong></span>
                     </div>
                   </div>
-
-                  <div className="grid grid-cols-7 text-center text-[10px] font-bold text-slate-400">
-                    <span>DOM</span>
-                    <span>LUN</span>
-                    <span>MAR</span>
-                    <span>MIÉ</span>
-                    <span>JUE</span>
-                    <span>VIE</span>
-                    <span>SÁB</span>
-                  </div>
-
-                  <div className="grid grid-cols-7 gap-1.5">
-                    {julyDays.map((dayObj, idx) => {
-                      if (!dayObj.day) {
-                        return <div key={`empty-${idx}`} className="h-8"></div>;
-                      }
-
-                      const scheduleForDay = selectedEventForModal.schedule.find(s => s.date === dayObj.dateString);
-                      const isEventActiveThisDay = !!scheduleForDay;
-                      const isSelected = selectedDateInModal === dayObj.dateString;
-
-                      return (
-                        <button
-                          key={`day-${dayObj.day}`}
-                          disabled={!isEventActiveThisDay}
-                          onClick={() => {
-                            setSelectedDateInModal(dayObj.dateString);
-                            setSelectedSlotInModal(null); 
-                          }}
-                          className={`h-8 w-full text-xs font-bold rounded-lg transition-all flex items-center justify-center relative cursor-pointer ${
-                            !isEventActiveThisDay 
-                              ? "text-slate-300 hover:bg-transparent cursor-not-allowed" 
-                              : isSelected 
-                                ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20" 
-                                : "bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200"
-                          }`}
-                        >
-                          {dayObj.day}
-                          {isEventActiveThisDay && !isSelected && (
-                            <span className="absolute bottom-1 w-1 h-1 rounded-full bg-indigo-600"></span>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
                 </div>
+              </div>
 
-                {selectedDateInModal ? (
-                  <div className="space-y-2">
-                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wide block">
-                      Horarios para el {selectedDateInModal}:
-                    </span>
+              <div className="md:w-7/12 p-6 sm:p-8 space-y-6 flex flex-col justify-between">
+                
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <h4 className="text-sm font-bold text-slate-900">Agenda tus Fechas y Horas</h4>
+                      <p className="text-[11px] text-slate-400">Selecciona uno de los días marcados en azul para ver los cupos</p>
+                    </div>
+                    <button 
+                      onClick={() => {
+                        setSelectedEventForModal(null);
+                        setSelectedDateInModal(null);
+                        setSelectedSlotInModal(null);
+                      }}
+                      className="p-1.5 hover:bg-slate-100 rounded-full transition-colors text-slate-400 hover:text-slate-950 cursor-pointer"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {selectedEventForModal.schedule.find(s => s.date === selectedDateInModal)?.slots.map((slot, sIdx) => {
-                        const isSlotSelected = selectedSlotInModal && selectedSlotInModal.time === slot.time;
-                        const isFull = slot.registered >= slot.capacity;
+                  <div className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                    <div className="flex justify-between items-center px-1">
+                      <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Julio 2026</span>
+                      <div className="flex gap-1">
+                        <button className="p-1 rounded hover:bg-slate-200 text-slate-400 cursor-not-allowed" disabled>
+                          <ChevronLeft size={14} />
+                        </button>
+                        <button className="p-1 rounded hover:bg-slate-200 text-slate-400 cursor-not-allowed" disabled>
+                          <ChevronRight size={14} />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-7 text-center text-[10px] font-bold text-slate-400">
+                      <span>DOM</span>
+                      <span>LUN</span>
+                      <span>MAR</span>
+                      <span>MIÉ</span>
+                      <span>JUE</span>
+                      <span>VIE</span>
+                      <span>SÁB</span>
+                    </div>
+
+                    <div className="grid grid-cols-7 gap-1.5">
+                      {julyDays.map((dayObj, idx) => {
+                        if (!dayObj.day) {
+                          return <div key={`empty-${idx}`} className="h-8"></div>;
+                        }
+
+                        const scheduleForDay = selectedEventForModal.schedule.find(s => s.date === dayObj.dateString);
+                        const isEventActiveThisDay = !!scheduleForDay;
+                        const isSelected = selectedDateInModal === dayObj.dateString;
 
                         return (
                           <button
-                            key={sIdx}
-                            disabled={isFull}
-                            onClick={() => setSelectedSlotInModal(slot)}
-                            className={`p-3 rounded-xl border text-xs text-left transition-all flex justify-between items-center cursor-pointer ${
-                              isFull 
-                                ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed" 
-                                : isSlotSelected 
-                                  ? "bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-600/15" 
-                                  : "bg-white hover:bg-slate-50 border-slate-200 text-slate-800"
+                            key={`day-${dayObj.day}`}
+                            disabled={!isEventActiveThisDay}
+                            onClick={() => {
+                              setSelectedDateInModal(dayObj.dateString);
+                              setSelectedSlotInModal(null); 
+                            }}
+                            className={`h-8 w-full text-xs font-bold rounded-lg transition-all flex items-center justify-center relative cursor-pointer ${
+                              !isEventActiveThisDay 
+                                ? "text-slate-300 hover:bg-transparent cursor-not-allowed" 
+                                : isSelected 
+                                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20" 
+                                  : "bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200"
                             }`}
                           >
-                            <div className="space-y-0.5">
-                              <span className="font-bold flex items-center gap-1">
-                                <Clock size={12} />
-                                {slot.time}
-                              </span>
-                              <span className={isSlotSelected ? "text-indigo-100 text-[10px]" : "text-slate-400 text-[10px]"}>
-                                {isFull ? "Cupo lleno" : `${slot.capacity - slot.registered} cupos de {slot.capacity} libres`}
-                              </span>
-                            </div>
-                            {isSlotSelected && <Check size={14} />}
+                            {dayObj.day}
+                            {isEventActiveThisDay && !isSelected && (
+                              <span className="absolute bottom-1 w-1 h-1 rounded-full bg-indigo-600"></span>
+                            )}
                           </button>
                         );
-                      }) || <p className="text-xs text-rose-500 font-bold">No hay horarios programados para esta fecha</p>}
+                      })}
                     </div>
                   </div>
-                ) : (
-                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center text-xs text-slate-400 italic">
-                    Selecciona una de las fechas resaltadas del calendario para ver la lista de horas
-                  </div>
-                )}
 
-              </div>
+                  {selectedDateInModal ? (
+                    <div className="space-y-2">
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wide block">
+                        Horarios para el {selectedDateInModal}:
+                      </span>
 
-              {selectedSlotInModal ? (
-                <form onSubmit={handleRegisterToEvent} className="border-t border-slate-100 pt-5 space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <label className="text-xs font-bold text-slate-700 block">Número de Tarjeta de Colaborador (4 a 6 dígitos)</label>
-                      <span className="text-[10px] text-slate-400 font-medium">Validación en padrón</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {selectedEventForModal.schedule.find(s => s.date === selectedDateInModal)?.slots.map((slot, sIdx) => {
+                          const isSlotSelected = selectedSlotInModal && selectedSlotInModal.time === slot.time;
+                          const isFull = slot.registered >= slot.capacity;
+
+                          return (
+                            <button
+                              key={sIdx}
+                              disabled={isFull}
+                              onClick={() => setSelectedSlotInModal(slot)}
+                              className={`p-3 rounded-xl border text-xs text-left transition-all flex justify-between items-center cursor-pointer ${
+                                isFull 
+                                  ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed" 
+                                  : isSlotSelected 
+                                    ? "bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-600/15" 
+                                    : "bg-white hover:bg-slate-50 border-slate-200 text-slate-800"
+                              }`}
+                            >
+                              <div className="space-y-0.5">
+                                <span className="font-bold flex items-center gap-1">
+                                  <Clock size={12} />
+                                  {slot.time}
+                                </span>
+                                <span className={isSlotSelected ? "text-indigo-100 text-[10px]" : "text-slate-400 text-[10px]"}>
+                                  {isFull ? "Cupo lleno" : `${slot.capacity - slot.registered} de ${slot.capacity} libres`}
+                                </span>
+                              </div>
+                              {isSlotSelected && <Check size={14} />}
+                            </button>
+                          );
+                        }) || <p className="text-xs text-rose-500 font-bold">No hay horarios programados para esta fecha</p>}
+                      </div>
                     </div>
-                    <div className="flex gap-2">
-                      <input 
-                        type="text"
-                        maxLength={6}
-                        placeholder="Ej. 2010 o 2012"
-                        value={userCardInput}
-                        onChange={(e) => setUserCardInput(e.target.value.replace(/\D/g, ''))}
-                        className="flex-1 bg-slate-50 border border-slate-200 focus:bg-white text-xs px-3.5 py-2.5 rounded-xl focus:ring-2 focus:ring-indigo-600 focus:outline-none transition-all"
-                      />
-                      <button
-                        type="submit"
-                        disabled={!verifiedParticipant}
-                        className={`text-xs font-bold px-5 py-2.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
-                          verifiedParticipant 
-                            ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-200" 
-                            : "bg-slate-200 text-slate-400 cursor-not-allowed"
-                        }`}
-                      >
-                        Inscribirme <ArrowRight size={14} />
-                      </button>
+                  ) : (
+                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center text-xs text-slate-400 italic">
+                      Selecciona una de las fechas resaltadas del calendario para ver la lista de horas
                     </div>
+                  )}
 
-                    {/* Mostrar feedback del usuario verificado */}
-                    {userCardInput.trim().length >= 4 && (
-                      <div className="animate-fadeIn">
-                        {verifiedParticipant ? (
-                          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-center justify-between">
+                </div>
+
+                {selectedSlotInModal ? (
+                  <form onSubmit={handleRegisterToEvent} className="border-t border-slate-100 pt-5 space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <label className="text-xs font-bold text-slate-700 block">Número de Tarjeta de Colaborador (4 a 6 dígitos)</label>
+                        <span className="text-[10px] text-slate-400 font-medium">Validación en padrón</span>
+                      </div>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <input 
+                          type="text"
+                          maxLength={6}
+                          placeholder="Ej. 2010 o 2012"
+                          value={userCardInput}
+                          onChange={(e) => setUserCardInput(e.target.value.replace(/\D/g, ''))}
+                          className="flex-1 bg-slate-50 border border-slate-200 focus:bg-white text-xs px-3.5 py-2.5 rounded-xl focus:ring-2 focus:ring-indigo-600 focus:outline-none transition-all"
+                        />
+                        <button
+                          type="submit"
+                          disabled={!verifiedParticipant}
+                          className={`text-xs font-bold px-5 py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                            verifiedParticipant 
+                              ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-200" 
+                              : "bg-slate-200 text-slate-400 cursor-not-allowed"
+                          }`}
+                        >
+                          Inscribirme <ArrowRight size={14} />
+                        </button>
+                      </div>
+
+                      {/* Mostrar feedback del usuario verificado */}
+                      {userCardInput.trim().length >= 4 && (
+                        verifiedParticipant ? (
+                          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-center justify-between animate-fadeIn">
                             <div className="space-y-0.5">
-                              <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">Colaborador Verificado</span>
+                              <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">Colaborador Encontrado</span>
                               <div className="text-xs font-bold text-slate-900">{verifiedParticipant.name}</div>
                               <div className="text-[10px] text-slate-500">{verifiedParticipant.email}</div>
                             </div>
-                            <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 flex-shrink-0">
                               <Check size={10} /> Válido
                             </span>
                           </div>
                         ) : (
-                          <div className="bg-rose-50 border border-rose-200 rounded-xl p-3 flex items-center justify-between">
+                          <div className="bg-rose-50 border border-rose-200 rounded-xl p-3 flex items-center justify-between animate-fadeIn">
                             <div className="space-y-0.5">
                               <span className="text-[10px] font-bold text-rose-800 uppercase tracking-wider block">No Registrado</span>
                               <div className="text-xs font-semibold text-rose-700">Tarjeta no encontrada en el padrón corporativo.</div>
                             </div>
-                            <span className="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <span className="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 flex-shrink-0">
                               <X size={10} /> Inválido
                             </span>
                           </div>
-                        )}
-                      </div>
-                    )}
+                        )
+                      )}
+                    </div>
+                  </form>
+                ) : (
+                  <div className="border-t border-slate-100 pt-5 text-center text-xs text-slate-400 italic">
+                    Selecciona una fecha y una hora para habilitar la reserva de cupos
                   </div>
-                </form>
-              ) : (
-                <div className="border-t border-slate-100 pt-5 text-center text-xs text-slate-400 italic">
-                  Selecciona una fecha y una hora para habilitar la reserva de cupos
-                </div>
-              )}
+                )}
 
+              </div>
             </div>
           </div>
         </div>
@@ -2528,133 +3107,135 @@ export default function App() {
       {/* MODAL ADM: LISTADO DE INSCRITOS Y DESCARGA CSV            */}
       {/* ========================================================= */}
       {attendeesModalEvent && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full overflow-hidden border border-slate-200 flex flex-col transform scale-100 transition-all duration-300">
-            
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-              <div className="space-y-1">
-                <span className="bg-indigo-100 text-indigo-800 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">
-                  Auditoría de Matrícula
-                </span>
-                <h3 className="text-lg font-bold text-slate-900">{attendeesModalEvent.title}</h3>
-                <p className="text-xs text-slate-500">Visualiza la lista y descarga el reporte consolidado para sistemas de nómina.</p>
-              </div>
-              <button 
-                onClick={() => setAttendeesModalEvent(null)}
-                className="p-1.5 hover:bg-slate-200 rounded-full text-slate-400 hover:text-slate-950 transition-colors cursor-pointer"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs overflow-y-auto animate-fadeIn">
+          <div className="flex min-h-full items-start justify-center p-4 text-center md:items-center">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full overflow-hidden border border-slate-200 flex flex-col transform scale-100 transition-all duration-300 my-auto text-left">
               
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <div className="space-y-0.5">
-                  <span className="text-xs font-extrabold text-slate-700 uppercase tracking-wide">
-                    Reportes del Evento
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                <div className="space-y-1">
+                  <span className="bg-indigo-100 text-indigo-800 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider flex-shrink-0">
+                    Auditoría de Matrícula
                   </span>
-                  <p className="text-[11px] text-slate-500">Descarga los consolidados en formato Excel/CSV.</p>
+                  <h3 className="text-lg font-bold text-slate-900">{attendeesModalEvent.title}</h3>
+                  <p className="text-xs text-slate-500">Visualiza la lista y descarga el reporte consolidado para sistemas de nómina.</p>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => handleDownloadAttendeesCSV(attendeesModalEvent)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer animate-fadeIn"
-                  >
-                    <Download size={13} />
-                    Descargar Inscritos
-                  </button>
-                  <button
-                    onClick={() => handleDownloadAttendanceCSV(attendeesModalEvent)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer animate-fadeIn"
-                  >
-                    <Download size={13} />
-                    Descargar Asistencia
-                  </button>
-                </div>
+                <button 
+                  onClick={() => setAttendeesModalEvent(null)}
+                  className="p-1.5 hover:bg-slate-200 rounded-full text-slate-400 hover:text-slate-950 transition-colors cursor-pointer flex-shrink-0"
+                >
+                  <X size={18} />
+                </button>
               </div>
 
-              <div className="space-y-4">
-                {attendeesModalEvent.schedule.map((sch, schIdx) => {
-                  return (
-                    <div key={schIdx} className="space-y-2 border border-slate-100 rounded-2xl p-4 bg-slate-50/50">
-                      <div className="flex items-center gap-2 text-xs font-extrabold text-slate-700">
-                        <CalendarIcon size={14} className="text-indigo-600" />
-                        <span>{sch.date}</span>
-                      </div>
+              <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
+                
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                  <div className="space-y-0.5">
+                    <span className="text-xs font-extrabold text-slate-700 uppercase tracking-wide">
+                      Reportes del Evento
+                    </span>
+                    <p className="text-[11px] text-slate-500">Descarga los consolidados en formato Excel/CSV.</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => handleDownloadAttendeesCSV(attendeesModalEvent)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer animate-fadeIn"
+                    >
+                      <Download size={13} />
+                      Descargar Inscritos
+                    </button>
+                    <button
+                      onClick={() => handleDownloadAttendanceCSV(attendeesModalEvent)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer animate-fadeIn"
+                    >
+                      <Download size={13} />
+                      Descargar Asistencia
+                    </button>
+                  </div>
+                </div>
 
-                      <div className="space-y-3 pl-4">
-                        {sch.slots.map((slot, slotIdx) => {
-                          const hasUsers = slot.attendees && slot.attendees.length > 0;
-                          
-                          return (
-                            <div key={slotIdx} className="space-y-1.5">
-                              <div className="flex justify-between items-center text-xs">
-                                <span className="font-semibold text-slate-600 bg-slate-200/60 px-2 py-0.5 rounded">
-                                  {slot.time}
-                                </span>
-                                <span className="text-slate-400 font-medium">
-                                  {slot.registered} registrados de {slot.capacity} max.
-                                </span>
+                <div className="space-y-4">
+                  {attendeesModalEvent.schedule.map((sch, schIdx) => {
+                    return (
+                      <div key={schIdx} className="space-y-2 border border-slate-100 rounded-2xl p-4 bg-slate-50/50">
+                        <div className="flex items-center gap-2 text-xs font-extrabold text-slate-700">
+                          <CalendarIcon size={14} className="text-indigo-600" />
+                          <span>{sch.date}</span>
+                        </div>
+
+                        <div className="space-y-3 pl-0 sm:pl-4">
+                          {sch.slots.map((slot, slotIdx) => {
+                            const hasUsers = slot.attendees && slot.attendees.length > 0;
+                            
+                            return (
+                              <div key={slotIdx} className="space-y-1.5">
+                                <div className="flex justify-between items-center text-xs">
+                                  <span className="font-semibold text-slate-600 bg-slate-200/60 px-2 py-0.5 rounded">
+                                    {slot.time}
+                                  </span>
+                                  <span className="text-slate-400 font-medium">
+                                    {slot.registered} registrados de {slot.capacity} max.
+                                  </span>
+                                </div>
+
+                                {hasUsers ? (
+                                  <ul className="divide-y divide-slate-100 bg-white border border-slate-100 rounded-xl overflow-hidden shadow-xs">
+                                    {slot.attendees.map((email, emailIdx) => {
+                                      const participant = participants.find(p => p.email === email);
+                                      const name = participant ? participant.name : "Usuario no registrado";
+                                      const card = participant ? participant.card : "N/A";
+                                      const hasAttended = slot.attendedList && slot.attendedList.includes(email);
+                                      
+                                      return (
+                                        <li key={emailIdx} className="px-3.5 py-2.5 text-xs text-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50/50">
+                                          <div className="flex flex-col gap-0.5">
+                                            <span className="font-semibold text-slate-900">{name}</span>
+                                            <span className="text-slate-500 text-[10px]">
+                                              Tarjeta: <span className="font-medium text-slate-700">{card}</span> • {email}
+                                            </span>
+                                          </div>
+                                          <div className="flex items-center gap-1.5 flex-wrap">
+                                            <span className="bg-blue-50 text-blue-700 text-[9px] font-extrabold px-2 py-0.5 rounded-full flex-shrink-0">
+                                              Reservado
+                                            </span>
+                                            {hasAttended ? (
+                                              <span className="bg-emerald-50 text-emerald-700 text-[9px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1 flex-shrink-0">
+                                                <Check size={10} /> Presente (QR)
+                                              </span>
+                                            ) : (
+                                              <span className="bg-slate-100 text-slate-500 text-[9px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1 flex-shrink-0">
+                                                Ausente / Pendiente
+                                              </span>
+                                            )}
+                                          </div>
+                                        </li>
+                                      );
+                                    })}
+                                  </ul>
+                                ) : (
+                                  <p className="text-[11px] text-slate-400 italic pl-2">No hay colaboradores inscritos en este horario.</p>
+                                )}
                               </div>
-
-                              {hasUsers ? (
-                                <ul className="divide-y divide-slate-100 bg-white border border-slate-100 rounded-xl overflow-hidden shadow-xs">
-                                  {slot.attendees.map((email, emailIdx) => {
-                                    const participant = participants.find(p => p.email === email);
-                                    const name = participant ? participant.name : "Usuario no registrado";
-                                    const card = participant ? participant.card : "N/A";
-                                    const hasAttended = slot.attendedList && slot.attendedList.includes(email);
-                                    
-                                    return (
-                                      <li key={emailIdx} className="px-3.5 py-2 text-xs text-slate-700 flex items-center justify-between hover:bg-slate-50/50">
-                                        <div className="flex flex-col gap-0.5">
-                                          <span className="font-semibold text-slate-900">{name}</span>
-                                          <span className="text-slate-500 text-[10px]">
-                                            Tarjeta: <span className="font-medium text-slate-700">{card}</span> • {email}
-                                          </span>
-                                        </div>
-                                        <div className="flex items-center gap-1.5">
-                                          <span className="bg-blue-50 text-blue-700 text-[9px] font-extrabold px-2 py-0.5 rounded-full">
-                                            Reservado
-                                          </span>
-                                          {hasAttended ? (
-                                            <span className="bg-emerald-50 text-emerald-700 text-[9px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1">
-                                              <Check size={10} /> Presente (QR)
-                                            </span>
-                                          ) : (
-                                            <span className="bg-slate-100 text-slate-500 text-[9px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
-                                              Ausente / Pendiente
-                                            </span>
-                                          )}
-                                        </div>
-                                      </li>
-                                    );
-                                  })}
-                                </ul>
-                              ) : (
-                                <p className="text-[11px] text-slate-400 italic pl-2">No hay colaboradores inscritos en este horario.</p>
-                              )}
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
+
+              </div>
+
+              <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+                <button
+                  onClick={() => setAttendeesModalEvent(null)}
+                  className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                >
+                  Cerrar Ventana
+                </button>
               </div>
 
             </div>
-
-            <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-end">
-              <button
-                onClick={() => setAttendeesModalEvent(null)}
-                className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-xl transition-all cursor-pointer"
-              >
-                Cerrar Ventana
-              </button>
-            </div>
-
           </div>
         </div>
       )}
@@ -2663,8 +3244,9 @@ export default function App() {
       {/* MODAL ADM: GESTIÓN DE NOTIFICACIONES CORREO & TEAMS       */}
       {/* ========================================================= */}
       {notificationModalEvent && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full overflow-hidden border border-slate-200 flex flex-col transform scale-100 transition-all duration-300">
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs overflow-y-auto animate-fadeIn">
+          <div className="flex min-h-full items-start justify-center p-4 text-center md:items-center">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full overflow-hidden border border-slate-200 flex flex-col transform scale-100 transition-all duration-300 my-auto text-left">
             
             <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
               <div className="space-y-1">
@@ -2739,7 +3321,7 @@ export default function App() {
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <label className="text-xs font-bold text-slate-700 block">Mensaje Personalizado del Recordatorio</label>
-                  <span className="text-[10px] text-slate-400">Variables: [EVENT_TITLE], [INSTRUCTOR]</span>
+                  <span className="text-[10px] text-slate-400">Variables: [EVENT_TITLE], [INSTRUCTOR], [SURVEY_LINK]</span>
                 </div>
                 <textarea
                   rows={3}
@@ -2749,7 +3331,7 @@ export default function App() {
                   className="w-full bg-slate-50 border border-slate-200 focus:bg-white text-xs p-3 rounded-xl focus:ring-2 focus:ring-indigo-600 focus:outline-none transition-all resize-none"
                 />
               </div>
-
+ 
               <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
                 <div className="flex items-center gap-2">
                   <Info size={14} className="text-indigo-600" />
@@ -2764,7 +3346,7 @@ export default function App() {
                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white text-xs font-semibold rounded-xl flex items-center gap-2 transition-all cursor-pointer"
                   >
                     <Mail size={12} />
-                    {sendingNotificationState ? "Enviando..." : "Enviar Prueba por Email"}
+                    {sendingNotificationState ? "Enviando..." : "Enviar Recordatorio por Email"}
                   </button>
                   <button
                     onClick={() => handleSendMockNotification(notificationModalEvent, "Teams")}
@@ -2772,9 +3354,57 @@ export default function App() {
                     className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white text-xs font-semibold rounded-xl flex items-center gap-2 transition-all cursor-pointer"
                   >
                     <Send size={12} />
-                    {sendingNotificationState ? "Enviando..." : "Enviar Prueba por Teams"}
+                    {sendingNotificationState ? "Enviando..." : "Enviar Recordatorio por Teams"}
                   </button>
                 </div>
+              </div>
+
+              {/* Sección de Encuesta / Evaluación */}
+              <div className="border border-indigo-150 rounded-2xl p-4 bg-indigo-50/40 space-y-3 animate-fadeIn">
+                <div className="flex items-center gap-2 text-indigo-950">
+                  <FileSpreadsheet size={16} className="text-indigo-650 flex-shrink-0" />
+                  <span className="text-xs font-bold text-slate-700">Encuesta y Evaluación del Evento</span>
+                </div>
+                
+                {(() => {
+                  const eventSurvey = notificationModalEvent.surveyUrl || notificationModalEvent.survey_url;
+                  if (eventSurvey) {
+                    return (
+                      <div className="space-y-2">
+                        <p className="text-[11px] text-slate-500 leading-normal">
+                          Envía el enlace de evaluación a los asistentes confirmados para recopilar feedback sobre el evento.
+                        </p>
+                        <div className="bg-white border border-slate-200 p-2.5 rounded-xl text-[10px] font-mono truncate text-slate-600">
+                          Enlace: <a href={eventSurvey} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">{eventSurvey}</a>
+                        </div>
+                        <div className="flex flex-wrap gap-2 pt-1">
+                          <button
+                            onClick={() => handleSendSurveyNotification(notificationModalEvent, "Email")}
+                            disabled={sendingNotificationState}
+                            className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-300 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                          >
+                            <Mail size={12} />
+                            Enviar Encuesta por Email
+                          </button>
+                          <button
+                            onClick={() => handleSendSurveyNotification(notificationModalEvent, "Teams")}
+                            disabled={sendingNotificationState}
+                            className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                          >
+                            <Send size={12} />
+                            Enviar Encuesta por Teams
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <p className="text-[11px] text-slate-500 italic">
+                        No se ha configurado un enlace de encuesta para este evento. Edita el evento en el panel de control para añadirlo.
+                      </p>
+                    );
+                  }
+                })()}
               </div>
 
               <div className="space-y-3">
@@ -2822,38 +3452,41 @@ export default function App() {
 
           </div>
         </div>
+      </div>
       )}
 
       {/* ========================================================= */}
       {/* MODAL ADM: CONFIRMACIÓN SEGUNDA ELIMINACIÓN EVENTOS        */}
       {/* ========================================================= */}
       {deleteConfirmationEvent && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 flex flex-col p-6 space-y-4 transform scale-100 transition-all duration-300">
-            <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center">
-              <AlertTriangle size={24} />
-            </div>
-            
-            <div className="space-y-1">
-              <h3 className="text-lg font-bold text-slate-900">¿Estás completamente seguro?</h3>
-              <p className="text-xs text-slate-500">
-                Estás a punto de eliminar permanentemente la actividad <strong>"{deleteConfirmationEvent.title}"</strong>. Esta acción no se puede deshacer y borrará también las inscripciones vinculadas.
-              </p>
-            </div>
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs overflow-y-auto animate-fadeIn">
+          <div className="flex min-h-full items-start justify-center p-4 text-center md:items-center">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 flex flex-col p-6 space-y-4 transform scale-100 transition-all duration-300 my-auto text-left">
+              <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center">
+                <AlertTriangle size={24} />
+              </div>
+              
+              <div className="space-y-1">
+                <h3 className="text-lg font-bold text-slate-900">¿Estás completamente seguro?</h3>
+                <p className="text-xs text-slate-500">
+                  Estás a punto de eliminar permanentemente la actividad <strong>"{deleteConfirmationEvent.title}"</strong>. Esta acción no se puede deshacer y borrará también las inscripciones vinculadas.
+                </p>
+              </div>
 
-            <div className="flex gap-3 pt-2">
-              <button
-                onClick={() => setDeleteConfirmationEvent(null)}
-                className="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all cursor-pointer"
-              >
-                No, mantener evento
-              </button>
-              <button
-                onClick={() => executeDeleteEvent(deleteConfirmationEvent.id)}
-                className="flex-1 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-600/15 transition-all cursor-pointer"
-              >
-                Sí, eliminar permanentemente
-              </button>
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setDeleteConfirmationEvent(null)}
+                  className="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all cursor-pointer"
+                >
+                  No, mantener evento
+                </button>
+                <button
+                  onClick={() => executeDeleteEvent(deleteConfirmationEvent.id)}
+                  className="flex-1 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-600/15 transition-all cursor-pointer"
+                >
+                  Sí, eliminar permanentemente
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -2863,8 +3496,9 @@ export default function App() {
       {/* MODAL ADM: PREVISUALIZACIÓN DE EVENTOS DE EXCEL            */}
       {/* ========================================================= */}
       {showExcelPreviewModal && excelDataPreview && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full overflow-hidden border border-slate-200 flex flex-col transform scale-100 transition-all duration-300">
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs overflow-y-auto animate-fadeIn">
+          <div className="flex min-h-full items-start justify-center p-4 text-center md:items-center">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full overflow-hidden border border-slate-200 flex flex-col transform scale-100 transition-all duration-300 my-auto text-left">
             
             <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
               <div className="space-y-1">
@@ -2940,14 +3574,16 @@ export default function App() {
 
           </div>
         </div>
+      </div>
       )}
 
       {/* ========================================================= */}
       {/* MODAL ADM: PREVISUALIZACIÓN DE PARTICIPANTES DE EXCEL      */}
       {/* ========================================================= */}
       {showExcelParticipantsModal && excelParticipantsPreview && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full overflow-hidden border border-slate-200 flex flex-col transform scale-100 transition-all duration-300">
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs overflow-y-auto animate-fadeIn">
+          <div className="flex min-h-full items-start justify-center p-4 text-center md:items-center">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full overflow-hidden border border-slate-200 flex flex-col transform scale-100 transition-all duration-300 my-auto text-left">
             
             <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
               <div className="space-y-1">
@@ -3022,14 +3658,16 @@ export default function App() {
 
           </div>
         </div>
+      </div>
       )}
 
       {/* ========================================================= */}
       {/* MODAL DE GENERACIÓN DE QR DE ASISTENCIA                   */}
       {/* ========================================================= */}
       {qrModalEvent && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-200">
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs overflow-y-auto animate-fadeIn">
+          <div className="flex min-h-full items-start justify-center p-4 text-center md:items-center">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-200 my-auto text-left">
             
             {/* Header */}
             <div className="bg-gradient-to-r from-slate-900 to-indigo-900 p-6 text-white">
@@ -3172,6 +3810,7 @@ export default function App() {
 
           </div>
         </div>
+      </div>
       )}
 
       {/* Canvas para animación de confetti */}

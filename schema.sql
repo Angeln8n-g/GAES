@@ -19,12 +19,13 @@ CREATE TABLE participants (
     email VARCHAR(255) UNIQUE NOT NULL
 );
 
--- 2. Tabla de Usuarios del Sistema (Para simulación de roles)
+-- 2. Tabla de Usuarios del Sistema (Para autenticación y roles)
 CREATE TABLE users_simulated (
     id VARCHAR(50) PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
     name VARCHAR(255) NOT NULL,
-    role VARCHAR(50) NOT NULL
+    role VARCHAR(50) NOT NULL,
+    password VARCHAR(255) NOT NULL
 );
 
 -- 3. Tabla de Eventos / Capacitaciones
@@ -38,7 +39,10 @@ CREATE TABLE events (
     status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
     send_email BOOLEAN DEFAULT TRUE,
     send_teams BOOLEAN DEFAULT FALSE,
-    custom_message TEXT
+    custom_message TEXT,
+    modality VARCHAR(100) DEFAULT 'Presencial',
+    location VARCHAR(255) DEFAULT 'Instalaciones',
+    survey_url VARCHAR(500) DEFAULT NULL
 );
 
 -- 4. Tabla de Fechas del Evento (Schedules)
@@ -97,18 +101,19 @@ INSERT INTO participants (card, name, email) VALUES
 ('1998', 'FERMIN GABRIEL CHI PERERA', 'fermin.chi@empresa.com'),
 ('2015', 'JESUS RAFAEL PECH CHULIM', 'jesus.pech@empresa.com');
 
--- Insertar Usuarios de Simulación
-INSERT INTO users_simulated (id, email, name, role) VALUES
-('usr_1', 'sofia.ceo@empresa.com', 'Sofía Martínez', 'Super Administrador'),
-('usr_2', 'admin.capacitacion@empresa.com', 'Carlos Pérez (Tú)', 'Administrador / Editor'),
-('usr_3', 'juan.diez@empresa.com', 'Juan Díez', 'Colaborador (User)'),
-('usr_4', 'marta.perez@empresa.com', 'Marta Pérez', 'Colaborador (User)');
+-- Insertar Usuarios de la Plataforma (Autenticación y Roles)
+INSERT INTO users_simulated (id, email, name, role, password) VALUES
+('usr_super', 'superadmin@empresa.com', 'Superusuario Principal', 'Super Administrador', 'admin'),
+('usr_1', 'sofia.ceo@empresa.com', 'Sofía Martínez', 'Super Administrador', '123'),
+('usr_2', 'admin.capacitacion@empresa.com', 'Carlos Pérez', 'Administrador / Editor', '123'),
+('usr_3', 'juan.diez@empresa.com', 'Juan Díez', 'Colaborador (User)', '123'),
+('usr_4', 'marta.perez@empresa.com', 'Marta Pérez', 'Colaborador (User)', '123');
 
 -- Insertar Eventos
-INSERT INTO events (id, title, description, category, instructor, image_url, status, send_email, send_teams, custom_message) VALUES
-('evt_1', 'Taller Avanzado de React y UX', 'Domina el diseño de interfaces memorables y fluidas aplicando principios avanzados de usabilidad, animaciones y gestión de estado con React.', 'Taller', 'Ing. Sofía Martínez', 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=800&q=80', 'active', TRUE, TRUE, 'Estimado colaborador, te recordamos que mañana inicia el taller ''[EVENT_TITLE]'' facilitado por [INSTRUCTOR]. ¡Te esperamos!'),
-('evt_2', 'Cine Forum: El Dilema de las Redes Sociales', 'Análisis colectivo y debate abierto sobre el impacto de los algoritmos de recomendación en la salud mental y la cohesión social de nuestro entorno.', 'Cine Forum', 'Dra. Carolina Herrera', 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80', 'active', TRUE, FALSE, '¡Hola! Te esperamos mañana en nuestro Cine Forum ''[EVENT_TITLE]'' para debatir ideas juntos.'),
-('evt_3', 'Webinar: El Futuro de la IA en la Productividad Diaria', 'Descubre cómo integrar herramientas de Inteligencia Artificial generativa en tus flujos de trabajo cotidianos para ahorrar hasta un 30% de tiempo en tareas repetitivas.', 'Webinar', 'Lic. Roberto Gómez', 'https://images.unsplash.com/photo-1677442136019-21780efad99a?auto=format&fit=crop&w=800&q=80', 'active', TRUE, TRUE, 'Recordatorio: Tu sesión de Webinar ''[EVENT_TITLE]'' está agendada para mañana.');
+INSERT INTO events (id, title, description, category, instructor, image_url, status, send_email, send_teams, custom_message, modality, location, survey_url) VALUES
+('evt_1', 'Taller Avanzado de React y UX', 'Domina el diseño de interfaces memorables y fluidas aplicando principios avanzados de usabilidad, animaciones y gestión de estado con React.', 'Taller', 'Ing. Sofía Martínez', 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=800&q=80', 'active', TRUE, TRUE, 'Estimado colaborador, te recordamos que mañana inicia el taller ''[EVENT_TITLE]'' facilitado por [INSTRUCTOR]. ¡Te esperamos!', 'Presencial', 'Sala de Juntas B (Piso 3)', 'https://forms.office.com/r/react-ux-evaluation'),
+('evt_2', 'Cine Forum: El Dilema de las Redes Sociales', 'Análisis colectivo y debate abierto sobre el impacto de los algoritmos de recomendación en la salud mental y la cohesión social de nuestro entorno.', 'Cine Forum', 'Dra. Carolina Herrera', 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80', 'active', TRUE, FALSE, '¡Hola! Te esperamos mañana en nuestro Cine Forum ''[EVENT_TITLE]'' para debatir ideas juntos.', 'Presencial', 'Auditorio Principal', NULL),
+('evt_3', 'Webinar: El Futuro de la IA en la Productividad Diaria', 'Descubre cómo integrar herramientas de Inteligencia Artificial generativa en tus flujos de trabajo cotidianos para ahorrar hasta un 30% de tiempo en tareas repetitivas.', 'Webinar', 'Lic. Roberto Gómez', 'https://images.unsplash.com/photo-1677442136019-21780efad99a?auto=format&fit=crop&w=800&q=80', 'active', TRUE, TRUE, 'Recordatorio: Tu sesión de Webinar ''[EVENT_TITLE]'' está agendada para mañana.', 'Virtual', 'Enlace de Microsoft Teams', NULL);
 
 -- Insertar Fechas para Taller React (evt_1)
 INSERT INTO event_schedules (id, event_id, date) VALUES

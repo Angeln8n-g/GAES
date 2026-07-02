@@ -1,0 +1,54 @@
+# Plan de Despliegue en Producción (Coolify)
+
+Este plan prepara la aplicación de React + Vite para ser desplegada en **Coolify** de manera eficiente, optimizada y robusta. 
+
+Dado que la aplicación es una SPA (Single Page Application) construida con Vite, utilizaremos una estrategia de construcción multi-etapa (multi-stage) con Docker:
+1. **Etapa de Construcción (Build Stage):** Node.js para instalar dependencias y compilar el proyecto a código de producción (`dist/`).
+2. **Etapa de Producción (Production Stage):** Servidor web ultra-ligero (Nginx) para servir los archivos estáticos de forma eficiente y segura.
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Modos de Ejecución de la API:**
+> La aplicación cuenta con dos modos definidos en [api.ts](file:///c:/Users/angel/Desktop/Develop/Web%20all%20projects/Gestion_de_reservas/src/services/api.ts#L104-L105):
+> 1. **Modo Local (localStorage):** Por defecto, si `VITE_API_MODE` no es `true`.
+> 2. **Modo Backend (PostgreSQL):** Si `VITE_API_MODE` es `true` y se define una URL en `VITE_API_URL`.
+>
+> Al desplegar en Coolify, se debe decidir si se ejecutará conectada a un backend real o usando almacenamiento local en el navegador del cliente. En Coolify se pueden configurar las variables de entorno de compilación (Build Arguments) si se desea usar un servidor backend externo.
+
+---
+
+## Proposed Changes
+
+### Docker and Server Configuration
+
+#### [NEW] [Dockerfile](file:///c:/Users/angel/Desktop/Develop/Web%20all%20projects/Gestion_de_reservas/Dockerfile)
+Crea la configuración para compilar y empaquetar la aplicación en un contenedor de producción. Soporta argumentos de construcción (Build Args) para las variables de entorno de Vite.
+
+#### [NEW] [nginx.conf](file:///c:/Users/angel/Desktop/Develop/Web%20all%20projects/Gestion_de_reservas/nginx.conf)
+Configura Nginx para servir los archivos de la aplicación. Incluye:
+- Manejo de rutas SPA (redirección de cualquier ruta inexistente a `index.html`).
+- Compresión Gzip para mejorar la velocidad de carga.
+- Cabeceras de caché eficientes para recursos estáticos.
+
+#### [NEW] [.dockerignore](file:///c:/Users/angel/Desktop/Develop/Web%20all%20projects/Gestion_de_reservas/.dockerignore)
+Evita subir archivos innecesarios al contexto del contenedor de Docker (como `node_modules` o archivos de entorno locales), acelerando el tiempo de compilación.
+
+#### [NEW] [.env.example](file:///c:/Users/angel/Desktop/Develop/Web%20all%20projects/Gestion_de_reservas/.env.example)
+Documenta las variables de entorno que pueden ser configuradas en Coolify.
+
+---
+
+## Verification Plan
+
+### Manual Verification
+1. **Construcción Local con Docker:**
+   Probar que el contenedor Docker se construye y funciona correctamente de forma local:
+   ```bash
+   docker build -t gestion-reservas .
+   docker run -p 8080:80 gestion-reservas
+   ```
+2. **Acceso al Navegador:**
+   Navegar a `http://localhost:8080` y comprobar que la aplicación carga correctamente y no hay errores de recursos estáticos en la consola.
