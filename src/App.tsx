@@ -192,6 +192,9 @@ const getDaysInMonthForJuly2026 = () => {
   return days;
 };
 
+const isProd = import.meta.env.PROD;
+const showDemoAccounts = import.meta.env.VITE_SHOW_DEMO_ACCOUNTS === 'true' || (!isProd && import.meta.env.VITE_SHOW_DEMO_ACCOUNTS !== 'false');
+
 export default function App() {
   const [events, setEvents] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>(INITIAL_USERS);
@@ -1460,30 +1463,32 @@ export default function App() {
           </form>
 
           {/* Quick Demo Accs */}
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 space-y-2">
-            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wide flex items-center gap-1.5">
-              <Info size={13} className="text-indigo-400" />
-              Cuentas de prueba (Clic para rellenar)
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
-              {users.map(u => (
-                <button
-                  key={u.id}
-                  type="button"
-                  onClick={() => {
-                    setLoginEmail(u.email);
-                    setLoginPassword(u.password);
-                    setLoginError("");
-                  }}
-                  className="text-left bg-slate-800/30 hover:bg-indigo-600/10 border border-slate-800 hover:border-indigo-500/30 p-2 rounded-xl transition-all text-[10px] cursor-pointer group"
-                >
-                  <div className="font-semibold text-slate-200 group-hover:text-indigo-300 leading-tight truncate">{u.name}</div>
-                  <div className="text-slate-400 text-[9px] truncate">{u.role}</div>
-                  <div className="text-slate-500 text-[8px] mt-0.5 font-mono">Pass: {u.password}</div>
-                </button>
-              ))}
+          {showDemoAccounts && (
+            <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 space-y-2">
+              <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wide flex items-center gap-1.5">
+                <Info size={13} className="text-indigo-400" />
+                Cuentas de prueba (Clic para rellenar)
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
+                {users.map(u => (
+                  <button
+                    key={u.id}
+                    type="button"
+                    onClick={() => {
+                      setLoginEmail(u.email);
+                      setLoginPassword(u.password);
+                      setLoginError("");
+                    }}
+                    className="text-left bg-slate-800/30 hover:bg-indigo-600/10 border border-slate-800 hover:border-indigo-500/30 p-2 rounded-xl transition-all text-[10px] cursor-pointer group"
+                  >
+                    <div className="font-semibold text-slate-200 group-hover:text-indigo-300 leading-tight truncate">{u.name}</div>
+                    <div className="text-slate-400 text-[9px] truncate">{u.role}</div>
+                    <div className="text-slate-500 text-[8px] mt-0.5 font-mono">Pass: {u.password}</div>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <p className="text-[10px] text-slate-500 mt-6 text-center">

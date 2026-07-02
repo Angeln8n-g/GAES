@@ -9,5 +9,4 @@ dist
 .env.production
 README.md
 Dockerfile
-nginx.conf
 schema.sql

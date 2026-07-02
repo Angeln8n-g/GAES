@@ -15,9 +15,11 @@ COPY . .
 # Argumentos de construcción para inyectar variables de entorno de Vite
 ARG VITE_API_URL
 ARG VITE_API_MODE
+ARG VITE_SHOW_DEMO_ACCOUNTS
 
 ENV VITE_API_URL=$VITE_API_URL
 ENV VITE_API_MODE=$VITE_API_MODE
+ENV VITE_SHOW_DEMO_ACCOUNTS=$VITE_SHOW_DEMO_ACCOUNTS
 
 # Compilar la aplicación para producción (genera la carpeta dist/)
 RUN npm run build
