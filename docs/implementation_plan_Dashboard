@@ -1,0 +1,46 @@
+# Plan de Implementación: Dashboard del Super Administrador
+
+Este plan detalla la incorporación de un nuevo módulo de Dashboard analítico interactivo diseñado específicamente para usuarios con el rol de **Super Administrador** en CapacitaHub.
+
+---
+
+## Cambios Propuestos
+
+### 1. Interfaz y Navegación
+- **[App.tsx](file:///c:/Users/angel/Desktop/Develop/Web%20all%20projects/Gestion_de_reservas/src/App.tsx)**:
+  - Importar iconos adicionales de `lucide-react` para uso en métricas e indicadores (`BarChart3`, `TrendingUp`, `Activity`, `Award`).
+  - Añadir una nueva pestaña/tab `"dashboard"` en el estado `currentTab`.
+  - Agregar el botón de acceso al **Dashboard** en el Navbar principal de la aplicación, visible únicamente si `currentUser.role === 'Super Administrador'`.
+  - Crear la nueva sección/vista del Dashboard que se renderizará cuando `currentTab === 'dashboard'`.
+
+### 2. Contenido del Dashboard del Super Administrador
+El Dashboard contará con un diseño premium y limpio, alineado con la estética de CapacitaHub:
+
+- **Sección de Tarjetas de Indicadores Clave (KPIs)**:
+  1. **Total de Eventos**: Número total de eventos creados.
+  2. **Inscripciones Totales**: Suma de colaboradores registrados en todos los eventos y horarios.
+  3. **Asistencias Confirmadas**: Suma de colaboradores cuya presencia ha sido registrada (a través del código QR o panel).
+  4. **Tasa de Asistencia Media**: Porcentaje global de asistencia (`Asistencias / Inscripciones`).
+- **Visualización de Datos con CSS Avanzado**:
+  - **Gráfico Comparativo de Registro vs Capacidad**: Barras horizontales interactivas mostrando la ocupación de cada evento.
+  - **Gráfico de Registro vs Asistencia**: Visualización de la efectividad de asistencia (cuántos se inscribieron vs cuántos asistieron).
+  - **Distribución de Modalidad**: Gráfico/barra de porcentaje para eventos Presenciales, Virtuales e Híbridos.
+  - **Distribución por Categorías**: Gráfico de píldoras coloreadas para clasificar los eventos (Taller, Curso, Webinar, etc.).
+- **Log de Actividad de Asistencias Recientes**:
+  - Un listado dinámico de las últimas personas en registrar asistencia, facilitando el monitoreo en tiempo real del check-in por código QR.
+- **Accesos y Acciones Rápidas**:
+  - Botones de atajo rápido hacia la Consola de Control de Eventos, Gestión de Roles y la Carga de Archivos Excel.
+
+---
+
+## Plan de Verificación
+
+### Pruebas Manuales
+1. Iniciar sesión como `superadmin@empresa.com` (contraseña `admin`).
+2. Verificar la aparición del botón **Dashboard** en la cabecera.
+3. Navegar a la pestaña y comprobar el cálculo correcto de las métricas (total de inscritos, total de asistencia confirmada).
+4. Registrar una asistencia de prueba mediante QR y comprobar que el Dashboard aumente los indicadores y liste al asistente en el Log en tiempo real.
+5. Iniciar sesión con una cuenta de menor rango (como Administrador o Colaborador) y verificar que no se muestre el acceso al Dashboard ni sea posible acceder a él.
+
+### Pruebas Automatizadas / Compilación
+- Ejecutar `npm run build` para asegurar la integridad de TypeScript y Vite.

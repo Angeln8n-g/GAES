@@ -38,7 +38,12 @@ import {
   FileSpreadsheet,
   Eye,
   EyeOff,
-  MapPin
+  MapPin,
+  BarChart3,
+  TrendingUp,
+  Activity,
+  Award,
+  Percent
 } from 'lucide-react';
 
 // --- DATOS DE PRUEBA INICIALES (MOCK DATA) ---
@@ -1556,6 +1561,21 @@ export default function App() {
               <span className="sm:hidden">Catálogo</span>
             </button>
 
+            {currentUser.role === "Super Administrador" && (
+              <button 
+                onClick={() => setCurrentTab("dashboard")}
+                className={`flex items-center gap-1 px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                  currentTab === "dashboard" 
+                    ? "text-purple-700 bg-purple-50 border border-purple-200" 
+                    : "text-slate-600 hover:text-purple-700 hover:bg-purple-50/50"
+                }`}
+              >
+                <BarChart3 size={14} />
+                <span className="hidden sm:inline">Dashboard</span>
+                <span className="sm:hidden">Métricas</span>
+              </button>
+            )}
+
             {(currentUser.role === "Super Administrador" || currentUser.role === "Administrador / Editor") && (
               <button 
                 onClick={() => setCurrentTab("admin")}
@@ -1830,6 +1850,342 @@ export default function App() {
             </div>
           </div>
         )}
+
+        {/* ========================================================= */}
+        {/* VISTA: DASHBOARD DEL SUPER ADMINISTRADOR                  */}
+        {/* ========================================================= */}
+        {currentTab === "dashboard" && currentUser.role === "Super Administrador" && (() => {
+          const totalEvents = events.length;
+          let totalRegistered = 0;
+          let totalCapacity = 0;
+          let totalAttended = 0;
+          const categoryCounts: { [key: string]: number } = {};
+          const modalityCounts: { [key: string]: number } = { Presencial: 0, Virtual: 0, Híbrido: 0 };
+          const recentLogs: Array<{ name: string; email: string; eventTitle: string; date: string; time: string }> = [];
+
+          events.forEach(evt => {
+            const mod = evt.modality || "Presencial";
+            modalityCounts[mod] = (modalityCounts[mod] || 0) + 1;
+            categoryCounts[evt.category] = (categoryCounts[evt.category] || 0) + 1;
+
+            evt.schedule.forEach(sch => {
+              sch.slots.forEach(slot => {
+                totalRegistered += slot.registered || 0;
+                totalCapacity += slot.capacity || 0;
+                const attended = slot.attendedList ? slot.attendedList.length : 0;
+                totalAttended += attended;
+
+                if (slot.attendedList) {
+                  slot.attendedList.forEach((email: string) => {
+                    const match = participants.find(p => p.email.toLowerCase() === email.toLowerCase());
+                    recentLogs.push({
+                      name: match ? match.name : email.split("@")[0].toUpperCase(),
+                      email,
+                      eventTitle: evt.title,
+                      date: sch.date,
+                      time: slot.time
+                    });
+                  });
+                }
+              });
+            });
+          });
+
+          const displayLogs = [...recentLogs].reverse().slice(0, 5);
+          const attendanceRate = totalRegistered > 0 ? Math.round((totalAttended / totalRegistered) * 100) : 0;
+          const occupancyRate = totalCapacity > 0 ? Math.round((totalRegistered / totalCapacity) * 100) : 0;
+
+          return (
+            <div className="space-y-8 animate-fadeIn">
+              {/* Encabezado */}
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900 text-white p-6 rounded-3xl shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -z-10 animate-pulse duration-[8000ms]"></div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="bg-indigo-500/20 text-indigo-300 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                      Consola de Inteligencia de Datos
+                    </span>
+                  </div>
+                  <h3 className="text-2xl font-black tracking-tight">Dashboard de Capacitaciones</h3>
+                  <p className="text-xs text-slate-350 mt-1 font-medium">Monitorea en tiempo real el comportamiento, asistencia e inscripciones de la plataforma corporativa.</p>
+                </div>
+                <div className="flex items-center gap-2.5 flex-shrink-0">
+                  <span className="bg-purple-600/35 border border-purple-500/30 text-purple-200 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm">
+                    <Shield size={14} className="stroke-[2.5]" />
+                    Modo: Super Administrador
+                  </span>
+                </div>
+              </div>
+
+              {/* Grid de KPIs */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                {/* KPI 1: Eventos */}
+                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs flex items-center justify-between hover:border-slate-300 hover:shadow-md transition-all">
+                  <div className="space-y-1">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Eventos</span>
+                    <h4 className="text-3xl font-black text-slate-900">{totalEvents}</h4>
+                    <span className="text-[10px] text-slate-500 flex items-center gap-1">
+                      <TrendingUp size={12} className="text-indigo-650" />
+                      Programas activos
+                    </span>
+                  </div>
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-650 flex items-center justify-center">
+                    <BookOpen size={22} />
+                  </div>
+                </div>
+
+                {/* KPI 2: Inscritos */}
+                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs flex items-center justify-between hover:border-slate-300 hover:shadow-md transition-all">
+                  <div className="space-y-1">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Reservas / Inscritos</span>
+                    <h4 className="text-3xl font-black text-slate-900">{totalRegistered}</h4>
+                    <span className="text-[10px] text-slate-500 flex items-center gap-1">
+                      <Percent size={12} className="text-blue-650" />
+                      {occupancyRate}% de ocupación
+                    </span>
+                  </div>
+                  <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <Users size={22} />
+                  </div>
+                </div>
+
+                {/* KPI 3: Asistencias */}
+                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs flex items-center justify-between hover:border-slate-300 hover:shadow-md transition-all">
+                  <div className="space-y-1">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Asistencias Confirmadas</span>
+                    <h4 className="text-3xl font-black text-slate-900">{totalAttended}</h4>
+                    <span className="text-[10px] text-slate-500 flex items-center gap-1">
+                      <CheckCircle2 size={12} className="text-emerald-650" />
+                      Check-in por código QR
+                    </span>
+                  </div>
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-650 flex items-center justify-center">
+                    <Check size={22} />
+                  </div>
+                </div>
+
+                {/* KPI 4: Tasa de asistencia */}
+                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs flex items-center justify-between hover:border-slate-300 hover:shadow-md transition-all">
+                  <div className="space-y-1">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Tasa de Asistencia</span>
+                    <h4 className="text-3xl font-black text-slate-900">{attendanceRate}%</h4>
+                    <span className="text-[10px] text-slate-500 flex items-center gap-1">
+                      <Activity size={12} className="text-purple-650" />
+                      Efectividad de asistencia
+                    </span>
+                  </div>
+                  <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-650 flex items-center justify-center">
+                    <Award size={22} />
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Grid central (Gráficos y Logs) */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                {/* Columna Izquierda: Ocupación y Análisis por Evento (7 Cols) */}
+                <div className="lg:col-span-7 space-y-6">
+                  
+                  {/* Card de Ocupación por Evento */}
+                  <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-5">
+                    <div>
+                      <h4 className="text-md font-bold text-slate-900 flex items-center gap-2">
+                        <TrendingUp size={16} className="text-indigo-650" />
+                        Ocupación de Eventos (Inscritos vs Capacidad)
+                      </h4>
+                      <p className="text-xs text-slate-550 mt-1">Porcentaje de vacantes reservadas por cada capacitación publicada.</p>
+                    </div>
+
+                    <div className="space-y-4">
+                      {events.map(evt => {
+                        let regCount = 0;
+                        let capCount = 0;
+                        evt.schedule.forEach(s => s.slots.forEach(sl => {
+                          regCount += sl.registered || 0;
+                          capCount += sl.capacity || 0;
+                        }));
+
+                        const percentage = capCount > 0 ? Math.round((regCount / capCount) * 100) : 0;
+
+                        return (
+                          <div key={evt.id} className="space-y-1.5">
+                            <div className="flex justify-between items-center text-xs">
+                              <span className="font-bold text-slate-800 truncate max-w-[280px]" title={evt.title}>
+                                {evt.title}
+                              </span>
+                              <span className="text-slate-500 font-semibold flex-shrink-0">
+                                {regCount}/{capCount} vacantes ({percentage}% ocupado)
+                              </span>
+                            </div>
+                            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                              <div 
+                                className={`h-full rounded-full transition-all duration-500 ${
+                                  percentage >= 100 ? "bg-rose-500" :
+                                  percentage > 75 ? "bg-amber-500" : "bg-indigo-600"
+                                }`}
+                                style={{ width: `${Math.min(percentage, 100)}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Card de Conversión Asistentes / Inscritos */}
+                  <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-5">
+                    <div>
+                      <h4 className="text-md font-bold text-slate-900 flex items-center gap-2">
+                        <CheckCircle2 size={16} className="text-emerald-650" />
+                        Efectividad de Asistencia Real por Evento
+                      </h4>
+                      <p className="text-xs text-slate-500 mt-1">Comparación de cuántos colaboradores inscritos confirmaron asistencia mediante QR.</p>
+                    </div>
+
+                    <div className="space-y-4">
+                      {events.map(evt => {
+                        let regCount = 0;
+                        let attCount = 0;
+                        evt.schedule.forEach(s => s.slots.forEach(sl => {
+                          regCount += sl.registered || 0;
+                          attCount += sl.attendedList ? sl.attendedList.length : 0;
+                        }));
+
+                        const attRate = regCount > 0 ? Math.round((attCount / regCount) * 100) : 0;
+
+                        return (
+                          <div key={evt.id} className="space-y-2">
+                            <div className="flex justify-between items-center text-xs">
+                              <span className="font-bold text-slate-800 truncate max-w-[280px]" title={evt.title}>
+                                {evt.title}
+                              </span>
+                              <span className="text-slate-500 font-semibold flex-shrink-0">
+                                {attCount} asistencias de {regCount} inscritos ({attRate}%)
+                              </span>
+                            </div>
+                            <div className="w-full bg-slate-150 h-3.5 rounded-xl flex overflow-hidden p-0.5 border border-slate-200">
+                              <div 
+                                className="h-full bg-emerald-500 transition-all duration-500 rounded-l-lg"
+                                style={{ width: `${regCount > 0 ? (attCount / regCount) * 100 : 0}%` }}
+                              ></div>
+                              <div 
+                                className="h-full bg-slate-100 transition-all duration-500 rounded-r-lg"
+                                style={{ width: `${regCount > 0 ? ((regCount - attCount) / regCount) * 100 : 100}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Columna Derecha: Participación, Categorías y Logs en vivo (5 Cols) */}
+                <div className="lg:col-span-5 space-y-6">
+                  
+                  {/* Card de Modalidades */}
+                  <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900 block">Distribución de Modalidades de Eventos</h4>
+                    </div>
+
+                    <div className="space-y-3.5 pt-1">
+                      {Object.keys(modalityCounts).map(key => {
+                        const count = modalityCounts[key];
+                        const total = totalEvents;
+                        const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+                        const colorClass = 
+                          key === "Virtual" ? "bg-cyan-500" :
+                          key === "Híbrido" ? "bg-amber-500" : "bg-emerald-500";
+                        const textColor = 
+                          key === "Virtual" ? "text-cyan-700 bg-cyan-50" :
+                          key === "Híbrido" ? "text-amber-700 bg-amber-50" : "text-emerald-700 bg-emerald-50";
+
+                        return (
+                          <div key={key} className="flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-2">
+                              <span className={`w-3 h-3 rounded-full ${colorClass}`}></span>
+                              <span className="font-semibold text-slate-700">{key}</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${textColor}`}>
+                                {count} {count === 1 ? 'evento' : 'eventos'}
+                              </span>
+                              <span className="font-bold text-slate-650 w-8 text-right">{percentage}%</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Card de Log de Check-ins en Vivo */}
+                  <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h4 className="text-sm font-bold text-slate-900">Asistencias Recientes (QR Check-in)</h4>
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" title="En tiempo real"></span>
+                    </div>
+
+                    {displayLogs.length > 0 ? (
+                      <div className="space-y-3 divide-y divide-slate-100">
+                        {displayLogs.map((log, idx) => (
+                          <div key={idx} className="pt-3 first:pt-0 flex items-start justify-between gap-3 text-xs animate-fadeIn">
+                            <div className="space-y-0.5">
+                              <p className="font-bold text-slate-800 leading-tight">{log.name}</p>
+                              <p className="text-[10px] text-slate-400 truncate max-w-[170px]" title={log.email}>{log.email}</p>
+                              <p className="text-[10px] text-indigo-650 font-semibold truncate max-w-[170px]" title={log.eventTitle}>
+                                {log.eventTitle}
+                              </p>
+                            </div>
+                            <div className="text-right flex-shrink-0">
+                              <span className="bg-emerald-50 text-emerald-700 text-[9px] font-bold px-2 py-0.5 rounded-full block text-center">
+                                Confirmado
+                              </span>
+                              <span className="text-[9px] text-slate-400 block mt-1">{log.date} {log.time}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-slate-400 italic py-2 text-center">No se han registrado asistencias por QR todavía.</p>
+                    )}
+                  </div>
+
+                  {/* Card de Atajos Rápidos */}
+                  <div className="bg-slate-900 text-white p-6 rounded-3xl shadow-xl space-y-4">
+                    <h4 className="text-sm font-bold flex items-center gap-2">
+                      <Sliders size={16} className="text-indigo-400" />
+                      Atajos Administrativos
+                    </h4>
+                    <p className="text-[11px] text-slate-400">Accede rápidamente a las secciones de gestión y actualización de datos.</p>
+                    
+                    <div className="space-y-2 pt-1 text-xs font-semibold">
+                      <button 
+                        onClick={() => setCurrentTab("admin")} 
+                        className="w-full py-2.5 px-4 bg-white/10 hover:bg-white/15 text-white border border-white/10 rounded-xl transition-all flex items-center justify-between cursor-pointer"
+                      >
+                        <span>Crear y Administrar Eventos</span>
+                        <ArrowRight size={14} className="text-indigo-400" />
+                      </button>
+                      <button 
+                        onClick={() => { setCurrentTab("admin"); setShowAddUserForm(true); }} 
+                        className="w-full py-2.5 px-4 bg-white/10 hover:bg-white/15 text-white border border-white/10 rounded-xl transition-all flex items-center justify-between cursor-pointer"
+                      >
+                        <span>Agregar / Controlar Usuarios</span>
+                        <ArrowRight size={14} className="text-indigo-400" />
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+          );
+        })()}
 
         {/* ========================================================= */}
         {/* VISTA 2: PANEL DE ADMINISTRACIÓN COMPLETO                 */}

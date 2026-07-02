@@ -1,0 +1,45 @@
+# Resumen de Cambios: Modalidad y Lugar en Eventos
+
+Se ha implementado con éxito la funcionalidad para gestionar y visualizar la **Modalidad** (Presencial, Virtual, Híbrido) y el **Lugar/Ubicación** de cada evento de capacitación. El sistema compila y funciona perfectamente.
+
+---
+
+## Cambios Realizados
+
+### 1. Base de Datos e Historial de Semillas
+- **Archivo modificado**: [schema.sql](file:///c:/Users/angel/Desktop/Develop/Web%2520all%2520projects/Gestion_de_reservas/schema.sql)
+- Se añadieron los campos `modality` (por defecto `'Presencial'`) y `location` (por defecto `'Instalaciones'`) en la tabla `events`.
+- Se actualizaron las sentencias de inserción inicial (seeds) de los eventos de prueba con datos reales.
+
+### 2. Datos de Prueba y Servicios
+- **Archivo modificado**: [api.ts](file:///c:/Users/angel/Desktop/Develop/Web%2520all%2520projects/Gestion_de_reservas/src/services/api.ts)
+- Se actualizaron los datos iniciales de `MOCK_EVENTS` para reflejar la modalidad y la ubicación exacta de cada taller/webinar predefinido.
+
+### 3. Componente e Interfaz de Usuario Principal
+- **Archivo modificado**: [App.tsx](file:///c:/Users/angel/Desktop/Develop/Web%2520all%2520projects/Gestion_de_reservas/src/App.tsx)
+- **Importaciones**: Se importó el icono `MapPin` de `lucide-react` para la representación de lugares.
+- **Datos Locales**: Se actualizó `INITIAL_EVENTS` para que coincida con las nuevas propiedades.
+- **Estados del Formulario**: Se crearon `formModality` y `formLocation` para rastrear las entradas en el formulario.
+- **Lógica de Formulario**:
+  - `handleSaveEvent` ahora adjunta los valores correspondientes al payload (con fallbacks amigables si se dejan vacíos).
+  - `startEditEvent` y `resetAdminForm` se actualizaron para gestionar la carga y limpieza de estos campos respectivamente.
+- **Lógica de Importación de Excel**:
+  - `handleImportExcelData` ahora busca columnas como `modalidad`, `lugar` o `ubicacion` para asociarlas directamente al crear eventos en lote.
+- **Formulario UI**:
+  - Se agregó una sección de cuadrícula de 2 columnas debajo de Facilitador/Categoría.
+  - La modalidad cuenta con un selector desplegable con las opciones `Presencial`, `Virtual` e `Híbrido`.
+  - El campo de texto de Lugar/Enlace tiene un placeholder dinámico interactivo que cambia según la modalidad seleccionada (por ejemplo, mostrando *"Ej. Enlace de Teams / Zoom"* si la modalidad es *Virtual*).
+- **Diseño del Catálogo Público**:
+  - Se colocó un badge colorido en el overlay de la imagen del evento según la modalidad seleccionada (Verde para Presencial, Azul para Virtual, Naranja para Híbrido).
+  - Se agregó una línea de ubicación al lado del facilitador con el icono `MapPin`.
+- **Detalle de Reserva**:
+  - Se eliminó el texto hardcodeado en la sección de modalidad en la barra lateral del modal de reserva, mostrando en su lugar el valor dinámico del evento y su ubicación.
+- **Vistas Administrativas**:
+  - Se agregaron descripciones de modalidad y lugar tanto en las tarjetas del listado de administración en móviles como en las filas de la tabla para pantallas de escritorio.
+
+---
+
+## Verificación
+
+- **Compilación**: Se ejecutó `npm run build` de manera exitosa y sin errores de TypeScript.
+- **Pruebas visuales**: Se validó la coherencia del diseño en responsive y escritorio para las tarjetas del catálogo y del panel administrativo, asegurando la consistencia estética y los colores premium establecidos en la guía de desarrollo.
