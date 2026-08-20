@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # 1. Base de Datos PostgreSQL 16
+  postgres:
+    image: postgres:16-alpine
+    container_name: capacitahub_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: capacitahub_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d capacitahub_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2. Servidor Backend API (Node.js / Express)
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: capacitahub_api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DATABASE_URL: postgresql://postgres:postgrespassword@postgres:5432/capacitahub_db
+    ports:
+      - "5000:5000"
+
+  # 3. Aplicación Frontend (React + Vite + Nginx)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_MODE: "true"
+        VITE_API_URL: "http://localhost:5000/api"
+        VITE_SHOW_DEMO_ACCOUNTS: "false"
+    container_name: capacitahub_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+
+volumes:
+  postgres_data:

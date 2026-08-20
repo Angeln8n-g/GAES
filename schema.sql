@@ -4,6 +4,8 @@
 -- ==========================================
 
 -- Eliminar tablas si existen (en orden inverso de dependencia)
+DROP TABLE IF EXISTS event_feedbacks CASCADE;
+DROP TABLE IF EXISTS attendance_logs CASCADE;
 DROP TABLE IF EXISTS registrations CASCADE;
 DROP TABLE IF EXISTS notification_logs CASCADE;
 DROP TABLE IF EXISTS event_slots CASCADE;
@@ -90,6 +92,17 @@ CREATE TABLE attendance_logs (
     UNIQUE (slot_id, participant_card)
 );
 
+-- 9. Evaluaciones y Feedback Rápido
+CREATE TABLE event_feedbacks (
+    id SERIAL PRIMARY KEY,
+    event_id VARCHAR(100) NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    user_email VARCHAR(255) NOT NULL,
+    user_name VARCHAR(255),
+    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    comment TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- ==========================================
 -- CARGA DE DATOS DE PRUEBA INICIALES (SEEDS)
 -- ==========================================
@@ -143,17 +156,20 @@ INSERT INTO event_slots (id, schedule_id, time, capacity) VALUES
 (5, 4, '11:00 AM', 100);
 
 -- Insertar Inscripciones de Prueba
--- LUIS ALBERTO ALMAZAN POOT (2010 -> luis.almazan@empresa.com) y LILIANA ESTHER SOSA PECH (2012 -> liliana.sosa@empresa.com)
--- registrados en Taller React slot 1 (09:00 AM)
 INSERT INTO registrations (slot_id, participant_card) VALUES
 (1, '2012'),
-(1, '2010');
-
--- Carlos Pérez (admin.capacitacion@empresa.com) registrado en slot 2 (02:00 PM) (simulado como participante libre)
-INSERT INTO registrations (slot_id, participant_card) VALUES
+(1, '2010'),
 (2, '2015');
+
+-- Insertar Asistencia previa de prueba
+INSERT INTO attendance_logs (slot_id, participant_card) VALUES
+(1, '2012');
 
 -- Insertar Logs de Notificaciones previas
 INSERT INTO notification_logs (event_id, date, channel, status, recipients) VALUES
 ('evt_1', '2026-06-20 10:00:00', 'Email', 'Enviado', 12),
 ('evt_1', '2026-06-20 10:01:00', 'Teams', 'Enviado', 12);
+
+-- Insertar Feedback inicial de prueba
+INSERT INTO event_feedbacks (event_id, user_email, user_name, rating, comment) VALUES
+('evt_1', 'liliana.sosa@empresa.com', 'LILIANA ESTHER SOSA PECH', 5, 'Excelente taller, muy práctico y aplicable a proyectos reales.');

@@ -2,9 +2,10 @@
 // CAPA DE SERVICIOS DE API (HÍBRIDO: LOCAL / POSTGRES)
 // PROYECTO: GESTIÓN DE RESERVAS DE CAPACITACIONES
 // ==========================================
-// INITIAL_EVENTS, INITIAL_PARTICIPANTS, INITIAL_USERS are defined as fallback copies here to avoid circular imports.
 
-const MOCK_EVENTS = [
+import { TrainingEvent, Participant, UserAccount, EventFeedback } from '../types';
+
+export const MOCK_EVENTS: TrainingEvent[] = [
   {
     id: "evt_1",
     title: "Taller Avanzado de React y UX",
@@ -29,15 +30,32 @@ const MOCK_EVENTS = [
       {
         date: "2026-07-15",
         slots: [
-          { time: "09:00 AM", capacity: 20, registered: 2, attendees: ["liliana.sosa@empresa.com", "luis.almazan@empresa.com"] },
-          { time: "02:00 PM", capacity: 20, registered: 1, attendees: ["jesus.pech@empresa.com"] }
+          { time: "09:00 AM", capacity: 20, registered: 2, attendees: ["liliana.sosa@empresa.com", "luis.almazan@empresa.com"], attendedList: ["liliana.sosa@empresa.com"] },
+          { time: "02:00 PM", capacity: 20, registered: 1, attendees: ["jesus.pech@empresa.com"], attendedList: [] }
         ]
       },
       {
         date: "2026-07-16",
         slots: [
-          { time: "10:00 AM", capacity: 15, registered: 0, attendees: [] }
+          { time: "10:00 AM", capacity: 15, registered: 0, attendees: [], attendedList: [] }
         ]
+      },
+      {
+        date: "2026-08-25",
+        slots: [
+          { time: "11:00 AM", capacity: 25, registered: 0, attendees: [], attendedList: [] }
+        ]
+      }
+    ],
+    feedbacks: [
+      {
+        id: "fb_1",
+        eventId: "evt_1",
+        userEmail: "liliana.sosa@empresa.com",
+        userName: "LILIANA ESTHER SOSA PECH",
+        rating: 5,
+        comment: "Excelente taller, muy práctico y aplicable a proyectos reales.",
+        createdAt: "2026-07-15 11:30 AM"
       }
     ]
   },
@@ -62,10 +80,17 @@ const MOCK_EVENTS = [
       {
         date: "2026-07-18",
         slots: [
-          { time: "04:30 PM", capacity: 40, registered: 0, attendees: [] }
+          { time: "04:30 PM", capacity: 40, registered: 0, attendees: [], attendedList: [] }
+        ]
+      },
+      {
+        date: "2026-08-28",
+        slots: [
+          { time: "05:00 PM", capacity: 50, registered: 0, attendees: [], attendedList: [] }
         ]
       }
-    ]
+    ],
+    feedbacks: []
   },
   {
     id: "evt_3",
@@ -88,21 +113,28 @@ const MOCK_EVENTS = [
       {
         date: "2026-07-22",
         slots: [
-          { time: "11:00 AM", capacity: 100, registered: 0, attendees: [] }
+          { time: "11:00 AM", capacity: 100, registered: 0, attendees: [], attendedList: [] }
+        ]
+      },
+      {
+        date: "2026-09-10",
+        slots: [
+          { time: "10:00 AM", capacity: 100, registered: 0, attendees: [], attendedList: [] }
         ]
       }
-    ]
+    ],
+    feedbacks: []
   }
-]
+];
 
-const MOCK_PARTICIPANTS = [
+export const MOCK_PARTICIPANTS: Participant[] = [
   { card: "2010", name: "LUIS ALBERTO ALMAZAN POOT", email: "luis.almazan@empresa.com" },
   { card: "2012", name: "LILIANA ESTHER SOSA PECH", email: "liliana.sosa@empresa.com" },
   { card: "1998", name: "FERMIN GABRIEL CHI PERERA", email: "fermin.chi@empresa.com" },
   { card: "2015", name: "JESUS RAFAEL PECH CHULIM", email: "jesus.pech@empresa.com" }
 ];
 
-const MOCK_USERS = [
+export const MOCK_USERS: UserAccount[] = [
   { id: "usr_super", email: "superadmin@empresa.com", name: "Superusuario Principal", role: "Super Administrador", password: "admin" },
   { id: "usr_1", email: "sofia.ceo@empresa.com", name: "Sofía Martínez", role: "Super Administrador", password: "123" },
   { id: "usr_2", email: "admin.capacitacion@empresa.com", name: "Carlos Pérez", role: "Administrador / Editor", password: "123" },
@@ -114,7 +146,7 @@ const MOCK_USERS = [
 const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/$/, '');
 const isApiMode = import.meta.env.VITE_API_MODE === 'true';
 
-// Inicializar almacenamiento local si no existe para el modo de prueba
+// Inicializar almacenamiento local si no existe para el modo local
 const initLocalStorage = () => {
   const existingEvents = localStorage.getItem('ch_events');
   if (!existingEvents) {
@@ -130,6 +162,7 @@ const initLocalStorage = () => {
       localStorage.setItem('ch_events', JSON.stringify(MOCK_EVENTS));
     }
   }
+
   if (!localStorage.getItem('ch_participants')) {
     localStorage.setItem('ch_participants', JSON.stringify(MOCK_PARTICIPANTS));
   }
@@ -138,7 +171,6 @@ const initLocalStorage = () => {
   if (!existingUsers) {
     localStorage.setItem('ch_users', JSON.stringify(MOCK_USERS));
   } else {
-    // Migración: Si algún usuario no tiene contraseña, o falta el superusuario, sobrescribimos
     try {
       const parsed = JSON.parse(existingUsers);
       const needsMigration = parsed.some((u: any) => !u.password) || !parsed.some((u: any) => u.email === 'superadmin@empresa.com');
@@ -157,7 +189,7 @@ if (!isApiMode) {
 
 export const apiService = {
   // --- MÉTODOS DE EVENTOS ---
-  async getEvents(): Promise<any[]> {
+  async getEvents(): Promise<TrainingEvent[]> {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/events`);
       if (!res.ok) throw new Error('Error al obtener eventos de Postgres');
@@ -167,7 +199,7 @@ export const apiService = {
     }
   },
 
-  async saveEvents(events: any[]): Promise<void> {
+  async saveEvents(events: TrainingEvent[]): Promise<void> {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/events/bulk`, {
         method: 'POST',
@@ -180,7 +212,7 @@ export const apiService = {
     }
   },
 
-  async saveEvent(event: any): Promise<any[]> {
+  async saveEvent(event: TrainingEvent): Promise<TrainingEvent[]> {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/events`, {
         method: 'POST',
@@ -202,7 +234,7 @@ export const apiService = {
     }
   },
 
-  async deleteEvent(eventId: string): Promise<any[]> {
+  async deleteEvent(eventId: string): Promise<TrainingEvent[]> {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/events/${eventId}`, {
         method: 'DELETE'
@@ -218,7 +250,7 @@ export const apiService = {
   },
 
   // --- MÉTODOS DE PARTICIPANTES ---
-  async getParticipants(): Promise<any[]> {
+  async getParticipants(): Promise<Participant[]> {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/participants`);
       if (!res.ok) throw new Error('Error al obtener participantes de Postgres');
@@ -228,7 +260,7 @@ export const apiService = {
     }
   },
 
-  async saveParticipants(participants: any[]): Promise<void> {
+  async saveParticipants(participants: Participant[]): Promise<void> {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/participants/bulk`, {
         method: 'POST',
@@ -242,7 +274,7 @@ export const apiService = {
   },
 
   // --- MÉTODOS DE REGISTRO / INSCRIPCIÓN ---
-  async registerToEvent(eventId: string, date: string, time: string, participantEmail: string): Promise<any[]> {
+  async registerToEvent(eventId: string, date: string, time: string, participantEmail: string): Promise<TrainingEvent[]> {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/registrations`, {
         method: 'POST',
@@ -255,13 +287,16 @@ export const apiService = {
       }
       return this.getEvents();
     } else {
-      const events = JSON.parse(localStorage.getItem('ch_events') || '[]');
-      const updated = events.map((evt: any) => {
+      const events: TrainingEvent[] = JSON.parse(localStorage.getItem('ch_events') || '[]');
+      const updated = events.map(evt => {
         if (evt.id === eventId) {
-          const updatedSchedule = evt.schedule.map((sch: any) => {
+          const updatedSchedule = evt.schedule.map(sch => {
             if (sch.date === date) {
-              const updatedSlots = sch.slots.map((sl: any) => {
+              const updatedSlots = sch.slots.map(sl => {
                 if (sl.time === time) {
+                  if (sl.attendees.includes(participantEmail)) {
+                    return sl; // Ya inscrito
+                  }
                   return {
                     ...sl,
                     registered: sl.registered + 1,
@@ -283,32 +318,53 @@ export const apiService = {
     }
   },
 
-  // --- MÉTODOS DE USUARIOS DE LA PLATAFORMA ---
-  async getUsers(): Promise<any[]> {
+  // --- MÉTODOS DE CANCELACIÓN DE RESERVA ---
+  async cancelRegistration(eventId: string, date: string, time: string, participantEmail: string): Promise<TrainingEvent[]> {
     if (isApiMode) {
-      const res = await fetch(`${API_BASE_URL}/users`);
-      if (!res.ok) throw new Error('Error al obtener usuarios de la base de datos');
-      return res.json();
-    } else {
-      return JSON.parse(localStorage.getItem('ch_users') || '[]');
-    }
-  },
-
-  async saveUsers(users: any[]): Promise<void> {
-    if (isApiMode) {
-      const res = await fetch(`${API_BASE_URL}/users/bulk`, {
-        method: 'POST',
+      const res = await fetch(`${API_BASE_URL}/registrations`, {
+        method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ users })
+        body: JSON.stringify({ eventId, date, time, email: participantEmail })
       });
-      if (!res.ok) throw new Error('Error al actualizar usuarios en Postgres');
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.message || 'Error al cancelar inscripción');
+      }
+      return this.getEvents();
     } else {
-      localStorage.setItem('ch_users', JSON.stringify(users));
+      const events: TrainingEvent[] = JSON.parse(localStorage.getItem('ch_events') || '[]');
+      const updated = events.map(evt => {
+        if (evt.id === eventId) {
+          const updatedSchedule = evt.schedule.map(sch => {
+            if (sch.date === date) {
+              const updatedSlots = sch.slots.map(sl => {
+                if (sl.time === time) {
+                  const filteredAttendees = (sl.attendees || []).filter(e => e.toLowerCase() !== participantEmail.toLowerCase());
+                  const filteredAttended = (sl.attendedList || []).filter(e => e.toLowerCase() !== participantEmail.toLowerCase());
+                  return {
+                    ...sl,
+                    registered: Math.max(0, filteredAttendees.length),
+                    attendees: filteredAttendees,
+                    attendedList: filteredAttended
+                  };
+                }
+                return sl;
+              });
+              return { ...sch, slots: updatedSlots };
+            }
+            return sch;
+          });
+          return { ...evt, schedule: updatedSchedule };
+        }
+        return evt;
+      });
+      localStorage.setItem('ch_events', JSON.stringify(updated));
+      return updated;
     }
   },
 
   // --- MÉTODOS DE ASISTENCIA PRESENCIAL (QR CHECK-IN) ---
-  async confirmAttendance(eventId: string, date: string, time: string, participantEmail: string): Promise<any[]> {
+  async confirmAttendance(eventId: string, date: string, time: string, participantEmail: string): Promise<TrainingEvent[]> {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/attendance`, {
         method: 'POST',
@@ -321,12 +377,12 @@ export const apiService = {
       }
       return this.getEvents();
     } else {
-      const events = JSON.parse(localStorage.getItem('ch_events') || '[]');
-      const updated = events.map((evt: any) => {
+      const events: TrainingEvent[] = JSON.parse(localStorage.getItem('ch_events') || '[]');
+      const updated = events.map(evt => {
         if (evt.id === eventId) {
-          const updatedSchedule = evt.schedule.map((sch: any) => {
+          const updatedSchedule = evt.schedule.map(sch => {
             if (sch.date === date) {
-              const updatedSlots = sch.slots.map((sl: any) => {
+              const updatedSlots = sch.slots.map(sl => {
                 if (sl.time === time) {
                   const attendedList = sl.attendedList || [];
                   if (!attendedList.includes(participantEmail)) {
@@ -347,6 +403,74 @@ export const apiService = {
         return evt;
       });
       localStorage.setItem('ch_events', JSON.stringify(updated));
+      return updated;
+    }
+  },
+
+  // --- MÉTODOS DE FEEDBACK / CALIFICACIÓN ---
+  async submitFeedback(feedback: EventFeedback): Promise<TrainingEvent[]> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/feedback`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(feedback)
+      });
+      if (!res.ok) throw new Error('Error al enviar retroalimentación');
+      return this.getEvents();
+    } else {
+      const events: TrainingEvent[] = JSON.parse(localStorage.getItem('ch_events') || '[]');
+      const updated = events.map(evt => {
+        if (evt.id === feedback.eventId) {
+          const existingFeedbacks = evt.feedbacks || [];
+          return {
+            ...evt,
+            feedbacks: [...existingFeedbacks, { ...feedback, id: `fb_${Date.now()}` }]
+          };
+        }
+        return evt;
+      });
+      localStorage.setItem('ch_events', JSON.stringify(updated));
+      return updated;
+    }
+  },
+
+  // --- MÉTODOS DE USUARIOS DE LA PLATAFORMA ---
+  async getUsers(): Promise<UserAccount[]> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/users`);
+      if (!res.ok) throw new Error('Error al obtener usuarios de la base de datos');
+      return res.json();
+    } else {
+      return JSON.parse(localStorage.getItem('ch_users') || '[]');
+    }
+  },
+
+  async saveUsers(users: UserAccount[]): Promise<void> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/users/bulk`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ users })
+      });
+      if (!res.ok) throw new Error('Error al actualizar usuarios en Postgres');
+    } else {
+      localStorage.setItem('ch_users', JSON.stringify(users));
+    }
+  },
+
+  async changePassword(userId: string, newPassword: string): Promise<UserAccount[]> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/users/${userId}/password`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newPassword })
+      });
+      if (!res.ok) throw new Error('Error al cambiar la contraseña en la base de datos');
+      return this.getUsers();
+    } else {
+      const users: UserAccount[] = JSON.parse(localStorage.getItem('ch_users') || '[]');
+      const updated = users.map(u => u.id === userId ? { ...u, password: newPassword } : u);
+      localStorage.setItem('ch_users', JSON.stringify(updated));
       return updated;
     }
   }
