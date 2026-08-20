@@ -18,7 +18,8 @@ DROP TABLE IF EXISTS users_simulated CASCADE;
 CREATE TABLE participants (
     card VARCHAR(20) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL
+    email VARCHAR(255) UNIQUE NOT NULL,
+    cedula VARCHAR(20)
 );
 
 -- 2. Tabla de Usuarios del Sistema (Para autenticación y roles)
@@ -27,7 +28,8 @@ CREATE TABLE users_simulated (
     email VARCHAR(255) UNIQUE NOT NULL,
     name VARCHAR(255) NOT NULL,
     role VARCHAR(50) NOT NULL,
-    password VARCHAR(255) NOT NULL
+    password VARCHAR(255) NOT NULL,
+    cedula VARCHAR(20)
 );
 
 -- 3. Tabla de Eventos / Capacitaciones
@@ -103,24 +105,76 @@ CREATE TABLE event_feedbacks (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- 10. Grupos de Participantes / Cohortes
+CREATE TABLE participant_groups (
+    id VARCHAR(100) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    color VARCHAR(50) DEFAULT 'indigo',
+    department VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 11. Miembros de Grupos
+CREATE TABLE group_members (
+    group_id VARCHAR(100) NOT NULL REFERENCES participant_groups(id) ON DELETE CASCADE,
+    participant_card VARCHAR(20) NOT NULL REFERENCES participants(card) ON DELETE CASCADE,
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (group_id, participant_card)
+);
+
+-- 12. Programas / Cronogramas de Capacitación
+CREATE TABLE training_programs (
+    id VARCHAR(100) PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'draft', 'archived', 'completed')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 13. Eventos incluidos en el Programa
+CREATE TABLE program_events (
+    program_id VARCHAR(100) NOT NULL REFERENCES training_programs(id) ON DELETE CASCADE,
+    event_id VARCHAR(100) NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    is_mandatory BOOLEAN DEFAULT TRUE,
+    order_index INTEGER DEFAULT 0,
+    PRIMARY KEY (program_id, event_id)
+);
+
+-- 14. Grupos objetivo asignados al Programa
+CREATE TABLE program_target_groups (
+    program_id VARCHAR(100) NOT NULL REFERENCES training_programs(id) ON DELETE CASCADE,
+    group_id VARCHAR(100) NOT NULL REFERENCES participant_groups(id) ON DELETE CASCADE,
+    PRIMARY KEY (program_id, group_id)
+);
+
+-- 15. Participantes específicos asignados al Programa
+CREATE TABLE program_target_participants (
+    program_id VARCHAR(100) NOT NULL REFERENCES training_programs(id) ON DELETE CASCADE,
+    participant_card VARCHAR(20) NOT NULL REFERENCES participants(card) ON DELETE CASCADE,
+    PRIMARY KEY (program_id, participant_card)
+);
+
 -- ==========================================
 -- CARGA DE DATOS DE PRUEBA INICIALES (SEEDS)
 -- ==========================================
 
 -- Insertar Participantes
-INSERT INTO participants (card, name, email) VALUES
-('2010', 'LUIS ALBERTO ALMAZAN POOT', 'luis.almazan@empresa.com'),
-('2012', 'LILIANA ESTHER SOSA PECH', 'liliana.sosa@empresa.com'),
-('1998', 'FERMIN GABRIEL CHI PERERA', 'fermin.chi@empresa.com'),
-('2015', 'JESUS RAFAEL PECH CHULIM', 'jesus.pech@empresa.com');
+INSERT INTO participants (card, name, email, cedula) VALUES
+('2010', 'LUIS ALBERTO ALMAZAN POOT', 'luis.almazan@empresa.com', '402-2196163-1'),
+('2012', 'LILIANA ESTHER SOSA PECH', 'liliana.sosa@empresa.com', '001-0876543-2'),
+('1998', 'FERMIN GABRIEL CHI PERERA', 'fermin.chi@empresa.com', '031-0456789-4'),
+('2015', 'JESUS RAFAEL PECH CHULIM', 'jesus.pech@empresa.com', '223-0098765-8');
 
 -- Insertar Usuarios de la Plataforma (Autenticación y Roles)
-INSERT INTO users_simulated (id, email, name, role, password) VALUES
-('usr_super', 'superadmin@empresa.com', 'Superusuario Principal', 'Super Administrador', 'admin'),
-('usr_1', 'sofia.ceo@empresa.com', 'Sofía Martínez', 'Super Administrador', '123'),
-('usr_2', 'admin.capacitacion@empresa.com', 'Carlos Pérez', 'Administrador / Editor', '123'),
-('usr_3', 'juan.diez@empresa.com', 'Juan Díez', 'Colaborador (User)', '123'),
-('usr_4', 'marta.perez@empresa.com', 'Marta Pérez', 'Colaborador (User)', '123');
+INSERT INTO users_simulated (id, email, name, role, password, cedula) VALUES
+('usr_super', 'superadmin@empresa.com', 'Superusuario Principal', 'Super Administrador', 'admin', '402-2196163-1'),
+('usr_1', 'sofia.ceo@empresa.com', 'Sofía Martínez', 'Super Administrador', '123', '001-1928374-5'),
+('usr_2', 'admin.capacitacion@empresa.com', 'Carlos Pérez', 'Administrador / Editor', '123', '001-2837465-9'),
+('usr_3', 'juan.diez@empresa.com', 'Juan Díez', 'Colaborador (User)', '123', '031-1827364-0'),
+('usr_4', 'marta.perez@empresa.com', 'Marta Pérez', 'Colaborador (User)', '123', '223-8765432-1');
 
 -- Insertar Eventos
 INSERT INTO events (id, title, description, category, instructor, image_url, status, send_email, send_teams, custom_message, modality, location, survey_url) VALUES
@@ -173,6 +227,35 @@ INSERT INTO notification_logs (event_id, date, channel, status, recipients) VALU
 -- Insertar Feedback inicial de prueba
 INSERT INTO event_feedbacks (event_id, user_email, user_name, rating, comment) VALUES
 ('evt_1', 'liliana.sosa@empresa.com', 'LILIANA ESTHER SOSA PECH', 5, 'Excelente taller, muy práctico y aplicable a proyectos reales.');
+
+-- Insertar Grupos de Prueba
+INSERT INTO participant_groups (id, name, description, color, department) VALUES
+('grp_ti', 'Departamento de TI & Sistemas', 'Equipo de desarrollo, infraestructura y soporte tecnológico.', 'indigo', 'Tecnología'),
+('grp_ventas', 'Equipo Comercial & Ventas', 'Ejecutivos de cuentas y asesores de atención al cliente.', 'emerald', 'Comercial'),
+('grp_lideres', 'Liderazgo & Mandos Medios', 'Supervisores, gerentes y líderes de proyecto.', 'amber', 'Dirección');
+
+-- Insertar Miembros de Grupos
+INSERT INTO group_members (group_id, participant_card) VALUES
+('grp_ti', '2010'),
+('grp_ti', '2012'),
+('grp_ventas', '1998'),
+('grp_ventas', '2015'),
+('grp_lideres', '2012');
+
+-- Insertar Programa / Cronograma de Prueba
+INSERT INTO training_programs (id, title, description, start_date, end_date, status) VALUES
+('prog_1', 'Plan de Innovación y Habilidades Digitales 2026', 'Ruta formativa obligatoria para potenciar el dominio de tecnologías modernas e inteligencia artificial en flujos de trabajo.', '2026-07-01', '2026-08-31', 'active');
+
+-- Insertar Eventos en el Programa
+INSERT INTO program_events (program_id, event_id, is_mandatory, order_index) VALUES
+('prog_1', 'evt_1', TRUE, 1),
+('prog_1', 'evt_3', TRUE, 2),
+('prog_1', 'evt_2', FALSE, 3);
+
+-- Asignar Grupo al Programa
+INSERT INTO program_target_groups (program_id, group_id) VALUES
+('prog_1', 'grp_ti'),
+('prog_1', 'grp_lideres');
 
 -- ==========================================
 -- SINCRONIZACIÓN DE SECUENCIAS AUTOINCREMENTALES

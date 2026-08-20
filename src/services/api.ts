@@ -3,7 +3,91 @@
 // PROYECTO: GESTIÓN DE RESERVAS DE CAPACITACIONES
 // ==========================================
 
-import { TrainingEvent, Participant, UserAccount, EventFeedback } from '../types';
+import { 
+  TrainingEvent, 
+  Participant, 
+  UserAccount, 
+  EventFeedback, 
+  ParticipantGroup, 
+  TrainingProgram, 
+  ProgramComplianceSummary,
+  ParticipantComplianceDetail,
+  ParticipantEventStatus,
+  ComplianceStatus
+} from '../types';
+
+export const MOCK_GROUPS: ParticipantGroup[] = [
+  {
+    id: "grp_ti",
+    name: "Departamento de TI & Sistemas",
+    description: "Equipo de desarrollo, infraestructura y soporte tecnológico.",
+    color: "indigo",
+    department: "Tecnología",
+    memberCards: ["2010", "2012"],
+    createdAt: "2026-06-01"
+  },
+  {
+    id: "grp_ventas",
+    name: "Equipo Comercial & Ventas",
+    description: "Ejecutivos de cuentas, asesores comerciales y servicio al cliente.",
+    color: "emerald",
+    department: "Comercial",
+    memberCards: ["1998", "2015"],
+    createdAt: "2026-06-05"
+  },
+  {
+    id: "grp_lideres",
+    name: "Liderazgo & Mandos Medios",
+    description: "Supervisores, gerentes de área y líderes de proyecto.",
+    color: "amber",
+    department: "Dirección",
+    memberCards: ["2012"],
+    createdAt: "2026-06-10"
+  },
+  {
+    id: "grp_onboarding",
+    name: "Nuevos Ingresos 2026",
+    description: "Colaboradores incorporados recientemente al plan de inducción.",
+    color: "sky",
+    department: "Recursos Humanos",
+    memberCards: ["2010", "2015"],
+    createdAt: "2026-06-15"
+  }
+];
+
+export const MOCK_PROGRAMS: TrainingProgram[] = [
+  {
+    id: "prog_1",
+    title: "Plan de Innovación y Habilidades Digitales 2026",
+    description: "Ruta formativa estratégica orientada al dominio de herramientas modernas de desarrollo, UX e inteligencia artificial para potenciar la productividad y el trabajo en equipo.",
+    startDate: "2026-07-01",
+    endDate: "2026-08-31",
+    status: "active",
+    eventItems: [
+      { eventId: "evt_1", isMandatory: true, orderIndex: 1 },
+      { eventId: "evt_3", isMandatory: true, orderIndex: 2 },
+      { eventId: "evt_2", isMandatory: false, orderIndex: 3 }
+    ],
+    targetGroupIds: ["grp_ti", "grp_lideres"],
+    targetParticipantCards: [],
+    createdAt: "2026-06-25"
+  },
+  {
+    id: "prog_2",
+    title: "Programa de Inducción y Cultura Organizacional",
+    description: "Capacitaciones esenciales sobre dinámicas de trabajo, seguridad digital y bienestar para nuevos ingresos.",
+    startDate: "2026-08-01",
+    endDate: "2026-09-30",
+    status: "active",
+    eventItems: [
+      { eventId: "evt_2", isMandatory: true, orderIndex: 1 },
+      { eventId: "evt_3", isMandatory: true, orderIndex: 2 }
+    ],
+    targetGroupIds: ["grp_onboarding"],
+    targetParticipantCards: [],
+    createdAt: "2026-07-01"
+  }
+];
 
 export const MOCK_EVENTS: TrainingEvent[] = [
   {
@@ -128,18 +212,19 @@ export const MOCK_EVENTS: TrainingEvent[] = [
 ];
 
 export const MOCK_PARTICIPANTS: Participant[] = [
-  { card: "2010", name: "LUIS ALBERTO ALMAZAN POOT", email: "luis.almazan@empresa.com" },
-  { card: "2012", name: "LILIANA ESTHER SOSA PECH", email: "liliana.sosa@empresa.com" },
-  { card: "1998", name: "FERMIN GABRIEL CHI PERERA", email: "fermin.chi@empresa.com" },
-  { card: "2015", name: "JESUS RAFAEL PECH CHULIM", email: "jesus.pech@empresa.com" }
+  { card: "2010", name: "LUIS ALBERTO ALMAZAN POOT", email: "luis.almazan@empresa.com", cedula: "402-2196163-1", department: "Tecnología", supervisorId: "usr_lead", supervisorName: "Ing. Laura Gómez (Líder TI)" },
+  { card: "2012", name: "LILIANA ESTHER SOSA PECH", email: "liliana.sosa@empresa.com", cedula: "001-0876543-2", department: "Tecnología", supervisorId: "usr_lead", supervisorName: "Ing. Laura Gómez (Líder TI)" },
+  { card: "1998", name: "FERMIN GABRIEL CHI PERERA", email: "fermin.chi@empresa.com", cedula: "031-0456789-4", department: "Operaciones" },
+  { card: "2015", name: "JESUS RAFAEL PECH CHULIM", email: "jesus.pech@empresa.com", cedula: "223-0098765-8", department: "Ventas" }
 ];
 
 export const MOCK_USERS: UserAccount[] = [
-  { id: "usr_super", email: "superadmin@empresa.com", name: "Superusuario Principal", role: "Super Administrador", password: "admin" },
-  { id: "usr_1", email: "sofia.ceo@empresa.com", name: "Sofía Martínez", role: "Super Administrador", password: "123" },
-  { id: "usr_2", email: "admin.capacitacion@empresa.com", name: "Carlos Pérez", role: "Administrador / Editor", password: "123" },
-  { id: "usr_3", email: "juan.diez@empresa.com", name: "Juan Díez", role: "Colaborador (User)", password: "123" },
-  { id: "usr_4", email: "marta.perez@empresa.com", name: "Marta Pérez", role: "Colaborador (User)", password: "123" }
+  { id: "usr_super", email: "superadmin@empresa.com", name: "Superusuario Principal", role: "Super Administrador", password: "admin", cedula: "402-2196163-1" },
+  { id: "usr_1", email: "sofia.ceo@empresa.com", name: "Sofía Martínez", role: "Super Administrador", password: "123", cedula: "001-1928374-5" },
+  { id: "usr_2", email: "admin.capacitacion@empresa.com", name: "Carlos Pérez", role: "Administrador / Editor", password: "123", cedula: "001-2837465-9" },
+  { id: "usr_lead", email: "laura.lider@empresa.com", name: "Ing. Laura Gómez (Líder TI)", role: "Líder de Área / Supervisor", password: "123", cedula: "001-3847261-8", department: "Tecnología", assignedGroupIds: ["grp_ti"], assignedMemberCards: ["2010", "2012"] },
+  { id: "usr_3", email: "juan.diez@empresa.com", name: "Juan Díez", role: "Colaborador (User)", password: "123", cedula: "031-1827364-0" },
+  { id: "usr_4", email: "marta.perez@empresa.com", name: "Marta Pérez", role: "Colaborador (User)", password: "123", cedula: "223-8765432-1" }
 ];
 
 // URLs del Backend (Configurables)
@@ -163,8 +248,18 @@ const initLocalStorage = () => {
     }
   }
 
-  if (!localStorage.getItem('ch_participants')) {
+  const existingParticipants = localStorage.getItem('ch_participants');
+  if (!existingParticipants) {
     localStorage.setItem('ch_participants', JSON.stringify(MOCK_PARTICIPANTS));
+  } else {
+    try {
+      const parsed = JSON.parse(existingParticipants);
+      if (!parsed.some((p: any) => p.cedula)) {
+        localStorage.setItem('ch_participants', JSON.stringify(MOCK_PARTICIPANTS));
+      }
+    } catch (e) {
+      localStorage.setItem('ch_participants', JSON.stringify(MOCK_PARTICIPANTS));
+    }
   }
   
   const existingUsers = localStorage.getItem('ch_users');
@@ -173,13 +268,23 @@ const initLocalStorage = () => {
   } else {
     try {
       const parsed = JSON.parse(existingUsers);
-      const needsMigration = parsed.some((u: any) => !u.password) || !parsed.some((u: any) => u.email === 'superadmin@empresa.com');
+      const needsMigration = parsed.some((u: any) => !u.password) || !parsed.some((u: any) => u.email === 'superadmin@empresa.com') || !parsed.some((u: any) => u.cedula);
       if (needsMigration) {
         localStorage.setItem('ch_users', JSON.stringify(MOCK_USERS));
       }
     } catch (e) {
       localStorage.setItem('ch_users', JSON.stringify(MOCK_USERS));
     }
+  }
+
+  const existingGroups = localStorage.getItem('ch_groups');
+  if (!existingGroups) {
+    localStorage.setItem('ch_groups', JSON.stringify(MOCK_GROUPS));
+  }
+
+  const existingPrograms = localStorage.getItem('ch_programs');
+  if (!existingPrograms) {
+    localStorage.setItem('ch_programs', JSON.stringify(MOCK_PROGRAMS));
   }
 };
 
@@ -315,6 +420,98 @@ export const apiService = {
       });
       localStorage.setItem('ch_events', JSON.stringify(updated));
       return updated;
+    }
+  },
+
+  async bulkRegisterUsers(
+    eventId: string,
+    date: string,
+    time: string,
+    emails: string[],
+    autoExpandCapacity: boolean = true
+  ): Promise<{ events: TrainingEvent[]; enrolledCount: number; skippedAlreadyEnrolled: string[] }> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/registrations/bulk`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventId, date, time, emails, autoExpandCapacity })
+      });
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.message || 'Error al matricular usuarios masivamente');
+      }
+      const data = await res.json();
+      return {
+        events: data.events || (await this.getEvents()),
+        enrolledCount: data.enrolledCount ?? emails.length,
+        skippedAlreadyEnrolled: data.skippedAlreadyEnrolled || []
+      };
+    } else {
+      const events: TrainingEvent[] = JSON.parse(localStorage.getItem('ch_events') || '[]');
+      const participants: Participant[] = JSON.parse(localStorage.getItem('ch_participants') || '[]');
+      const users: UserAccount[] = JSON.parse(localStorage.getItem('ch_users') || '[]');
+      
+      let enrolledCount = 0;
+      const skippedAlreadyEnrolled: string[] = [];
+
+      const updated = events.map(evt => {
+        if (evt.id === eventId) {
+          const updatedSchedule = evt.schedule.map(sch => {
+            if (sch.date === date) {
+              const updatedSlots = sch.slots.map(sl => {
+                if (sl.time === time) {
+                  const existingAttendees = new Set((sl.attendees || []).map(a => a.toLowerCase()));
+                  const toAdd: string[] = [];
+
+                  for (const rawEmail of emails) {
+                    const cleanEmail = rawEmail.trim().toLowerCase();
+                    if (!cleanEmail) continue;
+
+                    if (existingAttendees.has(cleanEmail)) {
+                      skippedAlreadyEnrolled.push(cleanEmail);
+                    } else {
+                      existingAttendees.add(cleanEmail);
+                      toAdd.push(cleanEmail);
+                      enrolledCount++;
+
+                      // Crear participante en padrón local si no existe
+                      if (!participants.some(p => p.email.toLowerCase() === cleanEmail)) {
+                        const matchedUser = users.find(u => u.email.toLowerCase() === cleanEmail);
+                        participants.push({
+                          card: `${Math.floor(1000 + Math.random() * 9000)}`,
+                          name: matchedUser ? matchedUser.name : cleanEmail.split('@')[0].replace(/\./g, ' ').toUpperCase(),
+                          email: cleanEmail,
+                          cedula: matchedUser?.cedula
+                        });
+                      }
+                    }
+                  }
+
+                  const newAttendees = [...(sl.attendees || []), ...toAdd];
+                  const newRegistered = newAttendees.length;
+                  const newCapacity = (autoExpandCapacity && newRegistered > sl.capacity) ? newRegistered : sl.capacity;
+
+                  return {
+                    ...sl,
+                    capacity: newCapacity,
+                    registered: newRegistered,
+                    attendees: newAttendees
+                  };
+                }
+                return sl;
+              });
+              return { ...sch, slots: updatedSlots };
+            }
+            return sch;
+          });
+          return { ...evt, schedule: updatedSchedule };
+        }
+        return evt;
+      });
+
+      localStorage.setItem('ch_events', JSON.stringify(updated));
+      localStorage.setItem('ch_participants', JSON.stringify(participants));
+      return { events: updated, enrolledCount, skippedAlreadyEnrolled };
     }
   },
 
@@ -473,5 +670,289 @@ export const apiService = {
       localStorage.setItem('ch_users', JSON.stringify(updated));
       return updated;
     }
+  },
+
+  // --- MÉTODOS DE GRUPOS DE PARTICIPANTES ---
+  async getGroups(): Promise<ParticipantGroup[]> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/groups`);
+      if (!res.ok) throw new Error('Error al obtener grupos de Postgres');
+      return res.json();
+    } else {
+      return JSON.parse(localStorage.getItem('ch_groups') || '[]');
+    }
+  },
+
+  async saveGroup(group: ParticipantGroup): Promise<ParticipantGroup[]> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/groups`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(group)
+      });
+      if (!res.ok) throw new Error('Error al guardar grupo en Postgres');
+      return res.json();
+    } else {
+      const groups: ParticipantGroup[] = JSON.parse(localStorage.getItem('ch_groups') || '[]');
+      const idx = groups.findIndex(g => g.id === group.id);
+      if (idx > -1) {
+        groups[idx] = group;
+      } else {
+        groups.unshift(group);
+      }
+      localStorage.setItem('ch_groups', JSON.stringify(groups));
+      return groups;
+    }
+  },
+
+  async saveGroups(groups: ParticipantGroup[]): Promise<void> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/groups/bulk`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ groups })
+      });
+      if (!res.ok) throw new Error('Error al importar grupos en Postgres');
+    } else {
+      localStorage.setItem('ch_groups', JSON.stringify(groups));
+    }
+  },
+
+  async deleteGroup(groupId: string): Promise<ParticipantGroup[]> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/groups/${groupId}`, {
+        method: 'DELETE'
+      });
+      if (!res.ok) throw new Error('Error al eliminar grupo en Postgres');
+      return res.json();
+    } else {
+      const groups: ParticipantGroup[] = JSON.parse(localStorage.getItem('ch_groups') || '[]');
+      const updated = groups.filter(g => g.id !== groupId);
+      localStorage.setItem('ch_groups', JSON.stringify(updated));
+      return updated;
+    }
+  },
+
+  // --- MÉTODOS DE PROGRAMAS / CRONOGRAMAS FORMATIVOS ---
+  async getPrograms(): Promise<TrainingProgram[]> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/programs`);
+      if (!res.ok) throw new Error('Error al obtener programas formativos de Postgres');
+      return res.json();
+    } else {
+      return JSON.parse(localStorage.getItem('ch_programs') || '[]');
+    }
+  },
+
+  async saveProgram(program: TrainingProgram): Promise<TrainingProgram[]> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/programs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(program)
+      });
+      if (!res.ok) throw new Error('Error al guardar programa formativo en Postgres');
+      return res.json();
+    } else {
+      const programs: TrainingProgram[] = JSON.parse(localStorage.getItem('ch_programs') || '[]');
+      const idx = programs.findIndex(p => p.id === program.id);
+      if (idx > -1) {
+        programs[idx] = program;
+      } else {
+        programs.unshift(program);
+      }
+      localStorage.setItem('ch_programs', JSON.stringify(programs));
+      return programs;
+    }
+  },
+
+  async deleteProgram(programId: string): Promise<TrainingProgram[]> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/programs/${programId}`, {
+        method: 'DELETE'
+      });
+      if (!res.ok) throw new Error('Error al eliminar programa formativo en Postgres');
+      return res.json();
+    } else {
+      const programs: TrainingProgram[] = JSON.parse(localStorage.getItem('ch_programs') || '[]');
+      const updated = programs.filter(p => p.id !== programId);
+      localStorage.setItem('ch_programs', JSON.stringify(updated));
+      return updated;
+    }
+  },
+
+  // --- CÁLCULO INTELIGENTE DE CUMPLIMIENTO (CLIENT-SIDE & CROSS-PLATFORM) ---
+  calculateProgramCompliance(
+    program: TrainingProgram,
+    events: TrainingEvent[],
+    participants: Participant[],
+    groups: ParticipantGroup[],
+    includeAllParticipants: boolean = false
+  ): ProgramComplianceSummary {
+    const participantsMap = new Map(participants.map(p => [p.card, p]));
+    const targetGroups = groups.filter(g => program.targetGroupIds.includes(g.id));
+
+    // 1. Identificar todas las tarjetas de participantes objetivo
+    const assignedCardsSet = new Set<string>();
+    if (includeAllParticipants) {
+      participants.forEach(p => assignedCardsSet.add(p.card));
+    } else {
+      targetGroups.forEach(g => {
+        g.memberCards.forEach(c => assignedCardsSet.add(c));
+      });
+      (program.targetParticipantCards || []).forEach(c => assignedCardsSet.add(c));
+    }
+
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const isPastDeadline = program.endDate < todayStr;
+
+    const participantsDetails: ParticipantComplianceDetail[] = [];
+
+    assignedCardsSet.forEach(card => {
+      const participant = participantsMap.get(card);
+      if (!participant) return;
+
+      const pEmail = participant.email.toLowerCase();
+
+      // Buscar grupos a los que pertenece el participante dentro del programa
+      const pGroups = targetGroups
+        .filter(g => g.memberCards.includes(card))
+        .map(g => g.name);
+
+      let completedCount = 0;
+      let mandatoryCompleted = 0;
+      const mandatoryTotal = program.eventItems.filter(e => e.isMandatory).length;
+      let hasAnyRegistration = false;
+
+      const eventsDetail: ParticipantEventStatus[] = program.eventItems.map(item => {
+        const evt = events.find(e => e.id === item.eventId);
+        let attended = false;
+        let registered = false;
+        let attendedDate: string | undefined;
+        let registeredDate: string | undefined;
+        let registeredTime: string | undefined;
+
+        if (evt) {
+          evt.schedule.forEach(sch => {
+            sch.slots.forEach(slot => {
+              const inAttendees = slot.attendees.map(a => a.toLowerCase()).includes(pEmail);
+              const inAttended = (slot.attendedList || []).map(a => a.toLowerCase()).includes(pEmail);
+
+              if (inAttended) {
+                attended = true;
+                attendedDate = sch.date;
+              }
+              if (inAttendees) {
+                registered = true;
+                registeredDate = sch.date;
+                registeredTime = slot.time;
+              }
+            });
+          });
+        }
+
+        if (attended) {
+          completedCount++;
+          if (item.isMandatory) mandatoryCompleted++;
+        }
+        if (registered) {
+          hasAnyRegistration = true;
+        }
+
+        return {
+          eventId: item.eventId,
+          isMandatory: item.isMandatory,
+          attended,
+          registered,
+          status: attended ? 'attended' : registered ? 'registered' : 'pending',
+          attendedDate,
+          registeredDate,
+          registeredTime
+        };
+      });
+
+      // Cálculo del porcentaje (priorizando obligatorios si existen)
+      let percentage = 0;
+      if (mandatoryTotal > 0) {
+        percentage = Math.round((mandatoryCompleted / mandatoryTotal) * 100);
+      } else if (program.eventItems.length > 0) {
+        percentage = Math.round((completedCount / program.eventItems.length) * 100);
+      }
+
+      // Determinar estatus de cumplimiento
+      let status: ComplianceStatus = 'not_started';
+      if (percentage === 100) {
+        status = 'completed';
+      } else if (isPastDeadline) {
+        status = 'overdue';
+      } else if (completedCount > 0 || hasAnyRegistration) {
+        status = 'in_progress';
+      } else {
+        status = 'not_started';
+      }
+
+      participantsDetails.push({
+        participantCard: participant.card,
+        participantName: participant.name,
+        participantEmail: participant.email,
+        participantCedula: participant.cedula,
+        groupNames: pGroups,
+        totalAssignedEvents: program.eventItems.length,
+        mandatoryEventsCount: mandatoryTotal,
+        completedEventsCount: completedCount,
+        mandatoryCompletedCount: mandatoryCompleted,
+        percentage,
+        status,
+        eventsDetail
+      });
+    });
+
+    // Ordenar participantes por estatus y porcentaje ascendente
+    participantsDetails.sort((a, b) => {
+      if (a.percentage !== b.percentage) return a.percentage - b.percentage;
+      return a.participantName.localeCompare(b.participantName);
+    });
+
+    // Estadísticas por Grupo
+    const groupStats = targetGroups.map(g => {
+      const groupParticipants = participantsDetails.filter(p => g.memberCards.includes(p.participantCard));
+      const totalMembers = groupParticipants.length;
+      const completedMembers = groupParticipants.filter(p => p.status === 'completed').length;
+      const averagePercentage = totalMembers > 0 
+        ? Math.round(groupParticipants.reduce((acc, curr) => acc + curr.percentage, 0) / totalMembers) 
+        : 0;
+
+      return {
+        groupId: g.id,
+        groupName: g.name,
+        groupColor: g.color || 'indigo',
+        totalMembers,
+        averagePercentage,
+        completedMembers
+      };
+    });
+
+    // Estadísticas Globales
+    const totalParticipants = participantsDetails.length;
+    const completedCount = participantsDetails.filter(p => p.status === 'completed').length;
+    const inProgressCount = participantsDetails.filter(p => p.status === 'in_progress').length;
+    const overdueCount = participantsDetails.filter(p => p.status === 'overdue').length;
+    const notStartedCount = participantsDetails.filter(p => p.status === 'not_started').length;
+    const overallPercentage = totalParticipants > 0
+      ? Math.round(participantsDetails.reduce((acc, curr) => acc + curr.percentage, 0) / totalParticipants)
+      : 0;
+
+    return {
+      programId: program.id,
+      programTitle: program.title,
+      totalParticipants,
+      completedCount,
+      inProgressCount,
+      overdueCount,
+      notStartedCount,
+      overallPercentage,
+      groupStats,
+      participants: participantsDetails
+    };
   }
 };

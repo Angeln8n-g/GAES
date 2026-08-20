@@ -8,6 +8,10 @@ import { attendanceRouter } from './routes/attendance.js';
 import { usersRouter } from './routes/users.js';
 import { feedbackRouter } from './routes/feedback.js';
 import { notificationsRouter } from './routes/notifications.js';
+import { groupsRouter } from './routes/groups.js';
+import { programsRouter } from './routes/programs.js';
+
+import { pool, initDbMigrations } from './db.js';
 
 dotenv.config();
 
@@ -35,12 +39,16 @@ app.use('/api/attendance', attendanceRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/feedback', feedbackRouter);
 app.use('/api/notifications', notificationsRouter);
+app.use('/api/groups', groupsRouter);
+app.use('/api/programs', programsRouter);
 
 // Iniciar Servidor
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`=========================================`);
   console.log(`🚀 Servidor CapacitaHub API en ejecución`);
   console.log(`📡 Puerto: http://localhost:${PORT}`);
   console.log(`🌐 Health check: http://localhost:${PORT}/api/health`);
   console.log(`=========================================`);
+  await initDbMigrations();
 });
+

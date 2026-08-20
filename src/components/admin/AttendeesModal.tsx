@@ -8,7 +8,8 @@ import {
   Clock, 
   Calendar as CalendarIcon, 
   UserCheck,
-  UserX
+  UserX,
+  UserPlus
 } from 'lucide-react';
 import { TrainingEvent, Participant } from '../../types';
 import { exportAttendeesToExcel } from '../../utils/excelUtils';
@@ -17,15 +18,19 @@ import { formatDateLong } from '../../utils/formatters';
 interface AttendeesModalProps {
   event: TrainingEvent | null;
   participants: Participant[];
+  isSuperAdmin?: boolean;
   onClose: () => void;
   onConfirmAttendance: (eventId: string, date: string, time: string, email: string) => Promise<void>;
+  onOpenBulkEnrollment?: (eventId: string, date: string, time: string) => void;
 }
 
 export const AttendeesModal: React.FC<AttendeesModalProps> = ({
   event,
   participants,
+  isSuperAdmin = false,
   onClose,
-  onConfirmAttendance
+  onConfirmAttendance,
+  onOpenBulkEnrollment
 }) => {
   if (!event) return null;
 
@@ -108,13 +113,25 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
               </div>
 
               {currentSlot && (
-                <button
-                  onClick={() => exportAttendeesToExcel(event, selectedDate, selectedTime, attendeesList, attendedList, participants)}
-                  className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition-all"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Exportar Asistentes (.xlsx)</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  {isSuperAdmin && onOpenBulkEnrollment && (
+                    <button
+                      onClick={() => onOpenBulkEnrollment(event.id, selectedDate, selectedTime)}
+                      className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-indigo-600/30 transition-all"
+                    >
+                      <UserPlus className="w-3.5 h-3.5" />
+                      <span>Matricular Masivamente</span>
+                    </button>
+                  )}
+
+                  <button
+                    onClick={() => exportAttendeesToExcel(event, selectedDate, selectedTime, attendeesList, attendedList, participants)}
+                    className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition-all"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Exportar Asistentes (.xlsx)</span>
+                  </button>
+                </div>
               )}
             </div>
           )}

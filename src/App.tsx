@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { apiService, MOCK_USERS } from './services/api';
+import { apiService, MOCK_USERS, MOCK_GROUPS, MOCK_PROGRAMS } from './services/api';
 import { 
   TrainingEvent, 
   Participant, 
   UserAccount, 
   ToastNotification, 
   TabView, 
-  EventFeedback 
+  EventFeedback,
+  ParticipantGroup,
+  TrainingProgram
 } from './types';
 import { Navbar } from './components/layout/Navbar';
 import { LoginModal } from './components/auth/LoginModal';
@@ -16,12 +18,15 @@ import { ReservationModal } from './components/reservations/ReservationModal';
 import { AttendanceView } from './components/attendance/AttendanceView';
 import { DashboardView } from './components/dashboard/DashboardView';
 import { AdminView } from './components/admin/AdminView';
+import { TeamLeadView } from './components/supervisor/TeamLeadView';
 import { Toast } from './components/common/Toast';
 
 export function App() {
   const [events, setEvents] = useState<TrainingEvent[]>([]);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [users, setUsers] = useState<UserAccount[]>(MOCK_USERS);
+  const [groups, setGroups] = useState<ParticipantGroup[]>(MOCK_GROUPS);
+  const [programs, setPrograms] = useState<TrainingProgram[]>(MOCK_PROGRAMS);
 
   // Sesión del usuario autenticado
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
@@ -49,14 +54,18 @@ export function App() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [loadedEvents, loadedParticipants, loadedUsers] = await Promise.all([
+        const [loadedEvents, loadedParticipants, loadedUsers, loadedGroups, loadedPrograms] = await Promise.all([
           apiService.getEvents(),
           apiService.getParticipants(),
-          apiService.getUsers()
+          apiService.getUsers(),
+          apiService.getGroups(),
+          apiService.getPrograms()
         ]);
         setEvents(loadedEvents);
         setParticipants(loadedParticipants);
         setUsers(loadedUsers);
+        setGroups(loadedGroups);
+        setPrograms(loadedPrograms);
       } catch (err) {
         console.error('Error al cargar datos:', err);
       }
@@ -138,7 +147,42 @@ export function App() {
     setUsers(newUsers);
   };
 
-  const handleSendNotification = async (eventId: string, channel: 'Email' | 'Teams', message: string, recipients: number) => {
+  const handleSaveGroup = async (group: ParticipantGroup) => {
+    const updated = await apiService.saveGroup(group);
+    setGroups(updated);
+  };
+
+  const handleDeleteGroup = async (groupId: string) => {
+    const updated = await apiService.deleteGroup(groupId);
+    setGroups(updated);
+  };
+
+  const handleSaveProgram = async (program: TrainingProgram) => {
+    const updated = await apiService.saveProgram(program);
+    setPrograms(updated);
+  };
+
+  const handleDeleteProgram = async (programId: string) => {
+    const updated = await apiService.deleteProgram(programId);
+    setPrograms(updated);
+  };
+
+  const handleBulkRegisterUsers = async (
+    eventId: string,
+    date: string,
+    time: string,
+    emails: string[],
+    autoExpandCapacity?: boolean
+  ) => {
+    const res = await apiService.bulkRegisterUsers(eventId, date, time, emails, autoExpandCapacity);
+    setEvents(res.events);
+    // Reload participants as well since new ones might have been created
+    const updatedParticipants = await apiService.getParticipants();
+    setParticipants(updatedParticipants);
+    return res;
+  };
+
+  const handleSendNotification = async (eventId: string, channel: 'Email' | 'Teams' | 'WhatsApp', message: string, recipients: number) => {
     const updatedEvents = events.map(evt => {
       if (evt.id === eventId) {
         const history = evt.notificationHistory || [];
@@ -205,17 +249,24 @@ export function App() {
           <CatalogView
             events={events}
             currentUser={currentUser}
+            programs={programs}
+            groups={groups}
+            participants={participants}
             onOpenReservationModal={(event) => setSelectedEventForModal(event)}
           />
         )}
 
-        {/* Tab 2: Mis Inscripciones */}
+        {/* Tab 2: Mis Inscripciones & Rutas Formativas */}
         {currentTab === 'my-registrations' && (
           <MyRegistrationsView
             events={events}
             currentUser={currentUser}
+            programs={programs}
+            groups={groups}
+            participants={participants}
             onCancelRegistration={handleCancelRegistration}
             onExploreCatalog={() => setCurrentTab('landing')}
+            onOpenReservationModal={(event) => setSelectedEventForModal(event)}
           />
         )}
 
@@ -224,6 +275,9 @@ export function App() {
           <DashboardView
             events={events}
             participants={participants}
+            groups={groups}
+            programs={programs}
+            onShowToast={showToast}
           />
         )}
 
@@ -233,18 +287,39 @@ export function App() {
             events={events}
             participants={participants}
             users={users}
+            groups={groups}
+            programs={programs}
             currentUser={currentUser}
             onSaveEvent={handleSaveEvent}
             onDeleteEvent={handleDeleteEvent}
             onSaveParticipants={handleSaveParticipants}
             onSaveUsers={handleSaveUsers}
+            onSaveGroup={handleSaveGroup}
+            onDeleteGroup={handleDeleteGroup}
+            onSaveProgram={handleSaveProgram}
+            onDeleteProgram={handleDeleteProgram}
             onConfirmAttendance={handleConfirmAttendance}
+            onSendNotification={handleSendNotification}
+            onBulkRegisterUsers={handleBulkRegisterUsers}
+            onShowToast={showToast}
+          />
+        )}
+
+        {/* Tab 5: Mi Equipo (Supervisores y Líderes de Área) */}
+        {currentTab === 'team' && (
+          <TeamLeadView
+            currentUser={currentUser}
+            users={users}
+            events={events}
+            participants={participants}
+            groups={groups}
+            programs={programs}
             onSendNotification={handleSendNotification}
             onShowToast={showToast}
           />
         )}
 
-        {/* Tab 5: Check-in de Asistencia Presencial por QR */}
+        {/* Tab 6: Check-in de Asistencia Presencial por QR */}
         {currentTab === 'attendance' && attendanceEventId && attendanceDate && attendanceTime && (
           <AttendanceView
             events={events}

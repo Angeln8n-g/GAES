@@ -11,13 +11,18 @@ import {
   Trash2, 
   QrCode, 
   CheckCircle2, 
-  AlertTriangle,
-  ArrowRight,
-  Sparkles,
-  X
+  AlertTriangle, 
+  ArrowRight, 
+  Sparkles, 
+  X,
+  Award,
+  Layers,
+  BookOpen,
+  Check,
+  ChevronRight
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import { TrainingEvent, UserAccount, Slot, Schedule } from '../../types';
+import { TrainingEvent, UserAccount, Slot, Schedule, TrainingProgram, ParticipantGroup, Participant } from '../../types';
 import { formatDateLong } from '../../utils/formatters';
 import { downloadIcsFile, getGoogleCalendarUrl, getOutlookCalendarUrl } from '../../utils/icsUtils';
 
@@ -31,15 +36,23 @@ interface UserRegistrationItem {
 interface MyRegistrationsViewProps {
   events: TrainingEvent[];
   currentUser: UserAccount | null;
+  programs?: TrainingProgram[];
+  groups?: ParticipantGroup[];
+  participants?: Participant[];
   onCancelRegistration: (eventId: string, date: string, time: string, email: string) => Promise<void>;
   onExploreCatalog: () => void;
+  onOpenReservationModal?: (event: TrainingEvent) => void;
 }
 
 export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
   events,
   currentUser,
+  programs = [],
+  groups = [],
+  participants = [],
   onCancelRegistration,
-  onExploreCatalog
+  onExploreCatalog,
+  onOpenReservationModal
 }) => {
   const [cancelingItem, setCancelingItem] = useState<UserRegistrationItem | null>(null);
   const [selectedPassItem, setSelectedPassItem] = useState<UserRegistrationItem | null>(null);
@@ -85,6 +98,21 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
     }
   };
 
+  // Identificar tarjeta y datos de participante del usuario actual
+  const userEmail = currentUser.email.toLowerCase();
+  const currentParticipant = participants.find(p => p.email.toLowerCase() === userEmail);
+  const userCard = currentParticipant?.card;
+
+  // Programas activos asignados al usuario
+  const assignedPrograms = programs.filter(prog => {
+    if (prog.status !== 'active') return false;
+    const isTargetByGroup = groups.some(g => 
+      prog.targetGroupIds.includes(g.id) && userCard && g.memberCards.includes(userCard)
+    );
+    const isTargetDirect = Boolean(userCard && (prog.targetParticipantCards || []).includes(userCard));
+    return isTargetByGroup || isTargetDirect;
+  });
+
   return (
     <div className="space-y-8 pb-16">
       
@@ -95,9 +123,9 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
             <CalendarCheck2 className="w-4 h-4" />
             <span>Panel del Colaborador</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Mis Capacitaciones Agendadas</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Mis Capacitaciones & Rutas</h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Consulta tus horarios, gestiona tus recordatorios y genera tus pases de acceso QR.
+            Consulta tus horarios agendados, monitorea el cumplimiento de tus cronogramas y genera pases QR.
           </p>
         </div>
 
@@ -107,9 +135,208 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
         </div>
       </div>
 
+      {/* SECCIÓN: RUTAS Y CRONOGRAMAS ASIGNADOS */}
+      {assignedPrograms.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-xs font-bold text-indigo-400 uppercase tracking-wider">
+            <Sparkles className="w-4 h-4" />
+            <span>Tus Rutas Formativas & Cronogramas Obligatorios</span>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6">
+            {assignedPrograms.map(prog => {
+              // Calcular avance personal para este programa
+              const mandatoryItems = prog.eventItems.filter(e => e.isMandatory);
+              
+              let completedMandatory = 0;
+              let totalCompleted = 0;
+
+              const coursesProgress = prog.eventItems.map(item => {
+                const targetEvent = events.find(e => e.id === item.eventId);
+                let hasAttended = false;
+                let isRegistered = false;
+                let registeredDate = '';
+                let registeredTime = '';
+
+                if (targetEvent) {
+                  targetEvent.schedule.forEach(sch => {
+                    sch.slots.forEach(slot => {
+                      if (slot.attendees.map(a => a.toLowerCase()).includes(userEmail)) {
+                        isRegistered = true;
+                        registeredDate = sch.date;
+                        registeredTime = slot.time;
+                      }
+                      if ((slot.attendedList || []).map(a => a.toLowerCase()).includes(userEmail)) {
+                        hasAttended = true;
+                      }
+                    });
+                  });
+                }
+
+                if (hasAttended) {
+                  totalCompleted++;
+                  if (item.isMandatory) completedMandatory++;
+                }
+
+                return {
+                  event: targetEvent,
+                  isMandatory: item.isMandatory,
+                  hasAttended,
+                  isRegistered,
+                  registeredDate,
+                  registeredTime
+                };
+              });
+
+              const percentage = mandatoryItems.length > 0 
+                ? Math.round((completedMandatory / mandatoryItems.length) * 100)
+                : Math.round((totalCompleted / prog.eventItems.length) * 100);
+
+              const isCompleted = percentage === 100;
+              const isOverdue = new Date(prog.endDate) < new Date() && !isCompleted;
+
+              return (
+                <div 
+                  key={prog.id}
+                  className="bg-gradient-to-br from-slate-900 via-indigo-950/20 to-slate-900 border border-indigo-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase border ${
+                          isCompleted
+                            ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                            : isOverdue
+                            ? 'bg-rose-500/20 text-rose-400 border-rose-500/30'
+                            : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
+                        }`}>
+                          {isCompleted ? '✓ Cronograma Completado' : isOverdue ? 'Atrasado / Por Vencer' : 'Ruta Activa'}
+                        </span>
+                        <span className="text-xs text-slate-400">
+                          Fecha Límite: <strong className="text-slate-200">{formatDateLong(prog.endDate)}</strong>
+                        </span>
+                      </div>
+
+                      <h2 className="text-xl font-black text-white">{prog.title}</h2>
+                      <p className="text-xs text-slate-400 mt-1 max-w-2xl">{prog.description}</p>
+                    </div>
+
+                    {/* Progress Percentage Badge */}
+                    <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center p-3 sm:p-0 rounded-2xl bg-slate-950/60 sm:bg-transparent border sm:border-0 border-slate-800">
+                      <div className="text-left sm:text-right">
+                        <span className="text-xs text-slate-400 font-semibold block">Tu Cumplimiento</span>
+                        <span className="text-2xl font-black text-indigo-400">{percentage}%</span>
+                      </div>
+                      <span className="text-[11px] text-slate-400 mt-0.5">
+                        {completedMandatory} de {mandatoryItems.length} obligatorios
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800/80">
+                    <div 
+                      className={`h-full rounded-full transition-all duration-700 ${
+                        isCompleted ? 'bg-emerald-500' : 'bg-gradient-to-r from-indigo-500 to-cyan-400'
+                      }`}
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+
+                  {/* Courses Checklist */}
+                  <div className="space-y-3 pt-2">
+                    <span className="text-xs font-bold text-slate-300 block">
+                      Capacitaciones requeridas en este programa:
+                    </span>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                      {coursesProgress.map((cp, idx) => {
+                        const { event, isMandatory, hasAttended, isRegistered, registeredDate, registeredTime } = cp;
+                        if (!event) return null;
+
+                        return (
+                          <div 
+                            key={event.id}
+                            className={`p-4 rounded-2xl border transition-all flex flex-col justify-between ${
+                              hasAttended 
+                                ? 'bg-emerald-950/20 border-emerald-500/30' 
+                                : isRegistered 
+                                ? 'bg-indigo-950/20 border-indigo-500/30' 
+                                : 'bg-slate-950/70 border-slate-800 hover:border-slate-700'
+                            }`}
+                          >
+                            <div>
+                              <div className="flex items-center justify-between gap-2 mb-2">
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                  isMandatory 
+                                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' 
+                                    : 'bg-slate-800 text-slate-400'
+                                }`}>
+                                  {isMandatory ? '★ Obligatorio' : 'Opcional'}
+                                </span>
+
+                                {hasAttended ? (
+                                  <span className="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
+                                    <CheckCircle2 className="w-3.5 h-3.5" /> Completado
+                                  </span>
+                                ) : isRegistered ? (
+                                  <span className="text-[11px] font-bold text-indigo-400 flex items-center gap-1">
+                                    <Clock className="w-3.5 h-3.5" /> Agendado
+                                  </span>
+                                ) : (
+                                  <span className="text-[11px] font-semibold text-slate-500">
+                                    Pendiente
+                                  </span>
+                                )}
+                              </div>
+
+                              <h4 className="text-xs font-bold text-white line-clamp-2">{event.title}</h4>
+                              <p className="text-[11px] text-slate-400 mt-1">Instructor: {event.instructor}</p>
+                            </div>
+
+                            <div className="mt-4 pt-3 border-t border-slate-800/60 flex items-center justify-between">
+                              {hasAttended ? (
+                                <span className="text-[11px] text-emerald-400 font-semibold">
+                                  Asistencia registrada ✓
+                                </span>
+                              ) : isRegistered ? (
+                                <span className="text-[11px] text-slate-300 font-medium">
+                                  📅 {registeredDate} ({registeredTime})
+                                </span>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => onOpenReservationModal && onOpenReservationModal(event)}
+                                  className="w-full py-1.5 px-3 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow transition-colors flex items-center justify-center gap-1.5"
+                                >
+                                  <span>Agendar Ahora</span>
+                                  <ChevronRight className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Registrations List */}
-      {userRegistrations.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+            Tus Inscripciones y Pases de Acceso ({userRegistrations.length})
+          </h3>
+        </div>
+
+        {userRegistrations.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {userRegistrations.map((item, idx) => {
             const { event, schedule, slot, hasAttended } = item;
             
@@ -238,6 +465,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
           </button>
         </div>
       )}
+      </div>
 
       {/* Cancel Confirmation Modal */}
       {cancelingItem && (

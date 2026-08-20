@@ -31,6 +31,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const isSuperAdmin = currentUser.role === 'Super Administrador';
   const isAdminOrSuper = isSuperAdmin || currentUser.role === 'Administrador / Editor';
+  const isLeaderOrAdmin = isAdminOrSuper || currentUser.role === 'Líder de Área / Supervisor';
 
   return (
     <header className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800 shadow-lg">
@@ -91,6 +92,20 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </button>
 
+            {isLeaderOrAdmin && (
+              <button
+                onClick={() => setCurrentTab('team')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+                  currentTab === 'team'
+                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30 font-bold'
+                    : 'text-slate-400 hover:text-emerald-300 hover:bg-slate-800/50'
+                }`}
+              >
+                <UserCheck className="w-4 h-4" />
+                Mi Equipo
+              </button>
+            )}
+
             {isSuperAdmin && (
               <button
                 onClick={() => setCurrentTab('dashboard')}
@@ -133,6 +148,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <span className="text-[10px] font-semibold text-amber-400 flex items-center gap-1">
                       <ShieldCheck className="w-3 h-3" /> Super Admin
                     </span>
+                  ) : currentUser.role === 'Líder de Área / Supervisor' ? (
+                    <span className="text-[10px] font-semibold text-emerald-400 flex items-center gap-1">
+                      <ShieldCheck className="w-3 h-3" /> Líder de Área
+                    </span>
                   ) : isAdminOrSuper ? (
                     <span className="text-[10px] font-semibold text-indigo-400">Administrador</span>
                   ) : (
@@ -154,7 +173,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Mobile Navigation Bar */}
-        <div className="md:hidden flex items-center justify-around py-2.5 border-t border-slate-800/60 overflow-x-auto">
+        <div className="md:hidden flex items-center justify-around py-2.5 border-t border-slate-800/60 overflow-x-auto gap-1">
           <button
             onClick={() => setCurrentTab('landing')}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 ${
@@ -171,6 +190,16 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <CalendarCheck2 className="w-3.5 h-3.5" /> Mis Cursos ({myRegistrationsCount})
           </button>
+          {isLeaderOrAdmin && (
+            <button
+              onClick={() => setCurrentTab('team')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 ${
+                currentTab === 'team' ? 'bg-emerald-600 text-white' : 'text-slate-400'
+              }`}
+            >
+              <UserCheck className="w-3.5 h-3.5" /> Mi Equipo
+            </button>
+          )}
           {isSuperAdmin && (
             <button
               onClick={() => setCurrentTab('dashboard')}

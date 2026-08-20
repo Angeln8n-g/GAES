@@ -16,12 +16,14 @@ import { formatDateShort } from '../../utils/formatters';
 interface EventCardProps {
   event: TrainingEvent;
   currentUser: UserAccount | null;
+  isRequiredInProgram?: boolean;
   onOpenReservationModal: (event: TrainingEvent) => void;
 }
 
 export const EventCard: React.FC<EventCardProps> = ({
   event,
   currentUser,
+  isRequiredInProgram = false,
   onOpenReservationModal
 }) => {
   // Calcular total de cupos y registros
@@ -61,10 +63,17 @@ export const EventCard: React.FC<EventCardProps> = ({
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-black/40" />
 
         {/* Top Badges */}
-        <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-          <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-indigo-600/90 text-white backdrop-blur-md shadow-md">
-            {event.category}
-          </span>
+        <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-indigo-600/90 text-white backdrop-blur-md shadow-md">
+              {event.category}
+            </span>
+            {isRequiredInProgram && (
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-600/90 text-white backdrop-blur-md shadow-md border border-purple-400/40 animate-pulse">
+                ★ En tu Cronograma
+              </span>
+            )}
+          </div>
           <span className={`px-2.5 py-1 rounded-full text-[11px] font-semibold backdrop-blur-md flex items-center gap-1 ${
             event.modality === 'Virtual'
               ? 'bg-cyan-950/80 text-cyan-300 border border-cyan-500/30'

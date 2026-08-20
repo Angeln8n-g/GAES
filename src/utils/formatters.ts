@@ -61,3 +61,29 @@ export const formatDateShort = (dateStr: string): string => {
 export const generateRandomCard = (): string => {
   return `${Math.floor(1000 + Math.random() * 9000)}`;
 };
+
+/**
+ * Valida si una cédula cumple con el formato estricto de 11 dígitos (000-0000000-0)
+ * Ejemplo válido: 402-2196163-1
+ */
+export const isValidCedula = (cedula?: string): boolean => {
+  if (!cedula) return false;
+  return /^\d{3}-\d{7}-\d{1}$/.test(cedula.trim());
+};
+
+/**
+ * Aplica máscara y auto-formateo a una cédula conforme el usuario escribe (máx 11 dígitos: 000-0000000-0)
+ * Ejemplo: "40221961631" -> "402-2196163-1"
+ */
+export const formatCedula = (val: string): string => {
+  if (!val) return '';
+  const digits = val.replace(/\D/g, '').slice(0, 11);
+  if (digits.length <= 3) {
+    return digits;
+  }
+  if (digits.length <= 10) {
+    return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  }
+  return `${digits.slice(0, 3)}-${digits.slice(3, 10)}-${digits.slice(10, 11)}`;
+};
+

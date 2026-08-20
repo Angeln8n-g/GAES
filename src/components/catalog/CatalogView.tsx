@@ -9,7 +9,7 @@ import {
   CalendarCheck,
   AlertCircle
 } from 'lucide-react';
-import { TrainingEvent, UserAccount } from '../../types';
+import { TrainingEvent, UserAccount, TrainingProgram, ParticipantGroup, Participant } from '../../types';
 import { EventCard } from './EventCard';
 import { PerpetualCalendar } from './PerpetualCalendar';
 
@@ -18,12 +18,18 @@ const CATEGORIES = ["Todos", "Taller", "Curso", "Webinar", "Charla", "Cine Forum
 interface CatalogViewProps {
   events: TrainingEvent[];
   currentUser: UserAccount | null;
+  programs?: TrainingProgram[];
+  groups?: ParticipantGroup[];
+  participants?: Participant[];
   onOpenReservationModal: (event: TrainingEvent) => void;
 }
 
 export const CatalogView: React.FC<CatalogViewProps> = ({
   events,
   currentUser,
+  programs = [],
+  groups = [],
+  participants = [],
   onOpenReservationModal
 }) => {
   const [selectedCategory, setSelectedCategory] = useState("Todos");
@@ -31,6 +37,25 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   const [onlyAvailable, setOnlyAvailable] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<string | null>(null);
+
+  // Eventos requeridos en los programas del usuario logueado
+  const userEmail = currentUser?.email?.toLowerCase();
+  const currentParticipant = participants.find(p => p.email.toLowerCase() === userEmail);
+  const userCard = currentParticipant?.card;
+
+  const requiredEventIds = new Set<string>();
+  if (userCard) {
+    programs.forEach(prog => {
+      if (prog.status !== 'active') return;
+      const isTarget = groups.some(g => prog.targetGroupIds.includes(g.id) && g.memberCards.includes(userCard)) ||
+                       (prog.targetParticipantCards || []).includes(userCard);
+      if (isTarget) {
+        prog.eventItems.forEach(item => {
+          requiredEventIds.add(item.eventId);
+        });
+      }
+    });
+  }
 
   // Filtrado compuesto
   const filteredEvents = events.filter(evt => {
@@ -206,6 +231,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   key={event.id}
                   event={event}
                   currentUser={currentUser}
+                  isRequiredInProgram={requiredEventIds.has(event.id)}
                   onOpenReservationModal={onOpenReservationModal}
                 />
               ))}

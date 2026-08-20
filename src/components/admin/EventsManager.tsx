@@ -12,28 +12,33 @@ import {
   MapPin, 
   Video, 
   AlertTriangle,
-  ExternalLink
+  ExternalLink,
+  UserPlus
 } from 'lucide-react';
 import { TrainingEvent } from '../../types';
 import { formatDateShort } from '../../utils/formatters';
 
 interface EventsManagerProps {
   events: TrainingEvent[];
+  isSuperAdmin?: boolean;
   onOpenCreateModal: () => void;
   onOpenEditModal: (event: TrainingEvent) => void;
   onOpenAttendeesModal: (event: TrainingEvent) => void;
   onOpenNotificationModal: (event: TrainingEvent) => void;
   onOpenQrModal: (event: TrainingEvent) => void;
+  onOpenBulkEnrollment?: (eventId?: string) => void;
   onDeleteEvent: (eventId: string) => Promise<void>;
 }
 
 export const EventsManager: React.FC<EventsManagerProps> = ({
   events,
+  isSuperAdmin = false,
   onOpenCreateModal,
   onOpenEditModal,
   onOpenAttendeesModal,
   onOpenNotificationModal,
   onOpenQrModal,
+  onOpenBulkEnrollment,
   onDeleteEvent
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -73,13 +78,25 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
           />
         </div>
 
-        <button
-          onClick={onOpenCreateModal}
-          className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-2xl shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 hover:scale-105 transition-all"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Crear Nueva Capacitación</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          {isSuperAdmin && onOpenBulkEnrollment && (
+            <button
+              onClick={() => onOpenBulkEnrollment()}
+              className="px-3.5 py-2.5 bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-500/30 text-indigo-200 text-xs font-bold rounded-2xl flex items-center gap-1.5 shadow-md shadow-indigo-600/10 transition-all"
+            >
+              <UserPlus className="w-4 h-4 text-indigo-400" />
+              <span>Matriculación Masiva</span>
+            </button>
+          )}
+
+          <button
+            onClick={onOpenCreateModal}
+            className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-2xl shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 hover:scale-105 transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Crear Nueva Capacitación</span>
+          </button>
+        </div>
       </div>
 
       {/* Events Table / Cards */}
