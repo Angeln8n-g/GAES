@@ -7,13 +7,34 @@ const { Pool } = pg;
 
 const connectionString = process.env.DATABASE_URL;
 
+const shouldEnableSSL = () => {
+  if (process.env.DB_SSL === 'true' || process.env.DB_SSL === '1') {
+    return { rejectUnauthorized: false };
+  }
+  if (process.env.DB_SSL === 'false' || process.env.DB_SSL === '0') {
+    return false;
+  }
+  if (connectionString) {
+    if (
+      connectionString.includes('localhost') ||
+      connectionString.includes('127.0.0.1') ||
+      connectionString.includes('@postgres:') ||
+      connectionString.includes('sslmode=disable')
+    ) {
+      return false;
+    }
+    if (connectionString.includes('sslmode=require') || connectionString.includes('ssl=true')) {
+      return { rejectUnauthorized: false };
+    }
+  }
+  return false;
+};
+
 export const pool = new Pool(
   connectionString
     ? {
         connectionString,
-        ssl: process.env.NODE_ENV === 'production' && !connectionString.includes('localhost')
-          ? { rejectUnauthorized: false }
-          : false
+        ssl: shouldEnableSSL()
       }
     : {
         host: process.env.PGHOST || 'localhost',
@@ -21,7 +42,7 @@ export const pool = new Pool(
         user: process.env.PGUSER || 'postgres',
         password: process.env.PGPASSWORD || 'postgres',
         database: process.env.PGDATABASE || 'capacitahub_db',
-        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+        ssl: shouldEnableSSL()
       }
 );
 

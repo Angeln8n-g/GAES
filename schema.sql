@@ -173,3 +173,14 @@ INSERT INTO notification_logs (event_id, date, channel, status, recipients) VALU
 -- Insertar Feedback inicial de prueba
 INSERT INTO event_feedbacks (event_id, user_email, user_name, rating, comment) VALUES
 ('evt_1', 'liliana.sosa@empresa.com', 'LILIANA ESTHER SOSA PECH', 5, 'Excelente taller, muy práctico y aplicable a proyectos reales.');
+
+-- ==========================================
+-- SINCRONIZACIÓN DE SECUENCIAS AUTOINCREMENTALES
+-- ==========================================
+SELECT setval(pg_get_serial_sequence('event_schedules', 'id'), COALESCE((SELECT MAX(id) FROM event_schedules), 1));
+SELECT setval(pg_get_serial_sequence('event_slots', 'id'), COALESCE((SELECT MAX(id) FROM event_slots), 1));
+SELECT setval(pg_get_serial_sequence('registrations', 'id'), COALESCE((SELECT MAX(id) FROM registrations), 1));
+SELECT setval(pg_get_serial_sequence('notification_logs', 'id'), COALESCE((SELECT MAX(id) FROM notification_logs), 1));
+SELECT setval(pg_get_serial_sequence('attendance_logs', 'id'), COALESCE((SELECT MAX(id) FROM attendance_logs), 1));
+SELECT setval(pg_get_serial_sequence('event_feedbacks', 'id'), COALESCE((SELECT MAX(id) FROM event_feedbacks), 1));
+
