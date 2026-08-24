@@ -1,0 +1,65 @@
+{
+  "name": "Aprendizaje y Desarrollo - Portal de Formación Inteligente",
+  "short_name": "CapacitaHub",
+  "description": "Plataforma Integral de Capacitación, Acompañamiento OJT, Bitácoras, Calibración y Gestión de Reservas de Claro Dominicana.",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "background_color": "#0F172A",
+  "theme_color": "#DA291C",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "es-DO",
+  "dir": "ltr",
+  "categories": ["education", "productivity", "business"],
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Catálogo de Capacitaciones",
+      "short_name": "Catálogo",
+      "description": "Explorar catálogo de cursos y talleres formativos",
+      "url": "/?tab=landing",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Bitácoras & OJT",
+      "short_name": "OJT",
+      "description": "Acceder a bitácoras de campo y mesas de calibración",
+      "url": "/?tab=ojt",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Mis Cursos Registrados",
+      "short_name": "Mis Cursos",
+      "description": "Consultar mis inscripciones y rutas formativas",
+      "url": "/?tab=my-registrations",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, RotateCcw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, RotateCcw, Sparkles } from 'lucide-react';
 import { TrainingEvent } from '../../types';
 import { getCalendarGrid, CalendarDay } from '../../utils/calendarUtils';
 import { MONTH_NAMES_ES, DAY_NAMES_SHORT_ES } from '../../utils/formatters';
@@ -39,20 +39,20 @@ export const PerpetualCalendar: React.FC<PerpetualCalendarProps> = ({
   const calendarDays: CalendarDay[] = getCalendarGrid(currentYear, currentMonth, events);
 
   return (
-    <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+    <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs hover:shadow-md transition-shadow">
       
       {/* Calendar Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-red-50 text-[#DA291C] border border-red-200">
+          <div className="w-10 h-10 rounded-2xl bg-red-50 text-[#DA291C] border border-red-100 flex items-center justify-center shadow-2xs">
             <CalendarIcon className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+            <h3 className="text-base font-black text-slate-900 flex items-center gap-1.5">
               <span>{MONTH_NAMES_ES[currentMonth - 1]}</span>
               <span className="text-[#DA291C]">{currentYear}</span>
             </h3>
-            <p className="text-xs text-slate-500">Filtrar por fecha específica</p>
+            <p className="text-xs text-slate-500 font-medium">Explorar por fecha</p>
           </div>
         </div>
 
@@ -60,7 +60,7 @@ export const PerpetualCalendar: React.FC<PerpetualCalendarProps> = ({
           {selectedDate && (
             <button
               onClick={() => onSelectDate(null)}
-              className="px-2.5 py-1.5 rounded-xl bg-slate-100 text-xs font-bold text-slate-700 hover:bg-slate-200 transition-colors flex items-center gap-1"
+              className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-[11px] font-bold text-slate-700 transition-colors flex items-center gap-1 cursor-pointer"
               title="Limpiar filtro de fecha"
             >
               <RotateCcw className="w-3 h-3 text-[#DA291C]" />
@@ -68,17 +68,17 @@ export const PerpetualCalendar: React.FC<PerpetualCalendarProps> = ({
             </button>
           )}
 
-          <div className="flex items-center bg-slate-100 border border-slate-200 rounded-2xl p-1">
+          <div className="flex items-center bg-slate-100/90 border border-slate-200 rounded-2xl p-1">
             <button
               onClick={handlePrevMonth}
-              className="p-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white transition-colors"
+              className="p-1.5 rounded-xl text-slate-600 hover:text-slate-950 hover:bg-white transition-colors cursor-pointer"
               title="Mes Anterior"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={handleNextMonth}
-              className="p-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white transition-colors"
+              className="p-1.5 rounded-xl text-slate-600 hover:text-slate-950 hover:bg-white transition-colors cursor-pointer"
               title="Mes Siguiente"
             >
               <ChevronRight className="w-4 h-4" />
@@ -88,11 +88,11 @@ export const PerpetualCalendar: React.FC<PerpetualCalendarProps> = ({
       </div>
 
       {/* Week Day Header */}
-      <div className="grid grid-cols-7 gap-1.5 mb-2 text-center">
+      <div className="grid grid-cols-7 gap-1.5 mb-2.5 text-center">
         {DAY_NAMES_SHORT_ES.map((d, i) => (
           <div 
             key={d} 
-            className={`text-[11px] font-bold py-1 ${i === 0 || i === 6 ? 'text-red-500' : 'text-slate-500'}`}
+            className={`text-[11px] font-black py-1 tracking-wider ${i === 0 || i === 6 ? 'text-red-500' : 'text-slate-400'}`}
           >
             {d}
           </div>
@@ -117,13 +117,13 @@ export const PerpetualCalendar: React.FC<PerpetualCalendarProps> = ({
               }}
               disabled={!day.isCurrentMonth}
               className={`
-                relative h-12 rounded-2xl flex flex-col items-center justify-center transition-all text-xs font-bold
-                ${!day.isCurrentMonth ? 'opacity-25 cursor-default' : 'hover:scale-105 active:scale-95'}
+                relative h-12 rounded-2xl flex flex-col items-center justify-center transition-all text-xs font-black cursor-pointer
+                ${!day.isCurrentMonth ? 'opacity-20 cursor-default pointer-events-none' : 'hover:scale-105 active:scale-95'}
                 ${isSelected 
-                  ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/30 ring-2 ring-red-300 font-bold' 
+                  ? 'bg-gradient-to-r from-[#DA291C] to-red-600 text-white shadow-md shadow-red-500/35 ring-2 ring-red-300 font-black' 
                   : hasEvents
-                  ? 'bg-red-50 border border-red-200 text-[#DA291C] hover:bg-red-100'
-                  : 'bg-slate-50 border border-slate-100 text-slate-700 hover:bg-slate-100 hover:text-slate-900'}
+                  ? 'bg-red-50/90 border border-red-200/80 text-[#DA291C] hover:bg-red-100 hover:border-red-300'
+                  : 'bg-slate-50/80 border border-slate-100 text-slate-700 hover:bg-slate-100 hover:text-slate-900'}
                 ${day.isToday && !isSelected ? 'ring-2 ring-[#DA291C]' : ''}
               `}
             >
@@ -141,7 +141,7 @@ export const PerpetualCalendar: React.FC<PerpetualCalendarProps> = ({
                     />
                   ))}
                   {day.eventCount > 3 && (
-                    <span className="text-[8px] font-extrabold leading-none text-[#DA291C]">+</span>
+                    <span className="text-[8px] font-black leading-none text-[#DA291C]">+</span>
                   )}
                 </div>
               )}
@@ -151,14 +151,14 @@ export const PerpetualCalendar: React.FC<PerpetualCalendarProps> = ({
       </div>
 
       {/* Legend Footer */}
-      <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+      <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-[#DA291C]" />
           <span className="font-semibold text-slate-700">Días con capacitaciones</span>
         </div>
         {selectedDate && (
-          <div className="text-[#DA291C] font-bold">
-            Filtro: {selectedDate}
+          <div className="text-[#DA291C] font-black bg-red-50 px-2 py-0.5 rounded-lg border border-red-200">
+            {selectedDate}
           </div>
         )}
       </div>
@@ -166,3 +166,4 @@ export const PerpetualCalendar: React.FC<PerpetualCalendarProps> = ({
     </div>
   );
 };
+

@@ -4,6 +4,7 @@ import {
   Participant, 
   UserAccount, 
   UserRole, 
+  EmploymentStatus,
   ParticipantGroup, 
   TrainingProgram, 
   ProgramComplianceSummary,
@@ -105,55 +106,163 @@ export const exportUsersToExcel = (users: UserAccount[]): void => {
     'Cédula': u.cedula || 'N/A',
     'Nombre Completo': u.name,
     'Correo Corporativo': u.email,
-    'Rol en Sistema': u.role
+    'Empresa': u.companyId || 'Kasino 21 Corporativo',
+    'Departamento': u.department || 'General',
+    'Rol en Sistema': u.role,
+    'Estado Laboral': u.employmentStatus === 'contratado' ? 'Contratado' : u.employmentStatus === 'en_proceso' ? 'En Proceso' : 'Inactivo',
+    'Estado Cuenta': u.isActive !== false ? 'Activo' : 'Inactivo'
   }));
 
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Usuarios');
-  ws['!cols'] = [{ wch: 6 }, { wch: 18 }, { wch: 35 }, { wch: 35 }, { wch: 25 }];
+  ws['!cols'] = [
+    { wch: 6 },  // No.
+    { wch: 20 }, // Cédula
+    { wch: 35 }, // Nombre
+    { wch: 35 }, // Correo
+    { wch: 25 }, // Empresa
+    { wch: 22 }, // Departamento
+    { wch: 28 }, // Rol
+    { wch: 18 }, // Estado Laboral
+    { wch: 15 }  // Estado Cuenta
+  ];
   XLSX.writeFile(wb, 'Usuarios_CapacitaHub.xlsx');
 };
 
 /**
- * Genera y descarga la Plantilla Oficial de Excel para creación masiva de usuarios
+ * Genera y descarga la Plantilla Oficial de Excel para creación masiva de usuarios con todos los campos requeridos
  */
 export const downloadUsersTemplateExcel = (): void => {
   const sampleData = [
     {
-      'Cédula (000-0000000-0)': '402-2196163-1',
-      'Nombre Completo': 'Ana Morales Batista',
-      'Correo Electrónico': 'ana.morales@empresa.com',
-      'Rol (Colaborador / Editor / Super Admin)': 'Colaborador (User)',
+      'Cédula (000-0000000-0) *': '402-2196163-1',
+      'Nombre Completo *': 'Ana Morales Batista',
+      'Correo Corporativo *': 'ana.morales@empresa.com',
+      'Empresa / Filial (ej. Claro Dominicana)': 'Claro Dominicana',
+      'Departamento / Área': 'Tecnología',
+      'Rol en Sistema (Colaborador / Tutor OJT / Líder / Administrador / Super Admin)': 'Colaborador (User)',
+      'Estado Laboral (Contratado / En Proceso / Inactivo)': 'Contratado',
       'Contraseña Inicial (Opcional)': '123'
     },
     {
-      'Cédula (000-0000000-0)': '001-0876543-2',
-      'Nombre Completo': 'Carlos Gómez Herrera',
-      'Correo Electrónico': 'carlos.gomez@empresa.com',
-      'Rol (Colaborador / Editor / Super Admin)': 'Administrador / Editor',
+      'Cédula (000-0000000-0) *': '001-0876543-2',
+      'Nombre Completo *': 'Lic. Carlos Gómez Herrera',
+      'Correo Corporativo *': 'carlos.gomez@empresa.com',
+      'Empresa / Filial (ej. Claro Dominicana)': 'Kasino 21 Corporativo',
+      'Departamento / Área': 'Operaciones',
+      'Rol en Sistema (Colaborador / Tutor OJT / Líder / Administrador / Super Admin)': 'Evaluador / Tutor OJT',
+      'Estado Laboral (Contratado / En Proceso / Inactivo)': 'Contratado',
+      'Contraseña Inicial (Opcional)': '123'
+    },
+    {
+      'Cédula (000-0000000-0) *': '031-0456789-4',
+      'Nombre Completo *': 'Ing. Laura Patricia Gómez',
+      'Correo Corporativo *': 'laura.gomez@empresa.com',
+      'Empresa / Filial (ej. Claro Dominicana)': 'Claro Dominicana',
+      'Departamento / Área': 'Tecnología',
+      'Rol en Sistema (Colaborador / Tutor OJT / Líder / Administrador / Super Admin)': 'Líder de Área / Supervisor',
+      'Estado Laboral (Contratado / En Proceso / Inactivo)': 'Contratado',
+      'Contraseña Inicial (Opcional)': '123'
+    },
+    {
+      'Cédula (000-0000000-0) *': '223-0098765-8',
+      'Nombre Completo *': 'Lic. Fernando Castillo',
+      'Correo Corporativo *': 'fernando.castillo@empresa.com',
+      'Empresa / Filial (ej. Claro Dominicana)': 'Kasino 21 Corporativo',
+      'Departamento / Área': 'Recursos Humanos',
+      'Rol en Sistema (Colaborador / Tutor OJT / Líder / Administrador / Super Admin)': 'Administrador / Editor',
+      'Estado Laboral (Contratado / En Proceso / Inactivo)': 'Contratado',
       'Contraseña Inicial (Opcional)': 'admin2026'
     },
     {
-      'Cédula (000-0000000-0)': '031-0456789-4',
-      'Nombre Completo': 'Laura Patricia Sánchez',
-      'Correo Electrónico': 'laura.sanchez@empresa.com',
-      'Rol (Colaborador / Editor / Super Admin)': 'Colaborador (User)',
+      'Cédula (000-0000000-0) *': '001-9876543-1',
+      'Nombre Completo *': 'Roberto Díaz Peña',
+      'Correo Corporativo *': 'roberto.diaz@empresa.com',
+      'Empresa / Filial (ej. Claro Dominicana)': 'Claro Dominicana',
+      'Departamento / Área': 'Comercial & Ventas',
+      'Rol en Sistema (Colaborador / Tutor OJT / Líder / Administrador / Super Admin)': 'Colaborador (User)',
+      'Estado Laboral (Contratado / En Proceso / Inactivo)': 'En Proceso',
       'Contraseña Inicial (Opcional)': '123'
     }
   ];
 
-  const ws = XLSX.utils.json_to_sheet(sampleData);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Plantilla_Usuarios');
+  const guideData = [
+    {
+      'Campo': 'Cédula de Identidad *',
+      'Obligatorio': 'Requerido / Recomendado',
+      'Formato / Opciones': '11 dígitos con guiones (ej. 402-2196163-1 o 001-1928374-5)',
+      'Descripción': 'Documento oficial único de identidad para acceso, bitácoras y registros.'
+    },
+    {
+      'Campo': 'Nombre Completo *',
+      'Obligatorio': 'Sí (Obligatorio)',
+      'Formato / Opciones': 'Texto libre (ej. Ana Morales Batista)',
+      'Descripción': 'Nombre y apellidos del colaborador.'
+    },
+    {
+      'Campo': 'Correo Corporativo *',
+      'Obligatorio': 'Sí (Obligatorio)',
+      'Formato / Opciones': 'ej. nombre.apellido@empresa.com',
+      'Descripción': 'Identificador único de inicio de sesión en la plataforma.'
+    },
+    {
+      'Campo': 'Empresa / Filial',
+      'Obligatorio': 'Opcional (Defecto: Kasino 21)',
+      'Formato / Opciones': 'Claro Dominicana, Kasino 21 Corporativo, etc.',
+      'Descripción': 'Empresa a la que pertenece el colaborador.'
+    },
+    {
+      'Campo': 'Departamento / Área',
+      'Obligatorio': 'Opcional (Recomendado)',
+      'Formato / Opciones': 'Tecnología, Operaciones, Ventas, Recursos Humanos, etc.',
+      'Descripción': 'Área o unidad funcional en la estructura organizativa.'
+    },
+    {
+      'Campo': 'Rol en Sistema',
+      'Obligatorio': 'Opcional (Defecto: Colaborador)',
+      'Formato / Opciones': 'Colaborador (User) | Evaluador / Tutor OJT | Líder de Área / Supervisor | Administrador / Editor | Super Administrador',
+      'Descripción': 'Nivel de permisos y accesos dentro del portal.'
+    },
+    {
+      'Campo': 'Estado Laboral',
+      'Obligatorio': 'Opcional (Defecto: Contratado)',
+      'Formato / Opciones': 'Contratado | En Proceso | Inactivo',
+      'Descripción': 'Condición laboral del colaborador.'
+    },
+    {
+      'Campo': 'Contraseña Inicial',
+      'Obligatorio': 'Opcional (Defecto: 123)',
+      'Formato / Opciones': 'Mínimo 3 caracteres (ej. 123 o clave personalizada)',
+      'Descripción': 'Clave inicial asignada para su primer acceso al portal.'
+    }
+  ];
 
-  ws['!cols'] = [
-    { wch: 24 }, // Cédula
-    { wch: 30 }, // Nombre
-    { wch: 32 }, // Correo
-    { wch: 40 }, // Rol
+  const wb = XLSX.utils.book_new();
+  
+  // Hoja 1: Plantilla de Usuarios
+  const ws1 = XLSX.utils.json_to_sheet(sampleData);
+  ws1['!cols'] = [
+    { wch: 26 }, // Cédula
+    { wch: 32 }, // Nombre
+    { wch: 35 }, // Correo
+    { wch: 35 }, // Empresa
+    { wch: 25 }, // Departamento
+    { wch: 45 }, // Rol
+    { wch: 25 }, // Estado Laboral
     { wch: 28 }  // Contraseña
   ];
+  XLSX.utils.book_append_sheet(wb, ws1, 'Plantilla_Usuarios');
+
+  // Hoja 2: Guía y Catálogo de Campos
+  const ws2 = XLSX.utils.json_to_sheet(guideData);
+  ws2['!cols'] = [
+    { wch: 25 },
+    { wch: 25 },
+    { wch: 45 },
+    { wch: 60 }
+  ];
+  XLSX.utils.book_append_sheet(wb, ws2, 'Guia_y_Catalogo');
 
   XLSX.writeFile(wb, 'Plantilla_Carga_Masiva_Usuarios_CapacitaHub.xlsx');
 };
@@ -214,6 +323,16 @@ export const normalizeUserRole = (rawRole: string): UserRole => {
   if (r.includes('lider') || r.includes('líder') || r.includes('supervisor') || r.includes('lead')) return 'Líder de Área / Supervisor';
   if (r.includes('ojt') || r.includes('tutor') || r.includes('evaluador') || r.includes('coach') || r.includes('mentor') || r.includes('trainer')) return 'Evaluador / Tutor OJT';
   return 'Colaborador (User)';
+};
+
+/**
+ * Normaliza y mapea cadenas de estado laboral al tipo EmploymentStatus
+ */
+export const normalizeEmploymentStatus = (rawStatus: string): EmploymentStatus => {
+  const s = (rawStatus || '').toLowerCase().trim();
+  if (s.includes('inactiv') || s.includes('desvinculad') || s.includes('baja') || s.includes('retirad')) return 'inactivo';
+  if (s.includes('proceso') || s.includes('prueb') || s.includes('temporal') || s.includes('seleccion') || s.includes('selección') || s.includes('induccion') || s.includes('inducción')) return 'en_proceso';
+  return 'contratado';
 };
 
 /**
@@ -311,10 +430,13 @@ export const parseUsersExcelFile = async (file: File): Promise<ParsedUserResult>
 
         // Detectar columnas
         const header = rows[0].map((h: any) => String(h || '').toLowerCase().trim());
-        let cedulaIdx = header.findIndex((h: string) => h.includes('cedula') || h.includes('cédula'));
-        let nameIdx = header.findIndex((h: string) => h.includes('nombre') || h.includes('name') || h.includes('usuario'));
+        let cedulaIdx = header.findIndex((h: string) => h.includes('cedula') || h.includes('cédula') || h.includes('identifica'));
+        let nameIdx = header.findIndex((h: string) => h.includes('nombre') || h.includes('name') || h.includes('usuario') || h.includes('colaborador'));
         let emailIdx = header.findIndex((h: string) => h.includes('correo') || h.includes('email') || h.includes('mail'));
+        let compIdx = header.findIndex((h: string) => h.includes('empresa') || h.includes('filial') || h.includes('compañ') || h.includes('compan') || h.includes('razon'));
+        let deptIdx = header.findIndex((h: string) => h.includes('departamento') || h.includes('area') || h.includes('área') || h.includes('dept'));
         let roleIdx = header.findIndex((h: string) => h.includes('rol') || h.includes('role') || h.includes('perfil') || h.includes('tipo'));
+        let statusIdx = header.findIndex((h: string) => h.includes('laboral') || h.includes('estatus') || h.includes('estado') || h.includes('condicion') || h.includes('situacion'));
         let passIdx = header.findIndex((h: string) => h.includes('contrase') || h.includes('password') || h.includes('clave') || h.includes('pass'));
 
         if (nameIdx === -1) nameIdx = cedulaIdx === 0 ? 1 : 0;
@@ -331,7 +453,10 @@ export const parseUsersExcelFile = async (file: File): Promise<ParsedUserResult>
           const rawCedula = cedulaIdx !== -1 ? String(row[cedulaIdx] || '').trim() : '';
           const name = String(row[nameIdx] || '').trim();
           const email = String(row[emailIdx] || '').trim().toLowerCase();
+          const rawCompany = compIdx !== -1 ? String(row[compIdx] || '').trim() : '';
+          const rawDepartment = deptIdx !== -1 ? String(row[deptIdx] || '').trim() : '';
           const rawRole = roleIdx !== -1 ? String(row[roleIdx] || '').trim() : '';
+          const rawStatus = statusIdx !== -1 ? String(row[statusIdx] || '').trim() : '';
           const password = passIdx !== -1 && row[passIdx] ? String(row[passIdx]).trim() : '123';
 
           if (!name) {
@@ -363,6 +488,19 @@ export const parseUsersExcelFile = async (file: File): Promise<ParsedUserResult>
             }
           }
 
+          // Resolver Empresa si se especificó
+          let resolvedCompanyId = 'emp_kasino';
+          if (rawCompany) {
+            const lowerComp = rawCompany.toLowerCase();
+            if (lowerComp.includes('claro') || lowerComp.includes('dom')) {
+              resolvedCompanyId = 'emp_claro';
+            } else if (lowerComp.includes('kasino')) {
+              resolvedCompanyId = 'emp_kasino';
+            }
+          }
+
+          const empStatus = normalizeEmploymentStatus(rawStatus);
+
           seenEmails.add(email);
           validUsers.push({
             id: `usr_${Date.now()}_${i}_${Math.floor(Math.random() * 1000)}`,
@@ -370,7 +508,11 @@ export const parseUsersExcelFile = async (file: File): Promise<ParsedUserResult>
             email,
             role: normalizeUserRole(rawRole),
             password: password || '123',
-            cedula: formattedCedula
+            cedula: formattedCedula,
+            department: rawDepartment || undefined,
+            companyId: resolvedCompanyId,
+            employmentStatus: empStatus,
+            isActive: empStatus !== 'inactivo'
           });
         }
 
@@ -386,7 +528,7 @@ export const parseUsersExcelFile = async (file: File): Promise<ParsedUserResult>
 
 /**
  * Parsea texto multilínea pegado desde el portapapeles o Excel
- * Formato esperado: Cédula (opcional), Nombre, Correo, Rol (opcional), Contraseña (opcional)
+ * Formato esperado: Cédula (opcional), Nombre, Correo, Departamento (opcional), Rol (opcional), Estado (opcional), Contraseña (opcional)
  * Separado por tabulación (\t), coma (,) o punto y coma (;)
  */
 export const parseUsersFromText = (text: string): { validUsers: UserAccount[]; invalidRows: Array<{ line: number; text: string; reason: string }> } => {
@@ -396,13 +538,11 @@ export const parseUsersFromText = (text: string): { validUsers: UserAccount[]; i
   const seenEmails = new Set<string>();
 
   lines.forEach((line, idx) => {
-    // Si es la cabecera (contiene "nombre" o "correo" o "cedula"), omitir
     const lower = line.toLowerCase();
     if (idx === 0 && (lower.includes('correo') || lower.includes('email') || lower.includes('nombre') || lower.includes('cédula') || lower.includes('cedula'))) {
       return;
     }
 
-    // Dividir por tabulación o comas o punto y coma
     let parts: string[] = [];
     if (line.includes('\t')) {
       parts = line.split('\t');
@@ -418,32 +558,37 @@ export const parseUsersFromText = (text: string): { validUsers: UserAccount[]; i
       return;
     }
 
-    // Determinar si la primera columna es cédula (contiene números o guiones)
     let cedulaVal = '';
     let nameVal = '';
     let emailVal = '';
+    let deptVal = '';
     let roleVal = '';
+    let statusVal = '';
     let passVal = '123';
 
     if (parts[0].includes('@')) {
       // Formato: Correo, Nombre, ...
       emailVal = parts[0];
       nameVal = parts[1] || '';
-      roleVal = parts[2] || '';
-      passVal = parts[3] || '123';
+      deptVal = parts[2] || '';
+      roleVal = parts[3] || '';
+      passVal = parts[4] || '123';
     } else if (/^\d{3}/.test(parts[0]) || /^\d{11}$/.test(parts[0].replace(/\D/g, ''))) {
-      // Formato: Cédula, Nombre, Correo, Rol, Contraseña
+      // Formato: Cédula, Nombre, Correo, [Empresa/Depto], Rol, Estado, Contraseña
       cedulaVal = parts[0];
       nameVal = parts[1] || '';
       emailVal = parts[2] || '';
-      roleVal = parts[3] || '';
-      passVal = parts[4] || '123';
+      deptVal = parts[3] || '';
+      roleVal = parts[4] || '';
+      statusVal = parts[5] || '';
+      passVal = parts[6] || '123';
     } else {
-      // Formato: Nombre, Correo, Rol, Contraseña
+      // Formato: Nombre, Correo, Departamento, Rol, Contraseña
       nameVal = parts[0];
       emailVal = parts[1] || '';
-      roleVal = parts[2] || '';
-      passVal = parts[3] || '123';
+      deptVal = parts[2] || '';
+      roleVal = parts[3] || '';
+      passVal = parts[4] || '123';
     }
 
     if (!nameVal) {
@@ -475,6 +620,8 @@ export const parseUsersFromText = (text: string): { validUsers: UserAccount[]; i
       }
     }
 
+    const empStatus = normalizeEmploymentStatus(statusVal);
+
     seenEmails.add(cleanEmail);
     validUsers.push({
       id: `usr_${Date.now()}_${idx}_${Math.floor(Math.random() * 1000)}`,
@@ -482,7 +629,10 @@ export const parseUsersFromText = (text: string): { validUsers: UserAccount[]; i
       email: cleanEmail,
       role: normalizeUserRole(roleVal),
       password: passVal || '123',
-      cedula: formattedCedula
+      cedula: formattedCedula,
+      department: deptVal || undefined,
+      employmentStatus: empStatus,
+      isActive: empStatus !== 'inactivo'
     });
   });
 

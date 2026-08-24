@@ -7,15 +7,17 @@ import {
   UserCheck, 
   CalendarCheck2, 
   LogOut, 
-  ShieldCheck,
-  Building2,
-  Phone,
-  Mail,
-  Menu,
-  X,
-  User,
-  ChevronRight,
-  Activity
+  ShieldCheck, 
+  Building2, 
+  Phone, 
+  Mail, 
+  Menu, 
+  X, 
+  User, 
+  ChevronRight, 
+  Activity, 
+  Sparkles,
+  KeyRound
 } from 'lucide-react';
 import { UserAccount, TabView, Company } from '../../types';
 
@@ -28,6 +30,9 @@ interface NavbarProps {
   setCurrentTab: (tab: TabView) => void;
   onLogout: () => void;
   myRegistrationsCount?: number;
+  onOpenMobileSidebar?: () => void;
+  isSidebarCollapsed?: boolean;
+  onOpenChangePassword?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -38,7 +43,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   onSelectCompanyScope,
   setCurrentTab,
   onLogout,
-  myRegistrationsCount = 0
+  myRegistrationsCount = 0,
+  onOpenMobileSidebar,
+  isSidebarCollapsed = false,
+  onOpenChangePassword
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -55,32 +63,87 @@ export const Navbar: React.FC<NavbarProps> = ({
     setIsMobileMenuOpen(false);
   };
 
+  const getRoleBadge = () => {
+    if (isSuperAdmin) {
+      return (
+        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1">
+          <ShieldCheck className="w-3 h-3 text-amber-600" /> Super Admin
+        </span>
+      );
+    }
+    if (isOjtUser) {
+      return (
+        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-purple-50 text-purple-700 border border-purple-200 flex items-center gap-1">
+          <Activity className="w-3 h-3 text-purple-600" /> Tutor OJT
+        </span>
+      );
+    }
+    if (currentUser.role === 'Líder de Área / Supervisor') {
+      return (
+        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-sky-50 text-sky-700 border border-sky-200 flex items-center gap-1">
+          <UserCheck className="w-3 h-3 text-sky-600" /> Líder
+        </span>
+      );
+    }
+    if (currentUser.role === 'Administrador / Editor') {
+      return (
+        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-50 text-rose-700 border border-rose-200 flex items-center gap-1">
+          <Sliders className="w-3 h-3 text-rose-600" /> Admin
+        </span>
+      );
+    }
+    return (
+      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+        <User className="w-3 h-3 text-emerald-600" /> Colaborador
+      </span>
+    );
+  };
+
+  const getSectionTitle = () => {
+    switch (currentTab) {
+      case 'landing': return 'Catálogo de Capacitaciones';
+      case 'my-registrations': return 'Mis Cursos & Rutas';
+      case 'team': return 'Mi Equipo de Trabajo';
+      case 'ojt': return 'Bitácoras & Mesas de Calibración';
+      case 'dashboard': return 'Dashboard & Métricas';
+      case 'admin': return 'Panel de Administración';
+      default: return 'Portal de Formación';
+    }
+  };
+
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.04)]">
       
-      {/* Top Contact & Utility Bar (Light Theme Claro Style) */}
-      <div className="bg-[#F8F9FA] border-b border-slate-200 py-1.5 px-4 sm:px-6 lg:px-8 text-[11px] text-slate-600">
+      {/* Top Contact & Utility Bar (Executive Dark-Slate Bar) */}
+      <div className="bg-gradient-to-r from-[#0F172A] via-[#1E293B] to-[#0F172A] border-b border-slate-800/80 py-1.5 px-4 sm:px-6 lg:px-8 text-[11px] text-slate-300">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
           
           {/* Left contact info */}
           <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
-            <a href="tel:8092203473" className="flex items-center gap-1.5 text-slate-700 hover:text-red-600 transition-colors">
-              <Phone className="w-3.5 h-3.5 text-[#DA291C]" />
-              <span>Tel: <strong className="text-slate-900">809-220-3473</strong></span>
+            <a href="tel:8092203473" className="flex items-center gap-1.5 text-slate-300 hover:text-red-400 transition-colors group">
+              <span className="p-1 rounded-md bg-red-500/20 text-red-400 group-hover:bg-red-500/30 transition-colors">
+                <Phone className="w-3 h-3" />
+              </span>
+              <span>Central: <strong className="text-white font-semibold">809-220-3473</strong></span>
             </a>
-            <span className="hidden sm:inline text-slate-300">•</span>
-            <a href="mailto:Capacitacion_Virtual@claro.com.do" className="hidden sm:flex items-center gap-1.5 text-slate-700 hover:text-red-600 transition-colors">
-              <Mail className="w-3.5 h-3.5 text-[#DA291C]" />
-              <span>Correo: <strong className="text-[#DA291C]">Capacitacion_Virtual@claro.com.do</strong></span>
+            <span className="hidden sm:inline text-slate-700">|</span>
+            <a href="mailto:Capacitacion_Virtual@claro.com.do" className="hidden sm:flex items-center gap-1.5 text-slate-300 hover:text-red-400 transition-colors group">
+              <span className="p-1 rounded-md bg-red-500/20 text-red-400 group-hover:bg-red-500/30 transition-colors">
+                <Mail className="w-3 h-3" />
+              </span>
+              <span>Mesa de Ayuda: <strong className="text-red-400 font-semibold">Capacitacion_Virtual@claro.com.do</strong></span>
             </a>
           </div>
 
-          {/* Right Status */}
+          {/* Right Live Status Badge */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-red-50 text-[#DA291C] border border-red-200 font-bold">
-              Plataforma Oficial
+            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold text-[10px]">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Sistema en Línea</span>
+            </div>
+            <span className="text-slate-400 hidden md:inline text-[11px]">
+              Centro de Aprendizaje & Acompañamiento OJT
             </span>
-            <span className="text-slate-500 hidden md:inline text-[11px]">Centro de Aprendizaje y Desarrollo</span>
           </div>
 
         </div>
@@ -90,126 +153,164 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           
-          {/* Logo & Brand (Aprendizaje y Desarrollo) */}
-          <div 
-            onClick={() => handleNavClick('landing')}
-            className="flex items-center gap-3 cursor-pointer group select-none"
-          >
-            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-[#DA291C] to-red-500 p-0.5 shadow-md shadow-red-500/20 group-hover:scale-105 transition-transform flex items-center justify-center text-white">
-              <BookOpen className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-base sm:text-lg lg:text-xl font-black text-slate-900 tracking-tight">
-                  Aprendizaje y <span className="text-[#DA291C]">Desarrollo</span>
-                </span>
-                <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-[#DA291C] text-white">
-                  HUB
-                </span>
+          {/* Left section: Hamburger for SuperAdmin / Brand for standard */}
+          <div className="flex items-center gap-3">
+            {isSuperAdmin && onOpenMobileSidebar && (
+              <button
+                onClick={onOpenMobileSidebar}
+                className="lg:hidden p-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 flex items-center justify-center cursor-pointer shadow-xs active:scale-95"
+                title="Abrir Panel Lateral"
+              >
+                <Menu className="w-5 h-5 text-[#DA291C]" />
+              </button>
+            )}
+
+            {/* Logo & Brand Identity */}
+            <div 
+              onClick={() => handleNavClick('landing')}
+              className="flex items-center gap-3 cursor-pointer group select-none shrink-0"
+            >
+              <div className="relative shrink-0">
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-[#DA291C] via-[#EA382D] to-orange-500 p-0.5 shadow-lg shadow-red-500/25 group-hover:scale-105 group-hover:shadow-red-500/40 transition-all flex items-center justify-center text-white ring-2 ring-red-100">
+                  <BookOpen className="w-5 h-5" />
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center">
+                  <Sparkles className="w-2 h-2 text-white" />
+                </div>
               </div>
-              <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium">Portal de Formación Inteligente</p>
+              <div className="shrink-0">
+                <div className="flex items-center gap-1.5 whitespace-nowrap">
+                  <span className="text-sm sm:text-base lg:text-lg font-black text-slate-900 tracking-tight">
+                    Aprendizaje y <span className="text-[#DA291C]">Desarrollo</span>
+                  </span>
+                  <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-gradient-to-r from-[#DA291C] to-red-600 text-white shadow-xs tracking-wider shrink-0">
+                    HUB
+                  </span>
+                </div>
+                <p className="hidden sm:block text-[10px] xl:text-[11px] text-slate-500 font-medium tracking-tight whitespace-nowrap">
+                  Portal de Formación Inteligente
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Desktop Navigation Links (>= md) */}
-          <nav className="hidden lg:flex items-center gap-1 bg-slate-100/80 p-1.5 rounded-2xl border border-slate-200/80">
-            <button
-              onClick={() => handleNavClick('landing')}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
-                currentTab === 'landing'
-                  ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25 font-bold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white'
-              }`}
-            >
-              <Grid className="w-4 h-4" />
-              Explorar Catálogo
-            </button>
+          {/* Breadcrumb section for SuperAdmin */}
+          {isSuperAdmin ? (
+            <div className="hidden md:flex items-center gap-2 text-xs">
+              <span className="px-3 py-1 rounded-2xl bg-red-50 text-[#DA291C] border border-red-200/80 font-black flex items-center gap-1.5 shadow-2xs">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#DA291C]" />
+                <span>Panel Lateral SuperAdmin</span>
+              </span>
+              <span className="text-slate-300">/</span>
+              <span className="text-slate-700 font-bold">
+                {getSectionTitle()}
+              </span>
+            </div>
+          ) : (
+            /* Desktop Navigation Links (Segmented Pill Style for non-SuperAdmin users) */
+            <nav className="hidden lg:flex items-center gap-1 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/70 shadow-inner shrink-0">
+              <button
+                onClick={() => handleNavClick('landing')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all whitespace-nowrap shrink-0 ${
+                  currentTab === 'landing'
+                    ? 'bg-gradient-to-r from-[#DA291C] to-[#E02418] text-white shadow-md shadow-red-500/25 font-bold scale-[1.02]'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white font-semibold'
+                }`}
+              >
+                <Grid className="w-4 h-4" />
+                <span>Catálogo</span>
+              </button>
 
-            <button
-              onClick={() => handleNavClick('my-registrations')}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all relative ${
-                currentTab === 'my-registrations'
-                  ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25 font-bold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white'
-              }`}
-            >
-              <CalendarCheck2 className="w-4 h-4" />
-              Mis Cursos
-              {myRegistrationsCount > 0 && (
-                <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-extrabold bg-white text-[#DA291C] shadow-sm">
-                  {myRegistrationsCount}
-                </span>
+              <button
+                onClick={() => handleNavClick('my-registrations')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all relative whitespace-nowrap shrink-0 ${
+                  currentTab === 'my-registrations'
+                    ? 'bg-gradient-to-r from-[#DA291C] to-[#E02418] text-white shadow-md shadow-red-500/25 font-bold scale-[1.02]'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white font-semibold'
+                }`}
+              >
+                <CalendarCheck2 className="w-4 h-4" />
+                <span>Mis Cursos</span>
+                {myRegistrationsCount > 0 && (
+                  <span className={`ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-black ${
+                    currentTab === 'my-registrations'
+                      ? 'bg-white text-[#DA291C]'
+                      : 'bg-[#DA291C] text-white'
+                  }`}>
+                    {myRegistrationsCount}
+                  </span>
+                )}
+              </button>
+
+              {isLeaderOrAdmin && (
+                <button
+                  onClick={() => handleNavClick('team')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all whitespace-nowrap shrink-0 ${
+                    currentTab === 'team'
+                      ? 'bg-gradient-to-r from-[#DA291C] to-[#E02418] text-white shadow-md shadow-red-500/25 font-bold scale-[1.02]'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white font-semibold'
+                  }`}
+                >
+                  <UserCheck className="w-4 h-4" />
+                  <span>Mi Equipo</span>
+                </button>
               )}
-            </button>
 
-            {isLeaderOrAdmin && (
-              <button
-                onClick={() => handleNavClick('team')}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
-                  currentTab === 'team'
-                    ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25 font-bold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white'
-                }`}
-              >
-                <UserCheck className="w-4 h-4" />
-                Mi Equipo
-              </button>
-            )}
+              {canAccessOjt && (
+                <button
+                  onClick={() => handleNavClick('ojt')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all whitespace-nowrap shrink-0 ${
+                    currentTab === 'ojt'
+                      ? 'bg-gradient-to-r from-[#DA291C] to-[#E02418] text-white shadow-md shadow-red-500/25 font-bold scale-[1.02]'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white font-semibold'
+                  }`}
+                >
+                  <Activity className="w-4 h-4" />
+                  <span>Bitácoras & OJT</span>
+                </button>
+              )}
 
-            {canAccessOjt && (
-              <button
-                onClick={() => handleNavClick('ojt')}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
-                  currentTab === 'ojt'
-                    ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25 font-bold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white'
-                }`}
-              >
-                <Activity className="w-4 h-4" />
-                Bitácoras & OJT
-              </button>
-            )}
+              {isAdminOrSuper && (
+                <button
+                  onClick={() => handleNavClick('dashboard')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all whitespace-nowrap shrink-0 ${
+                    currentTab === 'dashboard'
+                      ? 'bg-gradient-to-r from-[#DA291C] to-[#E02418] text-white shadow-md shadow-red-500/25 font-bold scale-[1.02]'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white font-semibold'
+                  }`}
+                >
+                  <BarChart3 className="w-4 h-4" />
+                  <span>Métricas</span>
+                </button>
+              )}
 
-            {isAdminOrSuper && (
-              <button
-                onClick={() => handleNavClick('dashboard')}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
-                  currentTab === 'dashboard'
-                    ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25 font-bold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white'
-                }`}
-              >
-                <BarChart3 className="w-4 h-4" />
-                Métricas & KPIs
-              </button>
-            )}
-
-            {isAdminOrSuper && (
-              <button
-                onClick={() => handleNavClick('admin')}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
-                  currentTab === 'admin'
-                    ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25 font-bold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white'
-                }`}
-              >
-                <Sliders className="w-4 h-4" />
-                Administración
-              </button>
-            )}
-          </nav>
+              {isAdminOrSuper && (
+                <button
+                  onClick={() => handleNavClick('admin')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all whitespace-nowrap shrink-0 ${
+                    currentTab === 'admin'
+                      ? 'bg-gradient-to-r from-[#DA291C] to-[#E02418] text-white shadow-md shadow-red-500/25 font-bold scale-[1.02]'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white font-semibold'
+                  }`}
+                >
+                  <Sliders className="w-4 h-4" />
+                  <span>Administración</span>
+                </button>
+              )}
+            </nav>
+          )}
 
           {/* User Profile & Action Controls */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
             
             {/* Company Switcher for SuperAdmin */}
             {isSuperAdmin && onSelectCompanyScope ? (
-              <div className="hidden sm:flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-2xl border border-slate-200 text-xs">
+              <div className="hidden sm:flex items-center gap-1.5 bg-slate-50 hover:bg-slate-100 px-2.5 xl:px-3 py-1.5 rounded-2xl border border-slate-200 text-xs transition-colors shrink-0">
                 <Building2 className="w-4 h-4 text-[#DA291C] shrink-0" />
                 <select
                   value={selectedCompanyId}
                   onChange={(e) => onSelectCompanyScope(e.target.value)}
-                  className="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer max-w-[150px] truncate"
+                  className="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer max-w-[130px] xl:max-w-[170px] truncate"
                 >
                   <option value="all">🏢 Todas las Empresas</option>
                   {companies.map(c => (
@@ -223,60 +324,57 @@ export const Navbar: React.FC<NavbarProps> = ({
               (() => {
                 const userComp = companies.find(c => c.id === (currentUser.companyId || 'emp_kasino'));
                 return (
-                  <div className="hidden sm:flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-2xl border border-slate-200 text-xs font-semibold text-slate-700">
+                  <div className="hidden sm:flex items-center gap-1.5 bg-slate-50 px-2.5 xl:px-3 py-1.5 rounded-2xl border border-slate-200 text-xs font-semibold text-slate-700 shrink-0">
                     <Building2 className="w-3.5 h-3.5 text-[#DA291C] shrink-0" />
-                    <span className="truncate max-w-[130px]">{userComp ? userComp.name : 'Claro Dominicana'}</span>
+                    <span className="truncate max-w-[120px] xl:max-w-[160px]">{userComp ? userComp.name : 'Claro Dominicana'}</span>
                   </div>
                 );
               })()
             )}
 
-            {/* User Avatar Card */}
-            <div className="hidden sm:flex items-center gap-2.5 pl-2.5 pr-3.5 py-1 rounded-2xl bg-slate-50 border border-slate-200">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#DA291C] to-red-500 flex items-center justify-center text-white font-bold text-xs shadow-sm">
+            {/* User Avatar Card Pill */}
+            <div className="hidden sm:flex items-center gap-2.5 pl-2 pr-3 py-1 rounded-2xl bg-slate-50 border border-slate-200/90 shadow-xs hover:border-slate-300 transition-all shrink-0">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#DA291C] via-red-500 to-amber-500 flex items-center justify-center text-white font-black text-xs shadow-sm shrink-0">
                 {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
               </div>
-              <div className="text-left">
-                <p className="text-xs font-bold text-slate-800 line-clamp-1">{currentUser.name}</p>
-                <div className="flex items-center gap-1">
-                  {isSuperAdmin ? (
-                    <span className="text-[10px] font-bold text-amber-600 flex items-center gap-1">
-                      <ShieldCheck className="w-3 h-3" /> Super Admin
-                    </span>
-                  ) : isOjtUser ? (
-                    <span className="text-[10px] font-bold text-purple-600 flex items-center gap-1">
-                      <Activity className="w-3 h-3" /> Tutor OJT
-                    </span>
-                  ) : currentUser.role === 'Líder de Área / Supervisor' ? (
-                    <span className="text-[10px] font-bold text-emerald-600 flex items-center gap-1">
-                      <ShieldCheck className="w-3 h-3" /> Líder
-                    </span>
-                  ) : isAdminOrSuper ? (
-                    <span className="text-[10px] font-semibold text-[#DA291C]">Administrador</span>
-                  ) : (
-                    <span className="text-[10px] font-medium text-slate-500">Colaborador</span>
-                  )}
+              <div className="text-left shrink-0">
+                <p className="text-xs font-bold text-slate-900 truncate max-w-[140px] xl:max-w-[200px]">{currentUser.name}</p>
+                <div className="flex items-center mt-0.5 whitespace-nowrap">
+                  {getRoleBadge()}
                 </div>
               </div>
             </div>
+
+            {/* Change Password Button (Desktop) */}
+            {onOpenChangePassword && (
+              <button
+                onClick={onOpenChangePassword}
+                title="Cambiar Mi Contraseña"
+                className="hidden sm:flex p-2 rounded-2xl text-slate-500 hover:text-[#DA291C] hover:bg-red-50 border border-slate-200 hover:border-red-200 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
+              >
+                <KeyRound className="w-4 h-4" />
+              </button>
+            )}
 
             {/* Logout Button (Desktop) */}
             <button
               onClick={onLogout}
               title="Cerrar Sesión"
-              className="hidden sm:flex p-2.5 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition-all"
+              className="hidden sm:flex p-2 rounded-2xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
             >
               <LogOut className="w-4 h-4" />
             </button>
 
-            {/* Hamburger Button for Mobile / Tablet (< lg) */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label="Abrir menú de navegación"
-              className="lg:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-all flex items-center justify-center"
-            >
-              {isMobileMenuOpen ? <X className="w-6 h-6 text-[#DA291C]" /> : <Menu className="w-6 h-6" />}
-            </button>
+            {/* Hamburger Button for Mobile / Tablet (< lg) (when not superadmin) */}
+            {!isSuperAdmin && (
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-label="Abrir menú de navegación"
+                className="lg:hidden p-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-all flex items-center justify-center cursor-pointer shadow-xs active:scale-95 shrink-0"
+              >
+                {isMobileMenuOpen ? <X className="w-6 h-6 text-[#DA291C]" /> : <Menu className="w-6 h-6" />}
+              </button>
+            )}
 
           </div>
 
@@ -285,29 +383,47 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Mobile Drawer / Overlay Dropdown Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-white border-b border-slate-200 shadow-2xl px-4 pt-3 pb-6 space-y-4 animate-in slide-in-from-top-2 duration-200">
+        <div className="lg:hidden bg-white/95 backdrop-blur-2xl border-b border-slate-200 shadow-2xl px-4 pt-3 pb-6 space-y-4 animate-in slide-in-from-top-3 duration-200">
           
           {/* User Profile Header in Mobile Drawer */}
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#DA291C] text-white flex items-center justify-center font-bold text-sm shadow-md">
-                {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
+          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#DA291C] to-red-500 text-white flex items-center justify-center font-black text-sm shadow-md">
+                  {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900">{currentUser.name}</p>
+                  <p className="text-xs text-slate-500">{currentUser.email}</p>
+                  <div className="mt-1">
+                    {getRoleBadge()}
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-bold text-slate-900">{currentUser.name}</p>
-                <p className="text-xs text-slate-500">{currentUser.email}</p>
-                <span className="inline-block mt-0.5 text-[10px] font-bold text-[#DA291C] bg-red-50 px-2 py-0.2 rounded-full border border-red-200">
-                  {currentUser.role}
-                </span>
-              </div>
+              <button
+                onClick={onLogout}
+                className="px-3 py-2 rounded-xl text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Salir</span>
+              </button>
             </div>
-            <button
-              onClick={onLogout}
-              className="p-2 rounded-xl text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-xs font-bold flex items-center gap-1"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Salir</span>
-            </button>
+
+            {onOpenChangePassword && (
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  onOpenChangePassword();
+                }}
+                className="w-full py-2 px-3 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 flex items-center justify-between hover:border-red-200"
+              >
+                <span className="flex items-center gap-2">
+                  <KeyRound className="w-3.5 h-3.5 text-[#DA291C]" />
+                  <span>Cambiar Contraseña</span>
+                </span>
+                <ChevronRight className="w-4 h-4 text-slate-400" />
+              </button>
+            )}
           </div>
 
           {/* Company Scope Selector in Mobile Drawer */}
@@ -320,7 +436,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <select
                 value={selectedCompanyId}
                 onChange={(e) => onSelectCompanyScope(e.target.value)}
-                className="bg-white border border-slate-300 text-xs font-bold text-slate-800 rounded-lg px-2 py-1 focus:outline-none max-w-[160px]"
+                className="bg-white border border-slate-300 text-xs font-bold text-slate-800 rounded-xl px-2.5 py-1.5 focus:outline-none max-w-[160px]"
               >
                 <option value="all">🏢 Todas</option>
                 {companies.map(c => (
@@ -333,36 +449,36 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
 
           {/* Navigation Links in Mobile Drawer */}
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <button
               onClick={() => handleNavClick('landing')}
-              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all ${
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
                 currentTab === 'landing'
-                  ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/20'
-                  : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
+                  ? 'bg-gradient-to-r from-[#DA291C] to-red-600 text-white shadow-md shadow-red-500/25'
+                  : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200/60'
               }`}
             >
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-3">
                 <Grid className="w-4 h-4" />
-                <span>Explorar Catálogo</span>
+                <span>Catálogo de Capacitaciones</span>
               </div>
               <ChevronRight className="w-4 h-4 opacity-70" />
             </button>
 
             <button
               onClick={() => handleNavClick('my-registrations')}
-              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all ${
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
                 currentTab === 'my-registrations'
-                  ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/20'
-                  : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
+                  ? 'bg-gradient-to-r from-[#DA291C] to-red-600 text-white shadow-md shadow-red-500/25'
+                  : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200/60'
               }`}
             >
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-3">
                 <CalendarCheck2 className="w-4 h-4" />
                 <span>Mis Inscripciones & Cursos</span>
               </div>
               {myRegistrationsCount > 0 && (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-white text-[#DA291C]">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-white text-[#DA291C] shadow-xs">
                   {myRegistrationsCount}
                 </span>
               )}
@@ -371,13 +487,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             {isLeaderOrAdmin && (
               <button
                 onClick={() => handleNavClick('team')}
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all ${
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
                   currentTab === 'team'
-                    ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/20'
-                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
+                    ? 'bg-gradient-to-r from-[#DA291C] to-red-600 text-white shadow-md shadow-red-500/25'
+                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200/60'
                 }`}
               >
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-3">
                   <UserCheck className="w-4 h-4" />
                   <span>Mi Equipo de Trabajo</span>
                 </div>
@@ -388,15 +504,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             {canAccessOjt && (
               <button
                 onClick={() => handleNavClick('ojt')}
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all ${
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
                   currentTab === 'ojt'
-                    ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/20'
-                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
+                    ? 'bg-gradient-to-r from-[#DA291C] to-red-600 text-white shadow-md shadow-red-500/25'
+                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200/60'
                 }`}
               >
-                <div className="flex items-center gap-2.5">
-                  <Activity className="w-4 h-4 text-[#DA291C]" />
-                  <span>Bitácoras & Mesas de Calibración</span>
+                <div className="flex items-center gap-3">
+                  <Activity className="w-4 h-4" />
+                  <span>Bitácoras OJT & Mesas Calibración</span>
                 </div>
                 <ChevronRight className="w-4 h-4 opacity-70" />
               </button>
@@ -405,15 +521,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             {isAdminOrSuper && (
               <button
                 onClick={() => handleNavClick('dashboard')}
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all ${
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
                   currentTab === 'dashboard'
-                    ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/20'
-                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
+                    ? 'bg-gradient-to-r from-[#DA291C] to-red-600 text-white shadow-md shadow-red-500/25'
+                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200/60'
                 }`}
               >
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-3">
                   <BarChart3 className="w-4 h-4" />
-                  <span>Dashboard & Métricas Estratégicas</span>
+                  <span>Métricas & Analítica TTP</span>
                 </div>
                 <ChevronRight className="w-4 h-4 opacity-70" />
               </button>
@@ -422,30 +538,32 @@ export const Navbar: React.FC<NavbarProps> = ({
             {isAdminOrSuper && (
               <button
                 onClick={() => handleNavClick('admin')}
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all ${
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
                   currentTab === 'admin'
-                    ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/20'
-                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
+                    ? 'bg-gradient-to-r from-[#DA291C] to-red-600 text-white shadow-md shadow-red-500/25'
+                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200/60'
                 }`}
               >
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-3">
                   <Sliders className="w-4 h-4" />
-                  <span>Panel de Administración & OJT</span>
+                  <span>Panel de Administración</span>
                 </div>
                 <ChevronRight className="w-4 h-4 opacity-70" />
               </button>
             )}
           </div>
 
-          {/* Contact Support Direct in Mobile Menu */}
-          <div className="pt-2 border-t border-slate-200 text-xs text-slate-600 flex flex-col gap-1">
+          {/* Contact Support in Mobile Menu */}
+          <div className="pt-3 border-t border-slate-200 text-xs text-slate-600 flex flex-col gap-1.5">
             <div className="flex items-center gap-2">
               <Phone className="w-3.5 h-3.5 text-[#DA291C]" />
               <span>Soporte: <strong>809-220-3473</strong></span>
             </div>
             <div className="flex items-center gap-2">
               <Mail className="w-3.5 h-3.5 text-[#DA291C]" />
-              <a href="mailto:Capacitacion_Virtual@claro.com.do" className="text-[#DA291C]">Capacitacion_Virtual@claro.com.do</a>
+              <a href="mailto:Capacitacion_Virtual@claro.com.do" className="text-[#DA291C] font-semibold">
+                Capacitacion_Virtual@claro.com.do
+              </a>
             </div>
           </div>
 
@@ -455,3 +573,4 @@ export const Navbar: React.FC<NavbarProps> = ({
     </header>
   );
 };
+

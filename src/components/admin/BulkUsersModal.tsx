@@ -198,7 +198,9 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
               password: imported.password || finalUsers[existingIdx].password || '123',
               cedula: imported.cedula || finalUsers[existingIdx].cedula,
               companyId: imported.companyId || finalUsers[existingIdx].companyId || 'emp_kasino',
-              department: imported.department || finalUsers[existingIdx].department
+              department: imported.department || finalUsers[existingIdx].department,
+              employmentStatus: imported.employmentStatus || finalUsers[existingIdx].employmentStatus || 'contratado',
+              isActive: imported.isActive !== undefined ? imported.isActive : finalUsers[existingIdx].isActive
             };
           }
         } else {
@@ -306,7 +308,7 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
                     <span>Carga mediante Plantilla Excel (.xlsx, .xls, .csv)</span>
                   </h4>
                   <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                    Asegúrate de incluir las columnas: <strong>Cédula</strong> (11 dígitos ej. <span className="text-[#DA291C] font-bold">402-2196163-1</span>), <strong>Nombre</strong>, <strong>Correo</strong>, <strong>Rol</strong> y <strong>Contraseña</strong>.
+                    Plantilla oficial con todos los campos: <strong>Cédula *</strong> (11 dígitos ej. <span className="text-[#DA291C] font-bold">402-2196163-1</span>), <strong>Nombre Completo *</strong>, <strong>Correo Corporativo *</strong>, <strong>Empresa</strong>, <strong>Departamento</strong>, <strong>Rol</strong>, <strong>Estado Laboral</strong> y <strong>Contraseña</strong>.
                   </p>
                 </div>
 
@@ -529,10 +531,12 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
                   <thead>
                     <tr className="border-b border-slate-200 bg-slate-50 text-slate-600 text-[11px] font-bold">
                       <th className="p-3">Estado</th>
-                      <th className="p-3">Cédula (11 dígitos)</th>
+                      <th className="p-3">Cédula</th>
                       <th className="p-3">Nombre</th>
                       <th className="p-3">Correo</th>
+                      <th className="p-3">Departamento</th>
                       <th className="p-3">Rol</th>
+                      <th className="p-3">Condición</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -566,9 +570,21 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
                           </td>
                           <td className="p-3 font-bold text-slate-900">{u.name}</td>
                           <td className="p-3 text-slate-500 font-mono text-[11px]">{u.email}</td>
+                          <td className="p-3 text-slate-600 text-[11px]">{u.department || '—'}</td>
                           <td className="p-3">
                             <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
                               {u.role}
+                            </span>
+                          </td>
+                          <td className="p-3">
+                            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${
+                              u.employmentStatus === 'inactivo'
+                                ? 'bg-rose-50 text-rose-700 border-rose-200'
+                                : u.employmentStatus === 'en_proceso'
+                                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            }`}>
+                              {u.employmentStatus === 'inactivo' ? 'Inactivo' : u.employmentStatus === 'en_proceso' ? 'En Proceso' : 'Contratado'}
                             </span>
                           </td>
                         </tr>

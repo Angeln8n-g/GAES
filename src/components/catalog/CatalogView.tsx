@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   Search, 
   Filter, 
@@ -7,7 +7,14 @@ import {
   Video, 
   CalendarCheck,
   AlertCircle,
-  ChevronRight
+  ChevronRight,
+  GraduationCap,
+  Users,
+  Building2,
+  Calendar,
+  X,
+  Flame,
+  Star
 } from 'lucide-react';
 import { TrainingEvent, UserAccount, TrainingProgram, ParticipantGroup, Participant, Company } from '../../types';
 import { EventCard } from './EventCard';
@@ -67,6 +74,48 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
     ? selectedCompanyId 
     : (currentUser?.companyId || 'emp_kasino');
 
+  // Cálculos de KPIs en Vivo
+  const stats = useMemo(() => {
+    const activeEvents = events.filter(e => e.status === 'active' && (effectiveCompany === 'all' || !e.companyId || e.companyId === effectiveCompany));
+    let totalCap = 0;
+    let totalReg = 0;
+    let totalSchedulesCount = 0;
+
+    activeEvents.forEach(evt => {
+      totalSchedulesCount += evt.schedule.length;
+      evt.schedule.forEach(s => s.slots.forEach(sl => {
+        totalCap += sl.capacity;
+        totalReg += sl.registered;
+      }));
+    });
+
+    const activeCompaniesCount = effectiveCompany === 'all' 
+      ? (companies.length > 0 ? companies.length : 3) 
+      : 1;
+
+    return {
+      activeEventsCount: activeEvents.length,
+      totalCapacity: totalCap,
+      totalRegistered: totalReg,
+      availableSlots: Math.max(0, totalCap - totalReg),
+      companiesCount: activeCompaniesCount,
+      sessionsCount: totalSchedulesCount
+    };
+  }, [events, effectiveCompany, companies]);
+
+  // Contadores dinámicos por categoría
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {
+      "Todos": events.filter(e => e.status === 'active' && (effectiveCompany === 'all' || !e.companyId || e.companyId === effectiveCompany)).length
+    };
+    CATEGORIES.forEach(cat => {
+      if (cat !== "Todos") {
+        counts[cat] = events.filter(e => e.status === 'active' && e.category === cat && (effectiveCompany === 'all' || !e.companyId || e.companyId === effectiveCompany)).length;
+      }
+    });
+    return counts;
+  }, [events, effectiveCompany]);
+
   // Filtrado compuesto
   const filteredEvents = events.filter(evt => {
     if (evt.status !== 'active') return false;
@@ -122,7 +171,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
     .slice(0, 4);
 
   return (
-    <div id="maincontent" className="space-y-8 pb-16">
+    <div id="maincontent" className="space-y-8 pb-20">
       
       {/* 1. Hero Carousel Institucional Claro */}
       <HeroCarousel onExplore={() => {
@@ -130,53 +179,97 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         if (el) el.scrollIntoView({ behavior: 'smooth' });
       }} />
 
-      {/* 2. Sección Cursos Sugeridos (Light Theme) */}
+      {/* 2. Live KPI Stats Ribbon (Modern Executive Strip) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-red-200 transition-all flex items-center gap-4 group">
+          <div className="w-12 h-12 rounded-2xl bg-red-50 text-[#DA291C] border border-red-100 flex items-center justify-center group-hover:scale-105 group-hover:bg-[#DA291C] group-hover:text-white transition-all shadow-sm">
+            <GraduationCap className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="text-2xl font-black text-slate-900 tracking-tight">{stats.activeEventsCount}</div>
+            <p className="text-xs font-semibold text-slate-500">Cursos & Talleres Activos</p>
+          </div>
+        </div>
+
+        <div className="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-cyan-200 transition-all flex items-center gap-4 group">
+          <div className="w-12 h-12 rounded-2xl bg-cyan-50 text-cyan-700 border border-cyan-100 flex items-center justify-center group-hover:scale-105 group-hover:bg-cyan-600 group-hover:text-white transition-all shadow-sm">
+            <Users className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="text-2xl font-black text-slate-900 tracking-tight">{stats.totalRegistered}</div>
+            <p className="text-xs font-semibold text-slate-500">Inscripciones Registradas</p>
+          </div>
+        </div>
+
+        <div className="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-emerald-200 transition-all flex items-center gap-4 group">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center justify-center group-hover:scale-105 group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-sm">
+            <CalendarCheck className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="text-2xl font-black text-slate-900 tracking-tight">{stats.availableSlots}</div>
+            <p className="text-xs font-semibold text-slate-500">Cupos Disponibles</p>
+          </div>
+        </div>
+
+        <div className="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-purple-200 transition-all flex items-center gap-4 group">
+          <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-700 border border-purple-100 flex items-center justify-center group-hover:scale-105 group-hover:bg-purple-600 group-hover:text-white transition-all shadow-sm">
+            <Building2 className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="text-2xl font-black text-slate-900 tracking-tight">{stats.companiesCount}</div>
+            <p className="text-xs font-semibold text-slate-500">Empresas & Sedes</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Sección Cursos Sugeridos & Tendencias */}
       {suggestedCourses.length > 0 && (
-        <section className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm">
+        <section className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-xs">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 border-b border-slate-100 pb-4">
             <div>
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#DA291C] animate-pulse" />
-                <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-                  Cursos <span className="text-[#DA291C]">Sugeridos</span>
+                <Flame className="w-5 h-5 text-[#DA291C] animate-bounce" />
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                  Cursos <span className="text-[#DA291C]">Recomendados & Tendencias</span>
                 </h3>
               </div>
               <p className="text-xs text-slate-500 mt-1">
-                Esta sección sugiere cursos en función de los que tienen mayor visualización e impacto dentro de la plataforma.
+                Formaciones de alto impacto sugeridas según tu plan de desarrollo y demanda operativa.
               </p>
             </div>
-            <span className="text-xs font-bold text-[#DA291C] bg-red-50 border border-red-200 px-3 py-1 rounded-xl self-start sm:self-auto">
-              ★ Más demandados
+            <span className="text-xs font-black text-[#DA291C] bg-red-50 border border-red-200/80 px-3.5 py-1.5 rounded-2xl shadow-xs self-start sm:self-auto flex items-center gap-1.5">
+              <Star className="w-3.5 h-3.5 fill-[#DA291C]" />
+              <span>Alta Prioridad</span>
             </span>
           </div>
 
           {/* Grid de Cursos Sugeridos */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {suggestedCourses.map(course => {
               return (
                 <div 
                   key={course.id}
                   onClick={() => onOpenReservationModal(course)}
-                  className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-[#DA291C] hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+                  className="bg-white border border-slate-200 rounded-3xl overflow-hidden hover:border-[#DA291C] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between"
                 >
-                  <div className="relative h-32 w-full overflow-hidden bg-slate-100">
+                  <div className="relative h-36 w-full overflow-hidden bg-slate-100">
                     <img 
                       src={course.imageUrl || "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=80"}
                       alt={course.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                    <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#DA291C] text-white shadow-sm">
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/20" />
+                    <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-[#DA291C] text-white shadow-md">
                       {course.category}
                     </span>
-                    <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/90 text-slate-800 border border-slate-200 backdrop-blur-md">
+                    <span className="absolute top-2.5 right-2.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/90 text-slate-900 backdrop-blur-md shadow-xs">
                       {course.modality}
                     </span>
                   </div>
 
                   <div className="p-4 flex-1 flex flex-col justify-between">
                     <div>
-                      <h4 className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-[#DA291C] transition-colors line-clamp-2 mb-1 leading-snug">
+                      <h4 className="text-xs sm:text-sm font-black text-slate-900 group-hover:text-[#DA291C] transition-colors line-clamp-2 mb-1.5 leading-snug">
                         {course.title}
                       </h4>
                       <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
@@ -184,12 +277,12 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                       </p>
                     </div>
 
-                    <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                      <span className="text-slate-500">
-                        Instructor: <strong className="text-slate-800">{course.instructor.split(' ')[0]}</strong>
+                    <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2 text-[11px]">
+                      <span className="text-slate-500 font-medium truncate max-w-[150px]">
+                        Facilitador: <strong className="text-slate-800 font-bold">{course.instructor}</strong>
                       </span>
-                      <span className="text-[#DA291C] font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                        Ver cupos <ChevronRight className="w-3 h-3" />
+                      <span className="text-[#DA291C] font-black flex items-center gap-1 group-hover:translate-x-1 transition-transform shrink-0">
+                        Inscribirme <ChevronRight className="w-3.5 h-3.5" />
                       </span>
                     </div>
                   </div>
@@ -200,103 +293,120 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         </section>
       )}
 
-      {/* 3. Barra de Búsqueda & Explorador (Light Theme) */}
-      <div id="catalog-search-section" className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-red-50/70 via-white to-slate-50 border border-slate-200 p-6 sm:p-8 shadow-sm">
+      {/* 4. Barra de Búsqueda Command-Bar */}
+      <div id="catalog-search-section" className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-red-50/80 via-white to-slate-50 border border-slate-200/90 p-6 sm:p-8 shadow-xs">
         <div className="max-w-3xl relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100 text-[#DA291C] text-xs font-bold mb-2">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Impulsa tu crecimiento y desarrollo profesional</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100 text-[#DA291C] text-xs font-black mb-2.5 shadow-xs">
+            <Sparkles className="w-3.5 h-3.5 text-[#DA291C]" />
+            <span>Impulsa tu crecimiento, certificaciones y desarrollo continuo</span>
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight mb-2">
             Catálogo General de <span className="text-[#DA291C]">Capacitaciones</span>
           </h2>
-          <p className="text-xs sm:text-sm text-slate-600 font-normal leading-relaxed mb-5">
-            Inscríbete a talleres prácticos, conferencias interactivas, certificaciones técnicas y clínicas de servicio al cliente.
+          <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed mb-6">
+            Inscríbete a talleres prácticos, conferencias interactivas, certificaciones técnicas y clínicas operativas.
           </p>
 
-          {/* Search Bar */}
-          <div className="relative max-w-xl">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+          {/* Command-Bar Search Input */}
+          <div className="relative max-w-2xl">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <Search className="w-5 h-5 text-[#DA291C]" />
             </div>
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Buscar por tema, código, instructor, palabra clave o lugar..."
-              className="w-full pl-12 pr-4 py-3 bg-white border border-slate-300 rounded-2xl text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] focus:ring-2 focus:ring-red-100 shadow-sm transition-all"
+              placeholder="Buscar por tema, instructor, palabra clave, código o lugar..."
+              className="w-full pl-12 pr-10 py-3.5 bg-white border border-slate-300/90 rounded-2xl text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] focus:ring-4 focus:ring-red-500/10 shadow-md shadow-slate-200/50 transition-all font-medium"
             />
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery('')}
+                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-700 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </div>
       </div>
 
-      {/* 4. Grid Principal: Filtros y Eventos + Calendario Perpetuo */}
+      {/* 5. Grid Principal: Filtros y Eventos + Calendario Perpetuo */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         
         {/* Columna Izquierda: Filtros & Grid de Cursos */}
         <div className="lg:col-span-2 space-y-6">
           
-          {/* Category Filter Pills */}
+          {/* Category Filter Pills with Live Counters */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
-            {CATEGORIES.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all ${
-                  selectedCategory === cat
-                    ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                    : 'bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:bg-slate-50'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+            {CATEGORIES.map(cat => {
+              const count = categoryCounts[cat] || 0;
+              const isSelected = selectedCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+                    isSelected
+                      ? 'bg-gradient-to-r from-[#DA291C] to-red-600 text-white shadow-md shadow-red-500/25 scale-[1.02]'
+                      : 'bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:bg-slate-50'
+                  }`}
+                >
+                  <span>{cat}</span>
+                  <span className={`px-2 py-0.2 rounded-full text-[10px] font-black ${
+                    isSelected ? 'bg-white text-[#DA291C]' : 'bg-slate-100 text-slate-600'
+                  }`}>
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Secondary Filter Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm text-xs">
-            <div className="flex items-center gap-2 text-slate-600">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-3xl border border-slate-200/90 shadow-xs text-xs">
+            <div className="flex items-center gap-2 text-slate-700">
               <Filter className="w-4 h-4 text-[#DA291C]" />
               <span className="font-bold">Filtros rápidos:</span>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2.5">
               {/* Modality Filter */}
-              <div className="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200">
+              <div className="flex items-center bg-slate-100/90 rounded-2xl p-1 border border-slate-200">
                 <button
                   onClick={() => setSelectedModality("Todos")}
-                  className={`px-2.5 py-1 rounded-lg font-bold transition-colors ${
-                    selectedModality === "Todos" ? 'bg-[#DA291C] text-white' : 'text-slate-600 hover:text-slate-900'
+                  className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer text-xs ${
+                    selectedModality === "Todos" ? 'bg-[#DA291C] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   Todas
                 </button>
                 <button
                   onClick={() => setSelectedModality("Presencial")}
-                  className={`px-2.5 py-1 rounded-lg font-bold transition-colors flex items-center gap-1 ${
-                    selectedModality === "Presencial" ? 'bg-[#DA291C] text-white' : 'text-slate-600 hover:text-slate-900'
+                  className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer text-xs flex items-center gap-1.5 ${
+                    selectedModality === "Presencial" ? 'bg-[#DA291C] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <MapPin className="w-3 h-3" /> Presencial
+                  <MapPin className="w-3.5 h-3.5" /> Presencial
                 </button>
                 <button
                   onClick={() => setSelectedModality("Virtual")}
-                  className={`px-2.5 py-1 rounded-lg font-bold transition-colors flex items-center gap-1 ${
-                    selectedModality === "Virtual" ? 'bg-[#DA291C] text-white' : 'text-slate-600 hover:text-slate-900'
+                  className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer text-xs flex items-center gap-1.5 ${
+                    selectedModality === "Virtual" ? 'bg-[#DA291C] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <Video className="w-3 h-3" /> Virtual
+                  <Video className="w-3.5 h-3.5" /> Virtual
                 </button>
               </div>
 
               {/* Only Available Toggle */}
               <button
                 onClick={() => setOnlyAvailable(!onlyAvailable)}
-                className={`px-3 py-1.5 rounded-xl border font-bold flex items-center gap-1.5 transition-colors ${
+                className={`px-3.5 py-1.5 rounded-2xl border font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs ${
                   onlyAvailable
-                    ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
-                    : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900'
+                    ? 'bg-emerald-500 text-white border-emerald-600 shadow-md shadow-emerald-500/20'
+                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                 }`}
               >
                 <CalendarCheck className="w-3.5 h-3.5" />
@@ -308,11 +418,11 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           {/* Events Count Indicator */}
           <div className="flex items-center justify-between text-xs text-slate-500 px-1">
             <span>
-              Mostrando <strong className="text-slate-900">{filteredEvents.length}</strong> capacitaciones activas
+              Mostrando <strong className="text-slate-900 font-black">{filteredEvents.length}</strong> capacitaciones activas
             </span>
             {selectedCalendarDate && (
-              <span className="text-[#DA291C] font-bold">
-                Filtrado por fecha: {selectedCalendarDate}
+              <span className="text-[#DA291C] font-bold bg-red-50 px-2.5 py-0.5 rounded-full border border-red-200">
+                📅 Filtrado por fecha: {selectedCalendarDate}
               </span>
             )}
           </div>
@@ -333,7 +443,9 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
             </div>
           ) : (
             <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center shadow-sm">
-              <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+              <div className="w-16 h-16 rounded-3xl bg-red-50 text-[#DA291C] border border-red-100 flex items-center justify-center mx-auto mb-4">
+                <AlertCircle className="w-8 h-8" />
+              </div>
               <h3 className="text-base font-bold text-slate-800">No se encontraron capacitaciones</h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
                 Intenta ajustar los términos de búsqueda, la categoría o la fecha seleccionada en el calendario.
@@ -346,7 +458,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   setSearchQuery("");
                   setSelectedCalendarDate(null);
                 }}
-                className="mt-4 px-4 py-2 rounded-xl bg-[#DA291C] hover:bg-red-700 text-white text-xs font-bold transition-colors shadow-sm"
+                className="mt-5 px-5 py-2.5 rounded-2xl bg-[#DA291C] hover:bg-red-700 text-white text-xs font-bold transition-all shadow-md shadow-red-500/20 cursor-pointer"
               >
                 Restablecer todos los filtros
               </button>
@@ -369,3 +481,4 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
     </div>
   );
 };
+

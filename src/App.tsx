@@ -15,6 +15,7 @@ import {
   CalibrationSession
 } from './types';
 import { Navbar } from './components/layout/Navbar';
+import { SuperAdminSidebar } from './components/layout/SuperAdminSidebar';
 import { LoginModal } from './components/auth/LoginModal';
 import { CatalogView } from './components/catalog/CatalogView';
 import { MyRegistrationsView } from './components/reservations/MyRegistrationsView';
@@ -26,6 +27,9 @@ import { TeamLeadView } from './components/supervisor/TeamLeadView';
 import { OjtManager } from './components/ojt/OjtManager';
 import { Toast } from './components/common/Toast';
 import { Footer } from './components/common/Footer';
+import { PwaInstallPrompt } from './components/common/PwaInstallPrompt';
+import { OfflineBanner } from './components/common/OfflineBanner';
+import { ChangePasswordModal } from './components/auth/ChangePasswordModal';
 
 export function App() {
   const [companies, setCompanies] = useState<Company[]>(MOCK_COMPANIES);
@@ -34,6 +38,13 @@ export function App() {
   });
   const [checklists, setChecklists] = useState<OjtChecklist[]>([]);
   const [calibrations, setCalibrations] = useState<CalibrationSession[]>([]);
+
+  // Estado del panel lateral (exclusivo para SuperAdmin)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
+
+  // Modal de cambio de contraseña para usuario autenticado
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState<boolean>(false);
 
   // Sesión del usuario autenticado
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
@@ -315,6 +326,7 @@ export function App() {
         <LoginModal
           users={users}
           onLoginSuccess={handleLoginSuccess}
+          onUsersUpdated={(newUsers) => setUsers(newUsers)}
           attendanceEventTitle={targetEvent?.title}
           attendanceTime={attendanceTime}
         />
@@ -341,26 +353,60 @@ export function App() {
     return (c.companyId || 'emp_kasino') === effectiveCompanyId;
   });
 
+  const isSuperAdminUser = currentUser?.role === 'Super Administrador';
+
   return (
     <div className="min-h-screen bg-[#F4F6F9] text-slate-800 flex flex-col selection:bg-[#DA291C] selection:text-white font-sans">
       
-      {/* Top Navbar */}
-      <Navbar
-        currentUser={currentUser}
-        currentTab={currentTab}
-        companies={companies}
-        selectedCompanyId={selectedCompanyId}
-        onSelectCompanyScope={(cId) => setSelectedCompanyId(cId)}
-        setCurrentTab={setCurrentTab}
-        onLogout={handleLogout}
-        myRegistrationsCount={myRegistrationsCount}
-      />
+      {/* PWA Offline Network Banner */}
+      <OfflineBanner />
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        
-        {/* Tab 1: Catálogo Principal */}
-        {currentTab === 'landing' && (
+      {/* SuperAdmin Sidebar (Only rendered if Super Admin) */}
+      {isSuperAdminUser && currentUser && (
+        <SuperAdminSidebar
+          currentUser={currentUser}
+          currentTab={currentTab}
+          companies={companies}
+          selectedCompanyId={selectedCompanyId}
+          onSelectCompanyScope={(cId) => setSelectedCompanyId(cId)}
+          setCurrentTab={setCurrentTab}
+          onLogout={handleLogout}
+          myRegistrationsCount={myRegistrationsCount}
+          isCollapsed={isSidebarCollapsed}
+          setIsCollapsed={setIsSidebarCollapsed}
+          isMobileOpen={isMobileSidebarOpen}
+          setIsMobileOpen={setIsMobileSidebarOpen}
+          onOpenChangePassword={() => setIsChangePasswordModalOpen(true)}
+        />
+      )}
+
+      {/* Main Layout Container (Offset when SuperAdmin sidebar is active) */}
+      <div className={`flex-1 flex flex-col transition-all duration-300 ${
+        isSuperAdminUser 
+          ? (isSidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64') 
+          : ''
+      }`}>
+
+        {/* Top Navbar */}
+        <Navbar
+          currentUser={currentUser}
+          currentTab={currentTab}
+          companies={companies}
+          selectedCompanyId={selectedCompanyId}
+          onSelectCompanyScope={(cId) => setSelectedCompanyId(cId)}
+          setCurrentTab={setCurrentTab}
+          onLogout={handleLogout}
+          myRegistrationsCount={myRegistrationsCount}
+          onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
+          isSidebarCollapsed={isSidebarCollapsed}
+          onOpenChangePassword={() => setIsChangePasswordModalOpen(true)}
+        />
+
+        {/* Main Content Area */}
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+          
+          {/* Tab 1: Catálogo Principal */}
+          {currentTab === 'landing' && (
           <CatalogView
             events={events}
             currentUser={currentUser}
@@ -512,6 +558,8 @@ export function App() {
       {/* Corporate Claro Training Footer */}
       <Footer />
 
+      </div>
+
       {/* Reservation Modal */}
       {selectedEventForModal && (
         <ReservationModal
@@ -524,6 +572,22 @@ export function App() {
 
       {/* Global Toast Alert */}
       <Toast toast={toast} onClose={() => setToast(null)} />
+
+      {/* PWA Installation Prompt */}
+      <PwaInstallPrompt />
+
+      {/* Change Password Modal */}
+      {isChangePasswordModalOpen && currentUser && (
+        <ChangePasswordModal
+          currentUser={currentUser}
+          onClose={() => setIsChangePasswordModalOpen(false)}
+          onSuccess={(updatedUser, message) => {
+            setCurrentUser(updatedUser);
+            setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
+            showToast('Seguridad', message, 'success');
+          }}
+        />
+      )}
 
     </div>
   );

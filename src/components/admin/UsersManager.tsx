@@ -26,6 +26,7 @@ import { formatCedula, isValidCedula } from "../../utils/formatters";
 import { BulkUsersModal } from "./BulkUsersModal";
 import { SupervisorAssignmentModal } from "./SupervisorAssignmentModal";
 import { ParticipantProfileModal } from "./ParticipantProfileModal";
+import { EditUserModal } from "./EditUserModal";
 
 interface UsersManagerProps {
   users: UserAccount[];
@@ -75,6 +76,9 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
 
   // Supervisor Team Assignment Modal
   const [selectedSupervisorForAssignment, setSelectedSupervisorForAssignment] = useState<UserAccount | null>(null);
+
+  // Edit User Modal state
+  const [selectedUserForEdit, setSelectedUserForEdit] = useState<UserAccount | null>(null);
 
   // Change Password state
   const [selectedUserForPassword, setSelectedUserForPassword] = useState<UserAccount | null>(null);
@@ -243,6 +247,39 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
     );
     await onSaveUsers(updated);
     onShowToast("Empresa actualizada", "La empresa del usuario fue reasignada exitosamente.", "success");
+  };
+
+  const handleSaveEditedUser = async (updatedUser: UserAccount) => {
+    // Validar correo duplicado si cambió
+    if (users.some(u => u.id !== updatedUser.id && u.email.toLowerCase() === updatedUser.email.toLowerCase())) {
+      onShowToast("Correo duplicado", "Ya existe otro usuario registrado con este correo corporativo.", "error");
+      return;
+    }
+
+    const updatedUsers = users.map(u => u.id === updatedUser.id ? updatedUser : u);
+    await onSaveUsers(updatedUsers);
+
+    // Sincronizar en el padrón de participantes si existe
+    if (onSaveParticipants && participants) {
+      const updatedParticipants = participants.map(p => {
+        if (p.email.toLowerCase() === updatedUser.email.toLowerCase()) {
+          return {
+            ...p,
+            name: updatedUser.name,
+            cedula: updatedUser.cedula,
+            department: updatedUser.department,
+            employmentStatus: updatedUser.employmentStatus,
+            isActive: updatedUser.isActive,
+            companyId: updatedUser.companyId
+          };
+        }
+        return p;
+      });
+      await onSaveParticipants(updatedParticipants);
+    }
+
+    onShowToast("Usuario actualizado", `Se guardaron exitosamente los cambios para ${updatedUser.name}.`, "success");
+    setSelectedUserForEdit(null);
   };
 
   const handleChangePasswordSubmit = async (e: React.FormEvent) => {
@@ -751,6 +788,14 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                           )}
 
                           <button
+                            onClick={() => setSelectedUserForEdit(u)}
+                            className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                            title="Editar usuario"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
+
+                          <button
                             onClick={() => {
                               setSelectedUserForPassword(u);
                               setNewPasswordInput("");
@@ -855,6 +900,18 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
           onClose={() => setSelectedSupervisorForAssignment(null)}
           onSaveAssignment={handleSaveSupervisorAssignment}
           onShowToast={onShowToast}
+        />
+      )}
+
+      {/* Modal de Edición de Usuario */}
+      {selectedUserForEdit && (
+        <EditUserModal
+          user={selectedUserForEdit}
+          companies={companies}
+          isSuperAdmin={isSuperAdmin}
+          currentUser={currentUser}
+          onClose={() => setSelectedUserForEdit(null)}
+          onSave={handleSaveEditedUser}
         />
       )}
 
