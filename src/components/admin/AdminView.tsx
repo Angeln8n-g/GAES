@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   Sliders, 
   BookOpen, 
@@ -7,14 +7,20 @@ import {
   Sparkles,
   UserPlus,
   Calendar,
-  Layers
+  Layers,
+  Building2,
+  Activity,
+  Settings
 } from 'lucide-react';
-import { TrainingEvent, Participant, UserAccount, ParticipantGroup, TrainingProgram } from '../../types';
+import { TrainingEvent, Participant, UserAccount, ParticipantGroup, TrainingProgram, Company, SystemSettings, OjtChecklist, CalibrationSession } from '../../types';
 import { EventsManager } from './EventsManager';
 import { ParticipantsManager } from './ParticipantsManager';
 import { UsersManager } from './UsersManager';
 import { GroupsManager } from './GroupsManager';
 import { ProgramsManager } from './ProgramsManager';
+import { CompaniesManager } from './CompaniesManager';
+import { SettingsManager } from './SettingsManager';
+import { OjtManager } from '../ojt/OjtManager';
 import { EventFormModal } from './EventFormModal';
 import { AttendeesModal } from './AttendeesModal';
 import { NotificationModal } from './NotificationModal';
@@ -27,7 +33,19 @@ interface AdminViewProps {
   users: UserAccount[];
   groups: ParticipantGroup[];
   programs: TrainingProgram[];
+  companies?: Company[];
+  settings?: SystemSettings;
+  checklists?: OjtChecklist[];
+  calibrations?: CalibrationSession[];
+  selectedCompanyId?: string;
   currentUser: UserAccount | null;
+  onSelectCompanyScope?: (companyId: string) => void;
+  onSaveCompany?: (company: Company) => Promise<void>;
+  onDeleteCompany?: (companyId: string) => Promise<void>;
+  onUpdateSettings?: (settings: SystemSettings) => void;
+  onSaveChecklist?: (checklist: Partial<OjtChecklist>) => Promise<void>;
+  onDeleteChecklist?: (id: string) => Promise<void>;
+  onSaveCalibration?: (session: Partial<CalibrationSession>) => Promise<void>;
   onSaveEvent: (event: TrainingEvent) => Promise<void>;
   onDeleteEvent: (eventId: string) => Promise<void>;
   onSaveParticipants: (participants: Participant[]) => Promise<void>;
@@ -54,7 +72,19 @@ export const AdminView: React.FC<AdminViewProps> = ({
   users,
   groups,
   programs,
+  companies = [],
+  settings = { ojt_plan_90d: { enabled: true, enable_702010: true, enable_calibration: true, target_ttp_days: 30 } },
+  checklists = [],
+  calibrations = [],
+  selectedCompanyId = 'all',
   currentUser,
+  onSelectCompanyScope,
+  onSaveCompany,
+  onDeleteCompany,
+  onUpdateSettings,
+  onSaveChecklist,
+  onDeleteChecklist,
+  onSaveCalibration,
   onSaveEvent,
   onDeleteEvent,
   onSaveParticipants,
@@ -68,7 +98,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
   onBulkRegisterUsers,
   onShowToast
 }) => {
-  const [adminTab, setAdminTab] = useState<'events' | 'programs' | 'groups' | 'participants' | 'users'>('events');
+  const [adminTab, setAdminTab] = useState<'events' | 'programs' | 'groups' | 'participants' | 'users' | 'companies' | 'ojt' | 'settings'>('events');
 
   // Modals state
   const [isEventFormOpen, setIsEventFormOpen] = useState(false);
@@ -84,6 +114,43 @@ export const AdminView: React.FC<AdminViewProps> = ({
   const [bulkTime, setBulkTime] = useState<string | null>(null);
 
   const isSuperAdmin = currentUser?.role === 'Super Administrador';
+  const effectiveCompanyId = isSuperAdmin ? selectedCompanyId : (currentUser?.companyId || 'emp_kasino');
+
+  // Filtrado de entidades por empresa activa / asignada
+  const scopedEvents = useMemo(() => {
+    if (isSuperAdmin && effectiveCompanyId === 'all') return events;
+    return events.filter(e => (e.companyId || 'emp_kasino') === effectiveCompanyId);
+  }, [events, isSuperAdmin, effectiveCompanyId]);
+
+  const scopedPrograms = useMemo(() => {
+    if (isSuperAdmin && effectiveCompanyId === 'all') return programs;
+    return programs.filter(p => (p.companyId || 'emp_kasino') === effectiveCompanyId);
+  }, [programs, isSuperAdmin, effectiveCompanyId]);
+
+  const scopedGroups = useMemo(() => {
+    if (isSuperAdmin && effectiveCompanyId === 'all') return groups;
+    return groups.filter(g => (g.companyId || 'emp_kasino') === effectiveCompanyId);
+  }, [groups, isSuperAdmin, effectiveCompanyId]);
+
+  const scopedParticipants = useMemo(() => {
+    if (isSuperAdmin && effectiveCompanyId === 'all') return participants;
+    return participants.filter(p => (p.companyId || 'emp_kasino') === effectiveCompanyId);
+  }, [participants, isSuperAdmin, effectiveCompanyId]);
+
+  const scopedUsers = useMemo(() => {
+    if (isSuperAdmin && effectiveCompanyId === 'all') return users;
+    return users.filter(u => (u.companyId || 'emp_kasino') === effectiveCompanyId);
+  }, [users, isSuperAdmin, effectiveCompanyId]);
+
+  const scopedChecklists = useMemo(() => {
+    if (isSuperAdmin && effectiveCompanyId === 'all') return checklists;
+    return checklists.filter(c => (c.companyId || 'emp_kasino') === effectiveCompanyId);
+  }, [checklists, isSuperAdmin, effectiveCompanyId]);
+
+  const scopedCalibrations = useMemo(() => {
+    if (isSuperAdmin && effectiveCompanyId === 'all') return calibrations;
+    return calibrations.filter(c => (c.companyId || 'emp_kasino') === effectiveCompanyId);
+  }, [calibrations, isSuperAdmin, effectiveCompanyId]);
 
   const handleOpenBulkEnrollment = (eventId?: string, date?: string, time?: string) => {
     setBulkEventId(eventId || null);
@@ -95,89 +162,160 @@ export const AdminView: React.FC<AdminViewProps> = ({
   return (
     <div className="space-y-8 pb-16">
       
-      {/* Header Banner */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1 text-xs font-semibold text-indigo-400">
-            <Sliders className="w-4 h-4" />
-            <span>Panel de Control Administrativo</span>
+      {/* Header Banner (Light Theme & Fully Responsive) */}
+      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+        
+        {/* Top Header Row */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1 text-xs font-bold text-[#DA291C]">
+              <Sliders className="w-4 h-4" />
+              <span>Panel de Control Administrativo</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              Administración del Sistema
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl">
+              Crea cursos, cronogramas grupales, gestiona cupos, importa padrones y audita el cumplimiento.
+            </p>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Administración del Sistema</h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Crea cursos, cronogramas grupales, gestiona cupos, importa padrones y audita el cumplimiento.
-          </p>
+
+          {/* Company Scope Selector */}
+          {companies.length > 0 && isSuperAdmin && onSelectCompanyScope && (
+            <div className="flex items-center gap-2 bg-slate-50 px-3.5 py-2 rounded-2xl border border-slate-200 text-xs shrink-0 self-start lg:self-auto">
+              <Building2 className="w-4 h-4 text-[#DA291C] shrink-0" />
+              <select
+                value={selectedCompanyId}
+                onChange={(e) => onSelectCompanyScope(e.target.value)}
+                className="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
+              >
+                <option value="all">🏢 Todas las Empresas</option>
+                {companies.map(c => (
+                  <option key={c.id} value={c.id}>
+                    🏢 {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
-        {/* Sub-tabs Selector */}
-        <div className="flex items-center bg-slate-950 p-1.5 rounded-2xl border border-slate-800 self-stretch sm:self-auto overflow-x-auto gap-1">
-          <button
-            onClick={() => setAdminTab('events')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-              adminTab === 'events'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 font-bold'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-            }`}
-          >
-            <BookOpen className="w-4 h-4" />
-            <span>Capacitaciones ({events.length})</span>
-          </button>
-
-          <button
-            onClick={() => setAdminTab('programs')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-              adminTab === 'programs'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 font-bold'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-            }`}
-          >
-            <Calendar className="w-4 h-4" />
-            <span>Cronogramas ({programs.length})</span>
-          </button>
-
-          <button
-            onClick={() => setAdminTab('groups')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-              adminTab === 'groups'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 font-bold'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-            }`}
-          >
-            <Layers className="w-4 h-4" />
-            <span>Grupos & Áreas ({groups.length})</span>
-          </button>
-
-          <button
-            onClick={() => setAdminTab('participants')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-              adminTab === 'participants'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 font-bold'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-            }`}
-          >
-            <Users className="w-4 h-4" />
-            <span>Padrón ({participants.length})</span>
-          </button>
-
-          {isSuperAdmin && (
+        {/* Sub-tabs Selector with Dedicated Responsive Scroll Bar */}
+        <div className="w-full overflow-x-auto pb-1 scrollbar-none">
+          <div className="flex items-center bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200 min-w-max gap-1">
             <button
-              onClick={() => setAdminTab('users')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-                adminTab === 'users'
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+              onClick={() => setAdminTab('events')}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                adminTab === 'events'
+                  ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white'
               }`}
             >
-              <ShieldCheck className="w-4 h-4" />
-              <span>Usuarios ({users.length})</span>
+              <BookOpen className="w-4 h-4" />
+              <span>Capacitaciones ({scopedEvents.length})</span>
             </button>
-          )}
+
+            <button
+              onClick={() => setAdminTab('programs')}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                adminTab === 'programs'
+                  ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+              }`}
+            >
+              <Calendar className="w-4 h-4" />
+              <span>Cronogramas ({scopedPrograms.length})</span>
+            </button>
+
+            <button
+              onClick={() => setAdminTab('groups')}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                adminTab === 'groups'
+                  ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+              }`}
+            >
+              <Layers className="w-4 h-4" />
+              <span>Grupos & Áreas ({scopedGroups.length})</span>
+            </button>
+
+            <button
+              onClick={() => setAdminTab('participants')}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                adminTab === 'participants'
+                  ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+              }`}
+            >
+              <Users className="w-4 h-4" />
+              <span>Padrón ({scopedParticipants.length})</span>
+            </button>
+
+            {(isSuperAdmin || currentUser?.role === 'Administrador / Editor') && (
+              <button
+                onClick={() => setAdminTab('users')}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                  adminTab === 'users'
+                    ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                }`}
+              >
+                <ShieldCheck className="w-4 h-4" />
+                <span>Usuarios ({scopedUsers.length})</span>
+              </button>
+            )}
+
+            {settings?.ojt_plan_90d?.enabled !== false && (isSuperAdmin || currentUser?.role === 'Evaluador / Tutor OJT') && (
+              <button
+                onClick={() => setAdminTab('ojt')}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                  adminTab === 'ojt'
+                    ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                }`}
+              >
+                <Activity className="w-4 h-4" />
+                <span>OJT & Campo ({scopedChecklists.length})</span>
+              </button>
+            )}
+
+            {isSuperAdmin && (
+              <button
+                onClick={() => setAdminTab('companies')}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                  adminTab === 'companies'
+                    ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                }`}
+              >
+                <Building2 className="w-4 h-4" />
+                <span>Empresas ({companies.length})</span>
+              </button>
+            )}
+
+            {isSuperAdmin && (
+              <button
+                onClick={() => setAdminTab('settings')}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                  adminTab === 'settings'
+                    ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                }`}
+              >
+                <Sliders className="w-4 h-4 text-amber-600" />
+                <span>Configuración</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Sub-tab Content */}
       {adminTab === 'events' && (
         <EventsManager
-          events={events}
+          events={scopedEvents}
+          companies={companies}
+          participants={scopedParticipants}
           isSuperAdmin={isSuperAdmin}
           onOpenCreateModal={() => {
             setEditingEvent(null);
@@ -200,10 +338,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
 
       {adminTab === 'programs' && (
         <ProgramsManager
-          programs={programs}
-          events={events}
-          participants={participants}
-          groups={groups}
+          programs={scopedPrograms}
+          events={scopedEvents}
+          participants={scopedParticipants}
+          groups={scopedGroups}
+          companies={companies}
+          currentUser={currentUser}
+          isSuperAdmin={isSuperAdmin}
           onSaveProgram={onSaveProgram}
           onDeleteProgram={onDeleteProgram}
           onSendNotification={onSendNotification}
@@ -213,8 +354,11 @@ export const AdminView: React.FC<AdminViewProps> = ({
 
       {adminTab === 'groups' && (
         <GroupsManager
-          groups={groups}
-          participants={participants}
+          groups={scopedGroups}
+          participants={scopedParticipants}
+          companies={companies}
+          currentUser={currentUser}
+          isSuperAdmin={isSuperAdmin}
           onSaveGroup={onSaveGroup}
           onDeleteGroup={onDeleteGroup}
           onShowToast={onShowToast}
@@ -223,20 +367,66 @@ export const AdminView: React.FC<AdminViewProps> = ({
 
       {adminTab === 'participants' && (
         <ParticipantsManager
-          participants={participants}
-          users={users}
+          participants={scopedParticipants}
+          users={scopedUsers}
+          events={scopedEvents}
+          programs={scopedPrograms}
+          companies={companies}
+          currentUser={currentUser}
+          isSuperAdmin={isSuperAdmin}
+          onSaveParticipants={onSaveParticipants}
+          onSaveUsers={onSaveUsers}
+          onShowToast={onShowToast}
+        />
+      )}
+
+      {adminTab === 'users' && (isSuperAdmin || currentUser?.role === 'Administrador / Editor') && (
+        <UsersManager
+          users={scopedUsers}
+          participants={scopedParticipants}
+          events={scopedEvents}
+          programs={scopedPrograms}
+          companies={companies}
+          currentUser={currentUser}
+          onSaveUsers={onSaveUsers}
           onSaveParticipants={onSaveParticipants}
           onShowToast={onShowToast}
         />
       )}
 
-      {adminTab === 'users' && isSuperAdmin && (
-        <UsersManager
-          users={users}
+      {adminTab === 'companies' && isSuperAdmin && onSaveCompany && onDeleteCompany && (
+        <CompaniesManager
+          companies={companies}
           participants={participants}
+          users={users}
+          events={events}
+          selectedCompanyId={selectedCompanyId}
+          onSelectCompanyScope={onSelectCompanyScope || (() => {})}
+          onSaveCompany={onSaveCompany}
+          onDeleteCompany={onDeleteCompany}
+          onShowToast={onShowToast}
+        />
+      )}
+
+      {adminTab === 'ojt' && settings?.ojt_plan_90d?.enabled !== false && (isSuperAdmin || currentUser?.role === 'Evaluador / Tutor OJT') && (
+        <OjtManager
+          checklists={scopedChecklists}
+          calibrations={scopedCalibrations}
+          participants={scopedParticipants}
           currentUser={currentUser}
-          onSaveUsers={onSaveUsers}
-          onSaveParticipants={onSaveParticipants}
+          companies={companies}
+          isSuperAdmin={isSuperAdmin}
+          onSaveChecklist={onSaveChecklist || (async () => {})}
+          onDeleteChecklist={onDeleteChecklist || (async () => {})}
+          onSaveCalibration={onSaveCalibration || (async () => {})}
+          onShowToast={onShowToast}
+        />
+      )}
+
+      {adminTab === 'settings' && isSuperAdmin && onUpdateSettings && (
+        <SettingsManager
+          settings={settings}
+          onUpdateSettings={onUpdateSettings}
           onShowToast={onShowToast}
         />
       )}
@@ -245,6 +435,10 @@ export const AdminView: React.FC<AdminViewProps> = ({
       {isEventFormOpen && (
         <EventFormModal
           initialEvent={editingEvent}
+          companies={companies}
+          users={scopedUsers}
+          currentUser={currentUser}
+          isSuperAdmin={isSuperAdmin}
           onClose={() => {
             setIsEventFormOpen(false);
             setEditingEvent(null);
@@ -271,6 +465,10 @@ export const AdminView: React.FC<AdminViewProps> = ({
             onShowToast('Asistencia confirmada', `Se confirmó la asistencia para ${email}.`, 'success');
           }}
           onOpenBulkEnrollment={(evtId, date, time) => handleOpenBulkEnrollment(evtId, date, time)}
+          onSaveGradesSuccess={(updatedEvt) => {
+            setAttendeesEvent(updatedEvt);
+            onShowToast('Calificaciones guardadas', `Se han registrado las calificaciones y debilidades para "${updatedEvt.title}".`, 'success');
+          }}
         />
       )}
 

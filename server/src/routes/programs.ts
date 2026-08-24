@@ -6,10 +6,18 @@ export const programsRouter = Router();
 /**
  * Helper para obtener todos los programas con eventos y grupos asignados
  */
-export async function fetchFullPrograms() {
-  const result = await pool.query(`
-    SELECT * FROM training_programs ORDER BY created_at DESC
-  `);
+export async function fetchFullPrograms(companyId?: string) {
+  let query = 'SELECT * FROM training_programs';
+  const params: any[] = [];
+
+  if (companyId && typeof companyId === 'string' && companyId !== 'all') {
+    query += ' WHERE company_id = $1';
+    params.push(companyId);
+  }
+
+  query += ' ORDER BY created_at DESC';
+
+  const result = await pool.query(query, params);
 
   const programs = [];
 
@@ -43,6 +51,7 @@ export async function fetchFullPrograms() {
       startDate: prog.start_date ? new Date(prog.start_date).toISOString().slice(0, 10) : '',
       endDate: prog.end_date ? new Date(prog.end_date).toISOString().slice(0, 10) : '',
       status: prog.status || 'active',
+      companyId: prog.company_id || 'emp_kasino',
       eventItems: eventsRes.rows.map(r => ({
         eventId: r.event_id,
         isMandatory: r.is_mandatory,
@@ -58,9 +67,10 @@ export async function fetchFullPrograms() {
 }
 
 // GET /api/programs
-programsRouter.get('/', async (_req: Request, res: Response) => {
+programsRouter.get('/', async (req: Request, res: Response) => {
   try {
-    const programs = await fetchFullPrograms();
+    const { companyId } = req.query;
+    const programs = await fetchFullPrograms(typeof companyId === 'string' ? companyId : undefined);
     res.json(programs);
   } catch (err: any) {
     console.error('Error al obtener programas formativos:', err);
@@ -81,7 +91,8 @@ programsRouter.post('/', async (req: Request, res: Response) => {
       status, 
       eventItems, 
       targetGroupIds, 
-      targetParticipantCards 
+      targetParticipantCards,
+      companyId
     } = req.body;
 
     if (!title || !title.trim()) {
@@ -92,27 +103,22 @@ programsRouter.post('/', async (req: Request, res: Response) => {
     }
 
     const programId = id || `prog_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    const cleanCompanyId = companyId ? companyId.trim() : 'emp_kasino';
 
     await client.query('BEGIN');
 
     // 1. Insertar / Actualizar programa
     await client.query(`
-      INSERT INTO training_programs (id, title, description, start_date, end_date, status)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO training_programs (id, title, description, start_date, end_date, status, company_id)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       ON CONFLICT (id) DO UPDATE SET
         title = EXCLUDED.title,
         description = EXCLUDED.description,
         start_date = EXCLUDED.start_date,
         end_date = EXCLUDED.end_date,
-        status = EXCLUDED.status
-    `, [
-      programId, 
-      title.trim(), 
-      description || '', 
-      startDate, 
-      endDate, 
-      status || 'active'
-    ]);
+        status = EXCLUDED.status,
+        company_id = EXCLUDED.company_id
+    `, [programId, title.trim(), description || null, startDate, endDate, status || 'active', cleanCompanyId]);
 
     // 2. Sincronizar eventos
     await client.query('DELETE FROM program_events WHERE program_id = $1', [programId]);

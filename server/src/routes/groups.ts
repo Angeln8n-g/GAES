@@ -6,14 +6,15 @@ export const groupsRouter = Router();
 /**
  * Helper para obtener todos los grupos con sus integrantes
  */
-export async function fetchFullGroups() {
-  const result = await pool.query(`
+export async function fetchFullGroups(companyId?: string) {
+  let query = `
     SELECT 
       g.id,
       g.name,
       g.description,
       g.color,
       g.department,
+      COALESCE(g.company_id, 'emp_kasino') as "companyId",
       g.created_at,
       COALESCE(
         ARRAY_AGG(gm.participant_card) FILTER (WHERE gm.participant_card IS NOT NULL), 
@@ -21,9 +22,17 @@ export async function fetchFullGroups() {
       ) as member_cards
     FROM participant_groups g
     LEFT JOIN group_members gm ON g.id = gm.group_id
-    GROUP BY g.id
-    ORDER BY g.name ASC
-  `);
+  `;
+  const params: any[] = [];
+
+  if (companyId && typeof companyId === 'string' && companyId !== 'all') {
+    query += ' WHERE g.company_id = $1';
+    params.push(companyId);
+  }
+
+  query += ' GROUP BY g.id ORDER BY g.name ASC';
+
+  const result = await pool.query(query, params);
 
   return result.rows.map(row => ({
     id: row.id,
@@ -31,15 +40,17 @@ export async function fetchFullGroups() {
     description: row.description || '',
     color: row.color || 'indigo',
     department: row.department || '',
+    companyId: row.companyId || 'emp_kasino',
     memberCards: row.member_cards || [],
     createdAt: row.created_at ? new Date(row.created_at).toISOString() : new Date().toISOString()
   }));
 }
 
 // GET /api/groups
-groupsRouter.get('/', async (_req: Request, res: Response) => {
+groupsRouter.get('/', async (req: Request, res: Response) => {
   try {
-    const groups = await fetchFullGroups();
+    const { companyId } = req.query;
+    const groups = await fetchFullGroups(typeof companyId === 'string' ? companyId : undefined);
     res.json(groups);
   } catch (err: any) {
     console.error('Error al obtener grupos:', err);
@@ -51,26 +62,28 @@ groupsRouter.get('/', async (_req: Request, res: Response) => {
 groupsRouter.post('/', async (req: Request, res: Response) => {
   const client = await pool.connect();
   try {
-    const { id, name, description, color, department, memberCards } = req.body;
+    const { id, name, description, color, department, memberCards, companyId } = req.body;
 
     if (!name || !name.trim()) {
       return res.status(400).json({ error: 'El nombre del grupo es obligatorio.' });
     }
 
     const groupId = id || `grp_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    const cleanCompanyId = companyId ? companyId.trim() : 'emp_kasino';
 
     await client.query('BEGIN');
 
     // 1. Insertar o actualizar grupo
     await client.query(`
-      INSERT INTO participant_groups (id, name, description, color, department)
-      VALUES ($1, $2, $3, $4, $5)
+      INSERT INTO participant_groups (id, name, description, color, department, company_id)
+      VALUES ($1, $2, $3, $4, $5, $6)
       ON CONFLICT (id) DO UPDATE SET
         name = EXCLUDED.name,
         description = EXCLUDED.description,
         color = EXCLUDED.color,
-        department = EXCLUDED.department
-    `, [groupId, name.trim(), description || '', color || 'indigo', department || '']);
+        department = EXCLUDED.department,
+        company_id = EXCLUDED.company_id
+    `, [groupId, name.trim(), description || null, color || 'indigo', department || null, cleanCompanyId]);
 
     // 2. Sincronizar miembros
     await client.query('DELETE FROM group_members WHERE group_id = $1', [groupId]);

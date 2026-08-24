@@ -6,7 +6,11 @@ import {
   UserRole, 
   ParticipantGroup, 
   TrainingProgram, 
-  ProgramComplianceSummary 
+  ProgramComplianceSummary,
+  ParticipantGrade,
+  OjtChecklist,
+  CalibrationSession,
+  Company
 } from '../types';
 import { formatDateLong, formatCedula, isValidCedula } from './formatters';
 
@@ -207,6 +211,8 @@ export const normalizeUserRole = (rawRole: string): UserRole => {
   const r = (rawRole || '').toLowerCase().trim();
   if (r.includes('super')) return 'Super Administrador';
   if (r.includes('admin') || r.includes('editor')) return 'Administrador / Editor';
+  if (r.includes('lider') || r.includes('líder') || r.includes('supervisor') || r.includes('lead')) return 'Líder de Área / Supervisor';
+  if (r.includes('ojt') || r.includes('tutor') || r.includes('evaluador') || r.includes('coach') || r.includes('mentor') || r.includes('trainer')) return 'Evaluador / Tutor OJT';
   return 'Colaborador (User)';
 };
 
@@ -847,4 +853,476 @@ export const exportInstructorsAndFeedbackReportToExcel = (
 
   XLSX.writeFile(wb, `Reporte_Calidad_Docente_Encuestas_${new Date().toISOString().slice(0, 10)}.xlsx`);
 };
+
+/**
+ * Exporta el Libro de Calificaciones de un evento específico
+ */
+export const exportEventGradesToExcel = (
+  event: TrainingEvent,
+  participants: Participant[]
+): void => {
+  const grades = event.grades || [];
+  const data = grades.map((g, idx) => {
+    const p = participants.find(part => part.card === g.participantCard || part.email.toLowerCase() === g.participantEmail?.toLowerCase());
+    return {
+      'No.': idx + 1,
+      'Cédula': p?.cedula || 'N/A',
+      'No. Tarjeta': g.participantCard,
+      'Nombre del Colaborador': g.participantName || p?.name || 'N/A',
+      'Correo Electrónico': g.participantEmail || p?.email || 'N/A',
+      'Departamento': g.participantDepartment || p?.department || 'General',
+      'Capacitación': event.title,
+      'Categoría': event.category,
+      'Tipo de Evaluación': event.evaluationType === 'score_100' ? 'Numérica (0-100)' : event.evaluationType === 'scale_1_5' ? 'Escala (1-5)' : 'Aprobado/Reprobado',
+      'Calificación Obtenida': g.score !== null && g.score !== undefined ? `${g.score} pts` : 'No asignada',
+      'Estado Académico': g.academicStatus === 'passed' ? 'APROBADO' : g.academicStatus === 'failed' ? 'REPROBADO' : 'PENDIENTE',
+      'Debilidades / Brechas Detectadas': (g.detectedSkillGaps || []).join(', ') || 'Ninguna',
+      'Notas de Debilidad': g.weaknessesNotes || '',
+      'Fortalezas Observadas': g.strengthsNotes || '',
+      'Requiere Re-capacitación': g.needsRetraining ? 'SÍ' : 'NO',
+      'Recomendaciones del Docente': g.feedback || '',
+      'Evaluado Por': g.gradedBy || 'Instructor',
+      'Fecha de Calificación': g.gradedAt || ''
+    };
+  });
+
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Calificaciones');
+
+  ws['!cols'] = [
+    { wch: 6 },
+    { wch: 18 },
+    { wch: 15 },
+    { wch: 30 },
+    { wch: 30 },
+    { wch: 20 },
+    { wch: 35 },
+    { wch: 15 },
+    { wch: 20 },
+    { wch: 20 },
+    { wch: 18 },
+    { wch: 35 },
+    { wch: 35 },
+    { wch: 35 },
+    { wch: 22 },
+    { wch: 40 },
+    { wch: 25 },
+    { wch: 20 }
+  ];
+
+  XLSX.writeFile(wb, `Libro_Calificaciones_${event.title.slice(0, 20).replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+};
+
+/**
+ * Exporta el Reporte Integral de Brechas de Habilidades y Detección de Debilidades (Skills Gap)
+ */
+export const exportSkillsGapReportToExcel = (
+  events: TrainingEvent[],
+  participants: Participant[],
+  allGrades: ParticipantGrade[]
+): void => {
+  const wb = XLSX.utils.book_new();
+
+  // Hoja 1: Matriz de Calificaciones Global
+  const globalGradesData = allGrades.map((g, idx) => {
+    const p = participants.find(part => part.card === g.participantCard);
+    const evt = events.find(e => e.id === g.eventId);
+    return {
+      'No.': idx + 1,
+      'Cédula': p?.cedula || 'N/A',
+      'No. Tarjeta': g.participantCard,
+      'Colaborador': g.participantName || p?.name || 'N/A',
+      'Correo': g.participantEmail || p?.email || 'N/A',
+      'Departamento': g.participantDepartment || p?.department || 'General',
+      'Capacitación': g.eventTitle || evt?.title || 'N/A',
+      'Nota': g.score !== null ? g.score : 'N/A',
+      'Estado': g.academicStatus === 'passed' ? 'Aprobado' : g.academicStatus === 'failed' ? 'Reprobado' : 'Pendiente',
+      'Debilidades': (g.detectedSkillGaps || []).join(', ') || 'Ninguna',
+      'Detalle de Debilidad': g.weaknessesNotes || '',
+      'Fortalezas': g.strengthsNotes || '',
+      'Re-capacitación Urgente': g.needsRetraining ? 'SÍ' : 'NO',
+      'Evaluador': g.gradedBy || '',
+      'Fecha': g.gradedAt || ''
+    };
+  });
+
+  const wsGrades = XLSX.utils.json_to_sheet(globalGradesData);
+  XLSX.utils.book_append_sheet(wb, wsGrades, 'Registro de Notas');
+
+  // Hoja 2: Colaboradores con Necesidad de Refuerzo / Re-capacitación
+  const retrainingData = allGrades
+    .filter(g => g.needsRetraining || g.academicStatus === 'failed')
+    .map((g, idx) => {
+      const p = participants.find(part => part.card === g.participantCard);
+      const evt = events.find(e => e.id === g.eventId);
+      return {
+        'Prioridad': idx + 1,
+        'No. Tarjeta': g.participantCard,
+        'Colaborador': g.participantName || p?.name || 'N/A',
+        'Departamento': g.participantDepartment || p?.department || 'General',
+        'Curso a Reforzar': g.eventTitle || evt?.title || 'N/A',
+        'Nota Obtenida': g.score !== null ? g.score : 'Sin nota',
+        'Competencias Débiles': (g.detectedSkillGaps || []).join(', ') || 'General',
+        'Observación del Evaluador': g.weaknessesNotes || g.feedback || 'Requiere refuerzo técnico',
+        'Supervisor Responsable': p?.supervisorName || 'Sin asignar'
+      };
+    });
+
+  const wsRetraining = XLSX.utils.json_to_sheet(retrainingData);
+  XLSX.utils.book_append_sheet(wb, wsRetraining, 'Plan de Re-capacitación');
+
+  XLSX.writeFile(wb, `Diagnostico_Debilidades_SkillsGap_${new Date().toISOString().slice(0, 10)}.xlsx`);
+};
+
+/**
+ * Exporta el reporte completo de bitácoras de campo OJT y diagnósticos operativos a Excel (.xlsx)
+ */
+export const exportOjtChecklistsToExcel = (
+  checklists: OjtChecklist[],
+  participants: Participant[] = [],
+  companies: Company[] = []
+): void => {
+  const compMap = new Map(companies.map(c => [c.id, c.name]));
+  const partMap = new Map(participants.map(p => [p.card, p]));
+
+  const data = checklists.map((c, idx) => {
+    const p = partMap.get(c.participantCard);
+    const compName = compMap.get(c.companyId) || 'Claro Dominicana';
+
+    const obsTypeLabel = 
+      c.observationType === 'daily_observation' ? 'Acompañamiento Diario' :
+      c.observationType === 'weekly_evaluation' ? 'Evaluación Semanal' :
+      c.observationType === 'cross_audit' ? 'Auditoría Cruzada' :
+      c.observationType === 'first_60d_check' ? 'Control 60 Días' : c.observationType;
+
+    const diagLabel = 
+      c.operationalStatus === 'compliant' ? 'Conforme a Estándar (Verde)' :
+      c.operationalStatus === 'needs_coaching' ? 'Requiere Coaching / Refuerzo (Amarillo)' :
+      'Brecha Crítica (Rojo)';
+
+    return {
+      'No.': idx + 1,
+      'ID Bitácora': c.id,
+      'Fecha': c.date,
+      'Empresa': compName,
+      'No. Tarjeta': c.participantCard,
+      'Colaborador': c.participantName || p?.name || 'N/A',
+      'Cédula': p?.cedula || 'N/A',
+      'Departamento': c.department || p?.department || 'Operaciones',
+      'Supervisor Asignado': p?.supervisorName || 'N/A',
+      'Evaluador / Tutor OJT': c.evaluatorName,
+      'Tipo de Observación': obsTypeLabel,
+      'Puntaje de Campo (1-100)': Number(c.overallScore),
+      'Diagnóstico Operativo': diagLabel,
+      'Protocolo Seguridad EPP': c.safetyProtocolPass ? 'CUMPLE (100%)' : 'NO CUMPLE (Falla Crítica)',
+      'First-Time Fix (FTF)': c.firstTimeFixPass ? 'APROBADO (A la primera)' : 'RETRABAJO REQUERIDO',
+      'Debilidades Detectadas': (c.weaknessesIdentified || []).join('; ') || 'Ninguna observada',
+      'Plan de Acción Inmediato': c.immediateActionPlan || 'Sin plan asignado',
+      'Notas / Observaciones': c.notes || ''
+    };
+  });
+
+  // Hoja 2: Resumen Ejecutivo
+  const total = checklists.length;
+  const compliant = checklists.filter(c => c.operationalStatus === 'compliant').length;
+  const coaching = checklists.filter(c => c.operationalStatus === 'needs_coaching').length;
+  const critical = checklists.filter(c => c.operationalStatus === 'critical_gap').length;
+  const eppPass = checklists.filter(c => c.safetyProtocolPass).length;
+  const ftfPass = checklists.filter(c => c.firstTimeFixPass).length;
+  const avgScore = total > 0 ? (checklists.reduce((acc, curr) => acc + Number(curr.overallScore), 0) / total).toFixed(1) : '0';
+
+  const summaryData = [
+    { 'Métrica': 'Total de Bitácoras de Campo', 'Valor': total },
+    { 'Métrica': 'Promedio General de Desempeño en Campo', 'Valor': `${avgScore} / 100` },
+    { 'Métrica': 'Tasa de Conformidad Operativa', 'Valor': total > 0 ? `${Math.round((compliant / total) * 100)}%` : '0%' },
+    { 'Métrica': 'Colaboradores Conformes (Verde)', 'Valor': compliant },
+    { 'Métrica': 'Colaboradores en Coaching (Amarillo)', 'Valor': coaching },
+    { 'Métrica': 'Colaboradores con Brecha Crítica (Rojo)', 'Valor': critical },
+    { 'Métrica': 'Adherencia a Seguridad y EPP', 'Valor': total > 0 ? `${Math.round((eppPass / total) * 100)}%` : '0%' },
+    { 'Métrica': 'Tasa de First-Time Fix (Resolución a la primera)', 'Valor': total > 0 ? `${Math.round((ftfPass / total) * 100)}%` : '0%' }
+  ];
+
+  const wb = XLSX.utils.book_new();
+  const wsDetail = XLSX.utils.json_to_sheet(data);
+  const wsSummary = XLSX.utils.json_to_sheet(summaryData);
+
+  XLSX.utils.book_append_sheet(wb, wsDetail, 'Bitácoras OJT Campo');
+  XLSX.utils.book_append_sheet(wb, wsSummary, 'Resumen Ejecutivo OJT');
+
+  XLSX.writeFile(wb, `Reporte_Bitacoras_OJT_${new Date().toISOString().slice(0, 10)}.xlsx`);
+};
+
+/**
+ * Exporta el reporte de sesiones de mesas de calibración a Excel (.xlsx)
+ */
+export const exportCalibrationsToExcel = (
+  calibrations: CalibrationSession[],
+  companies: Company[] = []
+): void => {
+  const compMap = new Map(companies.map(c => [c.id, c.name]));
+
+  const data = calibrations.map((cal, idx) => {
+    const compName = compMap.get(cal.companyId) || 'Claro Dominicana';
+    return {
+      'No.': idx + 1,
+      'ID Sesión': cal.id,
+      'Fecha': cal.date,
+      'Empresa': compName,
+      'Título / Motivo': cal.title,
+      'Comité / Facilitador': cal.conductedBy,
+      'Casos / Participantes Revisados': Number(cal.participantsReviewed),
+      'Promedio Teoría (Aula)': Number(cal.averageTheoryScore),
+      'Promedio Práctica (Campo)': Number(cal.averageFieldScore),
+      'Dispersión / Brecha de Varianza (%)': Number(cal.varianceGapPct),
+      'Estado': cal.status === 'completed' ? 'Completada' : cal.status === 'in_progress' ? 'En Progreso' : 'Programada',
+      'Hallazgos Clave': cal.keyFindings || '',
+      'Acuerdos y Compromisos': cal.actionAgreements || ''
+    };
+  });
+
+  const wb = XLSX.utils.book_new();
+  const wsCalibrations = XLSX.utils.json_to_sheet(data);
+  XLSX.utils.book_append_sheet(wb, wsCalibrations, 'Mesas de Calibración');
+
+  XLSX.writeFile(wb, `Reporte_Mesas_Calibracion_${new Date().toISOString().slice(0, 10)}.xlsx`);
+};
+
+/**
+ * Exporta el Libro Integral de Calificaciones de la Sesión para:
+ * 1. Plantilla Insumo para Bitácoras de Campo OJT
+ * 2. Insumo para Mesas de Calibración (Aula vs Campo)
+ * 3. Estadísticas & Métricas de la Sesión
+ * 4. Calificaciones Detalladas
+ */
+export const exportSessionGradesForOjtAndCalibration = (
+  event: TrainingEvent,
+  participants: Participant[] = [],
+  companies: Company[] = []
+): void => {
+  const grades = event.grades || [];
+  const comp = companies.find(c => c.id === (event.companyId || 'emp_kasino'));
+  const compName = comp?.name || 'Kasino 21 Corporativo';
+  const ojtTutorName = event.ojtEvaluatorName || 'No asignado / Formación general';
+
+  // Participantes inscritos / asistentes si no hay grades directos
+  const allAttendeeCards = new Set<string>();
+  const attendeeEmailMap = new Map(participants.map(p => [p.email.toLowerCase(), p]));
+  const attendeeCardMap = new Map(participants.map(p => [p.card, p]));
+
+  // Recolectar participantes de los slots del evento
+  event.schedule.forEach(sch => {
+    sch.slots.forEach(slot => {
+      slot.attendees.forEach(email => {
+        const p = attendeeEmailMap.get(email.toLowerCase());
+        if (p) allAttendeeCards.add(p.card);
+      });
+      (slot.attendedList || []).forEach(email => {
+        const p = attendeeEmailMap.get(email.toLowerCase());
+        if (p) allAttendeeCards.add(p.card);
+      });
+    });
+  });
+
+  // Si hay grades, agregamos las tarjetas de los evaluados
+  grades.forEach(g => allAttendeeCards.add(g.participantCard));
+
+  // Generar lista combinada de participantes
+  const participantsInSession: Array<{
+    card: string;
+    name: string;
+    email: string;
+    cedula: string;
+    department: string;
+    grade?: ParticipantGrade;
+  }> = [];
+
+  allAttendeeCards.forEach(card => {
+    const p = attendeeCardMap.get(card);
+    const g = grades.find(grd => grd.participantCard === card);
+    participantsInSession.push({
+      card,
+      name: g?.participantName || p?.name || `Colaborador #${card}`,
+      email: g?.participantEmail || p?.email || 'N/A',
+      cedula: p?.cedula || 'N/A',
+      department: g?.participantDepartment || p?.department || 'General',
+      grade: g
+    });
+  });
+
+  // Si no había asistentes en slots ni grades pero sí grades
+  if (participantsInSession.length === 0 && grades.length > 0) {
+    grades.forEach(g => {
+      const p = attendeeCardMap.get(g.participantCard);
+      participantsInSession.push({
+        card: g.participantCard,
+        name: g.participantName || p?.name || `Colaborador #${g.participantCard}`,
+        email: g.participantEmail || p?.email || 'N/A',
+        cedula: p?.cedula || 'N/A',
+        department: g.participantDepartment || p?.department || 'General',
+        grade: g
+      });
+    });
+  }
+
+  // -------------------------------------------------------------
+  // HOJA 1: INSUMO PARA BITÁCORAS DE CAMPO OJT (Checklists 70-20-10)
+  // -------------------------------------------------------------
+  const ojtChecklistInputData = participantsInSession.map((item, idx) => {
+    const g = item.grade;
+    const scoreText = g?.score !== null && g?.score !== undefined ? `${g.score} pts` : 'Pendiente';
+    const academicStatusText = g?.academicStatus === 'passed' ? 'APROBADO EN AULA' : g?.academicStatus === 'failed' ? 'REPROBADO EN AULA' : 'SIN EVALUACIÓN';
+
+    return {
+      'No.': idx + 1,
+      'No. Tarjeta': item.card,
+      'Cédula': item.cedula,
+      'Nombre del Colaborador': item.name,
+      'Departamento': item.department,
+      'Capacitación Teórica': event.title,
+      'Instructor de Aula': event.instructor,
+      'Tutor OJT Asignado': ojtTutorName,
+      'Nota Teoría Aula (% / Pts)': scoreText,
+      'Estado Aula': academicStatusText,
+      'Habilidades / Competencias a Auditar': (event.skillsEvaluated || []).join(', ') || 'Procedimiento estándar',
+      'Debilidades Detectadas en Aula': (g?.detectedSkillGaps || []).join(', ') || 'Ninguna',
+      '[CAMPO] Fecha de Observación OJT': '',
+      '[CAMPO] Tipo de Observación (Diario/Semanal/60D)': '',
+      '[CAMPO] Protocolo Seguridad EPP (SÍ/NO)': '',
+      '[CAMPO] First-Time Fix Sin Retrabajo (SÍ/NO)': '',
+      '[CAMPO] Puntaje Práctico Obtenido (0-100)': '',
+      '[CAMPO] Diagnóstico (Conforme / Coaching / Brecha Crítica)': '',
+      '[CAMPO] Plan de Acción Inmediato': ''
+    };
+  });
+
+  // -------------------------------------------------------------
+  // HOJA 2: INSUMO PARA MESAS DE CALIBRACIÓN (Varianza Aula vs Práctica)
+  // -------------------------------------------------------------
+  const calibrationInputData = participantsInSession.map((item, idx) => {
+    const g = item.grade;
+    const theoryScore = g?.score !== null && g?.score !== undefined ? Number(g.score) : 0;
+
+    return {
+      'Fila': idx + 1,
+      'Empresa': compName,
+      'Capacitación Evaluada': event.title,
+      'No. Tarjeta': item.card,
+      'Nombre Colaborador': item.name,
+      'Departamento': item.department,
+      'Instructor de Aula': event.instructor,
+      'Tutor OJT de Campo': ojtTutorName,
+      'Nota Aula (Teoría 100)': theoryScore > 0 ? theoryScore : 'Pendiente',
+      'Nota Campo (Práctica 100)': '',
+      'Dispersión / Varianza Gap (%)': '',
+      'Diagnóstico de Calibración': '',
+      'Hallazgos / Brecha de Transferencia': g?.weaknessesNotes || '',
+      'Acuerdos de Calibración / Ajuste al Estándar': ''
+    };
+  });
+
+  // -------------------------------------------------------------
+  // HOJA 3: ESTADÍSTICAS & RESUMEN EJECUTIVO DE LA SESIÓN
+  // -------------------------------------------------------------
+  const totalGraded = grades.filter(g => g.score !== null && g.score !== undefined).length;
+  const passedCount = grades.filter(g => g.academicStatus === 'passed').length;
+  const failedCount = grades.filter(g => g.academicStatus === 'failed').length;
+  const retrainingCount = grades.filter(g => g.needsRetraining).length;
+  const avgScore = totalGraded > 0
+    ? Math.round(grades.reduce((acc, curr) => acc + (Number(curr.score) || 0), 0) / totalGraded)
+    : 0;
+  const passRate = totalGraded > 0 ? Math.round((passedCount / totalGraded) * 100) : 0;
+
+  // Frecuencia de debilidades detectadas
+  const gapCounts: Record<string, number> = {};
+  grades.forEach(g => {
+    (g.detectedSkillGaps || []).forEach(gap => {
+      gapCounts[gap] = (gapCounts[gap] || 0) + 1;
+    });
+  });
+  const topGapsSummary = Object.entries(gapCounts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([gap, count]) => `${gap} (${count} colaboradores)`)
+    .join('; ') || 'Sin debilidades críticas reportadas';
+
+  const statsData = [
+    { 'Métrica / Indicador': 'Capacitación Evaluada', 'Valor': event.title, 'Detalle Operativo': `Categoría: ${event.category} • Modalidad: ${event.modality}` },
+    { 'Métrica / Indicador': 'Empresa / Sede', 'Valor': compName, 'Detalle Operativo': event.location || 'Instalaciones corporativas' },
+    { 'Métrica / Indicador': 'Instructor Docente (Aula)', 'Valor': event.instructor, 'Detalle Operativo': 'Responsable de la formación teórica' },
+    { 'Métrica / Indicador': 'Tutor / Evaluador OJT (Campo)', 'Valor': ojtTutorName, 'Detalle Operativo': 'Responsable del acompañamiento y bitácoras en puesto' },
+    { 'Métrica / Indicador': 'Total Participantes Registrados', 'Valor': participantsInSession.length, 'Detalle Operativo': 'Inscritos en las fechas del evento' },
+    { 'Métrica / Indicador': 'Colaboradores Calificados', 'Valor': totalGraded, 'Detalle Operativo': `${participantsInSession.length - totalGraded} pendientes de nota` },
+    { 'Métrica / Indicador': 'Promedio General de la Sesión', 'Valor': `${avgScore} / 100`, 'Detalle Operativo': `Nota mínima de aprobación: ${event.passingScore || 70} pts` },
+    { 'Métrica / Indicador': 'Tasa de Aprobación Teórica', 'Valor': `${passRate}%`, 'Detalle Operativo': `${passedCount} aprobados vs ${failedCount} reprobados` },
+    { 'Métrica / Indicador': 'Colaboradores que Requieren Re-capacitación', 'Valor': retrainingCount, 'Detalle Operativo': 'Requerimiento señalado por el instructor' },
+    { 'Métrica / Indicador': 'Competencias / Habilidades Evaluadas', 'Valor': (event.skillsEvaluated || []).join(', ') || 'Evaluación estándar', 'Detalle Operativo': 'Criterios de evaluación definidos en el programa' },
+    { 'Métrica / Indicador': 'Top Debilidades / Brechas Identificadas', 'Valor': topGapsSummary, 'Detalle Operativo': 'Focos de atención para el seguimiento OJT' },
+    { 'Métrica / Indicador': 'Fecha de Generación del Reporte', 'Valor': new Date().toLocaleString(), 'Detalle Operativo': 'Plataforma CapacitaHub Claro / GAES' }
+  ];
+
+  // -------------------------------------------------------------
+  // HOJA 4: CALIFICACIONES DETALLADAS NOMINALES
+  // -------------------------------------------------------------
+  const detailedGradesData = participantsInSession.map((item, idx) => {
+    const g = item.grade;
+    return {
+      'No.': idx + 1,
+      'No. Tarjeta': item.card,
+      'Cédula': item.cedula,
+      'Nombre del Colaborador': item.name,
+      'Correo Electrónico': item.email,
+      'Departamento': item.department,
+      'Calificación Obtenida': g?.score !== null && g?.score !== undefined ? Number(g.score) : 'No asignada',
+      'Estado Académico': g?.academicStatus === 'passed' ? 'APROBADO' : g?.academicStatus === 'failed' ? 'REPROBADO' : 'PENDIENTE',
+      'Debilidades Detectadas': (g?.detectedSkillGaps || []).join(', ') || 'Ninguna',
+      'Notas de Debilidad': g?.weaknessesNotes || '',
+      'Fortalezas Observadas': g?.strengthsNotes || '',
+      'Requiere Re-capacitación': g?.needsRetraining ? 'SÍ' : 'NO',
+      'Feedback / Recomendaciones': g?.feedback || '',
+      'Evaluador': g?.gradedBy || event.instructor,
+      'Fecha de Calificación': g?.gradedAt || ''
+    };
+  });
+
+  // Crear libro de trabajo con todas las hojas
+  const wb = XLSX.utils.book_new();
+
+  const wsOjt = XLSX.utils.json_to_sheet(ojtChecklistInputData);
+  const wsCalib = XLSX.utils.json_to_sheet(calibrationInputData);
+  const wsStats = XLSX.utils.json_to_sheet(statsData);
+  const wsDetail = XLSX.utils.json_to_sheet(detailedGradesData);
+
+  // Ancho de columnas optimizado
+  wsOjt['!cols'] = [
+    { wch: 6 }, { wch: 14 }, { wch: 16 }, { wch: 28 }, { wch: 20 },
+    { wch: 30 }, { wch: 24 }, { wch: 28 }, { wch: 18 }, { wch: 20 },
+    { wch: 35 }, { wch: 30 }, { wch: 24 }, { wch: 26 }, { wch: 22 },
+    { wch: 22 }, { wch: 24 }, { wch: 28 }, { wch: 35 }
+  ];
+
+  wsCalib['!cols'] = [
+    { wch: 6 }, { wch: 24 }, { wch: 30 }, { wch: 14 }, { wch: 28 },
+    { wch: 20 }, { wch: 24 }, { wch: 28 }, { wch: 18 }, { wch: 18 },
+    { wch: 20 }, { wch: 24 }, { wch: 35 }, { wch: 35 }
+  ];
+
+  wsStats['!cols'] = [
+    { wch: 38 }, { wch: 35 }, { wch: 45 }
+  ];
+
+  wsDetail['!cols'] = [
+    { wch: 6 }, { wch: 14 }, { wch: 16 }, { wch: 28 }, { wch: 28 },
+    { wch: 20 }, { wch: 18 }, { wch: 18 }, { wch: 30 }, { wch: 30 },
+    { wch: 30 }, { wch: 18 }, { wch: 35 }, { wch: 24 }, { wch: 20 }
+  ];
+
+  XLSX.utils.book_append_sheet(wb, wsOjt, 'Insumo Bitácoras OJT');
+  XLSX.utils.book_append_sheet(wb, wsCalib, 'Insumo Mesas Calibración');
+  XLSX.utils.book_append_sheet(wb, wsStats, 'Estadísticas de Sesión');
+  XLSX.utils.book_append_sheet(wb, wsDetail, 'Calificaciones Detalladas');
+
+  const safeEventTitle = event.title.slice(0, 25).replace(/[^a-zA-Z0-9_-]/g, '_');
+  XLSX.writeFile(wb, `Reporte_OJT_Calibracion_${safeEventTitle}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+};
+
 

@@ -2,10 +2,30 @@
 // TIPOS E INTERFACES TYPESCRIPT CENTRALIZADOS
 // ==========================================
 
-export type UserRole = 'Super Administrador' | 'Administrador / Editor' | 'Líder de Área / Supervisor' | 'Colaborador (User)';
+export type UserRole = 'Super Administrador' | 'Administrador / Editor' | 'Líder de Área / Supervisor' | 'Evaluador / Tutor OJT' | 'Colaborador (User)';
 
 export type EventStatus = 'active' | 'inactive';
 export type EventModality = 'Presencial' | 'Virtual' | 'Híbrida';
+
+export interface RegistrationAttendeeDetail {
+  email: string;
+  isMandatory?: boolean;
+  assignedBy?: string | null;
+  assignmentType?: 'mandatory' | 'voluntary' | 'self';
+  assignmentNotes?: string | null;
+  assignedAt?: string | null;
+}
+
+export interface TeamAssignmentPayload {
+  eventId: string;
+  date: string;
+  time: string;
+  emails: string[];
+  isMandatory: boolean;
+  assignedBy: string;
+  assignmentType?: 'mandatory' | 'voluntary';
+  notes?: string;
+}
 
 export interface Slot {
   time: string;
@@ -13,6 +33,7 @@ export interface Slot {
   registered: number;
   attendees: string[]; // Emails de colaboradores inscritos
   attendedList?: string[]; // Emails con asistencia confirmada (QR)
+  attendeesDetails?: RegistrationAttendeeDetail[]; // Metadatos de asignación
   waitlist?: string[]; // Emails en lista de espera
 }
 
@@ -44,6 +65,53 @@ export interface EventFeedback {
   createdAt: string;
 }
 
+export interface Company {
+  id: string;
+  name: string;
+  slug: string;
+  logoUrl?: string;
+  rncTaxId?: string;
+  industry?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  isActive: boolean;
+  createdAt?: string;
+  stats?: {
+    participantsCount: number;
+    usersCount: number;
+    eventsCount: number;
+    supervisorsCount: number;
+  };
+}
+
+export type EvaluationType = 'attendance_only' | 'score_100' | 'scale_1_5' | 'pass_fail';
+export type AcademicStatus = 'passed' | 'failed' | 'pending';
+
+export interface ParticipantGrade {
+  id: string;
+  eventId: string;
+  slotId?: number | null;
+  participantCard: string;
+  participantName?: string;
+  participantEmail?: string;
+  participantDepartment?: string;
+  companyId?: string;
+  score: number | null;
+  academicStatus: AcademicStatus;
+  detectedSkillGaps: string[];
+  weaknessesNotes?: string | null;
+  strengthsNotes?: string | null;
+  needsRetraining: boolean;
+  feedback?: string | null;
+  gradedBy?: string;
+  gradedAt?: string;
+  eventTitle?: string;
+  eventCategory?: string;
+  evaluationType?: EvaluationType;
+  passingScore?: number;
+  skillsEvaluated?: string[];
+}
+
 export interface TrainingEvent {
   id: string;
   title: string;
@@ -55,11 +123,21 @@ export interface TrainingEvent {
   modality: EventModality;
   location: string;
   surveyUrl?: string;
+  companyId?: string;
+  evaluationType?: EvaluationType;
+  passingScore?: number;
+  skillsEvaluated?: string[];
   notificationSettings?: NotificationSettings;
   notificationHistory?: NotificationHistoryItem[];
   schedule: Schedule[];
   feedbacks?: EventFeedback[];
+  grades?: ParticipantGrade[];
+  ojtEvaluatorId?: string;
+  ojtEvaluatorName?: string;
+  ojtEvaluatorEmail?: string;
 }
+
+export type EmploymentStatus = 'contratado' | 'en_proceso' | 'inactivo';
 
 export interface Participant {
   card: string;
@@ -69,6 +147,9 @@ export interface Participant {
   department?: string;
   supervisorId?: string; // ID del usuario supervisor asignado
   supervisorName?: string; // Nombre del supervisor
+  employmentStatus?: EmploymentStatus;
+  isActive?: boolean;
+  companyId?: string;
 }
 
 export interface UserAccount {
@@ -81,6 +162,9 @@ export interface UserAccount {
   department?: string;
   assignedGroupIds?: string[];
   assignedMemberCards?: string[]; // Tarjetas de colaboradores supervisados directamente
+  employmentStatus?: EmploymentStatus;
+  isActive?: boolean;
+  companyId?: string;
 }
 
 export interface ToastNotification {
@@ -90,7 +174,7 @@ export interface ToastNotification {
   type: 'success' | 'error' | 'info' | 'warning';
 }
 
-export type TabView = 'landing' | 'my-registrations' | 'dashboard' | 'admin' | 'attendance' | 'team';
+export type TabView = 'landing' | 'my-registrations' | 'dashboard' | 'admin' | 'attendance' | 'team' | 'ojt';
 
 // ==========================================
 // MÓDULO DE GRUPOS, CRONOGRAMAS Y CUMPLIMIENTO
@@ -102,14 +186,19 @@ export interface ParticipantGroup {
   description?: string;
   color: string; // 'indigo' | 'emerald' | 'amber' | 'rose' | 'sky' | 'purple' | 'cyan' | 'slate'
   department?: string;
+  companyId?: string;
   memberCards: string[]; // Lista de tarjetas de colaboradores
   createdAt: string;
 }
+
+export type StageCategory = 'field_practice_70' | 'shadowing_coaching_20' | 'formal_course_10';
+export type LearningFramework = 'standard' | '70_20_10';
 
 export interface ProgramEventItem {
   eventId: string;
   isMandatory: boolean;
   orderIndex?: number;
+  stageCategory?: StageCategory;
 }
 
 export type ProgramStatus = 'active' | 'draft' | 'archived' | 'completed';
@@ -121,10 +210,88 @@ export interface TrainingProgram {
   startDate: string; // YYYY-MM-DD
   endDate: string; // YYYY-MM-DD
   status: ProgramStatus;
+  companyId?: string;
+  learningFramework?: LearningFramework;
   eventItems: ProgramEventItem[];
   targetGroupIds: string[];
   targetParticipantCards?: string[];
   createdAt: string;
+}
+
+// ==========================================
+// MÓDULO OJT & PLAN DE ACCIÓN 90 DÍAS
+// ==========================================
+
+export interface OjtPlanSettings {
+  enabled: boolean;
+  enable_702010?: boolean;
+  enable_calibration?: boolean;
+  target_ttp_days?: number;
+}
+
+export interface SystemSettings {
+  ojt_plan_90d?: OjtPlanSettings;
+  [key: string]: any;
+}
+
+export type OjtObservationType = 'daily_observation' | 'weekly_evaluation' | 'cross_audit' | 'first_60d_check';
+export type OjtOperationalStatus = 'compliant' | 'needs_coaching' | 'critical_gap';
+
+export interface OjtRubricItem {
+  category: string;
+  score: number; // 0 to 100
+  notes?: string;
+}
+
+export interface OjtChecklist {
+  id: string;
+  companyId: string;
+  participantCard: string;
+  participantName?: string;
+  department?: string;
+  evaluatorUserId: string;
+  evaluatorName: string;
+  date: string; // YYYY-MM-DD
+  observationType: OjtObservationType;
+  overallScore: number;
+  operationalStatus: OjtOperationalStatus;
+  safetyProtocolPass: boolean;
+  firstTimeFixPass: boolean;
+  rubricEvaluation: OjtRubricItem[];
+  weaknessesIdentified: string[];
+  immediateActionPlan?: string | null;
+  notes?: string | null;
+  createdAt?: string;
+}
+
+export interface CalibrationSession {
+  id: string;
+  companyId: string;
+  title: string;
+  date: string;
+  conductedBy: string;
+  participantsReviewed: number;
+  averageTheoryScore: number;
+  averageFieldScore: number;
+  varianceGapPct: number;
+  status: 'completed' | 'scheduled' | 'in_progress';
+  keyFindings?: string | null;
+  actionAgreements?: string | null;
+  createdAt?: string;
+}
+
+export interface OjtMetrics {
+  totalChecklists: number;
+  avgOperationalScore: number;
+  complianceRate: number;
+  firstTimeFixRate: number;
+  safetyPassRate: number;
+  estimatedTtpDays: number;
+  targetTtpDays: number;
+  theoryVsFieldGap: number;
+  avgTheoryScore: number;
+  avgFieldScore: number;
+  topFieldWeaknesses: Array<{ weakness: string; count: string | number }>;
 }
 
 export type ComplianceStatus = 'completed' | 'in_progress' | 'overdue' | 'not_started';

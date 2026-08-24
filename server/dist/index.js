@@ -15,6 +15,10 @@ const feedback_js_1 = require("./routes/feedback.js");
 const notifications_js_1 = require("./routes/notifications.js");
 const groups_js_1 = require("./routes/groups.js");
 const programs_js_1 = require("./routes/programs.js");
+const companies_js_1 = require("./routes/companies.js");
+const grades_js_1 = require("./routes/grades.js");
+const settings_js_1 = __importDefault(require("./routes/settings.js"));
+const ojt_js_1 = __importDefault(require("./routes/ojt.js"));
 const db_js_1 = require("./db.js");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -31,7 +35,11 @@ app.get('/api/health', (_req, res) => {
     });
 });
 // Rutas de la API
+app.use('/api/companies', companies_js_1.companiesRouter);
+app.use('/api/settings', settings_js_1.default);
+app.use('/api/ojt', ojt_js_1.default);
 app.use('/api/events', events_js_1.eventsRouter);
+app.use('/api/grades', grades_js_1.gradesRouter);
 app.use('/api/participants', participants_js_1.participantsRouter);
 app.use('/api/registrations', registrations_js_1.registrationsRouter);
 app.use('/api/attendance', attendance_js_1.attendanceRouter);

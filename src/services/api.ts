@@ -13,8 +13,55 @@ import {
   ProgramComplianceSummary,
   ParticipantComplianceDetail,
   ParticipantEventStatus,
-  ComplianceStatus
+  ComplianceStatus,
+  TeamAssignmentPayload,
+  Company,
+  ParticipantGrade,
+  SystemSettings,
+  OjtChecklist,
+  CalibrationSession,
+  OjtMetrics,
+  OjtPlanSettings
 } from '../types';
+
+export const MOCK_COMPANIES: Company[] = [
+  {
+    id: "emp_kasino",
+    name: "Kasino 21 Corporativo",
+    slug: "kasino-21",
+    logoUrl: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&w=200&q=80",
+    rncTaxId: "101-928374-1",
+    industry: "Entretenimiento & Hospitalidad",
+    contactEmail: "contacto@kasino21.com",
+    contactPhone: "+1 (809) 555-0120",
+    isActive: true,
+    createdAt: "2026-01-01T00:00:00Z"
+  },
+  {
+    id: "emp_resort",
+    name: "Gran Resort & Hospitality Club",
+    slug: "gran-resort",
+    logoUrl: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=200&q=80",
+    rncTaxId: "101-445566-2",
+    industry: "Turismo & Hotelería",
+    contactEmail: "info@granresort.com",
+    contactPhone: "+1 (809) 555-0340",
+    isActive: true,
+    createdAt: "2026-02-01T00:00:00Z"
+  },
+  {
+    id: "emp_tech",
+    name: "Tech Innovations Labs",
+    slug: "tech-innovations",
+    logoUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=200&q=80",
+    rncTaxId: "101-778899-3",
+    industry: "Tecnología & Software",
+    contactEmail: "rrhh@techlabs.io",
+    contactPhone: "+1 (809) 555-0560",
+    isActive: true,
+    createdAt: "2026-03-01T00:00:00Z"
+  }
+];
 
 export const MOCK_GROUPS: ParticipantGroup[] = [
   {
@@ -101,6 +148,9 @@ export const MOCK_EVENTS: TrainingEvent[] = [
     modality: "Presencial",
     location: "Sala de Juntas B (Piso 3)",
     surveyUrl: "https://forms.office.com/r/react-ux-evaluation",
+    ojtEvaluatorId: "usr_ojt",
+    ojtEvaluatorName: "Lic. Carlos Mendoza (Tutor OJT)",
+    ojtEvaluatorEmail: "tutor.ojt@empresa.com",
     notificationSettings: {
       sendEmail: true,
       sendTeams: true,
@@ -222,6 +272,7 @@ export const MOCK_USERS: UserAccount[] = [
   { id: "usr_super", email: "superadmin@empresa.com", name: "Superusuario Principal", role: "Super Administrador", password: "admin", cedula: "402-2196163-1" },
   { id: "usr_1", email: "sofia.ceo@empresa.com", name: "Sofía Martínez", role: "Super Administrador", password: "123", cedula: "001-1928374-5" },
   { id: "usr_2", email: "admin.capacitacion@empresa.com", name: "Carlos Pérez", role: "Administrador / Editor", password: "123", cedula: "001-2837465-9" },
+  { id: "usr_ojt", email: "tutor.ojt@empresa.com", name: "Lic. Carlos Mendoza (Tutor OJT)", role: "Evaluador / Tutor OJT", password: "123", cedula: "001-9876543-1", department: "Operaciones" },
   { id: "usr_lead", email: "laura.lider@empresa.com", name: "Ing. Laura Gómez (Líder TI)", role: "Líder de Área / Supervisor", password: "123", cedula: "001-3847261-8", department: "Tecnología", assignedGroupIds: ["grp_ti"], assignedMemberCards: ["2010", "2012"] },
   { id: "usr_3", email: "juan.diez@empresa.com", name: "Juan Díez", role: "Colaborador (User)", password: "123", cedula: "031-1827364-0" },
   { id: "usr_4", email: "marta.perez@empresa.com", name: "Marta Pérez", role: "Colaborador (User)", password: "123", cedula: "223-8765432-1" }
@@ -294,13 +345,18 @@ if (!isApiMode) {
 
 export const apiService = {
   // --- MÉTODOS DE EVENTOS ---
-  async getEvents(): Promise<TrainingEvent[]> {
+  async getEvents(companyId?: string): Promise<TrainingEvent[]> {
     if (isApiMode) {
-      const res = await fetch(`${API_BASE_URL}/events`);
+      const query = companyId && companyId !== 'all' ? `?companyId=${encodeURIComponent(companyId)}` : '';
+      const res = await fetch(`${API_BASE_URL}/events${query}`);
       if (!res.ok) throw new Error('Error al obtener eventos de Postgres');
       return res.json();
     } else {
-      return JSON.parse(localStorage.getItem('ch_events') || '[]');
+      const list: TrainingEvent[] = JSON.parse(localStorage.getItem('ch_events') || '[]');
+      if (companyId && companyId !== 'all') {
+        return list.filter(e => (e.companyId || 'emp_kasino') === companyId);
+      }
+      return list;
     }
   },
 
@@ -354,14 +410,109 @@ export const apiService = {
     }
   },
 
-  // --- MÉTODOS DE PARTICIPANTES ---
-  async getParticipants(): Promise<Participant[]> {
+  // --- MÉTODOS DE CALIFICACIONES Y DESEMPEÑO ---
+  async getGrades(params?: { eventId?: string; participantCard?: string; companyId?: string; needsRetraining?: boolean }): Promise<ParticipantGrade[]> {
     if (isApiMode) {
-      const res = await fetch(`${API_BASE_URL}/participants`);
+      const query = new URLSearchParams();
+      if (params?.eventId) query.append('eventId', params.eventId);
+      if (params?.participantCard) query.append('participantCard', params.participantCard);
+      if (params?.companyId && params.companyId !== 'all') query.append('companyId', params.companyId);
+      if (params?.needsRetraining) query.append('needsRetraining', 'true');
+      
+      const res = await fetch(`${API_BASE_URL}/grades?${query.toString()}`);
+      if (!res.ok) throw new Error('Error al obtener calificaciones');
+      return res.json();
+    } else {
+      const grades: ParticipantGrade[] = JSON.parse(localStorage.getItem('ch_grades') || '[]');
+      return grades.filter(g => {
+        if (params?.eventId && g.eventId !== params.eventId) return false;
+        if (params?.participantCard && g.participantCard !== params.participantCard) return false;
+        if (params?.needsRetraining && !g.needsRetraining) return false;
+        return true;
+      });
+    }
+  },
+
+  async saveGrade(grade: Partial<ParticipantGrade>): Promise<ParticipantGrade> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/grades`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(grade)
+      });
+      if (!res.ok) throw new Error('Error al guardar calificación');
+      return res.json();
+    } else {
+      const grades: ParticipantGrade[] = JSON.parse(localStorage.getItem('ch_grades') || '[]');
+      const idx = grades.findIndex(g => g.eventId === grade.eventId && g.participantCard === grade.participantCard);
+      const updated = {
+        id: grade.id || `grd_${Date.now()}`,
+        eventId: grade.eventId!,
+        participantCard: grade.participantCard!,
+        slotId: grade.slotId || null,
+        score: grade.score ?? null,
+        academicStatus: grade.academicStatus || (grade.score !== null && grade.score !== undefined ? (grade.score >= (grade.passingScore || 70) ? 'passed' : 'failed') : 'pending'),
+        detectedSkillGaps: grade.detectedSkillGaps || [],
+        weaknessesNotes: grade.weaknessesNotes || null,
+        strengthsNotes: grade.strengthsNotes || null,
+        needsRetraining: grade.needsRetraining ?? (grade.academicStatus === 'failed'),
+        feedback: grade.feedback || null,
+        gradedBy: grade.gradedBy || 'Instructor / Evaluador',
+        gradedAt: new Date().toISOString()
+      } as ParticipantGrade;
+
+      if (idx > -1) {
+        grades[idx] = { ...grades[idx], ...updated };
+      } else {
+        grades.push(updated);
+      }
+      localStorage.setItem('ch_grades', JSON.stringify(grades));
+      return updated;
+    }
+  },
+
+  async saveBulkGrades(grades: Partial<ParticipantGrade>[]): Promise<{ message: string; grades: ParticipantGrade[] }> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/grades/bulk`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ grades })
+      });
+      if (!res.ok) throw new Error('Error al guardar calificaciones masivamente');
+      return res.json();
+    } else {
+      for (const g of grades) {
+        await this.saveGrade(g);
+      }
+      const allGrades = JSON.parse(localStorage.getItem('ch_grades') || '[]');
+      return { message: 'Calificaciones actualizadas', grades: allGrades };
+    }
+  },
+
+  async deleteGrade(id: string): Promise<void> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/grades/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Error al eliminar calificación');
+    } else {
+      const grades: ParticipantGrade[] = JSON.parse(localStorage.getItem('ch_grades') || '[]');
+      const filtered = grades.filter(g => g.id !== id);
+      localStorage.setItem('ch_grades', JSON.stringify(filtered));
+    }
+  },
+
+  // --- MÉTODOS DE PARTICIPANTES ---
+  async getParticipants(companyId?: string): Promise<Participant[]> {
+    if (isApiMode) {
+      const query = companyId && companyId !== 'all' ? `?companyId=${encodeURIComponent(companyId)}` : '';
+      const res = await fetch(`${API_BASE_URL}/participants${query}`);
       if (!res.ok) throw new Error('Error al obtener participantes de Postgres');
       return res.json();
     } else {
-      return JSON.parse(localStorage.getItem('ch_participants') || '[]');
+      const list: Participant[] = JSON.parse(localStorage.getItem('ch_participants') || '[]');
+      if (companyId && companyId !== 'all') {
+        return list.filter(p => (p.companyId || 'emp_kasino') === companyId);
+      }
+      return list;
     }
   },
 
@@ -515,13 +666,146 @@ export const apiService = {
     }
   },
 
+  // --- ASIGNACIÓN DE EVENTOS POR PARTE DE SUPERVISORES ---
+  async assignTeamMembersToEvent(
+    payload: TeamAssignmentPayload
+  ): Promise<{ events: TrainingEvent[]; assignedCount: number; skippedAlreadyEnrolled: string[] }> {
+    const { eventId, date, time, emails, isMandatory, assignedBy, assignmentType, notes } = payload;
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/registrations/assign`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventId,
+          date,
+          time,
+          emails,
+          isMandatory,
+          assignedBy,
+          assignmentType: assignmentType || (isMandatory ? 'mandatory' : 'voluntary'),
+          notes
+        })
+      });
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.message || 'Error al asignar participantes');
+      }
+      const data = await res.json();
+      return {
+        events: data.events || (await this.getEvents()),
+        assignedCount: data.assignedCount ?? emails.length,
+        skippedAlreadyEnrolled: data.skippedAlreadyEnrolled || []
+      };
+    } else {
+      const events: TrainingEvent[] = JSON.parse(localStorage.getItem('ch_events') || '[]');
+      const participants: Participant[] = JSON.parse(localStorage.getItem('ch_participants') || '[]');
+      const users: UserAccount[] = JSON.parse(localStorage.getItem('ch_users') || '[]');
+
+      let assignedCount = 0;
+      const skippedAlreadyEnrolled: string[] = [];
+
+      const updated = events.map(evt => {
+        if (evt.id === eventId) {
+          const updatedSchedule = evt.schedule.map(sch => {
+            if (sch.date === date) {
+              const updatedSlots = sch.slots.map(sl => {
+                if (sl.time === time) {
+                  const existingAttendees = new Set((sl.attendees || []).map(a => a.toLowerCase()));
+                  const attendeesDetails = [...(sl.attendeesDetails || [])];
+                  const toAdd: string[] = [];
+
+                  for (const rawEmail of emails) {
+                    const cleanEmail = rawEmail.trim().toLowerCase();
+                    if (!cleanEmail) continue;
+
+                    if (existingAttendees.has(cleanEmail)) {
+                      skippedAlreadyEnrolled.push(cleanEmail);
+                      // Si ya existía, actualizar detalle si es necesario
+                      const existingDetailIndex = attendeesDetails.findIndex(d => d.email.toLowerCase() === cleanEmail);
+                      if (existingDetailIndex >= 0 && isMandatory) {
+                        attendeesDetails[existingDetailIndex] = {
+                          ...attendeesDetails[existingDetailIndex],
+                          isMandatory: true,
+                          assignedBy,
+                          assignmentType: assignmentType || 'mandatory',
+                          assignmentNotes: notes
+                        };
+                      }
+                    } else {
+                      existingAttendees.add(cleanEmail);
+                      toAdd.push(cleanEmail);
+                      attendeesDetails.push({
+                        email: cleanEmail,
+                        isMandatory,
+                        assignedBy,
+                        assignmentType: assignmentType || (isMandatory ? 'mandatory' : 'voluntary'),
+                        assignmentNotes: notes,
+                        assignedAt: new Date().toISOString()
+                      });
+                      assignedCount++;
+
+                      if (!participants.some(p => p.email.toLowerCase() === cleanEmail)) {
+                        const matchedUser = users.find(u => u.email.toLowerCase() === cleanEmail);
+                        participants.push({
+                          card: `${Math.floor(1000 + Math.random() * 9000)}`,
+                          name: matchedUser ? matchedUser.name : cleanEmail.split('@')[0].replace(/\./g, ' ').toUpperCase(),
+                          email: cleanEmail,
+                          cedula: matchedUser?.cedula
+                        });
+                      }
+                    }
+                  }
+
+                  const newAttendees = [...(sl.attendees || []), ...toAdd];
+                  const newRegistered = newAttendees.length;
+                  const newCapacity = newRegistered > sl.capacity ? newRegistered : sl.capacity;
+
+                  return {
+                    ...sl,
+                    capacity: newCapacity,
+                    registered: newRegistered,
+                    attendees: newAttendees,
+                    attendeesDetails
+                  };
+                }
+                return sl;
+              });
+              return { ...sch, slots: updatedSlots };
+            }
+            return sch;
+          });
+          return { ...evt, schedule: updatedSchedule };
+        }
+        return evt;
+      });
+
+      localStorage.setItem('ch_events', JSON.stringify(updated));
+      localStorage.setItem('ch_participants', JSON.stringify(participants));
+      return { events: updated, assignedCount, skippedAlreadyEnrolled };
+    }
+  },
+
   // --- MÉTODOS DE CANCELACIÓN DE RESERVA ---
-  async cancelRegistration(eventId: string, date: string, time: string, participantEmail: string): Promise<TrainingEvent[]> {
+  async cancelRegistration(
+    eventId: string, 
+    date: string, 
+    time: string, 
+    participantEmail: string,
+    isSupervisorOrAdmin: boolean = false,
+    force: boolean = false
+  ): Promise<TrainingEvent[]> {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/registrations`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ eventId, date, time, email: participantEmail })
+        body: JSON.stringify({ 
+          eventId, 
+          date, 
+          time, 
+          email: participantEmail,
+          isSupervisorOrAdmin,
+          force 
+        })
       });
       if (!res.ok) {
         const errData = await res.json();
@@ -536,13 +820,21 @@ export const apiService = {
             if (sch.date === date) {
               const updatedSlots = sch.slots.map(sl => {
                 if (sl.time === time) {
+                  // Verificar si es obligatorio en mock local
+                  const detail = (sl.attendeesDetails || []).find(d => d.email.toLowerCase() === participantEmail.toLowerCase());
+                  if (detail && detail.isMandatory && !isSupervisorOrAdmin && !force) {
+                    throw new Error('Esta inscripción es obligatoria y fue asignada por tu supervisor. No puede ser cancelada.');
+                  }
+
                   const filteredAttendees = (sl.attendees || []).filter(e => e.toLowerCase() !== participantEmail.toLowerCase());
                   const filteredAttended = (sl.attendedList || []).filter(e => e.toLowerCase() !== participantEmail.toLowerCase());
+                  const filteredDetails = (sl.attendeesDetails || []).filter(d => d.email.toLowerCase() !== participantEmail.toLowerCase());
                   return {
                     ...sl,
                     registered: Math.max(0, filteredAttendees.length),
                     attendees: filteredAttendees,
-                    attendedList: filteredAttended
+                    attendedList: filteredAttended,
+                    attendeesDetails: filteredDetails
                   };
                 }
                 return sl;
@@ -632,13 +924,18 @@ export const apiService = {
   },
 
   // --- MÉTODOS DE USUARIOS DE LA PLATAFORMA ---
-  async getUsers(): Promise<UserAccount[]> {
+  async getUsers(companyId?: string): Promise<UserAccount[]> {
     if (isApiMode) {
-      const res = await fetch(`${API_BASE_URL}/users`);
+      const query = companyId && companyId !== 'all' ? `?companyId=${encodeURIComponent(companyId)}` : '';
+      const res = await fetch(`${API_BASE_URL}/users${query}`);
       if (!res.ok) throw new Error('Error al obtener usuarios de la base de datos');
       return res.json();
     } else {
-      return JSON.parse(localStorage.getItem('ch_users') || '[]');
+      const list: UserAccount[] = JSON.parse(localStorage.getItem('ch_users') || '[]');
+      if (companyId && companyId !== 'all') {
+        return list.filter(u => (u.companyId || 'emp_kasino') === companyId);
+      }
+      return list;
     }
   },
 
@@ -673,13 +970,18 @@ export const apiService = {
   },
 
   // --- MÉTODOS DE GRUPOS DE PARTICIPANTES ---
-  async getGroups(): Promise<ParticipantGroup[]> {
+  async getGroups(companyId?: string): Promise<ParticipantGroup[]> {
     if (isApiMode) {
-      const res = await fetch(`${API_BASE_URL}/groups`);
+      const query = companyId && companyId !== 'all' ? `?companyId=${encodeURIComponent(companyId)}` : '';
+      const res = await fetch(`${API_BASE_URL}/groups${query}`);
       if (!res.ok) throw new Error('Error al obtener grupos de Postgres');
       return res.json();
     } else {
-      return JSON.parse(localStorage.getItem('ch_groups') || '[]');
+      const list: ParticipantGroup[] = JSON.parse(localStorage.getItem('ch_groups') || '[]');
+      if (companyId && companyId !== 'all') {
+        return list.filter(g => (g.companyId || 'emp_kasino') === companyId);
+      }
+      return list;
     }
   },
 
@@ -691,7 +993,7 @@ export const apiService = {
         body: JSON.stringify(group)
       });
       if (!res.ok) throw new Error('Error al guardar grupo en Postgres');
-      return res.json();
+      return this.getGroups();
     } else {
       const groups: ParticipantGroup[] = JSON.parse(localStorage.getItem('ch_groups') || '[]');
       const idx = groups.findIndex(g => g.id === group.id);
@@ -724,7 +1026,7 @@ export const apiService = {
         method: 'DELETE'
       });
       if (!res.ok) throw new Error('Error al eliminar grupo en Postgres');
-      return res.json();
+      return this.getGroups();
     } else {
       const groups: ParticipantGroup[] = JSON.parse(localStorage.getItem('ch_groups') || '[]');
       const updated = groups.filter(g => g.id !== groupId);
@@ -734,13 +1036,18 @@ export const apiService = {
   },
 
   // --- MÉTODOS DE PROGRAMAS / CRONOGRAMAS FORMATIVOS ---
-  async getPrograms(): Promise<TrainingProgram[]> {
+  async getPrograms(companyId?: string): Promise<TrainingProgram[]> {
     if (isApiMode) {
-      const res = await fetch(`${API_BASE_URL}/programs`);
+      const query = companyId && companyId !== 'all' ? `?companyId=${encodeURIComponent(companyId)}` : '';
+      const res = await fetch(`${API_BASE_URL}/programs${query}`);
       if (!res.ok) throw new Error('Error al obtener programas formativos de Postgres');
       return res.json();
     } else {
-      return JSON.parse(localStorage.getItem('ch_programs') || '[]');
+      const list: TrainingProgram[] = JSON.parse(localStorage.getItem('ch_programs') || '[]');
+      if (companyId && companyId !== 'all') {
+        return list.filter(p => (p.companyId || 'emp_kasino') === companyId);
+      }
+      return list;
     }
   },
 
@@ -777,6 +1084,54 @@ export const apiService = {
       const programs: TrainingProgram[] = JSON.parse(localStorage.getItem('ch_programs') || '[]');
       const updated = programs.filter(p => p.id !== programId);
       localStorage.setItem('ch_programs', JSON.stringify(updated));
+      return updated;
+    }
+  },
+
+  // --- MÉTODOS DE EMPRESAS (MULTI-TENANT) ---
+  async getCompanies(): Promise<Company[]> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/companies`);
+      if (!res.ok) throw new Error('Error al obtener empresas de Postgres');
+      return res.json();
+    } else {
+      return JSON.parse(localStorage.getItem('ch_companies') || JSON.stringify(MOCK_COMPANIES));
+    }
+  },
+
+  async saveCompany(company: Company): Promise<Company[]> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/companies`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(company)
+      });
+      if (!res.ok) throw new Error('Error al guardar empresa en Postgres');
+      return this.getCompanies();
+    } else {
+      const companies: Company[] = JSON.parse(localStorage.getItem('ch_companies') || JSON.stringify(MOCK_COMPANIES));
+      const idx = companies.findIndex(c => c.id === company.id);
+      if (idx > -1) {
+        companies[idx] = company;
+      } else {
+        companies.push(company);
+      }
+      localStorage.setItem('ch_companies', JSON.stringify(companies));
+      return companies;
+    }
+  },
+
+  async deleteCompany(companyId: string): Promise<Company[]> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/companies/${companyId}`, {
+        method: 'DELETE'
+      });
+      if (!res.ok) throw new Error('Error al eliminar empresa en Postgres');
+      return this.getCompanies();
+    } else {
+      const companies: Company[] = JSON.parse(localStorage.getItem('ch_companies') || JSON.stringify(MOCK_COMPANIES));
+      const updated = companies.filter(c => c.id !== companyId);
+      localStorage.setItem('ch_companies', JSON.stringify(updated));
       return updated;
     }
   },
@@ -954,5 +1309,139 @@ export const apiService = {
       groupStats,
       participants: participantsDetails
     };
+  },
+
+  // ==========================================
+  // CONFIGURACIÓN GLOBAL & FEATURE FLAGS
+  // ==========================================
+  getSettings: async (): Promise<SystemSettings> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/settings`);
+      if (response.ok) {
+        const data = await response.json();
+        return data.settings || { ojt_plan_90d: { enabled: true, enable_702010: true, enable_calibration: true, target_ttp_days: 30 } };
+      }
+    } catch (e) {
+      console.warn('Fallo al obtener settings de API, usando valores por defecto:', e);
+    }
+    return {
+      ojt_plan_90d: { enabled: true, enable_702010: true, enable_calibration: true, target_ttp_days: 30 }
+    };
+  },
+
+  updateOjtSettings: async (payload: Partial<OjtPlanSettings> & { updated_by?: string }): Promise<any> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/settings/ojt`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (e) {
+      console.warn('Fallo al actualizar settings de OJT en API:', e);
+    }
+    return { success: true, ojt_plan_90d: payload };
+  },
+
+  // ==========================================
+  // BITÁCORAS & CHECKLISTS OJT
+  // ==========================================
+  getOjtChecklists: async (companyId?: string): Promise<OjtChecklist[]> => {
+    try {
+      const url = companyId && companyId !== 'all' 
+        ? `${API_BASE_URL}/ojt/checklists?companyId=${encodeURIComponent(companyId)}`
+        : `${API_BASE_URL}/ojt/checklists`;
+      const response = await fetch(url);
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (e) {
+      console.warn('Fallo al obtener checklists OJT de API:', e);
+    }
+    return [];
+  },
+
+  saveOjtChecklist: async (checklist: Partial<OjtChecklist>): Promise<OjtChecklist> => {
+    const response = await fetch(`${API_BASE_URL}/ojt/checklists`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(checklist)
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || 'Error al guardar bitácora OJT');
+    }
+    return await response.json();
+  },
+
+  deleteOjtChecklist: async (id: string): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/ojt/checklists/${id}`, {
+      method: 'DELETE'
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || 'Error al eliminar bitácora OJT');
+    }
+  },
+
+  // ==========================================
+  // SESIONES DE CALIBRACIÓN OPS-CAPACITACIÓN
+  // ==========================================
+  getCalibrationSessions: async (companyId?: string): Promise<CalibrationSession[]> => {
+    try {
+      const url = companyId && companyId !== 'all'
+        ? `${API_BASE_URL}/ojt/calibrations?companyId=${encodeURIComponent(companyId)}`
+        : `${API_BASE_URL}/ojt/calibrations`;
+      const response = await fetch(url);
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (e) {
+      console.warn('Fallo al obtener calibraciones de API:', e);
+    }
+    return [];
+  },
+
+  saveCalibrationSession: async (session: Partial<CalibrationSession>): Promise<CalibrationSession> => {
+    const response = await fetch(`${API_BASE_URL}/ojt/calibrations`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(session)
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || 'Error al guardar sesión de calibración');
+    }
+    return await response.json();
+  },
+
+  getOjtMetrics: async (companyId?: string): Promise<OjtMetrics> => {
+    try {
+      const url = companyId && companyId !== 'all'
+        ? `${API_BASE_URL}/ojt/metrics?companyId=${encodeURIComponent(companyId)}`
+        : `${API_BASE_URL}/ojt/metrics`;
+      const response = await fetch(url);
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (e) {
+      console.warn('Fallo al obtener métricas OJT de API:', e);
+    }
+    return {
+      totalChecklists: 0,
+      avgOperationalScore: 0,
+      complianceRate: 0,
+      firstTimeFixRate: 0,
+      safetyPassRate: 0,
+      estimatedTtpDays: 30,
+      targetTtpDays: 30,
+      theoryVsFieldGap: 0,
+      avgTheoryScore: 0,
+      avgFieldScore: 0,
+      topFieldWeaknesses: []
+    };
   }
 };
+

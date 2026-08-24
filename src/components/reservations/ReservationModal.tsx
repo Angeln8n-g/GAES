@@ -1,20 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   X, 
   Calendar as CalendarIcon, 
   Clock, 
   MapPin, 
   Video, 
-  User, 
   CheckCircle2, 
   Download, 
-  ExternalLink,
-  Users,
-  AlertTriangle
+  ExternalLink, 
+  AlertTriangle,
+  Lock
 } from 'lucide-react';
-import { TrainingEvent, UserAccount, Schedule, Slot } from '../../types';
+import { TrainingEvent, UserAccount, Slot } from '../../types';
 import { formatDateLong } from '../../utils/formatters';
-import { downloadIcsFile, getGoogleCalendarUrl, getOutlookCalendarUrl } from '../../utils/icsUtils';
+import { downloadIcsFile, getGoogleCalendarUrl } from '../../utils/icsUtils';
 
 interface ReservationModalProps {
   event: TrainingEvent | null;
@@ -37,6 +36,28 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
+
+  // Verificar si el usuario actual tiene una asignación obligatoria en algún horario de este evento
+  const mandatoryAssignment = useMemo(() => {
+    if (!currentUser?.email) return null;
+    const cleanEmail = currentUser.email.toLowerCase();
+    for (const sch of event.schedule) {
+      for (const sl of sch.slots) {
+        if (sl.attendees.map(a => a.toLowerCase()).includes(cleanEmail)) {
+          const detail = (sl.attendeesDetails || []).find(d => d.email.toLowerCase() === cleanEmail);
+          if (detail && detail.isMandatory) {
+            return {
+              date: sch.date,
+              time: sl.time,
+              assignedBy: detail.assignedBy,
+              notes: detail.assignmentNotes
+            };
+          }
+        }
+      }
+    }
+    return null;
+  }, [event, currentUser]);
 
   const currentSchedule = event.schedule.find(s => s.date === selectedDate);
 
@@ -78,35 +99,35 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       return;
     }
 
+    setIsSubmitting(true);
+
     try {
-      setIsSubmitting(true);
       await onConfirmReservation(event.id, selectedDate, selectedSlot.time, emailInput.trim());
       setIsSuccess(true);
     } catch (err: any) {
-      setErrorMessage(err.message || 'Error al procesar la reserva.');
+      setErrorMessage(err.message || 'Error al procesar la reserva. Intenta nuevamente.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
         
-        {/* Header */}
-        <div className="p-6 border-b border-slate-800 flex items-start justify-between">
+        {/* Modal Header */}
+        <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
-                {event.category}
-              </span>
-              <span className="text-xs text-slate-400 font-medium">Reserva de Cupo</span>
-            </div>
-            <h2 className="text-lg font-bold text-slate-100 line-clamp-1">{event.title}</h2>
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-50 text-[#DA291C] border border-red-200 uppercase tracking-wider">
+              {event.category}
+            </span>
+            <h2 className="text-lg font-extrabold text-slate-900 mt-1 line-clamp-1">
+              {event.title}
+            </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -118,27 +139,27 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
           {isSuccess ? (
             /* Success Confirmation Screen */
             <div className="text-center py-6 space-y-5 animate-in zoom-in-95 duration-300">
-              <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/20">
+              <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto shadow-md">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
 
               <div>
-                <h3 className="text-xl font-bold text-white">¡Inscripción Exitosa!</h3>
-                <p className="text-xs text-slate-300 max-w-sm mx-auto mt-1">
+                <h3 className="text-xl font-extrabold text-slate-900">¡Inscripción Confirmada!</h3>
+                <p className="text-xs text-slate-600 max-w-sm mx-auto mt-1 leading-relaxed">
                   Hemos confirmado tu lugar para <strong>{event.title}</strong> el día <strong>{formatDateLong(selectedDate)}</strong> a las <strong>{selectedSlot?.time}</strong>.
                 </p>
               </div>
 
               {/* Add to Calendar Actions */}
-              <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 text-left space-y-3">
-                <p className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                  <CalendarIcon className="w-4 h-4 text-indigo-400" />
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-left space-y-3">
+                <p className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <CalendarIcon className="w-4 h-4 text-[#DA291C]" />
                   Agendar en tu Calendario Laboral:
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <button
                     onClick={() => selectedSlot && downloadIcsFile(event, selectedDate, selectedSlot.time)}
-                    className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-colors border border-slate-700"
+                    className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold transition-colors border border-slate-200 shadow-sm"
                   >
                     <Download className="w-3.5 h-3.5" />
                     Descargar .ICS
@@ -147,7 +168,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                     href={selectedSlot ? getGoogleCalendarUrl(event, selectedDate, selectedSlot.time) : '#'}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 text-xs font-semibold transition-colors border border-indigo-500/30"
+                    className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-[#DA291C] text-xs font-bold transition-colors border border-red-200"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     Google Calendar
@@ -157,38 +178,54 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
               <button
                 onClick={onClose}
-                className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-2xl shadow-lg transition-all"
+                className="w-full py-3 bg-[#DA291C] hover:bg-red-700 text-white text-xs font-bold rounded-2xl shadow-md shadow-red-500/25 transition-all"
               >
                 Finalizar y Cerrar
               </button>
             </div>
           ) : (
-            /* Reservation Form */
+            /* Reservation Form Screen */
             <form onSubmit={handleReserve} className="space-y-5">
               
+              {/* Mandatory assignment notice */}
+              {mandatoryAssignment && (
+                <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl flex items-start gap-3 text-xs text-rose-800">
+                  <Lock className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold">Asignación Obligatoria Activa</p>
+                    <p className="text-slate-700 mt-0.5">
+                      Tu supervisor ({mandatoryAssignment.assignedBy || 'Líder'}) te asignó obligatoriamente el <strong>{formatDateLong(mandatoryAssignment.date)} ({mandatoryAssignment.time})</strong>.
+                    </p>
+                    {mandatoryAssignment.notes && (
+                      <p className="text-amber-800 italic mt-1 text-[11px]">Nota: "{mandatoryAssignment.notes}"</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Event Details Quick Summary */}
-              <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800/80 space-y-2 text-xs text-slate-300">
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-xs text-slate-700">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Instructor:</span>
-                  <span className="font-semibold text-white">{event.instructor}</span>
+                  <span className="text-slate-500">Instructor:</span>
+                  <span className="font-bold text-slate-900">{event.instructor}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Modalidad:</span>
-                  <span className="font-semibold text-white flex items-center gap-1">
-                    {event.modality === 'Virtual' ? <Video className="w-3 h-3 text-cyan-400" /> : <MapPin className="w-3 h-3 text-emerald-400" />}
+                  <span className="text-slate-500">Modalidad:</span>
+                  <span className="font-bold text-slate-900 flex items-center gap-1">
+                    {event.modality === 'Virtual' ? <Video className="w-3.5 h-3.5 text-cyan-600" /> : <MapPin className="w-3.5 h-3.5 text-emerald-600" />}
                     {event.modality}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Ubicación / Plataforma:</span>
-                  <span className="font-semibold text-indigo-300 line-clamp-1">{event.location}</span>
+                  <span className="text-slate-500">Ubicación / Sala:</span>
+                  <span className="font-bold text-slate-900 line-clamp-1">{event.location}</span>
                 </div>
               </div>
 
               {/* 1. Date Selector */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-2 flex items-center gap-1.5">
-                  <CalendarIcon className="w-3.5 h-3.5 text-indigo-400" />
+                <label className="block text-xs font-bold text-slate-700 mb-2 flex items-center gap-1.5">
+                  <CalendarIcon className="w-3.5 h-3.5 text-[#DA291C]" />
                   1. Selecciona la Fecha Disponible:
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -202,12 +239,12 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                         onClick={() => handleDateChange(sch.date)}
                         className={`p-3 rounded-2xl border text-left transition-all ${
                           isSelected
-                            ? 'bg-indigo-600/20 border-indigo-500 text-white font-bold ring-1 ring-indigo-500'
-                            : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
+                            ? 'bg-red-50 border-[#DA291C] text-[#DA291C] font-bold ring-1 ring-[#DA291C]'
+                            : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                         }`}
                       >
-                        <p className="text-xs font-semibold">{formatDateLong(sch.date)}</p>
-                        <p className="text-[10px] text-slate-400 mt-0.5">{totalSlots} horario(s) disponible(s)</p>
+                        <p className="text-xs font-bold">{formatDateLong(sch.date)}</p>
+                        <p className="text-[10px] text-slate-500 mt-0.5">{totalSlots} horario(s) disponible(s)</p>
                       </button>
                     );
                   })}
@@ -217,8 +254,8 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               {/* 2. Slot / Time Selector */}
               {currentSchedule && (
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-2 flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-indigo-400" />
+                  <label className="block text-xs font-bold text-slate-700 mb-2 flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-[#DA291C]" />
                     2. Selecciona el Horario:
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -235,25 +272,25 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                           onClick={() => handleSlotSelect(slot)}
                           className={`p-3 rounded-2xl border text-left transition-all ${
                             isFull
-                              ? 'opacity-40 bg-slate-950/20 border-slate-800/40 cursor-not-allowed text-slate-500'
+                              ? 'opacity-40 bg-slate-100 border-slate-200 cursor-not-allowed text-slate-400'
                               : isSelected
-                              ? 'bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-600/30 ring-1 ring-indigo-400'
-                              : 'bg-slate-950/40 border-slate-800 text-slate-300 hover:bg-slate-800'
+                              ? 'bg-[#DA291C] text-white font-bold shadow-md shadow-red-500/25 ring-1 ring-red-400'
+                              : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                           }`}
                         >
                           <div className="flex items-center justify-between">
                             <span className="text-xs font-bold">{slot.time}</span>
-                            <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-semibold ${
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold ${
                               isFull
-                                ? 'bg-rose-500/20 text-rose-400'
+                                ? 'bg-rose-100 text-rose-700'
                                 : isSelected
                                 ? 'bg-white/20 text-white'
-                                : 'bg-slate-800 text-slate-400'
+                                : 'bg-slate-200 text-slate-700'
                             }`}>
                               {isFull ? 'Agotado' : `${remaining} libres`}
                             </span>
                           </div>
-                          <p className="text-[10px] opacity-80 mt-1">
+                          <p className={`text-[10px] mt-1 ${isSelected ? 'text-white/80' : 'text-slate-500'}`}>
                             Capacidad: {slot.registered} / {slot.capacity}
                           </p>
                         </button>
@@ -265,23 +302,23 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
               {/* 3. Collaborator Email Input */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
                   3. Correo Electrónico del Colaborador:
                 </label>
                 <input
                   type="email"
                   value={emailInput}
                   onChange={(e) => setEmailInput(e.target.value)}
-                  placeholder="nombre.apellido@empresa.com"
-                  className="w-full px-4 py-3 bg-slate-950/60 border border-slate-800 rounded-2xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                  placeholder="nombre.apellido@claro.com.do"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] font-medium"
                   required
                 />
               </div>
 
               {/* Error Message */}
               {errorMessage && (
-                <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center gap-2 text-rose-300 text-xs">
-                  <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
+                <div className="p-3 rounded-2xl bg-rose-50 border border-rose-200 flex items-center gap-2 text-rose-700 text-xs font-medium">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-rose-500" />
                   <span>{errorMessage}</span>
                 </div>
               )}
@@ -290,7 +327,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitting || !selectedSlot || (selectedSlot && selectedSlot.registered >= selectedSlot.capacity)}
-                className="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white text-xs font-bold rounded-2xl shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 disabled:opacity-50 transition-all"
+                className="w-full py-3.5 bg-[#DA291C] hover:bg-red-700 text-white text-xs font-bold rounded-2xl shadow-md shadow-red-500/25 flex items-center justify-center gap-2 disabled:opacity-50 transition-all cursor-pointer"
               >
                 {isSubmitting ? 'Confirmando reserva...' : 'Confirmar Mi Lugar'}
               </button>

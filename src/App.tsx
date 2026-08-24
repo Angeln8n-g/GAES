@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { apiService, MOCK_USERS, MOCK_GROUPS, MOCK_PROGRAMS } from './services/api';
+import { apiService, MOCK_USERS, MOCK_GROUPS, MOCK_PROGRAMS, MOCK_COMPANIES } from './services/api';
 import { 
   TrainingEvent, 
   Participant, 
@@ -8,7 +8,11 @@ import {
   TabView, 
   EventFeedback,
   ParticipantGroup,
-  TrainingProgram
+  TrainingProgram,
+  Company,
+  SystemSettings,
+  OjtChecklist,
+  CalibrationSession
 } from './types';
 import { Navbar } from './components/layout/Navbar';
 import { LoginModal } from './components/auth/LoginModal';
@@ -19,20 +23,42 @@ import { AttendanceView } from './components/attendance/AttendanceView';
 import { DashboardView } from './components/dashboard/DashboardView';
 import { AdminView } from './components/admin/AdminView';
 import { TeamLeadView } from './components/supervisor/TeamLeadView';
+import { OjtManager } from './components/ojt/OjtManager';
 import { Toast } from './components/common/Toast';
+import { Footer } from './components/common/Footer';
 
 export function App() {
-  const [events, setEvents] = useState<TrainingEvent[]>([]);
-  const [participants, setParticipants] = useState<Participant[]>([]);
-  const [users, setUsers] = useState<UserAccount[]>(MOCK_USERS);
-  const [groups, setGroups] = useState<ParticipantGroup[]>(MOCK_GROUPS);
-  const [programs, setPrograms] = useState<TrainingProgram[]>(MOCK_PROGRAMS);
+  const [companies, setCompanies] = useState<Company[]>(MOCK_COMPANIES);
+  const [settings, setSettings] = useState<SystemSettings>({
+    ojt_plan_90d: { enabled: true, enable_702010: true, enable_calibration: true, target_ttp_days: 30 }
+  });
+  const [checklists, setChecklists] = useState<OjtChecklist[]>([]);
+  const [calibrations, setCalibrations] = useState<CalibrationSession[]>([]);
 
   // Sesión del usuario autenticado
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
     const saved = localStorage.getItem('ch_logged_user');
     return saved ? JSON.parse(saved) : null;
   });
+
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>(() => {
+    const saved = localStorage.getItem('ch_logged_user');
+    if (saved) {
+      try {
+        const u = JSON.parse(saved);
+        if (u && u.role !== 'Super Administrador') {
+          return u.companyId || 'emp_kasino';
+        }
+      } catch (e) {}
+    }
+    return 'all';
+  });
+
+  const [events, setEvents] = useState<TrainingEvent[]>([]);
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [users, setUsers] = useState<UserAccount[]>(MOCK_USERS);
+  const [groups, setGroups] = useState<ParticipantGroup[]>(MOCK_GROUPS);
+  const [programs, setPrograms] = useState<TrainingProgram[]>(MOCK_PROGRAMS);
 
   // Vista actual / Navegación
   const [currentTab, setCurrentTab] = useState<TabView>('landing');
@@ -54,18 +80,36 @@ export function App() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [loadedEvents, loadedParticipants, loadedUsers, loadedGroups, loadedPrograms] = await Promise.all([
+        const [
+          loadedCompanies, 
+          loadedEvents, 
+          loadedParticipants, 
+          loadedUsers, 
+          loadedGroups, 
+          loadedPrograms,
+          loadedSettings,
+          loadedChecklists,
+          loadedCalibrations
+        ] = await Promise.all([
+          apiService.getCompanies(),
           apiService.getEvents(),
           apiService.getParticipants(),
           apiService.getUsers(),
           apiService.getGroups(),
-          apiService.getPrograms()
+          apiService.getPrograms(),
+          apiService.getSettings(),
+          apiService.getOjtChecklists(),
+          apiService.getCalibrationSessions()
         ]);
+        setCompanies(loadedCompanies);
         setEvents(loadedEvents);
         setParticipants(loadedParticipants);
         setUsers(loadedUsers);
         setGroups(loadedGroups);
         setPrograms(loadedPrograms);
+        if (loadedSettings) setSettings(loadedSettings);
+        if (loadedChecklists) setChecklists(loadedChecklists);
+        if (loadedCalibrations) setCalibrations(loadedCalibrations);
       } catch (err) {
         console.error('Error al cargar datos:', err);
       }
@@ -92,12 +136,16 @@ export function App() {
   // Handlers de Sesión
   const handleLoginSuccess = (user: UserAccount) => {
     setCurrentUser(user);
+    if (user.role !== 'Super Administrador') {
+      setSelectedCompanyId(user.companyId || 'emp_kasino');
+    }
     localStorage.setItem('ch_logged_user', JSON.stringify(user));
     showToast('¡Bienvenido!', `Has iniciado sesión como ${user.name}.`, 'success');
   };
 
   const handleLogout = () => {
     setCurrentUser(null);
+    setSelectedCompanyId('all');
     localStorage.removeItem('ch_logged_user');
     setCurrentTab('landing');
     showToast('Sesión cerrada', 'Has salido de tu cuenta correctamente.', 'info');
@@ -110,10 +158,25 @@ export function App() {
     showToast('Reserva exitosa', 'Tu lugar ha sido reservado con éxito.', 'success');
   };
 
-  const handleCancelRegistration = async (eventId: string, date: string, time: string, email: string) => {
-    const updated = await apiService.cancelRegistration(eventId, date, time, email);
+  const handleCancelRegistration = async (
+    eventId: string, 
+    date: string, 
+    time: string, 
+    email: string,
+    isSupervisorOrAdmin: boolean = false,
+    force: boolean = false
+  ) => {
+    const updated = await apiService.cancelRegistration(eventId, date, time, email, isSupervisorOrAdmin, force);
     setEvents(updated);
-    showToast('Inscripción cancelada', 'Tu cupo ha sido liberado para otros colaboradores.', 'info');
+    showToast('Inscripción cancelada', 'El cupo ha sido liberado correctamente.', 'info');
+  };
+
+  const handleAssignTeamMembers = async (payload: any) => {
+    const res = await apiService.assignTeamMembersToEvent(payload);
+    setEvents(res.events);
+    const updatedParticipants = await apiService.getParticipants();
+    setParticipants(updatedParticipants);
+    return res;
   };
 
   const handleConfirmAttendance = async (eventId: string, date: string, time: string, email: string) => {
@@ -167,6 +230,16 @@ export function App() {
     setPrograms(updated);
   };
 
+  const handleSaveCompany = async (company: Company) => {
+    const updated = await apiService.saveCompany(company);
+    setCompanies(updated);
+  };
+
+  const handleDeleteCompany = async (companyId: string) => {
+    const updated = await apiService.deleteCompany(companyId);
+    setCompanies(updated);
+  };
+
   const handleBulkRegisterUsers = async (
     eventId: string,
     date: string,
@@ -203,6 +276,27 @@ export function App() {
     setEvents(updatedEvents);
   };
 
+  const handleUpdateSettings = (newSettings: SystemSettings) => {
+    setSettings(newSettings);
+  };
+
+  const handleSaveOjtChecklist = async (checklist: Partial<OjtChecklist>) => {
+    await apiService.saveOjtChecklist(checklist);
+    const updated = await apiService.getOjtChecklists();
+    setChecklists(updated);
+  };
+
+  const handleDeleteOjtChecklist = async (id: string) => {
+    await apiService.deleteOjtChecklist(id);
+    setChecklists(prev => prev.filter(c => c.id !== id));
+  };
+
+  const handleSaveCalibration = async (session: Partial<CalibrationSession>) => {
+    await apiService.saveCalibrationSession(session);
+    const updated = await apiService.getCalibrationSessions();
+    setCalibrations(updated);
+  };
+
   // Contar inscripciones activas del usuario logueado
   let myRegistrationsCount = 0;
   if (currentUser) {
@@ -229,13 +323,34 @@ export function App() {
     );
   }
 
+  const isSuperAdmin = currentUser.role === 'Super Administrador';
+  const effectiveCompanyId = isSuperAdmin ? selectedCompanyId : (currentUser.companyId || 'emp_kasino');
+
+  const scopedParticipants = participants.filter(p => {
+    if (isSuperAdmin && effectiveCompanyId === 'all') return true;
+    return (p.companyId || 'emp_kasino') === effectiveCompanyId;
+  });
+
+  const scopedChecklists = checklists.filter(c => {
+    if (isSuperAdmin && effectiveCompanyId === 'all') return true;
+    return (c.companyId || 'emp_kasino') === effectiveCompanyId;
+  });
+
+  const scopedCalibrations = calibrations.filter(c => {
+    if (isSuperAdmin && effectiveCompanyId === 'all') return true;
+    return (c.companyId || 'emp_kasino') === effectiveCompanyId;
+  });
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-[#F4F6F9] text-slate-800 flex flex-col selection:bg-[#DA291C] selection:text-white font-sans">
       
       {/* Top Navbar */}
       <Navbar
         currentUser={currentUser}
         currentTab={currentTab}
+        companies={companies}
+        selectedCompanyId={selectedCompanyId}
+        onSelectCompanyScope={(cId) => setSelectedCompanyId(cId)}
         setCurrentTab={setCurrentTab}
         onLogout={handleLogout}
         myRegistrationsCount={myRegistrationsCount}
@@ -249,6 +364,8 @@ export function App() {
           <CatalogView
             events={events}
             currentUser={currentUser}
+            companies={companies}
+            selectedCompanyId={selectedCompanyId}
             programs={programs}
             groups={groups}
             participants={participants}
@@ -270,13 +387,20 @@ export function App() {
           />
         )}
 
-        {/* Tab 3: Métricas & KPIs (Solo Super Administrador) */}
-        {currentTab === 'dashboard' && currentUser.role === 'Super Administrador' && (
+        {/* Tab 3: Métricas & KPIs */}
+        {currentTab === 'dashboard' && (currentUser.role === 'Super Administrador' || currentUser.role === 'Administrador / Editor') && (
           <DashboardView
             events={events}
             participants={participants}
             groups={groups}
             programs={programs}
+            companies={companies}
+            settings={settings}
+            checklists={checklists}
+            calibrations={calibrations}
+            selectedCompanyId={currentUser.role === 'Super Administrador' ? selectedCompanyId : (currentUser.companyId || 'emp_kasino')}
+            currentUser={currentUser}
+            onSelectCompanyScope={currentUser.role === 'Super Administrador' ? ((cId) => setSelectedCompanyId(cId)) : undefined}
             onShowToast={showToast}
           />
         )}
@@ -289,6 +413,18 @@ export function App() {
             users={users}
             groups={groups}
             programs={programs}
+            companies={companies}
+            settings={settings}
+            checklists={checklists}
+            calibrations={calibrations}
+            selectedCompanyId={selectedCompanyId}
+            onSelectCompanyScope={(cId) => setSelectedCompanyId(cId)}
+            onSaveCompany={handleSaveCompany}
+            onDeleteCompany={handleDeleteCompany}
+            onUpdateSettings={handleUpdateSettings}
+            onSaveChecklist={handleSaveOjtChecklist}
+            onDeleteChecklist={handleDeleteOjtChecklist}
+            onSaveCalibration={handleSaveCalibration}
             currentUser={currentUser}
             onSaveEvent={handleSaveEvent}
             onDeleteEvent={handleDeleteEvent}
@@ -314,9 +450,45 @@ export function App() {
             participants={participants}
             groups={groups}
             programs={programs}
+            companies={companies}
+            onAssignTeamMembers={handleAssignTeamMembers}
+            onCancelRegistration={handleCancelRegistration}
             onSendNotification={handleSendNotification}
             onShowToast={showToast}
           />
+        )}
+
+        {/* Tab OJT: Bitácoras de Campo, Mesas de Calibración & Analítica TTP (Exclusivo SuperAdmin y OJT) */}
+        {currentTab === 'ojt' && (currentUser.role === 'Super Administrador' || currentUser.role === 'Evaluador / Tutor OJT') && (
+          <div className="space-y-6">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm">
+              <div>
+                <div className="flex items-center gap-2 text-xs font-bold text-[#DA291C] mb-1">
+                  <span className="w-2 h-2 rounded-full bg-[#DA291C] animate-pulse"></span>
+                  <span>Módulo Especializado de Formación en Campo (OJT)</span>
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                  Bitácoras & Mesas de Calibración
+                </h1>
+                <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl">
+                  Acompañamiento en el puesto de trabajo, diagnóstico de brechas operativas, aseguramiento First-Time Fix y reportes ejecutivos.
+                </p>
+              </div>
+            </div>
+
+            <OjtManager
+              checklists={scopedChecklists}
+              calibrations={scopedCalibrations}
+              participants={scopedParticipants}
+              currentUser={currentUser}
+              companies={companies}
+              isSuperAdmin={currentUser.role === 'Super Administrador'}
+              onSaveChecklist={handleSaveOjtChecklist}
+              onDeleteChecklist={handleDeleteOjtChecklist}
+              onSaveCalibration={handleSaveCalibration}
+              onShowToast={showToast}
+            />
+          </div>
         )}
 
         {/* Tab 6: Check-in de Asistencia Presencial por QR */}
@@ -336,6 +508,9 @@ export function App() {
         )}
 
       </main>
+
+      {/* Corporate Claro Training Footer */}
+      <Footer />
 
       {/* Reservation Modal */}
       {selectedEventForModal && (

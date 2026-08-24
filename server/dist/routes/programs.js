@@ -8,10 +8,15 @@ exports.programsRouter = (0, express_1.Router)();
 /**
  * Helper para obtener todos los programas con eventos y grupos asignados
  */
-async function fetchFullPrograms() {
-    const result = await db_js_1.pool.query(`
-    SELECT * FROM training_programs ORDER BY created_at DESC
-  `);
+async function fetchFullPrograms(companyId) {
+    let query = 'SELECT * FROM training_programs';
+    const params = [];
+    if (companyId && typeof companyId === 'string' && companyId !== 'all') {
+        query += ' WHERE company_id = $1';
+        params.push(companyId);
+    }
+    query += ' ORDER BY created_at DESC';
+    const result = await db_js_1.pool.query(query, params);
     const programs = [];
     for (const prog of result.rows) {
         // 1. Obtener eventos asignados
@@ -40,6 +45,7 @@ async function fetchFullPrograms() {
             startDate: prog.start_date ? new Date(prog.start_date).toISOString().slice(0, 10) : '',
             endDate: prog.end_date ? new Date(prog.end_date).toISOString().slice(0, 10) : '',
             status: prog.status || 'active',
+            companyId: prog.company_id || 'emp_kasino',
             eventItems: eventsRes.rows.map(r => ({
                 eventId: r.event_id,
                 isMandatory: r.is_mandatory,
@@ -53,9 +59,10 @@ async function fetchFullPrograms() {
     return programs;
 }
 // GET /api/programs
-exports.programsRouter.get('/', async (_req, res) => {
+exports.programsRouter.get('/', async (req, res) => {
     try {
-        const programs = await fetchFullPrograms();
+        const { companyId } = req.query;
+        const programs = await fetchFullPrograms(typeof companyId === 'string' ? companyId : undefined);
         res.json(programs);
     }
     catch (err) {
@@ -67,7 +74,7 @@ exports.programsRouter.get('/', async (_req, res) => {
 exports.programsRouter.post('/', async (req, res) => {
     const client = await db_js_1.pool.connect();
     try {
-        const { id, title, description, startDate, endDate, status, eventItems, targetGroupIds, targetParticipantCards } = req.body;
+        const { id, title, description, startDate, endDate, status, eventItems, targetGroupIds, targetParticipantCards, companyId } = req.body;
         if (!title || !title.trim()) {
             return res.status(400).json({ error: 'El título del programa es obligatorio.' });
         }
@@ -75,25 +82,20 @@ exports.programsRouter.post('/', async (req, res) => {
             return res.status(400).json({ error: 'Las fechas de inicio y fin son obligatorias.' });
         }
         const programId = id || `prog_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+        const cleanCompanyId = companyId ? companyId.trim() : 'emp_kasino';
         await client.query('BEGIN');
         // 1. Insertar / Actualizar programa
         await client.query(`
-      INSERT INTO training_programs (id, title, description, start_date, end_date, status)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO training_programs (id, title, description, start_date, end_date, status, company_id)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       ON CONFLICT (id) DO UPDATE SET
         title = EXCLUDED.title,
         description = EXCLUDED.description,
         start_date = EXCLUDED.start_date,
         end_date = EXCLUDED.end_date,
-        status = EXCLUDED.status
-    `, [
-            programId,
-            title.trim(),
-            description || '',
-            startDate,
-            endDate,
-            status || 'active'
-        ]);
+        status = EXCLUDED.status,
+        company_id = EXCLUDED.company_id
+    `, [programId, title.trim(), description || null, startDate, endDate, status || 'active', cleanCompanyId]);
         // 2. Sincronizar eventos
         await client.query('DELETE FROM program_events WHERE program_id = $1', [programId]);
         if (Array.isArray(eventItems) && eventItems.length > 0) {

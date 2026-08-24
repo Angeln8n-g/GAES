@@ -19,7 +19,12 @@ CREATE TABLE participants (
     card VARCHAR(20) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    cedula VARCHAR(20)
+    cedula VARCHAR(20),
+    department VARCHAR(150),
+    supervisor_id VARCHAR(100),
+    supervisor_name VARCHAR(255),
+    employment_status VARCHAR(50) DEFAULT 'contratado',
+    is_active BOOLEAN DEFAULT TRUE
 );
 
 -- 2. Tabla de Usuarios del Sistema (Para autenticación y roles)
@@ -29,7 +34,11 @@ CREATE TABLE users_simulated (
     name VARCHAR(255) NOT NULL,
     role VARCHAR(50) NOT NULL,
     password VARCHAR(255) NOT NULL,
-    cedula VARCHAR(20)
+    cedula VARCHAR(20),
+    department VARCHAR(150),
+    assigned_member_cards TEXT[],
+    employment_status VARCHAR(50) DEFAULT 'contratado',
+    is_active BOOLEAN DEFAULT TRUE
 );
 
 -- 3. Tabla de Eventos / Capacitaciones
@@ -72,6 +81,11 @@ CREATE TABLE registrations (
     slot_id INTEGER NOT NULL REFERENCES event_slots(id) ON DELETE CASCADE,
     participant_card VARCHAR(20) NOT NULL REFERENCES participants(card) ON DELETE CASCADE,
     registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_mandatory BOOLEAN DEFAULT FALSE,
+    assigned_by VARCHAR(255) DEFAULT NULL,
+    assignment_type VARCHAR(50) DEFAULT 'self',
+    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    assignment_notes TEXT DEFAULT NULL,
     UNIQUE (slot_id, participant_card)
 );
 

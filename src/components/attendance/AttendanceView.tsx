@@ -162,13 +162,13 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
 
   if (!event || !slot) {
     return (
-      <div className="max-w-md mx-auto my-12 bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center space-y-4">
-        <AlertTriangle className="w-12 h-12 text-rose-400 mx-auto" />
-        <h2 className="text-lg font-bold text-white">Sesión no encontrada</h2>
-        <p className="text-xs text-slate-400">El evento o el horario especificado en el código QR no existe o fue reprogramado.</p>
+      <div className="max-w-md mx-auto my-12 bg-white border border-slate-200 rounded-3xl p-8 text-center space-y-4 shadow-xl">
+        <AlertTriangle className="w-12 h-12 text-[#DA291C] mx-auto" />
+        <h2 className="text-lg font-black text-slate-900">Sesión no encontrada</h2>
+        <p className="text-xs text-slate-500">El evento o el horario especificado en el código QR no existe o fue reprogramado.</p>
         <button
           onClick={onNavigateHome}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-semibold"
+          className="px-4 py-2 bg-[#DA291C] hover:bg-red-700 text-white rounded-xl text-xs font-bold shadow-md shadow-red-500/25 transition-all cursor-pointer"
         >
           Volver al Inicio
         </button>
@@ -178,18 +178,18 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center py-10 px-4">
-      <div className="max-w-xl w-full bg-slate-900/90 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden backdrop-blur-xl animate-in zoom-in-95 duration-300">
+      <div className="max-w-xl w-full bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
         
         {/* Header Ribbon */}
-        <div className="bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 p-6 text-white text-center relative">
-          <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center mx-auto mb-3 shadow-inner">
-            <PartyPopper className="w-8 h-8 text-yellow-300" />
+        <div className="bg-gradient-to-r from-[#DA291C] via-red-600 to-red-700 p-6 text-white text-center relative">
+          <div className="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center mx-auto mb-3 shadow-inner">
+            <PartyPopper className="w-8 h-8 text-amber-300" />
           </div>
-          <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/20 backdrop-blur-md">
+          <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/20 backdrop-blur-md">
             Check-In Presencial
           </span>
-          <h1 className="text-xl font-bold mt-2 leading-snug">{event.title}</h1>
-          <div className="flex flex-wrap items-center justify-center gap-3 mt-2 text-xs text-indigo-100 font-medium">
+          <h1 className="text-xl font-black mt-2 leading-snug">{event.title}</h1>
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-2 text-xs text-red-100 font-bold">
             <span className="flex items-center gap-1"><CalendarIcon className="w-3.5 h-3.5" /> {formatDateLong(dateStr)}</span>
             <span>•</span>
             <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {timeStr}</span>
@@ -203,26 +203,26 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
           {statusMessage && (
             <div className={`p-4 rounded-2xl border flex items-start gap-3 text-xs leading-relaxed animate-in fade-in duration-300 ${
               statusMessage.type === 'success'
-                ? 'bg-emerald-950/80 border-emerald-500/30 text-emerald-200'
-                : 'bg-rose-950/80 border-rose-500/30 text-rose-200'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                : 'bg-rose-50 border-rose-200 text-rose-900'
             }`}>
-              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
               <div>
-                <p className="font-bold">{statusMessage.type === 'success' ? '¡Asistencia Registrada!' : 'Atención'}</p>
-                <p className="mt-0.5">{statusMessage.text}</p>
+                <p className="font-black">{statusMessage.type === 'success' ? '¡Asistencia Registrada!' : 'Atención'}</p>
+                <p className="mt-0.5 font-medium">{statusMessage.text}</p>
               </div>
             </div>
           )}
 
           {/* Quick Details Card */}
-          <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-2 text-xs text-slate-300">
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-xs text-slate-700">
             <div className="flex items-center justify-between">
-              <span className="text-slate-500">Facilitador / Instructor:</span>
-              <span className="font-semibold text-slate-200">{event.instructor}</span>
+              <span className="text-slate-500 font-medium">Facilitador / Instructor:</span>
+              <span className="font-bold text-slate-900">{event.instructor}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-slate-500">Ubicación:</span>
-              <span className="font-semibold text-indigo-300 flex items-center gap-1">
+              <span className="text-slate-500 font-medium">Ubicación:</span>
+              <span className="font-bold text-[#DA291C] flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5" /> {event.location || 'Sala de Capacitación'}
               </span>
             </div>
@@ -230,19 +230,19 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
 
           {/* External Survey CTA (If event has survey_url) */}
           {event.surveyUrl && (
-            <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-950 to-slate-950 border border-indigo-500/30 space-y-3">
-              <div className="flex items-center gap-2 text-xs font-bold text-indigo-300 uppercase tracking-wider">
-                <Sparkles className="w-4 h-4 text-cyan-400" />
+            <div className="p-5 rounded-2xl bg-red-50/50 border border-red-200 space-y-3">
+              <div className="flex items-center gap-2 text-xs font-bold text-[#DA291C] uppercase tracking-wider">
+                <Sparkles className="w-4 h-4 text-[#DA291C]" />
                 <span>Encuesta de Satisfacción Oficial</span>
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-xs text-slate-600 leading-relaxed font-medium">
                 Tu opinión es clave para seguir mejorando. Por favor completa la breve evaluación de este evento:
               </p>
               <a
                 href={event.surveyUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition-all"
+                className="inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#DA291C] hover:bg-red-700 text-white text-xs font-bold shadow-md shadow-red-500/25 transition-all cursor-pointer"
               >
                 <span>Completar Encuesta del Evento</span>
                 <ExternalLink className="w-4 h-4" />
@@ -252,14 +252,14 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
 
           {/* In-App Quick Feedback Rating Widget */}
           {currentUser && (
-            <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3">
+            <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-200">¿Qué te pareció la sesión?</span>
-                <span className="text-[10px] text-slate-500">Calificación rápida</span>
+                <span className="text-xs font-bold text-slate-900">¿Qué te pareció la sesión?</span>
+                <span className="text-[10px] text-slate-500 font-semibold">Calificación rápida</span>
               </div>
 
               {feedbackSent ? (
-                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs text-center">
+                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold text-center">
                   ¡Muchas gracias por tu calificación!
                 </div>
               ) : (
@@ -273,13 +273,13 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
                         onClick={() => setRating(star)}
                         onMouseEnter={() => setHoverRating(star)}
                         onMouseLeave={() => setHoverRating(0)}
-                        className="p-1 transition-transform hover:scale-125 focus:outline-none"
+                        className="p-1 transition-transform hover:scale-125 focus:outline-none cursor-pointer"
                       >
                         <Star
                           className={`w-7 h-7 transition-colors ${
                             (hoverRating || rating) >= star
-                              ? 'text-amber-400 fill-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]'
-                              : 'text-slate-700'
+                              ? 'text-amber-500 fill-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]'
+                              : 'text-slate-300'
                           }`}
                         />
                       </button>
@@ -293,12 +293,12 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
                         placeholder="Comentario u opinión opcional..."
-                        className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                        className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
                       />
                       <button
                         type="submit"
                         disabled={isSendingFeedback}
-                        className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors"
+                        className="w-full py-2 bg-[#DA291C] hover:bg-red-700 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-md shadow-red-500/25"
                       >
                         <Send className="w-3 h-3" />
                         <span>{isSendingFeedback ? 'Enviando...' : 'Enviar Calificación'}</span>
@@ -316,18 +316,18 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
               <button
                 type="button"
                 onClick={() => setShowManualForm(true)}
-                className="w-full py-2.5 rounded-xl border border-slate-800 hover:border-slate-700 bg-slate-950/40 text-xs font-semibold text-slate-400 hover:text-slate-200 transition-colors"
+                className="w-full py-2.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-slate-50 text-xs font-bold text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
               >
                 ¿Registrar a otro colaborador manualmente?
               </button>
             ) : (
-              <form onSubmit={handleManualCheckIn} className="space-y-3 bg-slate-950/60 p-4 rounded-2xl border border-slate-800">
+              <form onSubmit={handleManualCheckIn} className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-300">Registro Manual</span>
+                  <span className="text-xs font-bold text-slate-900">Registro Manual</span>
                   <button
                     type="button"
                     onClick={() => setShowManualForm(false)}
-                    className="text-[11px] text-slate-500 hover:text-slate-300"
+                    className="text-[11px] text-slate-500 hover:text-slate-800 font-bold cursor-pointer"
                   >
                     Cancelar
                   </button>
@@ -337,12 +337,12 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
                   value={manualCardInput}
                   onChange={(e) => setManualCardInput(e.target.value)}
                   placeholder="Número de Tarjeta o Correo..."
-                  className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
                 />
                 <button
                   type="submit"
                   disabled={isProcessing || !manualCardInput.trim()}
-                  className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-xl transition-colors disabled:opacity-50"
+                  className="w-full py-2.5 bg-[#DA291C] hover:bg-red-700 text-white text-xs font-bold rounded-xl transition-colors disabled:opacity-50 shadow-md shadow-red-500/25 cursor-pointer"
                 >
                   {isProcessing ? 'Validando...' : 'Confirmar Asistencia Manual'}
                 </button>
@@ -353,7 +353,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
           {/* Footer Back Button */}
           <button
             onClick={onNavigateHome}
-            className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-2xl flex items-center justify-center gap-2 transition-colors"
+            className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-2xl flex items-center justify-center gap-2 transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Volver a la Plataforma Principal</span>

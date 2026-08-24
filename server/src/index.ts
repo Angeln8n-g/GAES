@@ -10,6 +10,10 @@ import { feedbackRouter } from './routes/feedback.js';
 import { notificationsRouter } from './routes/notifications.js';
 import { groupsRouter } from './routes/groups.js';
 import { programsRouter } from './routes/programs.js';
+import { companiesRouter } from './routes/companies.js';
+import { gradesRouter } from './routes/grades.js';
+import settingsRouter from './routes/settings.js';
+import ojtRouter from './routes/ojt.js';
 
 import { pool, initDbMigrations } from './db.js';
 
@@ -32,7 +36,11 @@ app.get('/api/health', (_req, res) => {
 });
 
 // Rutas de la API
+app.use('/api/companies', companiesRouter);
+app.use('/api/settings', settingsRouter);
+app.use('/api/ojt', ojtRouter);
 app.use('/api/events', eventsRouter);
+app.use('/api/grades', gradesRouter);
 app.use('/api/participants', participantsRouter);
 app.use('/api/registrations', registrationsRouter);
 app.use('/api/attendance', attendanceRouter);

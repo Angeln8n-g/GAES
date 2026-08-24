@@ -108,11 +108,226 @@ export const initDbMigrations = async () => {
         PRIMARY KEY (program_id, participant_card)
       );
 
-      ALTER TABLE participants ADD COLUMN IF NOT EXISTS supervisor_id VARCHAR(100);
-      ALTER TABLE participants ADD COLUMN IF NOT EXISTS supervisor_name VARCHAR(255);
-      ALTER TABLE participants ADD COLUMN IF NOT EXISTS department VARCHAR(150);
-      ALTER TABLE users ADD COLUMN IF NOT EXISTS assigned_member_cards TEXT[];
-      ALTER TABLE users ADD COLUMN IF NOT EXISTS department VARCHAR(150);
+      CREATE TABLE IF NOT EXISTS companies (
+        id VARCHAR(100) PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        slug VARCHAR(100) UNIQUE NOT NULL,
+        logo_url TEXT,
+        rnc_tax_id VARCHAR(50),
+        industry VARCHAR(100),
+        contact_email VARCHAR(255),
+        contact_phone VARCHAR(50),
+        is_active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      INSERT INTO companies (id, name, slug, logo_url, rnc_tax_id, industry, contact_email, contact_phone, is_active)
+      VALUES 
+        ('emp_kasino', 'Kasino 21 Corporativo', 'kasino-21', 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&w=200&q=80', '101-928374-1', 'Entretenimiento & Hospitalidad', 'contacto@kasino21.com', '+1 (809) 555-0120', true),
+        ('emp_resort', 'Gran Resort & Hospitality Club', 'gran-resort', 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=200&q=80', '101-445566-2', 'Turismo & Hotelería', 'info@granresort.com', '+1 (809) 555-0340', true),
+        ('emp_tech', 'Tech Innovations Labs', 'tech-innovations', 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=200&q=80', '101-778899-3', 'Tecnología & Software', 'rrhh@techlabs.io', '+1 (809) 555-0560', true)
+      ON CONFLICT (id) DO NOTHING;
+
+      ALTER TABLE IF EXISTS participants ADD COLUMN IF NOT EXISTS supervisor_id VARCHAR(100);
+      ALTER TABLE IF EXISTS participants ADD COLUMN IF NOT EXISTS supervisor_name VARCHAR(255);
+      ALTER TABLE IF EXISTS participants ADD COLUMN IF NOT EXISTS department VARCHAR(150);
+      ALTER TABLE IF EXISTS participants ADD COLUMN IF NOT EXISTS employment_status VARCHAR(50) DEFAULT 'contratado';
+      ALTER TABLE IF EXISTS participants ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
+      ALTER TABLE IF EXISTS participants ADD COLUMN IF NOT EXISTS company_id VARCHAR(100) DEFAULT 'emp_kasino';
+
+      ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS assigned_member_cards TEXT[];
+      ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS department VARCHAR(150);
+      ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS employment_status VARCHAR(50) DEFAULT 'contratado';
+      ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
+      ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS company_id VARCHAR(100) DEFAULT 'emp_kasino';
+
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS company_id VARCHAR(100) DEFAULT 'emp_kasino';
+      ALTER TABLE IF EXISTS participant_groups ADD COLUMN IF NOT EXISTS company_id VARCHAR(100) DEFAULT 'emp_kasino';
+      ALTER TABLE IF EXISTS training_programs ADD COLUMN IF NOT EXISTS company_id VARCHAR(100) DEFAULT 'emp_kasino';
+
+      ALTER TABLE IF EXISTS registrations ADD COLUMN IF NOT EXISTS is_mandatory BOOLEAN DEFAULT FALSE;
+      ALTER TABLE IF EXISTS registrations ADD COLUMN IF NOT EXISTS assigned_by VARCHAR(255) DEFAULT NULL;
+      ALTER TABLE IF EXISTS registrations ADD COLUMN IF NOT EXISTS assignment_type VARCHAR(50) DEFAULT 'self';
+      ALTER TABLE IF EXISTS registrations ADD COLUMN IF NOT EXISTS assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+      ALTER TABLE IF EXISTS registrations ADD COLUMN IF NOT EXISTS assignment_notes TEXT DEFAULT NULL;
+
+      -- Campos de Evaluación Académica y Calificaciones
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS evaluation_type VARCHAR(50) DEFAULT 'attendance_only';
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS passing_score NUMERIC(5, 2) DEFAULT 70.00;
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS skills_evaluated TEXT[] DEFAULT '{}';
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS ojt_evaluator_id VARCHAR(100);
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS ojt_evaluator_name VARCHAR(255);
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS ojt_evaluator_email VARCHAR(255);
+
+      CREATE TABLE IF NOT EXISTS participant_grades (
+        id VARCHAR(100) PRIMARY KEY,
+        event_id VARCHAR(100) NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+        participant_card VARCHAR(20) NOT NULL REFERENCES participants(card) ON DELETE CASCADE,
+        slot_id INTEGER REFERENCES event_slots(id) ON DELETE SET NULL,
+        score NUMERIC(5, 2),
+        academic_status VARCHAR(50) DEFAULT 'pending' CHECK (academic_status IN ('passed', 'failed', 'pending')),
+        detected_skill_gaps TEXT[] DEFAULT '{}',
+        weaknesses_notes TEXT,
+        strengths_notes TEXT,
+        needs_retraining BOOLEAN DEFAULT FALSE,
+        feedback TEXT,
+        graded_by VARCHAR(255),
+        graded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(event_id, participant_card)
+      );
+
+      -- Actualizar eventos existentes para tener competencias y tipos de evaluación demostrativos
+      UPDATE events 
+      SET evaluation_type = 'score_100', 
+          passing_score = 75.00, 
+          skills_evaluated = ARRAY['Arquitectura y Hooks React', 'Optimización de Rendimiento Frontend', 'Diseño de Interfaces UI/UX']
+      WHERE id = 'evt_1' AND (evaluation_type IS NULL OR evaluation_type = 'attendance_only');
+
+      UPDATE events 
+      SET evaluation_type = 'pass_fail', 
+          passing_score = 70.00, 
+          skills_evaluated = ARRAY['Pensamiento Crítico', 'Ética en Redes Digitales', 'Privacidad de Datos']
+      WHERE id = 'evt_2' AND (evaluation_type IS NULL OR evaluation_type = 'attendance_only');
+
+      UPDATE events 
+      SET evaluation_type = 'attendance_only', 
+          skills_evaluated = ARRAY['Productividad con IA', 'Ingeniería de Prompts', 'Automatización de Tareas']
+      WHERE id = 'evt_3' AND (evaluation_type IS NULL OR evaluation_type = 'attendance_only');
+
+      -- Insertar calificaciones de ejemplo para demostrar detección de debilidades
+      INSERT INTO participant_grades (id, event_id, participant_card, score, academic_status, detected_skill_gaps, weaknesses_notes, strengths_notes, needs_retraining, feedback, graded_by)
+      VALUES 
+        ('grd_demo_1', 'evt_1', '2010', 92.00, 'passed', '{}', 'Ninguna debilidad observada. Excelente dominio técnico.', 'Excelente velocidad de implementación y patrones limpios.', false, '¡Aprobado con honores! Puede actuar como mentor técnico.', 'Ing. Roberto Gómez'),
+        ('grd_demo_2', 'evt_1', '2012', 62.00, 'failed', ARRAY['Optimización de Rendimiento Frontend'], 'Dificultad con useMemo, re-renders innecesarios y bundle splitting.', 'Buena maquetación y diseño visual.', true, 'Requiere re-capacitación práctica en profiling y optimización de componentes.', 'Ing. Roberto Gómez'),
+        ('grd_demo_3', 'evt_2', '2010', 100.00, 'passed', '{}', 'Ninguna debilidad.', 'Excelente participación en debate de ciberseguridad.', false, 'Aprobado satisfactoriamente.', 'Lic. María Santos')
+      ON CONFLICT (event_id, participant_card) DO NOTHING;
+
+      -- =========================================================
+      -- TABLA DE CONFIGURACIONES GLOBALES (FEATURE FLAGS & SETTINGS)
+      -- =========================================================
+      CREATE TABLE IF NOT EXISTS system_settings (
+        key VARCHAR(100) PRIMARY KEY,
+        value JSONB NOT NULL,
+        description TEXT,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_by VARCHAR(255) DEFAULT 'Super Administrador'
+      );
+
+      INSERT INTO system_settings (key, value, description)
+      VALUES 
+        ('ojt_plan_90d', '{"enabled": true, "enable_702010": true, "enable_calibration": true, "target_ttp_days": 30}', 'Control general del módulo de operaciones OJT, modelo 70-20-10 y plan a 90 días')
+      ON CONFLICT (key) DO NOTHING;
+
+      -- =========================================================
+      -- EXTENSIÓN MODELO 70-20-10 EN CRONOGRAMAS
+      -- =========================================================
+      ALTER TABLE IF EXISTS training_programs ADD COLUMN IF NOT EXISTS learning_framework VARCHAR(50) DEFAULT 'standard';
+      ALTER TABLE IF EXISTS program_events ADD COLUMN IF NOT EXISTS stage_category VARCHAR(50) DEFAULT 'formal_course_10';
+
+      -- =========================================================
+      -- TABLA DE BITÁCORAS & CHECKLISTS OJT EN CAMPO
+      -- =========================================================
+      CREATE TABLE IF NOT EXISTS ojt_checklists (
+        id VARCHAR(100) PRIMARY KEY,
+        company_id VARCHAR(100) NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+        participant_card VARCHAR(20) NOT NULL REFERENCES participants(card) ON DELETE CASCADE,
+        evaluator_user_id VARCHAR(100) NOT NULL,
+        evaluator_name VARCHAR(255) NOT NULL,
+        date DATE NOT NULL,
+        observation_type VARCHAR(50) DEFAULT 'daily_observation',
+        overall_score NUMERIC(5, 2) NOT NULL,
+        operational_status VARCHAR(50) DEFAULT 'compliant',
+        safety_protocol_pass BOOLEAN DEFAULT TRUE,
+        first_time_fix_pass BOOLEAN DEFAULT TRUE,
+        rubric_evaluation JSONB DEFAULT '[]',
+        weaknesses_identified TEXT[] DEFAULT '{}',
+        immediate_action_plan TEXT,
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      -- =========================================================
+      -- TABLA DE SESIONES DE CALIBRACIÓN OPS-CAPACITACIÓN
+      -- =========================================================
+      CREATE TABLE IF NOT EXISTS calibration_sessions (
+        id VARCHAR(100) PRIMARY KEY,
+        company_id VARCHAR(100) NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+        title VARCHAR(255) NOT NULL,
+        date DATE NOT NULL,
+        conducted_by VARCHAR(255) NOT NULL,
+        participants_reviewed INTEGER DEFAULT 0,
+        average_theory_score NUMERIC(5, 2) DEFAULT 0,
+        average_field_score NUMERIC(5, 2) DEFAULT 0,
+        variance_gap_pct NUMERIC(5, 2) DEFAULT 0,
+        status VARCHAR(50) DEFAULT 'completed',
+        key_findings TEXT,
+        action_agreements TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      -- Insertar datos demo OJT y Calibración
+      INSERT INTO ojt_checklists (
+        id, company_id, participant_card, evaluator_user_id, evaluator_name, date, observation_type, overall_score, operational_status, safety_protocol_pass, first_time_fix_pass, rubric_evaluation, weaknesses_identified, immediate_action_plan, notes
+      ) VALUES 
+        (
+          'ojt_demo_1', 
+          'emp_kasino', 
+          '2010', 
+          'usr_1', 
+          'Lic. Carlos Mendoza (Líder OJT)', 
+          CURRENT_DATE - INTERVAL '3 days', 
+          'daily_observation', 
+          95.00, 
+          'compliant', 
+          true, 
+          true, 
+          '[{"category":"Seguridad y EPP","score":100,"notes":"Uso impecable de equipo"},{"category":"Procedimiento Técnico","score":95,"notes":"Secuencia correcta"},{"category":"First-Time Fix","score":100,"notes":"Sin retrabajo"},{"category":"Tiempo Operativo","score":85,"notes":"Dentro de estándar"}]'::jsonb, 
+          '{}', 
+          'Mantener autonomía actual y asignar como acompañante de nuevos ingresos.', 
+          'Desempeño sobresaliente en atención al cliente y resolución técnica.'
+        ),
+        (
+          'ojt_demo_2', 
+          'emp_kasino', 
+          '2012', 
+          'usr_1', 
+          'Lic. Carlos Mendoza (Líder OJT)', 
+          CURRENT_DATE - INTERVAL '1 day', 
+          'weekly_evaluation', 
+          68.00, 
+          'needs_coaching', 
+          true, 
+          false, 
+          '[{"category":"Seguridad y EPP","score":90,"notes":"Cumple protocolos"},{"category":"Procedimiento Técnico","score":60,"notes":"Dudas en secuencia de arranque"},{"category":"First-Time Fix","score":50,"notes":"Requirió apoyo secundario"},{"category":"Tiempo Operativo","score":70,"notes":"Tiempo elevado"}]'::jsonb, 
+          ARRAY['Procedimiento Técnico', 'First-Time Fix'], 
+          'Shadowing guiado de 3 días con técnico senior y repaso de checklist de puesta a punto.', 
+          'Presenta nerviosismo al operar bajo presión de tiempo. Buena actitud de aprendizaje.'
+        )
+      ON CONFLICT (id) DO NOTHING;
+
+      INSERT INTO calibration_sessions (
+        id, company_id, title, date, conducted_by, participants_reviewed, average_theory_score, average_field_score, variance_gap_pct, status, key_findings, action_agreements
+      ) VALUES 
+        (
+          'calib_demo_1', 
+          'emp_kasino', 
+          'Mesa de Calibración Mensual: Operaciones vs Formación Q3', 
+          CURRENT_DATE - INTERVAL '7 days', 
+          'Mesa Conjunta (Ing. Roberto Gómez & Lic. Carlos Mendoza)', 
+          12, 
+          88.50, 
+          72.30, 
+          16.20, 
+          'completed',
+          'Se detecta que los colaboradores aprueban la teoría con 90% pero al ejecutar el procedimiento en campo omiten 2 pasos clave del checklist.', 
+          '1. Actualizar videos y simulaciones del taller. 2. Aumentar el shadowing en campo de 3 a 5 días antes de otorgar certificación de autonomía.'
+        )
+      ON CONFLICT (id) DO NOTHING;
+
+      INSERT INTO users_simulated (id, email, name, role, password, cedula, department, company_id)
+      VALUES 
+        ('usr_ojt', 'tutor.ojt@empresa.com', 'Lic. Carlos Mendoza (Tutor OJT)', 'Evaluador / Tutor OJT', '123', '001-9876543-1', 'Operaciones', 'emp_kasino')
+      ON CONFLICT (id) DO UPDATE SET role = 'Evaluador / Tutor OJT';
     `);
     console.log('✅ Esquema PostgreSQL sincronizado y verificado correctamente.');
   } catch (err: any) {

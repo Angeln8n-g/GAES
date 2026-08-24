@@ -42,23 +42,23 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
         
         {/* Header */}
-        <div className="p-6 border-b border-slate-800 flex items-center justify-between">
+        <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-indigo-500/20 text-indigo-400">
+            <div className="p-2 rounded-xl bg-red-50 text-[#DA291C] border border-red-200">
               <QrCode className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white">Código QR de Asistencia</h2>
-              <p className="text-xs text-slate-400">Para carteles en sala o escaneo móvil</p>
+              <h2 className="text-base font-black text-slate-900">Código QR de Asistencia</h2>
+              <p className="text-xs text-slate-500">Para carteles en sala o escaneo móvil</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -69,7 +69,7 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
           
           {/* Date & Time Selectors */}
           <div className="space-y-3">
-            <label className="block text-xs font-semibold text-slate-300">
+            <label className="block text-xs font-bold text-slate-700">
               Selecciona Fecha y Horario a Imprimir:
             </label>
             <div className="flex flex-wrap gap-2">
@@ -81,10 +81,10 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
                     setSelectedDate(sch.date);
                     setSelectedTime(sch.slots[0]?.time || '');
                   }}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     selectedDate === sch.date
-                      ? 'bg-indigo-600 text-white font-bold'
-                      : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white'
+                      ? 'bg-[#DA291C] text-white shadow-xs'
+                      : 'bg-slate-50 border border-slate-300 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
                   {formatDateLong(sch.date)}
@@ -99,10 +99,10 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
                     key={sl.time}
                     type="button"
                     onClick={() => setSelectedTime(sl.time)}
-                    className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all ${
+                    className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       selectedTime === sl.time
-                        ? 'bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 font-bold'
-                        : 'bg-slate-950 border border-slate-800 text-slate-400'
+                        ? 'bg-red-50 border border-red-200 text-[#DA291C]'
+                        : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50'
                     }`}
                   >
                     {sl.time}
@@ -113,18 +113,18 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
           </div>
 
           {/* Printable Badge Card */}
-          <div id="printable-qr-badge" className="p-6 rounded-3xl bg-white text-slate-900 shadow-2xl text-center space-y-4 border border-slate-200">
+          <div id="printable-qr-badge" className="p-6 rounded-3xl bg-white text-slate-900 shadow-lg text-center space-y-4 border border-slate-200">
             <div className="border-b border-slate-200 pb-3">
-              <span className="text-[10px] font-black tracking-widest text-indigo-600 uppercase">
-                CapacitaHub • Control de Asistencia
+              <span className="text-[10px] font-black tracking-widest text-[#DA291C] uppercase">
+                Aprendizaje y Desarrollo • Control de Asistencia
               </span>
-              <h3 className="text-base font-extrabold text-slate-900 mt-1 leading-snug">
+              <h3 className="text-base font-black text-slate-900 mt-1 leading-snug">
                 {event.title}
               </h3>
               <p className="text-xs text-slate-600 mt-0.5">Facilitador: {event.instructor}</p>
             </div>
 
-            <div className="p-3 bg-white inline-block rounded-2xl">
+            <div className="p-3 bg-white inline-block rounded-2xl border border-slate-200 shadow-xs">
               <QRCodeSVG
                 value={attendanceUrl}
                 size={200}
@@ -135,8 +135,8 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
 
             <div className="text-xs text-slate-700 bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1">
               <p className="font-bold text-slate-900">{formatDateLong(selectedDate)}</p>
-              <p className="text-indigo-600 font-bold text-sm">{selectedTime}</p>
-              <p className="text-[11px] text-slate-500">{event.location}</p>
+              <p className="text-[#DA291C] font-black text-sm">{selectedTime}</p>
+              <p className="text-[11px] text-slate-500 font-semibold">{event.location}</p>
             </div>
 
             <p className="text-[10px] text-slate-500 font-medium">
@@ -148,15 +148,15 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
           <div className="flex items-center gap-3 pt-2">
             <button
               onClick={handleCopyLink}
-              className="flex-1 py-2.5 px-4 rounded-2xl bg-slate-950 hover:bg-slate-800 text-slate-300 text-xs font-semibold flex items-center justify-center gap-2 border border-slate-800 transition-colors"
+              className="flex-1 py-2.5 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center gap-2 border border-slate-300 transition-colors cursor-pointer"
             >
-              {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+              {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
               <span>{copied ? '¡Enlace Copiado!' : 'Copiar Enlace'}</span>
             </button>
 
             <button
               onClick={handlePrint}
-              className="flex-1 py-2.5 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition-all"
+              className="flex-1 py-2.5 px-4 rounded-2xl bg-[#DA291C] hover:bg-red-700 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md shadow-red-500/25 transition-all cursor-pointer"
             >
               <Printer className="w-4 h-4" />
               <span>Imprimir Cartel</span>
