@@ -13,7 +13,8 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
-  KeyRound
+  KeyRound,
+  GraduationCap
 } from 'lucide-react';
 import { UserAccount, TabView, Company } from '../../types';
 
@@ -65,7 +66,8 @@ export const SuperAdminSidebar: React.FC<SuperAdminSidebarProps> = ({
     {
       group: "Acompañamiento & Calibración",
       items: [
-        { id: 'ojt' as TabView, label: "Bitácoras & OJT", icon: Activity, badge: null }
+        { id: 'ojt' as TabView, label: "Bitácoras & OJT", icon: Activity, badge: null },
+        { id: 'evaluator-courses' as TabView, label: "Cursos Asignados (OJT)", icon: GraduationCap, badge: null }
       ]
     },
     {

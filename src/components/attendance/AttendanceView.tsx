@@ -28,6 +28,7 @@ interface AttendanceViewProps {
   onSubmitFeedback: (feedback: EventFeedback) => Promise<void>;
   onSaveParticipants: (participants: Participant[]) => Promise<void>;
   onNavigateHome: () => void;
+  onOpenTecEvaluation?: (event: TrainingEvent) => void;
 }
 
 export const AttendanceView: React.FC<AttendanceViewProps> = ({
@@ -40,7 +41,8 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
   onConfirmAttendance,
   onSubmitFeedback,
   onSaveParticipants,
-  onNavigateHome
+  onNavigateHome,
+  onOpenTecEvaluation
 }) => {
   const [manualCardInput, setManualCardInput] = useState('');
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
@@ -250,8 +252,37 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
             </div>
           )}
 
-          {/* In-App Quick Feedback Rating Widget */}
+          {/* Encuesta Oficial TEC (Curso & Facilitador) */}
           {currentUser && (
+            <div className="p-5 rounded-2xl bg-gradient-to-r from-red-50 via-amber-50/40 to-red-50 border border-red-200 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-[#DA291C] uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-[#DA291C]" />
+                  Evaluación de Curso y Facilitador - TEC
+                </span>
+                <span className="text-[10px] text-amber-800 font-black px-2 py-0.5 rounded-md bg-amber-200/80">
+                  Estándar TEC
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                Esta evaluación del curso y del facilitador nos permite conocer los puntos fuertes y las oportunidades de mejora en nuestros entrenamientos.
+              </p>
+
+              {onOpenTecEvaluation && (
+                <button
+                  type="button"
+                  onClick={() => onOpenTecEvaluation(event)}
+                  className="w-full py-3 bg-[#DA291C] hover:bg-red-700 text-white text-xs font-black rounded-xl flex items-center justify-center gap-2 shadow-md shadow-red-500/25 transition-all cursor-pointer"
+                >
+                  <Star className="w-4 h-4 fill-white" />
+                  <span>Completar Evaluación de Curso y Facilitador</span>
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* In-App Quick Feedback Rating Widget (Opcional Rápido) */}
+          {currentUser && !onOpenTecEvaluation && (
             <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-900">¿Qué te pareció la sesión?</span>

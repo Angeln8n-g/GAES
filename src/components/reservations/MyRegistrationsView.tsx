@@ -20,7 +20,9 @@ import {
   Lock,
   ShieldAlert,
   ShieldCheck,
-  GraduationCap
+  GraduationCap,
+  Camera,
+  Star
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { TrainingEvent, UserAccount, Slot, Schedule, TrainingProgram, ParticipantGroup, Participant } from '../../types';
@@ -47,6 +49,8 @@ interface MyRegistrationsViewProps {
   onCancelRegistration: (eventId: string, date: string, time: string, email: string) => Promise<void>;
   onExploreCatalog: () => void;
   onOpenReservationModal?: (event: TrainingEvent) => void;
+  onOpenQrScanner?: () => void;
+  onOpenTecEvaluation?: (event: TrainingEvent) => void;
 }
 
 export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
@@ -57,7 +61,9 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
   participants = [],
   onCancelRegistration,
   onExploreCatalog,
-  onOpenReservationModal
+  onOpenReservationModal,
+  onOpenQrScanner,
+  onOpenTecEvaluation
 }) => {
   const [cancelingItem, setCancelingItem] = useState<UserRegistrationItem | null>(null);
   const [selectedPassItem, setSelectedPassItem] = useState<UserRegistrationItem | null>(null);
@@ -138,9 +144,21 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
           </p>
         </div>
 
-        <div className="px-5 py-3 rounded-2xl bg-red-50 border border-red-200 text-center sm:text-right">
-          <p className="text-2xl font-black text-[#DA291C]">{userRegistrations.length}</p>
-          <p className="text-[11px] text-slate-600 font-bold">Inscripciones Activas</p>
+        <div className="flex flex-wrap items-center gap-3">
+          {onOpenQrScanner && (
+            <button
+              onClick={onOpenQrScanner}
+              className="px-4 py-2.5 rounded-2xl bg-[#DA291C] hover:bg-red-700 text-white text-xs font-bold flex items-center gap-2 shadow-md shadow-red-500/25 transition-all cursor-pointer active:scale-95"
+            >
+              <Camera className="w-4 h-4" />
+              <span>Escanear QR Asistencia</span>
+            </button>
+          )}
+
+          <div className="px-5 py-3 rounded-2xl bg-red-50 border border-red-200 text-center sm:text-right">
+            <p className="text-2xl font-black text-[#DA291C]">{userRegistrations.length}</p>
+            <p className="text-[11px] text-slate-600 font-bold">Inscripciones Activas</p>
+          </div>
         </div>
       </div>
 
@@ -482,6 +500,38 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                         </button>
                       ) : null}
                     </div>
+
+                    {/* Botón de Evaluación TEC si el colaborador asistió */}
+                    {hasAttended && onOpenTecEvaluation && (
+                      (() => {
+                        const userFeedback = (event.feedbacks || []).find(
+                          fb => fb.userEmail.toLowerCase() === currentUser.email.toLowerCase()
+                        );
+                        return (
+                          <div className="pt-2">
+                            {userFeedback ? (
+                              <button
+                                type="button"
+                                onClick={() => onOpenTecEvaluation(event)}
+                                className="w-full py-2 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                              >
+                                <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                                <span>Evaluado ({userFeedback.rating}★) - Ver / Modificar</span>
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => onOpenTecEvaluation(event)}
+                                className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 text-xs font-black flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20 transition-all cursor-pointer"
+                              >
+                                <Star className="w-3.5 h-3.5 fill-slate-950 text-slate-950" />
+                                <span>Evaluar Curso & Facilitador (TEC)</span>
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })()
+                    )}
 
                   </div>
 

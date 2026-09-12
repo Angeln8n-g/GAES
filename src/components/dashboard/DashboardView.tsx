@@ -47,6 +47,11 @@ import {
   exportSkillsGapReportToExcel
 } from '../../utils/excelUtils';
 import { OjtTtpSection } from './OjtTtpSection';
+import { 
+  COURSE_QUESTIONS, 
+  FACILITATOR_QUESTIONS, 
+  TEC_SURVEY_INFO 
+} from '../../constants/tecSurveyQuestions';
 
 interface DashboardViewProps {
   events: TrainingEvent[];
@@ -80,6 +85,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [activeTab, setActiveTab] = useState<'overview' | 'compliance' | 'instructors' | 'skills' | 'reports' | 'ojt_ttp'>('overview');
   const [selectedProgramId, setSelectedProgramId] = useState<string>(programs[0]?.id || '');
   const [skillsSearchQuery, setSkillsSearchQuery] = useState<string>('');
+  const [selectedSurveyEventId, setSelectedSurveyEventId] = useState<string>('all');
 
   // 1. Métricas Globales de Eventos
   const totalCapacity = useMemo(() => {
@@ -114,15 +120,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     return totalAttended * 2;
   }, [totalAttended]);
 
-  // 3. Satisfacción Promedio Global (CSAT)
+  // 3. Satisfacción Promedio Global (CSAT & Encuesta TEC)
   const allFeedbacks = useMemo(() => {
     const list: Array<{
       eventId: string;
       eventTitle: string;
+      instructor: string;
       rating: number;
       comment: string;
       userName?: string;
       userEmail?: string;
+      courseRatings?: Record<string, number>;
+      facilitatorRatings?: Record<string, number>;
+      courseScore?: number;
+      facilitatorScore?: number;
       createdAt: string;
     }> = [];
 
@@ -131,10 +142,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         list.push({
           eventId: evt.id,
           eventTitle: evt.title,
+          instructor: evt.instructor,
           rating: fb.rating,
-          comment: fb.comment,
+          comment: fb.comment || '',
           userName: fb.userName,
           userEmail: fb.userEmail,
+          courseRatings: fb.courseRatings || {},
+          facilitatorRatings: fb.facilitatorRatings || {},
+          courseScore: fb.courseScore,
+          facilitatorScore: fb.facilitatorScore,
           createdAt: fb.createdAt
         });
       });
@@ -147,6 +163,104 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     const sum = allFeedbacks.reduce((acc, curr) => acc + curr.rating, 0);
     return (sum / allFeedbacks.length).toFixed(1);
   }, [allFeedbacks]);
+
+  // Feedbacks filtrados por curso para el desglose analítico TEC
+  const surveyFilteredFeedbacks = useMemo(() => {
+    if (selectedSurveyEventId === 'all') return allFeedbacks;
+    return allFeedbacks.filter(fb => fb.eventId === selectedSurveyEventId);
+  }, [allFeedbacks, selectedSurveyEventId]);
+
+  // Métricas completas de la Encuesta TEC (Curso vs Facilitador y pregunta por pregunta)
+  const tecSurveyMetrics = useMemo(() => {
+    const list = surveyFilteredFeedbacks;
+    if (list.length === 0) {
+      return {
+        totalResponses: 0,
+        avgComposite: '5.0',
+        avgCourse: '5.0',
+        avgFacilitator: '5.0',
+        excellenceRate: 100,
+        courseQuestionsAvg: {} as Record<string, { avg: number; pct: number }>,
+        facilitatorQuestionsAvg: {} as Record<string, { avg: number; pct: number }>
+      };
+    }
+
+    let sumComposite = 0;
+    let sumCourse = 0;
+    let sumFacilitator = 0;
+    let courseCount = 0;
+    let facilitatorCount = 0;
+    let fiveStarCount = 0;
+
+    const courseSums: Record<string, { sum: number; count: number }> = {};
+    const facilitatorSums: Record<string, { sum: number; count: number }> = {};
+
+    COURSE_QUESTIONS.forEach(q => { courseSums[q.id] = { sum: 0, count: 0 }; });
+    FACILITATOR_QUESTIONS.forEach(q => { facilitatorSums[q.id] = { sum: 0, count: 0 }; });
+
+    list.forEach(fb => {
+      sumComposite += fb.rating;
+      if (fb.rating === 5) fiveStarCount++;
+
+      if (fb.courseScore) {
+        sumCourse += Number(fb.courseScore);
+        courseCount++;
+      } else {
+        sumCourse += fb.rating;
+        courseCount++;
+      }
+
+      if (fb.facilitatorScore) {
+        sumFacilitator += Number(fb.facilitatorScore);
+        facilitatorCount++;
+      } else {
+        sumFacilitator += fb.rating;
+        facilitatorCount++;
+      }
+
+      if (fb.courseRatings) {
+        Object.entries(fb.courseRatings).forEach(([qId, val]) => {
+          if (courseSums[qId] && typeof val === 'number') {
+            courseSums[qId].sum += val;
+            courseSums[qId].count += 1;
+          }
+        });
+      }
+
+      if (fb.facilitatorRatings) {
+        Object.entries(fb.facilitatorRatings).forEach(([qId, val]) => {
+          if (facilitatorSums[qId] && typeof val === 'number') {
+            facilitatorSums[qId].sum += val;
+            facilitatorSums[qId].count += 1;
+          }
+        });
+      }
+    });
+
+    const courseQuestionsAvg: Record<string, { avg: number; pct: number }> = {};
+    COURSE_QUESTIONS.forEach(q => {
+      const item = courseSums[q.id];
+      const avg = item && item.count > 0 ? Number((item.sum / item.count).toFixed(1)) : 5.0;
+      courseQuestionsAvg[q.id] = { avg, pct: Math.round((avg / 5) * 100) };
+    });
+
+    const facilitatorQuestionsAvg: Record<string, { avg: number; pct: number }> = {};
+    FACILITATOR_QUESTIONS.forEach(q => {
+      const item = facilitatorSums[q.id];
+      const avg = item && item.count > 0 ? Number((item.sum / item.count).toFixed(1)) : 5.0;
+      facilitatorQuestionsAvg[q.id] = { avg, pct: Math.round((avg / 5) * 100) };
+    });
+
+    return {
+      totalResponses: list.length,
+      avgComposite: (sumComposite / list.length).toFixed(1),
+      avgCourse: courseCount > 0 ? (sumCourse / courseCount).toFixed(1) : '5.0',
+      avgFacilitator: facilitatorCount > 0 ? (sumFacilitator / facilitatorCount).toFixed(1) : '5.0',
+      excellenceRate: Math.round((fiveStarCount / list.length) * 100),
+      courseQuestionsAvg,
+      facilitatorQuestionsAvg
+    };
+  }, [surveyFilteredFeedbacks]);
 
   // 4. Métricas por Categoría
   const categoryStats = useMemo(() => {
@@ -882,10 +996,225 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       )}
 
       {/* ==========================================
-          TAB 3: DESEMPEÑO DOCENTE & ENCUESTAS
+          TAB 3: DESEMPEÑO DOCENTE & ENCUESTAS TEC
           ========================================== */}
       {activeTab === 'instructors' && (
         <div className="space-y-8 animate-in fade-in duration-300">
+          
+          {/* Header & Course Filter Bar */}
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-bold text-[#DA291C] mb-1">
+                <Sparkles className="w-4 h-4 text-[#DA291C]" />
+                <span>Encuesta de Evaluación de Curso y Facilitador - TEC</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                Métricas de Calidad y Satisfacción TEC
+              </h2>
+              <p className="text-xs text-slate-500 mt-1 max-w-2xl">
+                {TEC_SURVEY_INFO.intro}
+              </p>
+            </div>
+
+            {/* Filter controls */}
+            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+              <select
+                value={selectedSurveyEventId}
+                onChange={(e) => setSelectedSurveyEventId(e.target.value)}
+                className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-800 focus:outline-none focus:border-[#DA291C] cursor-pointer"
+              >
+                <option value="all">Todos los Cursos ({events.length})</option>
+                {events.map(evt => (
+                  <option key={evt.id} value={evt.id}>
+                    {evt.title} ({evt.feedbacks?.length || 0} evals)
+                  </option>
+                ))}
+              </select>
+
+              <button
+                type="button"
+                onClick={() => exportInstructorsAndFeedbackReportToExcel(events)}
+                className="px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-2xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Exportar Excel</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Top 4 KPI Metric Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            
+            {/* KPI 1: Promedio General TEC */}
+            <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Índice Global TEC</span>
+                <div className="p-2 rounded-xl bg-amber-50 text-amber-700">
+                  <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
+                </div>
+              </div>
+              <div className="mt-4">
+                <p className="text-3xl font-black text-slate-900 leading-none">
+                  {tecSurveyMetrics.avgComposite} <span className="text-sm font-semibold text-slate-400">/ 5.0</span>
+                </p>
+                <p className="text-[11px] text-slate-500 font-medium mt-1">
+                  {tecSurveyMetrics.totalResponses} evaluaciones recibidas
+                </p>
+              </div>
+            </div>
+
+            {/* KPI 2: Evaluación Contenido del Curso */}
+            <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Evaluación Curso</span>
+                <div className="p-2 rounded-xl bg-red-50 text-[#DA291C]">
+                  <BookOpen className="w-4 h-4 text-[#DA291C]" />
+                </div>
+              </div>
+              <div className="mt-4">
+                <p className="text-3xl font-black text-[#DA291C] leading-none">
+                  {tecSurveyMetrics.avgCourse} <span className="text-sm font-semibold text-slate-400">/ 5.0</span>
+                </p>
+                <p className="text-[11px] text-slate-500 font-medium mt-1">
+                  8 dimensiones pedagógicas evaluadas
+                </p>
+              </div>
+            </div>
+
+            {/* KPI 3: Evaluación del Facilitador */}
+            <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Evaluación Facilitador</span>
+                <div className="p-2 rounded-xl bg-amber-50 text-amber-800">
+                  <Award className="w-4 h-4 text-amber-600" />
+                </div>
+              </div>
+              <div className="mt-4">
+                <p className="text-3xl font-black text-amber-700 leading-none">
+                  {tecSurveyMetrics.avgFacilitator} <span className="text-sm font-semibold text-slate-400">/ 5.0</span>
+                </p>
+                <p className="text-[11px] text-slate-500 font-medium mt-1">
+                  7 competencias docentes evaluadas
+                </p>
+              </div>
+            </div>
+
+            {/* KPI 4: Tasa de Excelencia */}
+            <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Tasa de Excelencia</span>
+                <div className="p-2 rounded-xl bg-emerald-50 text-emerald-700">
+                  <CheckCircle2 className="w-4 h-4" />
+                </div>
+              </div>
+              <div className="mt-4">
+                <p className="text-3xl font-black text-emerald-700 leading-none">
+                  {tecSurveyMetrics.excellenceRate}%
+                </p>
+                <p className="text-[11px] text-slate-500 font-medium mt-1">
+                  Calificaciones de 5 estrellas
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Desglose Pregunta por Pregunta: Curso vs Facilitador */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            {/* PARTE 1: CURSO */}
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-xl bg-red-50 text-[#DA291C]">
+                    <BookOpen className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-slate-900">Parte 1: Evaluación del Curso</h3>
+                    <p className="text-[11px] text-slate-500 font-medium">8 preguntas de contenidos, recursos y aplicación</p>
+                  </div>
+                </div>
+                <span className="px-3 py-1 rounded-xl bg-red-50 text-[#DA291C] border border-red-200 text-xs font-black">
+                  {tecSurveyMetrics.avgCourse} ★
+                </span>
+              </div>
+
+              <div className="space-y-4">
+                {COURSE_QUESTIONS.map((q, idx) => {
+                  const data = tecSurveyMetrics.courseQuestionsAvg[q.id] || { avg: 5.0, pct: 100 };
+                  return (
+                    <div key={q.id} className="space-y-1.5 p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                      <div className="flex items-start justify-between gap-3 text-xs">
+                        <span className="font-bold text-slate-800 leading-snug">
+                          <span className="text-[#DA291C] font-black mr-1">{idx + 1}.</span>
+                          {q.shortLabel}
+                        </span>
+                        <span className="font-black text-slate-900 shrink-0">
+                          {data.avg.toFixed(1)} <span className="text-[10px] text-slate-400 font-normal">/ 5.0</span>
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 line-clamp-1 italic">
+                        "{q.question}"
+                      </p>
+                      <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-red-500 to-[#DA291C] rounded-full transition-all duration-500"
+                          style={{ width: `${data.pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* PARTE 2: FACILITADOR */}
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-xl bg-amber-50 text-amber-700">
+                    <Award className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-slate-900">Parte 2: Evaluación del Facilitador</h3>
+                    <p className="text-[11px] text-slate-500 font-medium">7 preguntas de metodología, dominio y claridad</p>
+                  </div>
+                </div>
+                <span className="px-3 py-1 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 text-xs font-black">
+                  {tecSurveyMetrics.avgFacilitator} ★
+                </span>
+              </div>
+
+              <div className="space-y-4">
+                {FACILITATOR_QUESTIONS.map((q, idx) => {
+                  const data = tecSurveyMetrics.facilitatorQuestionsAvg[q.id] || { avg: 5.0, pct: 100 };
+                  return (
+                    <div key={q.id} className="space-y-1.5 p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                      <div className="flex items-start justify-between gap-3 text-xs">
+                        <span className="font-bold text-slate-800 leading-snug">
+                          <span className="text-amber-600 font-black mr-1">{idx + 1}.</span>
+                          {q.shortLabel}
+                        </span>
+                        <span className="font-black text-slate-900 shrink-0">
+                          {data.avg.toFixed(1)} <span className="text-[10px] text-slate-400 font-normal">/ 5.0</span>
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 line-clamp-1 italic">
+                        "{q.question}"
+                      </p>
+                      <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-amber-400 to-amber-600 rounded-full transition-all duration-500"
+                          style={{ width: `${data.pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+          </div>
           
           {/* Facilitators Table */}
           <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
@@ -946,38 +1275,58 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </div>
 
-          {/* Feedback Stream */}
-          {allFeedbacks.length > 0 && (
+          {/* Enriched Feedback Stream */}
+          {surveyFilteredFeedbacks.length > 0 && (
             <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-[#DA291C]" />
-                  Muro de Comentarios y Evaluaciones Recibidas
+                  Muro de Comentarios y Evaluaciones TEC
                 </h3>
-                <span className="text-xs text-slate-500 font-medium">{allFeedbacks.length} opiniones</span>
+                <span className="text-xs text-slate-500 font-medium">
+                  {surveyFilteredFeedbacks.length} opiniones registradas
+                </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {allFeedbacks.map((fb, idx) => (
-                  <div key={idx} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5 flex flex-col justify-between">
+                {surveyFilteredFeedbacks.map((fb, idx) => (
+                  <div key={idx} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 flex flex-col justify-between hover:border-slate-300 transition-colors">
                     <div>
-                      <div className="flex items-center justify-between gap-2 mb-1.5">
-                        <span className="text-xs font-bold text-slate-900 line-clamp-1">{fb.eventTitle}</span>
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div>
+                          <span className="text-xs font-bold text-slate-900 line-clamp-1">{fb.eventTitle}</span>
+                          <span className="text-[10px] text-slate-500 block">Facilitador: {fb.instructor}</span>
+                        </div>
                         <div className="flex items-center gap-0.5 text-amber-500 shrink-0">
-                          {Array.from({ length: fb.rating }).map((_, sIdx) => (
+                          {Array.from({ length: Math.min(5, Math.max(1, Math.round(fb.rating))) }).map((_, sIdx) => (
                             <Star key={sIdx} className="w-3 h-3 fill-amber-500" />
                           ))}
                         </div>
                       </div>
+
+                      {/* Subscores badges */}
+                      <div className="flex items-center gap-1.5 flex-wrap mb-2">
+                        {fb.courseScore && (
+                          <span className="px-2 py-0.5 rounded-lg bg-red-50 text-[#DA291C] border border-red-200 text-[10px] font-black">
+                            Curso: {Number(fb.courseScore).toFixed(1)}★
+                          </span>
+                        )}
+                        {fb.facilitatorScore && (
+                          <span className="px-2 py-0.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-black">
+                            Facilitador: {Number(fb.facilitatorScore).toFixed(1)}★
+                          </span>
+                        )}
+                      </div>
+
                       {fb.comment ? (
                         <p className="text-xs text-slate-700 italic leading-relaxed">"{fb.comment}"</p>
                       ) : (
-                        <p className="text-[11px] text-slate-400 italic">Sin comentario escrito.</p>
+                        <p className="text-[11px] text-slate-400 italic">Evaluación cuantitativa sin comentario adicional.</p>
                       )}
                     </div>
                     
-                    <div className="flex items-center justify-between text-[10px] text-slate-500 pt-2 border-t border-slate-200">
-                      <span>{fb.userName || fb.userEmail}</span>
+                    <div className="flex items-center justify-between text-[10px] text-slate-500 pt-2 border-t border-slate-200/80">
+                      <span className="font-semibold">{fb.userName || fb.userEmail}</span>
                       <span>{fb.createdAt}</span>
                     </div>
                   </div>

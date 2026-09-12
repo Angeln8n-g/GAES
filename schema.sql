@@ -55,7 +55,15 @@ CREATE TABLE events (
     custom_message TEXT,
     modality VARCHAR(100) DEFAULT 'Presencial',
     location VARCHAR(255) DEFAULT 'Instalaciones',
-    survey_url VARCHAR(500) DEFAULT NULL
+    survey_url VARCHAR(500) DEFAULT NULL,
+    company_id VARCHAR(100) DEFAULT 'emp_kasino',
+    evaluation_type VARCHAR(50) DEFAULT 'attendance_only',
+    passing_score NUMERIC(5, 2) DEFAULT 70.00,
+    skills_evaluated TEXT[] DEFAULT '{}',
+    ojt_evaluator_id VARCHAR(100),
+    ojt_evaluator_name VARCHAR(255),
+    ojt_evaluator_email VARCHAR(255),
+    modules JSONB DEFAULT '[]'
 );
 
 -- 4. Tabla de Fechas del Evento (Schedules)
@@ -116,6 +124,10 @@ CREATE TABLE event_feedbacks (
     user_name VARCHAR(255),
     rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
     comment TEXT,
+    course_ratings JSONB DEFAULT '{}',
+    facilitator_ratings JSONB DEFAULT '{}',
+    course_score NUMERIC(5,2),
+    facilitator_score NUMERIC(5,2),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -100,9 +100,15 @@ export async function fetchFullEvents(companyId?: string) {
       [evt.id]
     );
 
-    // 6. Feedbacks / Evaluaciones de satisfacción
+    // 6. Feedbacks / Evaluaciones de satisfacción (Encuesta TEC)
     const feedbacksResult = await pool.query(
-      `SELECT id, event_id as "eventId", user_email as "userEmail", user_name as "userName", rating, comment, to_char(created_at, 'YYYY-MM-DD HH12:MI AM') as "createdAt"
+      `SELECT id, event_id as "eventId", user_email as "userEmail", user_name as "userName", 
+              rating, comment, 
+              COALESCE(course_ratings, '{}') as "courseRatings",
+              COALESCE(facilitator_ratings, '{}') as "facilitatorRatings",
+              course_score as "courseScore",
+              facilitator_score as "facilitatorScore",
+              to_char(created_at, 'YYYY-MM-DD HH12:MI AM') as "createdAt"
        FROM event_feedbacks WHERE event_id = $1 ORDER BY created_at DESC`,
       [evt.id]
     );
@@ -151,6 +157,7 @@ export async function fetchFullEvents(companyId?: string) {
       ojtEvaluatorId: evt.ojt_evaluator_id || null,
       ojtEvaluatorName: evt.ojt_evaluator_name || null,
       ojtEvaluatorEmail: evt.ojt_evaluator_email || null,
+      modules: Array.isArray(evt.modules) ? evt.modules : [],
       notificationSettings: {
         sendEmail: evt.send_email,
         sendTeams: evt.send_teams,
@@ -191,9 +198,9 @@ eventsRouter.post('/', async (req: Request, res: Response) => {
         id, title, description, category, instructor, image_url, status, 
         send_email, send_teams, custom_message, modality, location, survey_url, 
         company_id, evaluation_type, passing_score, skills_evaluated,
-        ojt_evaluator_id, ojt_evaluator_name, ojt_evaluator_email
+        ojt_evaluator_id, ojt_evaluator_name, ojt_evaluator_email, modules
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
       ON CONFLICT (id) DO UPDATE SET
         title = EXCLUDED.title,
         description = EXCLUDED.description,
@@ -213,7 +220,8 @@ eventsRouter.post('/', async (req: Request, res: Response) => {
         skills_evaluated = EXCLUDED.skills_evaluated,
         ojt_evaluator_id = EXCLUDED.ojt_evaluator_id,
         ojt_evaluator_name = EXCLUDED.ojt_evaluator_name,
-        ojt_evaluator_email = EXCLUDED.ojt_evaluator_email`,
+        ojt_evaluator_email = EXCLUDED.ojt_evaluator_email,
+        modules = EXCLUDED.modules`,
       [
         event.id,
         event.title,
@@ -234,7 +242,8 @@ eventsRouter.post('/', async (req: Request, res: Response) => {
         Array.isArray(event.skillsEvaluated) ? event.skillsEvaluated : [],
         event.ojtEvaluatorId || null,
         event.ojtEvaluatorName || null,
-        event.ojtEvaluatorEmail || null
+        event.ojtEvaluatorEmail || null,
+        JSON.stringify(Array.isArray(event.modules) ? event.modules : [])
       ]
     );
 

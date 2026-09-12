@@ -72,8 +72,14 @@ async function fetchFullEvents(companyId) {
         // 5. Historial de Notificaciones
         const notifsResult = await db_js_1.pool.query(`SELECT to_char(date, 'YYYY-MM-DD HH12:MI AM') as date, channel, status, recipients 
        FROM notification_logs WHERE event_id = $1 ORDER BY date DESC`, [evt.id]);
-        // 6. Feedbacks / Evaluaciones de satisfacción
-        const feedbacksResult = await db_js_1.pool.query(`SELECT id, event_id as "eventId", user_email as "userEmail", user_name as "userName", rating, comment, to_char(created_at, 'YYYY-MM-DD HH12:MI AM') as "createdAt"
+        // 6. Feedbacks / Evaluaciones de satisfacción (Encuesta TEC)
+        const feedbacksResult = await db_js_1.pool.query(`SELECT id, event_id as "eventId", user_email as "userEmail", user_name as "userName", 
+              rating, comment, 
+              COALESCE(course_ratings, '{}') as "courseRatings",
+              COALESCE(facilitator_ratings, '{}') as "facilitatorRatings",
+              course_score as "courseScore",
+              facilitator_score as "facilitatorScore",
+              to_char(created_at, 'YYYY-MM-DD HH12:MI AM') as "createdAt"
        FROM event_feedbacks WHERE event_id = $1 ORDER BY created_at DESC`, [evt.id]);
         // 7. Calificaciones y Desempeño Académico
         const gradesResult = await db_js_1.pool.query(`SELECT 
@@ -112,6 +118,10 @@ async function fetchFullEvents(companyId) {
             evaluationType: evt.evaluation_type || 'attendance_only',
             passingScore: evt.passing_score !== null && evt.passing_score !== undefined ? Number(evt.passing_score) : 70,
             skillsEvaluated: evt.skills_evaluated || [],
+            ojtEvaluatorId: evt.ojt_evaluator_id || null,
+            ojtEvaluatorName: evt.ojt_evaluator_name || null,
+            ojtEvaluatorEmail: evt.ojt_evaluator_email || null,
+            modules: Array.isArray(evt.modules) ? evt.modules : [],
             notificationSettings: {
                 sendEmail: evt.send_email,
                 sendTeams: evt.send_teams,
@@ -147,9 +157,10 @@ exports.eventsRouter.post('/', async (req, res) => {
         await client.query(`INSERT INTO events (
         id, title, description, category, instructor, image_url, status, 
         send_email, send_teams, custom_message, modality, location, survey_url, 
-        company_id, evaluation_type, passing_score, skills_evaluated
+        company_id, evaluation_type, passing_score, skills_evaluated,
+        ojt_evaluator_id, ojt_evaluator_name, ojt_evaluator_email, modules
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
       ON CONFLICT (id) DO UPDATE SET
         title = EXCLUDED.title,
         description = EXCLUDED.description,
@@ -166,7 +177,11 @@ exports.eventsRouter.post('/', async (req, res) => {
         company_id = EXCLUDED.company_id,
         evaluation_type = EXCLUDED.evaluation_type,
         passing_score = EXCLUDED.passing_score,
-        skills_evaluated = EXCLUDED.skills_evaluated`, [
+        skills_evaluated = EXCLUDED.skills_evaluated,
+        ojt_evaluator_id = EXCLUDED.ojt_evaluator_id,
+        ojt_evaluator_name = EXCLUDED.ojt_evaluator_name,
+        ojt_evaluator_email = EXCLUDED.ojt_evaluator_email,
+        modules = EXCLUDED.modules`, [
             event.id,
             event.title,
             event.description,
@@ -183,7 +198,11 @@ exports.eventsRouter.post('/', async (req, res) => {
             event.companyId || 'emp_kasino',
             event.evaluationType || 'attendance_only',
             event.passingScore !== undefined && event.passingScore !== null ? Number(event.passingScore) : 70,
-            Array.isArray(event.skillsEvaluated) ? event.skillsEvaluated : []
+            Array.isArray(event.skillsEvaluated) ? event.skillsEvaluated : [],
+            event.ojtEvaluatorId || null,
+            event.ojtEvaluatorName || null,
+            event.ojtEvaluatorEmail || null,
+            JSON.stringify(Array.isArray(event.modules) ? event.modules : [])
         ]);
         // 2. Insertar Schedules y Slots
         for (const sch of event.schedule || []) {

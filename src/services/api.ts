@@ -151,6 +151,11 @@ export const MOCK_EVENTS: TrainingEvent[] = [
     ojtEvaluatorId: "usr_ojt",
     ojtEvaluatorName: "Lic. Carlos Mendoza (Tutor OJT)",
     ojtEvaluatorEmail: "tutor.ojt@empresa.com",
+    modules: [
+      { id: "mod_1", title: "Módulo 1: Fundamentos y Arquitectura UI", description: "Hooks avanzados, ciclo de vida y patrones de renderizado.", passingScore: 70, maxScore: 100, orderIndex: 1 },
+      { id: "mod_2", title: "Módulo 2: Optimización de Rendimiento y UX", description: "Profiling, bundle splitting y estándares de experiencia.", passingScore: 75, maxScore: 100, orderIndex: 2 },
+      { id: "mod_3", title: "Módulo 3: Práctica de Campo y Evaluación Operativa", description: "Implementación práctica en puesto de trabajo y simulación real.", passingScore: 80, maxScore: 100, orderIndex: 3 }
+    ],
     notificationSettings: {
       sendEmail: true,
       sendTeams: true,
@@ -896,6 +901,44 @@ export const apiService = {
     }
   },
 
+  async revertAttendance(eventId: string, date: string, time: string, participantEmail: string): Promise<TrainingEvent[]> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/attendance/revert`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventId, date, time, email: participantEmail })
+      });
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.message || 'Error al revertir asistencia en Postgres');
+      }
+      return this.getEvents();
+    } else {
+      const events: TrainingEvent[] = JSON.parse(localStorage.getItem('ch_events') || '[]');
+      const updated = events.map(evt => {
+        if (evt.id === eventId) {
+          const updatedSchedule = evt.schedule.map(sch => {
+            if (sch.date === date) {
+              const updatedSlots = sch.slots.map(sl => {
+                if (sl.time === time) {
+                  const attendedList = (sl.attendedList || []).filter(e => e.toLowerCase() !== participantEmail.toLowerCase());
+                  return { ...sl, attendedList };
+                }
+                return sl;
+              });
+              return { ...sch, slots: updatedSlots };
+            }
+            return sch;
+          });
+          return { ...evt, schedule: updatedSchedule };
+        }
+        return evt;
+      });
+      localStorage.setItem('ch_events', JSON.stringify(updated));
+      return updated;
+    }
+  },
+
   // --- MÉTODOS DE FEEDBACK / CALIFICACIÓN ---
   async submitFeedback(feedback: EventFeedback): Promise<TrainingEvent[]> {
     if (isApiMode) {
@@ -911,9 +954,17 @@ export const apiService = {
       const updated = events.map(evt => {
         if (evt.id === feedback.eventId) {
           const existingFeedbacks = evt.feedbacks || [];
+          const matchIdx = existingFeedbacks.findIndex(f => f.userEmail.toLowerCase() === feedback.userEmail.toLowerCase());
+          let newFeedbacks;
+          if (matchIdx >= 0) {
+            newFeedbacks = [...existingFeedbacks];
+            newFeedbacks[matchIdx] = { ...existingFeedbacks[matchIdx], ...feedback };
+          } else {
+            newFeedbacks = [...existingFeedbacks, { ...feedback, id: `fb_${Date.now()}` }];
+          }
           return {
             ...evt,
-            feedbacks: [...existingFeedbacks, { ...feedback, id: `fb_${Date.now()}` }]
+            feedbacks: newFeedbacks
           };
         }
         return evt;

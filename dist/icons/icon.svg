@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="pwaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EA382D" />
+      <stop offset="50%" stop-color="#DA291C" />
+      <stop offset="100%" stop-color="#B91C1C" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#DA291C" flood-opacity="0.35" />
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#pwaGrad)" filter="url(#shadow)" />
+  <!-- Book / Graduation Icon -->
+  <g transform="translate(106, 116) scale(1.2)" fill="none" stroke="#FFFFFF" stroke-width="20" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 195v-135a30 30 0 0 1 30 -30h80a40 40 0 0 1 40 40v135a30 30 0 0 0 -30 -30h-90a30 30 0 0 0 -30 20z" fill="#FFFFFF" fill-opacity="0.15" />
+    <path d="M244 195v-135a30 30 0 0 0 -30 -30h-80a40 40 0 0 0 -40 40v135a30 30 0 0 1 30 -30h90a30 30 0 0 1 30 20z" fill="#FFFFFF" fill-opacity="0.15" />
+    <path d="M124 20v-20" />
+    <circle cx="124" cy="5" r="4" fill="#FFFFFF" />
+  </g>
+</svg>

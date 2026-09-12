@@ -19,9 +19,11 @@ import {
   Target,
   ShieldAlert,
   GraduationCap,
-  UserCheck
+  UserCheck,
+  Layers,
+  ListOrdered
 } from 'lucide-react';
-import { TrainingEvent, Schedule, Slot, EventModality, EventStatus, Company, EvaluationType, UserAccount } from '../../types';
+import { TrainingEvent, Schedule, Slot, EventModality, EventStatus, Company, EvaluationType, UserAccount, EventModule } from '../../types';
 import { formatDateLong } from '../../utils/formatters';
 
 interface EventFormModalProps {
@@ -81,6 +83,14 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
     initialEvent?.skillsEvaluated || []
   );
   const [newSkillInput, setNewSkillInput] = useState('');
+
+  // Estructura de Módulos de la Capacitación
+  const [enableModules, setEnableModules] = useState<boolean>(
+    Boolean(initialEvent?.modules && initialEvent.modules.length > 0)
+  );
+  const [modules, setModules] = useState<EventModule[]>(
+    initialEvent?.modules || []
+  );
 
   // Notificaciones
   const [sendEmail, setSendEmail] = useState(initialEvent?.notificationSettings?.sendEmail ?? true);
@@ -175,6 +185,47 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
     setSkillsEvaluated(prev => prev.filter(s => s !== skillToRemove));
   };
 
+  const handleAddModule = (customTitle?: string) => {
+    const nextIdx = modules.length + 1;
+    const newMod: EventModule = {
+      id: `mod_${Date.now()}_${nextIdx}`,
+      title: customTitle || `Módulo ${nextIdx}: `,
+      description: '',
+      passingScore: passingScore || 70,
+      maxScore: 100,
+      orderIndex: nextIdx
+    };
+    setModules(prev => [...prev, newMod]);
+    setEnableModules(true);
+  };
+
+  const handleApplyModulePreset = (count: number) => {
+    const newMods: EventModule[] = [];
+    for (let i = 1; i <= count; i++) {
+      newMods.push({
+        id: `mod_${Date.now()}_${i}`,
+        title: `Módulo ${i}: `,
+        description: '',
+        passingScore: passingScore || 70,
+        maxScore: 100,
+        orderIndex: i
+      });
+    }
+    setModules(newMods);
+    setEnableModules(true);
+  };
+
+  const handleUpdateModule = (id: string, field: keyof EventModule, val: any) => {
+    setModules(prev => prev.map(m => m.id === id ? { ...m, [field]: val } : m));
+  };
+
+  const handleRemoveModule = (id: string) => {
+    setModules(prev => {
+      const filtered = prev.filter(m => m.id !== id);
+      return filtered.map((m, idx) => ({ ...m, orderIndex: idx + 1 }));
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -209,6 +260,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
       evaluationType,
       passingScore: evaluationType === 'attendance_only' ? undefined : Number(passingScore),
       skillsEvaluated,
+      modules: enableModules ? modules.filter(m => m.title.trim().length > 0) : [],
       notificationSettings: {
         sendEmail,
         sendTeams,
@@ -598,10 +650,185 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
             )}
           </div>
 
-          {/* 3. Schedule & Slot Builder */}
+          {/* 3. Módulos de la Capacitación (Evaluación Continua) */}
+          <div className="space-y-4 pt-4 border-t border-slate-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xs font-black text-[#DA291C] uppercase tracking-wider flex items-center gap-1.5">
+                  <Layers className="w-4 h-4 text-[#DA291C]" />
+                  3. Estructura de Módulos & Calificación Continua
+                </h3>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Divide el evento en etapas o módulos para que el tutor OJT asiente calificaciones progresivas.
+                </p>
+              </div>
+
+              <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer select-none bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 hover:border-slate-300 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={enableModules}
+                  onChange={(e) => {
+                    setEnableModules(e.target.checked);
+                    if (e.target.checked && modules.length === 0) {
+                      handleApplyModulePreset(2);
+                    }
+                  }}
+                  className="rounded border-slate-300 text-[#DA291C] focus:ring-0 cursor-pointer"
+                />
+                <span>Habilitar Módulos</span>
+              </label>
+            </div>
+
+            {enableModules && (
+              <div className="space-y-3.5 bg-slate-50/70 border border-slate-200 p-4 rounded-2xl">
+                {/* Information Callout */}
+                <div className="p-3 bg-red-50/60 rounded-xl border border-red-200/80 text-[11px] text-slate-700 flex items-start gap-2">
+                  <Target className="w-4 h-4 text-[#DA291C] shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-[#DA291C]">Evaluación Modular: </span>
+                    El evaluador podrá asentar notas módulo a módulo según avancen los colaboradores. Cada módulo tiene peso equitativo y la nota final del curso será el promedio de los módulos completados.
+                  </div>
+                </div>
+
+                {/* Preset Buttons */}
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-1">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[10px] text-slate-400 font-bold">Plantillas rápidas:</span>
+                    <button
+                      type="button"
+                      onClick={() => handleApplyModulePreset(2)}
+                      className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-red-300 text-slate-700 hover:text-[#DA291C] text-[11px] font-bold shadow-2xs transition-colors cursor-pointer"
+                    >
+                      2 Módulos
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleApplyModulePreset(3)}
+                      className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-red-300 text-slate-700 hover:text-[#DA291C] text-[11px] font-bold shadow-2xs transition-colors cursor-pointer"
+                    >
+                      3 Módulos
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleApplyModulePreset(4)}
+                      className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-red-300 text-slate-700 hover:text-[#DA291C] text-[11px] font-bold shadow-2xs transition-colors cursor-pointer"
+                    >
+                      4 Módulos
+                    </button>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleAddModule()}
+                    className="px-3 py-1.5 rounded-xl bg-white hover:bg-red-50 text-[#DA291C] border border-red-200 text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Agregar Módulo</span>
+                  </button>
+                </div>
+
+                {/* Modules Cards List */}
+                {modules.length > 0 ? (
+                  <div className="space-y-3">
+                    {modules.map((mod, idx) => (
+                      <div
+                        key={mod.id}
+                        className="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-xs space-y-3 relative hover:border-slate-300 transition-colors"
+                      >
+                        {/* Module Header Bar */}
+                        <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-lg bg-[#DA291C] text-white text-[10px] font-black flex items-center justify-center">
+                              {idx + 1}
+                            </span>
+                            <span className="text-xs font-bold text-slate-800">
+                              Módulo {idx + 1}
+                            </span>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveModule(mod.id)}
+                            className="p-1 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer rounded-lg hover:bg-slate-50"
+                            title="Eliminar módulo"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        {/* Title and Scoring Inputs */}
+                        <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                          <div className="sm:col-span-6">
+                            <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                              Nombre del Módulo *
+                            </label>
+                            <input
+                              type="text"
+                              value={mod.title}
+                              onChange={(e) => handleUpdateModule(mod.id, 'title', e.target.value)}
+                              placeholder={`ej. Módulo ${idx + 1}: Fundamentos y Procedimientos`}
+                              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 font-medium focus:outline-none focus:border-[#DA291C]"
+                              required
+                            />
+                          </div>
+
+                          <div className="sm:col-span-3">
+                            <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                              Nota Mínima (pts) *
+                            </label>
+                            <input
+                              type="number"
+                              min={0}
+                              max={mod.maxScore || 100}
+                              value={mod.passingScore ?? 70}
+                              onChange={(e) => handleUpdateModule(mod.id, 'passingScore', Number(e.target.value))}
+                              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold text-center focus:outline-none focus:border-[#DA291C]"
+                              required
+                            />
+                          </div>
+
+                          <div className="sm:col-span-3">
+                            <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                              Puntaje Máximo *
+                            </label>
+                            <input
+                              type="number"
+                              min={1}
+                              max={1000}
+                              value={mod.maxScore ?? 100}
+                              onChange={(e) => handleUpdateModule(mod.id, 'maxScore', Number(e.target.value))}
+                              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold text-center focus:outline-none focus:border-[#DA291C]"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        {/* Optional Description */}
+                        <div>
+                          <input
+                            type="text"
+                            value={mod.description || ''}
+                            onChange={(e) => handleUpdateModule(mod.id, 'description', e.target.value)}
+                            placeholder="Descripción u objetivos del módulo (opcional)..."
+                            className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-6 text-slate-400 text-xs bg-white rounded-2xl border border-dashed border-slate-300">
+                    No has agregado módulos aún. Haz clic en "Agregar Módulo" o selecciona una plantilla rápida.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* 4. Schedule & Slot Builder */}
           <div className="space-y-4 pt-4 border-t border-slate-200">
             <h3 className="text-xs font-black text-[#DA291C] uppercase tracking-wider">
-              3. Fechas y Horarios (Slots)
+              4. Fechas y Horarios (Slots)
             </h3>
 
             {/* Existing Slots */}
@@ -680,10 +907,10 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
             </div>
           </div>
 
-          {/* 4. Notification Settings */}
+          {/* 5. Notification Settings */}
           <div className="space-y-3 pt-4 border-t border-slate-200">
             <h3 className="text-xs font-black text-[#DA291C] uppercase tracking-wider">
-              4. Configuración de Recordatorios Automáticos
+              5. Configuración de Recordatorios Automáticos
             </h3>
             
             <div className="flex items-center gap-6">

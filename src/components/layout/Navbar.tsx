@@ -17,7 +17,9 @@ import {
   ChevronRight, 
   Activity, 
   Sparkles,
-  KeyRound
+  KeyRound,
+  GraduationCap,
+  Camera
 } from 'lucide-react';
 import { UserAccount, TabView, Company } from '../../types';
 
@@ -30,9 +32,11 @@ interface NavbarProps {
   setCurrentTab: (tab: TabView) => void;
   onLogout: () => void;
   myRegistrationsCount?: number;
+  evaluatorCoursesCount?: number;
   onOpenMobileSidebar?: () => void;
   isSidebarCollapsed?: boolean;
   onOpenChangePassword?: () => void;
+  onOpenQrScanner?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -44,9 +48,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   setCurrentTab,
   onLogout,
   myRegistrationsCount = 0,
+  evaluatorCoursesCount = 0,
   onOpenMobileSidebar,
   isSidebarCollapsed = false,
-  onOpenChangePassword
+  onOpenChangePassword,
+  onOpenQrScanner
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -57,6 +63,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const isAdminOrSuper = isSuperAdmin || currentUser.role === 'Administrador / Editor';
   const isLeaderOrAdmin = isAdminOrSuper || currentUser.role === 'Líder de Área / Supervisor';
   const canAccessOjt = isSuperAdmin || isOjtUser;
+  const canAccessEvaluatorCourses = isSuperAdmin || isOjtUser;
 
   const handleNavClick = (tab: TabView) => {
     setCurrentTab(tab);
@@ -105,6 +112,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       case 'my-registrations': return 'Mis Cursos & Rutas';
       case 'team': return 'Mi Equipo de Trabajo';
       case 'ojt': return 'Bitácoras & Mesas de Calibración';
+      case 'evaluator-courses': return 'Cursos Asignados (Evaluación OJT)';
       case 'dashboard': return 'Dashboard & Métricas';
       case 'admin': return 'Panel de Administración';
       default: return 'Portal de Formación';
@@ -270,6 +278,29 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               )}
 
+              {canAccessEvaluatorCourses && (
+                <button
+                  onClick={() => handleNavClick('evaluator-courses')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all relative whitespace-nowrap shrink-0 ${
+                    currentTab === 'evaluator-courses'
+                      ? 'bg-gradient-to-r from-[#DA291C] to-[#E02418] text-white shadow-md shadow-red-500/25 font-bold scale-[1.02]'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white font-semibold'
+                  }`}
+                >
+                  <GraduationCap className="w-4 h-4" />
+                  <span>Cursos Asignados</span>
+                  {evaluatorCoursesCount > 0 && (
+                    <span className={`ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-black ${
+                      currentTab === 'evaluator-courses'
+                        ? 'bg-white text-[#DA291C]'
+                        : 'bg-[#DA291C] text-white'
+                    }`}>
+                      {evaluatorCoursesCount}
+                    </span>
+                  )}
+                </button>
+              )}
+
               {isAdminOrSuper && (
                 <button
                   onClick={() => handleNavClick('dashboard')}
@@ -344,6 +375,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
               </div>
             </div>
+
+            {/* Quick QR Scanner Button (Desktop) */}
+            {onOpenQrScanner && (
+              <button
+                onClick={onOpenQrScanner}
+                title="Escanear QR de Asistencia"
+                className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-red-50 hover:bg-[#DA291C] text-[#DA291C] hover:text-white border border-red-200 hover:border-[#DA291C] text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
+              >
+                <Camera className="w-4 h-4" />
+                <span className="hidden xl:inline">Escanear QR</span>
+              </button>
+            )}
 
             {/* Change Password Button (Desktop) */}
             {onOpenChangePassword && (
@@ -450,6 +493,22 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Navigation Links in Mobile Drawer */}
           <div className="space-y-2">
+            {onOpenQrScanner && (
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  onOpenQrScanner();
+                }}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all bg-red-50 text-[#DA291C] hover:bg-red-100 border border-red-200"
+              >
+                <div className="flex items-center gap-3">
+                  <Camera className="w-4 h-4 text-[#DA291C]" />
+                  <span className="font-extrabold">Escanear QR de Asistencia</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-[#DA291C]" />
+              </button>
+            )}
+
             <button
               onClick={() => handleNavClick('landing')}
               className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
@@ -515,6 +574,30 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <span>Bitácoras OJT & Mesas Calibración</span>
                 </div>
                 <ChevronRight className="w-4 h-4 opacity-70" />
+              </button>
+            )}
+
+            {canAccessEvaluatorCourses && (
+              <button
+                onClick={() => handleNavClick('evaluator-courses')}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
+                  currentTab === 'evaluator-courses'
+                    ? 'bg-gradient-to-r from-[#DA291C] to-red-600 text-white shadow-md shadow-red-500/25'
+                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200/60'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <GraduationCap className="w-4 h-4" />
+                  <span>Cursos Asignados (Evaluación OJT)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {evaluatorCoursesCount > 0 && (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-white text-[#DA291C] shadow-xs">
+                      {evaluatorCoursesCount}
+                    </span>
+                  )}
+                  <ChevronRight className="w-4 h-4 opacity-70" />
+                </div>
               </button>
             )}
 

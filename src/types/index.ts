@@ -60,8 +60,12 @@ export interface EventFeedback {
   eventId: string;
   userEmail: string;
   userName?: string;
-  rating: number; // 1 to 5
+  rating: number; // 1 to 5 (promedio general redondeado o ponderado)
   comment?: string;
+  courseRatings?: Record<string, number>;
+  facilitatorRatings?: Record<string, number>;
+  courseScore?: number;
+  facilitatorScore?: number;
   createdAt: string;
 }
 
@@ -87,6 +91,25 @@ export interface Company {
 export type EvaluationType = 'attendance_only' | 'score_100' | 'scale_1_5' | 'pass_fail';
 export type AcademicStatus = 'passed' | 'failed' | 'pending';
 
+export interface EventModule {
+  id: string;
+  title: string;
+  description?: string;
+  passingScore?: number; // Nota mínima para aprobar este módulo (ej: 70)
+  maxScore?: number;     // Puntaje máximo (ej: 100)
+  orderIndex: number;
+}
+
+export interface ParticipantModuleGrade {
+  moduleId: string;
+  moduleName: string;
+  score: number | null;
+  academicStatus: AcademicStatus;
+  feedback?: string;
+  gradedAt?: string;
+  gradedBy?: string;
+}
+
 export interface ParticipantGrade {
   id: string;
   eventId: string;
@@ -110,6 +133,7 @@ export interface ParticipantGrade {
   evaluationType?: EvaluationType;
   passingScore?: number;
   skillsEvaluated?: string[];
+  moduleGrades?: ParticipantModuleGrade[];
 }
 
 export interface TrainingEvent {
@@ -127,6 +151,7 @@ export interface TrainingEvent {
   evaluationType?: EvaluationType;
   passingScore?: number;
   skillsEvaluated?: string[];
+  modules?: EventModule[];
   notificationSettings?: NotificationSettings;
   notificationHistory?: NotificationHistoryItem[];
   schedule: Schedule[];
@@ -174,7 +199,7 @@ export interface ToastNotification {
   type: 'success' | 'error' | 'info' | 'warning';
 }
 
-export type TabView = 'landing' | 'my-registrations' | 'dashboard' | 'admin' | 'attendance' | 'team' | 'ojt';
+export type TabView = 'landing' | 'my-registrations' | 'dashboard' | 'admin' | 'attendance' | 'team' | 'ojt' | 'evaluator-courses';
 
 // ==========================================
 // MÓDULO DE GRUPOS, CRONOGRAMAS Y CUMPLIMIENTO

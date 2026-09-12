@@ -25,11 +25,14 @@ import { DashboardView } from './components/dashboard/DashboardView';
 import { AdminView } from './components/admin/AdminView';
 import { TeamLeadView } from './components/supervisor/TeamLeadView';
 import { OjtManager } from './components/ojt/OjtManager';
+import { EvaluatorCoursesView } from './components/evaluator/EvaluatorCoursesView';
 import { Toast } from './components/common/Toast';
 import { Footer } from './components/common/Footer';
 import { PwaInstallPrompt } from './components/common/PwaInstallPrompt';
 import { OfflineBanner } from './components/common/OfflineBanner';
 import { ChangePasswordModal } from './components/auth/ChangePasswordModal';
+import { TecEvaluationModal } from './components/feedback/TecEvaluationModal';
+import { QrScannerModal } from './components/scanner/QrScannerModal';
 
 export function App() {
   const [companies, setCompanies] = useState<Company[]>(MOCK_COMPANIES);
@@ -72,7 +75,18 @@ export function App() {
   const [programs, setPrograms] = useState<TrainingProgram[]>(MOCK_PROGRAMS);
 
   // Vista actual / Navegación
-  const [currentTab, setCurrentTab] = useState<TabView>('landing');
+  const [currentTab, setCurrentTab] = useState<TabView>(() => {
+    const saved = localStorage.getItem('ch_logged_user');
+    if (saved) {
+      try {
+        const u = JSON.parse(saved);
+        if (u && u.role === 'Evaluador / Tutor OJT') {
+          return 'evaluator-courses';
+        }
+      } catch (e) {}
+    }
+    return 'landing';
+  });
 
   // Parámetros de asistencia QR
   const [attendanceEventId, setAttendanceEventId] = useState<string | null>(null);
@@ -81,6 +95,8 @@ export function App() {
 
   // Modales
   const [selectedEventForModal, setSelectedEventForModal] = useState<TrainingEvent | null>(null);
+  const [selectedEventForTecModal, setSelectedEventForTecModal] = useState<TrainingEvent | null>(null);
+  const [isQrScannerOpen, setIsQrScannerOpen] = useState<boolean>(false);
   const [toast, setToast] = useState<ToastNotification | null>(null);
 
   const showToast = (title: string, message: string, type: 'success' | 'error' | 'info' | 'warning' = 'success') => {
@@ -151,6 +167,9 @@ export function App() {
       setSelectedCompanyId(user.companyId || 'emp_kasino');
     }
     localStorage.setItem('ch_logged_user', JSON.stringify(user));
+    if (user.role === 'Evaluador / Tutor OJT') {
+      setCurrentTab('evaluator-courses');
+    }
     showToast('¡Bienvenido!', `Has iniciado sesión como ${user.name}.`, 'success');
   };
 
@@ -192,6 +211,11 @@ export function App() {
 
   const handleConfirmAttendance = async (eventId: string, date: string, time: string, email: string) => {
     const updated = await apiService.confirmAttendance(eventId, date, time, email);
+    setEvents(updated);
+  };
+
+  const handleRevertAttendance = async (eventId: string, date: string, time: string, email: string) => {
+    const updated = await apiService.revertAttendance(eventId, date, time, email);
     setEvents(updated);
   };
 
@@ -308,14 +332,31 @@ export function App() {
     setCalibrations(updated);
   };
 
-  // Contar inscripciones activas del usuario logueado
+  // Contar inscripciones activas y cursos asignados del usuario logueado
   let myRegistrationsCount = 0;
+  let evaluatorCoursesCount = 0;
   if (currentUser) {
-    events.forEach(e => e.schedule.forEach(s => s.slots.forEach(sl => {
-      if (sl.attendees.map(a => a.toLowerCase()).includes(currentUser.email.toLowerCase())) {
-        myRegistrationsCount++;
+    const userEmail = (currentUser.email || '').toLowerCase();
+    const userName = (currentUser.name || '').toLowerCase();
+    const userId = currentUser.id;
+
+    events.forEach(e => {
+      e.schedule.forEach(s => s.slots.forEach(sl => {
+        if (sl.attendees.map(a => a.toLowerCase()).includes(userEmail)) {
+          myRegistrationsCount++;
+        }
+      }));
+
+      const isOjtAssigned = 
+        (e.ojtEvaluatorId && e.ojtEvaluatorId === userId) ||
+        (e.ojtEvaluatorEmail && e.ojtEvaluatorEmail.toLowerCase() === userEmail) ||
+        (e.ojtEvaluatorName && e.ojtEvaluatorName.toLowerCase() === userName) ||
+        (e.instructor && e.instructor.toLowerCase() === userName);
+
+      if (isOjtAssigned) {
+        evaluatorCoursesCount++;
       }
-    })));
+    });
   }
 
   // Si no está logueado, mostrar pantalla de inicio de sesión
@@ -397,9 +438,11 @@ export function App() {
           setCurrentTab={setCurrentTab}
           onLogout={handleLogout}
           myRegistrationsCount={myRegistrationsCount}
+          evaluatorCoursesCount={evaluatorCoursesCount}
           onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
           isSidebarCollapsed={isSidebarCollapsed}
           onOpenChangePassword={() => setIsChangePasswordModalOpen(true)}
+          onOpenQrScanner={() => setIsQrScannerOpen(true)}
         />
 
         {/* Main Content Area */}
@@ -430,6 +473,8 @@ export function App() {
             onCancelRegistration={handleCancelRegistration}
             onExploreCatalog={() => setCurrentTab('landing')}
             onOpenReservationModal={(event) => setSelectedEventForModal(event)}
+            onOpenQrScanner={() => setIsQrScannerOpen(true)}
+            onOpenTecEvaluation={(event) => setSelectedEventForTecModal(event)}
           />
         )}
 
@@ -481,6 +526,7 @@ export function App() {
             onSaveProgram={handleSaveProgram}
             onDeleteProgram={handleDeleteProgram}
             onConfirmAttendance={handleConfirmAttendance}
+            onRevertAttendance={handleRevertAttendance}
             onSendNotification={handleSendNotification}
             onBulkRegisterUsers={handleBulkRegisterUsers}
             onShowToast={showToast}
@@ -537,6 +583,20 @@ export function App() {
           </div>
         )}
 
+        {/* Tab Evaluator: Cursos Asignados & Calificación Modular (SuperAdmin y Evaluador OJT) */}
+        {currentTab === 'evaluator-courses' && (currentUser.role === 'Super Administrador' || currentUser.role === 'Evaluador / Tutor OJT') && (
+          <EvaluatorCoursesView
+            events={events}
+            participants={participants}
+            currentUser={currentUser}
+            isSuperAdmin={currentUser.role === 'Super Administrador'}
+            onConfirmAttendance={handleConfirmAttendance}
+            onRevertAttendance={handleRevertAttendance}
+            onSaveEvent={handleSaveEvent}
+            onShowToast={showToast}
+          />
+        )}
+
         {/* Tab 6: Check-in de Asistencia Presencial por QR */}
         {currentTab === 'attendance' && attendanceEventId && attendanceDate && attendanceTime && (
           <AttendanceView
@@ -550,6 +610,7 @@ export function App() {
             onSubmitFeedback={handleSubmitFeedback}
             onSaveParticipants={handleSaveParticipants}
             onNavigateHome={() => setCurrentTab('landing')}
+            onOpenTecEvaluation={(event) => setSelectedEventForTecModal(event)}
           />
         )}
 
@@ -586,6 +647,34 @@ export function App() {
             setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
             showToast('Seguridad', message, 'success');
           }}
+        />
+      )}
+
+      {/* TEC Evaluation Modal */}
+      {selectedEventForTecModal && currentUser && (
+        <TecEvaluationModal
+          event={selectedEventForTecModal}
+          currentUser={currentUser}
+          existingFeedback={(selectedEventForTecModal.feedbacks || []).find(
+            fb => fb.userEmail.toLowerCase() === currentUser.email.toLowerCase()
+          )}
+          isOpen={Boolean(selectedEventForTecModal)}
+          onClose={() => setSelectedEventForTecModal(null)}
+          onSubmitFeedback={handleSubmitFeedback}
+          onShowToast={showToast}
+        />
+      )}
+
+      {/* QR Attendance Scanner Modal */}
+      {isQrScannerOpen && currentUser && (
+        <QrScannerModal
+          isOpen={isQrScannerOpen}
+          onClose={() => setIsQrScannerOpen(false)}
+          currentUser={currentUser}
+          events={events}
+          onConfirmAttendance={handleConfirmAttendance}
+          onOpenTecEvaluation={(event) => setSelectedEventForTecModal(event)}
+          onShowToast={showToast}
         />
       )}
 

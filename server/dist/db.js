@@ -150,6 +150,10 @@ const initDbMigrations = async () => {
       ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS evaluation_type VARCHAR(50) DEFAULT 'attendance_only';
       ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS passing_score NUMERIC(5, 2) DEFAULT 70.00;
       ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS skills_evaluated TEXT[] DEFAULT '{}';
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS ojt_evaluator_id VARCHAR(100);
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS ojt_evaluator_name VARCHAR(255);
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS ojt_evaluator_email VARCHAR(255);
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS modules JSONB DEFAULT '[]';
 
       CREATE TABLE IF NOT EXISTS participant_grades (
         id VARCHAR(100) PRIMARY KEY,
@@ -165,15 +169,32 @@ const initDbMigrations = async () => {
         feedback TEXT,
         graded_by VARCHAR(255),
         graded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        module_grades JSONB DEFAULT '[]',
         UNIQUE(event_id, participant_card)
       );
+
+      ALTER TABLE IF EXISTS participant_grades ADD COLUMN IF NOT EXISTS module_grades JSONB DEFAULT '[]';
+
+      -- Columnas para Encuesta de Evaluación TEC (Curso y Facilitador)
+      ALTER TABLE IF EXISTS event_feedbacks ADD COLUMN IF NOT EXISTS course_ratings JSONB DEFAULT '{}';
+      ALTER TABLE IF EXISTS event_feedbacks ADD COLUMN IF NOT EXISTS facilitator_ratings JSONB DEFAULT '{}';
+      ALTER TABLE IF EXISTS event_feedbacks ADD COLUMN IF NOT EXISTS course_score NUMERIC(5, 2);
+      ALTER TABLE IF EXISTS event_feedbacks ADD COLUMN IF NOT EXISTS facilitator_score NUMERIC(5, 2);
 
       -- Actualizar eventos existentes para tener competencias y tipos de evaluación demostrativos
       UPDATE events 
       SET evaluation_type = 'score_100', 
           passing_score = 75.00, 
-          skills_evaluated = ARRAY['Arquitectura y Hooks React', 'Optimización de Rendimiento Frontend', 'Diseño de Interfaces UI/UX']
-      WHERE id = 'evt_1' AND (evaluation_type IS NULL OR evaluation_type = 'attendance_only');
+          skills_evaluated = ARRAY['Arquitectura y Hooks React', 'Optimización de Rendimiento Frontend', 'Diseño de Interfaces UI/UX'],
+          ojt_evaluator_id = 'usr_ojt',
+          ojt_evaluator_name = 'Lic. Carlos Mendoza (Tutor OJT)',
+          ojt_evaluator_email = 'tutor.ojt@empresa.com',
+          modules = '[
+            {"id": "mod_1", "title": "Módulo 1: Fundamentos y Arquitectura UI", "description": "Hooks avanzados, ciclo de vida y patrones de renderizado.", "passingScore": 70, "maxScore": 100, "orderIndex": 1},
+            {"id": "mod_2", "title": "Módulo 2: Optimización de Rendimiento y UX", "description": "Profiling, bundle splitting y estándares de experiencia.", "passingScore": 75, "maxScore": 100, "orderIndex": 2},
+            {"id": "mod_3", "title": "Módulo 3: Práctica de Campo y Evaluación Operativa", "description": "Implementación práctica en puesto de trabajo y simulación real.", "passingScore": 80, "maxScore": 100, "orderIndex": 3}
+          ]'::jsonb
+      WHERE id = 'evt_1';
 
       UPDATE events 
       SET evaluation_type = 'pass_fail', 

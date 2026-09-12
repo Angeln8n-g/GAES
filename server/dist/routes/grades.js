@@ -27,6 +27,7 @@ exports.gradesRouter.get('/', async (req, res) => {
         g.feedback,
         g.graded_by as "gradedBy",
         to_char(g.graded_at, 'YYYY-MM-DD HH12:MI AM') as "gradedAt",
+        COALESCE(g.module_grades, '[]'::jsonb) as "moduleGrades",
         e.title as "eventTitle",
         e.category as "eventCategory",
         COALESCE(e.evaluation_type, 'attendance_only') as "evaluationType",
@@ -66,29 +67,36 @@ exports.gradesRouter.get('/', async (req, res) => {
 exports.gradesRouter.post('/', async (req, res) => {
     const client = await db_js_1.pool.connect();
     try {
-        const { id, eventId, participantCard, slotId, score, academicStatus, detectedSkillGaps, weaknessesNotes, strengthsNotes, needsRetraining, feedback, gradedBy } = req.body;
+        const { id, eventId, participantCard, slotId, score, academicStatus, detectedSkillGaps, weaknessesNotes, strengthsNotes, needsRetraining, feedback, gradedBy, moduleGrades } = req.body;
         if (!eventId || !participantCard) {
             return res.status(400).json({ error: 'eventId y participantCard son obligatorios.' });
         }
         const gradeId = id || `grd_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
         const skillGaps = Array.isArray(detectedSkillGaps) ? detectedSkillGaps : [];
         // Obtener evento para calcular estado si no fue provisto
-        const eventRes = await client.query('SELECT evaluation_type, passing_score FROM events WHERE id = $1', [eventId]);
+        const eventRes = await client.query('SELECT evaluation_type, passing_score, modules FROM events WHERE id = $1', [eventId]);
         const event = eventRes.rows[0];
         const passingScore = event ? Number(event.passing_score || 70) : 70;
+        let computedScore = score !== null && score !== undefined && score !== '' ? Number(score) : null;
+        const validMods = Array.isArray(moduleGrades) ? moduleGrades.filter((m) => m.score !== null && m.score !== undefined && m.score !== '') : [];
+        // Si tiene calificaciones de módulos y no se proveyó una nota global, calcular el promedio simple
+        if (validMods.length > 0 && computedScore === null) {
+            const sum = validMods.reduce((acc, curr) => acc + Number(curr.score), 0);
+            computedScore = Math.round((sum / validMods.length) * 100) / 100;
+        }
         let computedStatus = academicStatus;
         let computedRetraining = needsRetraining;
-        if (!computedStatus && score !== null && score !== undefined && score !== '') {
-            const numScore = Number(score);
-            if (numScore >= passingScore) {
-                computedStatus = 'passed';
-                if (computedRetraining === undefined)
-                    computedRetraining = false;
-            }
-            else {
+        if (!computedStatus && computedScore !== null) {
+            const anyModFailed = validMods.some((m) => m.academicStatus === 'failed');
+            if (anyModFailed || computedScore < passingScore) {
                 computedStatus = 'failed';
                 if (computedRetraining === undefined)
                     computedRetraining = true;
+            }
+            else {
+                computedStatus = 'passed';
+                if (computedRetraining === undefined)
+                    computedRetraining = false;
             }
         }
         else if (!computedStatus) {
@@ -100,8 +108,8 @@ exports.gradesRouter.post('/', async (req, res) => {
         await client.query(`
       INSERT INTO participant_grades (
         id, event_id, participant_card, slot_id, score, academic_status, 
-        detected_skill_gaps, weaknesses_notes, strengths_notes, needs_retraining, feedback, graded_by, graded_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, CURRENT_TIMESTAMP)
+        detected_skill_gaps, weaknesses_notes, strengths_notes, needs_retraining, feedback, graded_by, graded_at, module_grades
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, CURRENT_TIMESTAMP, $13)
       ON CONFLICT (event_id, participant_card) DO UPDATE SET
         slot_id = COALESCE(EXCLUDED.slot_id, participant_grades.slot_id),
         score = EXCLUDED.score,
@@ -112,20 +120,22 @@ exports.gradesRouter.post('/', async (req, res) => {
         needs_retraining = EXCLUDED.needs_retraining,
         feedback = EXCLUDED.feedback,
         graded_by = EXCLUDED.graded_by,
+        module_grades = EXCLUDED.module_grades,
         graded_at = CURRENT_TIMESTAMP
     `, [
             gradeId,
             eventId,
             participantCard,
             slotId || null,
-            score !== null && score !== undefined && score !== '' ? Number(score) : null,
+            computedScore,
             computedStatus,
             skillGaps,
             weaknessesNotes || null,
             strengthsNotes || null,
             Boolean(computedRetraining),
             feedback || null,
-            gradedBy || 'Instructor / Evaluador'
+            gradedBy || 'Instructor / Evaluador',
+            JSON.stringify(Array.isArray(moduleGrades) ? moduleGrades : [])
         ]);
         const result = await client.query(`
       SELECT 
@@ -145,7 +155,8 @@ exports.gradesRouter.post('/', async (req, res) => {
         COALESCE(g.needs_retraining, false) as "needsRetraining",
         g.feedback,
         g.graded_by as "gradedBy",
-        to_char(g.graded_at, 'YYYY-MM-DD HH12:MI AM') as "gradedAt"
+        to_char(g.graded_at, 'YYYY-MM-DD HH12:MI AM') as "gradedAt",
+        COALESCE(g.module_grades, '[]'::jsonb) as "moduleGrades"
       FROM participant_grades g
       JOIN participants p ON g.participant_card = p.card
       WHERE g.event_id = $1 AND g.participant_card = $2
@@ -174,14 +185,30 @@ exports.gradesRouter.post('/bulk', async (req, res) => {
                 continue;
             const gradeId = g.id || `grd_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
             const skillGaps = Array.isArray(g.detectedSkillGaps) ? g.detectedSkillGaps : [];
-            const scoreVal = g.score !== null && g.score !== undefined && g.score !== '' ? Number(g.score) : null;
-            const statusVal = g.academicStatus || (scoreVal !== null ? (scoreVal >= (g.passingScore || 70) ? 'passed' : 'failed') : 'pending');
+            let scoreVal = g.score !== null && g.score !== undefined && g.score !== '' ? Number(g.score) : null;
+            const modGrades = Array.isArray(g.moduleGrades) ? g.moduleGrades : [];
+            const validMods = modGrades.filter((m) => m.score !== null && m.score !== undefined && m.score !== '');
+            if (validMods.length > 0 && scoreVal === null) {
+                const sum = validMods.reduce((acc, curr) => acc + Number(curr.score), 0);
+                scoreVal = Math.round((sum / validMods.length) * 100) / 100;
+            }
+            const passingScore = g.passingScore !== undefined ? Number(g.passingScore) : 70;
+            let statusVal = g.academicStatus;
+            if (!statusVal) {
+                if (scoreVal !== null) {
+                    const anyFailed = validMods.some((m) => m.academicStatus === 'failed');
+                    statusVal = (!anyFailed && scoreVal >= passingScore) ? 'passed' : 'failed';
+                }
+                else {
+                    statusVal = 'pending';
+                }
+            }
             const retrainingVal = g.needsRetraining !== undefined ? Boolean(g.needsRetraining) : (statusVal === 'failed');
             await client.query(`
         INSERT INTO participant_grades (
           id, event_id, participant_card, slot_id, score, academic_status, 
-          detected_skill_gaps, weaknesses_notes, strengths_notes, needs_retraining, feedback, graded_by, graded_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, CURRENT_TIMESTAMP)
+          detected_skill_gaps, weaknesses_notes, strengths_notes, needs_retraining, feedback, graded_by, graded_at, module_grades
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, CURRENT_TIMESTAMP, $13)
         ON CONFLICT (event_id, participant_card) DO UPDATE SET
           slot_id = COALESCE(EXCLUDED.slot_id, participant_grades.slot_id),
           score = EXCLUDED.score,
@@ -192,6 +219,7 @@ exports.gradesRouter.post('/bulk', async (req, res) => {
           needs_retraining = EXCLUDED.needs_retraining,
           feedback = EXCLUDED.feedback,
           graded_by = EXCLUDED.graded_by,
+          module_grades = EXCLUDED.module_grades,
           graded_at = CURRENT_TIMESTAMP
       `, [
                 gradeId,
@@ -205,7 +233,8 @@ exports.gradesRouter.post('/bulk', async (req, res) => {
                 g.strengthsNotes || null,
                 retrainingVal,
                 g.feedback || null,
-                g.gradedBy || 'Instructor / Evaluador'
+                g.gradedBy || 'Instructor / Evaluador',
+                JSON.stringify(modGrades)
             ]);
         }
         await client.query('COMMIT');
@@ -227,7 +256,8 @@ exports.gradesRouter.post('/bulk', async (req, res) => {
         COALESCE(g.needs_retraining, false) as "needsRetraining",
         g.feedback,
         g.graded_by as "gradedBy",
-        to_char(g.graded_at, 'YYYY-MM-DD HH12:MI AM') as "gradedAt"
+        to_char(g.graded_at, 'YYYY-MM-DD HH12:MI AM') as "gradedAt",
+        COALESCE(g.module_grades, '[]'::jsonb) as "moduleGrades"
       FROM participant_grades g
       JOIN participants p ON g.participant_card = p.card
       ORDER BY g.graded_at DESC, p.name ASC

@@ -977,7 +977,9 @@ export const exportInstructorsAndFeedbackReportToExcel = (
         'Modalidad': evt.modality,
         'Colaborador': fb.userName || fb.userEmail,
         'Correo': fb.userEmail,
-        'Calificación (1-5)': `${fb.rating} ★`,
+        'Puntaje General TEC': `${fb.rating} ★`,
+        'Evaluación Curso': fb.courseScore ? `${Number(fb.courseScore).toFixed(1)} ★` : `${fb.rating} ★`,
+        'Evaluación Facilitador': fb.facilitatorScore ? `${Number(fb.facilitatorScore).toFixed(1)} ★` : `${fb.rating} ★`,
         'Comentarios y Retroalimentación': fb.comment || 'Sin comentario',
         'Fecha de Evaluación': fb.createdAt
       });
@@ -1012,9 +1014,13 @@ export const exportEventGradesToExcel = (
   participants: Participant[]
 ): void => {
   const grades = event.grades || [];
+  const modules = event.modules || [];
+  const hasModules = modules.length > 0;
+
   const data = grades.map((g, idx) => {
     const p = participants.find(part => part.card === g.participantCard || part.email.toLowerCase() === g.participantEmail?.toLowerCase());
-    return {
+    
+    const row: Record<string, any> = {
       'No.': idx + 1,
       'Cédula': p?.cedula || 'N/A',
       'No. Tarjeta': g.participantCard,
@@ -1023,43 +1029,52 @@ export const exportEventGradesToExcel = (
       'Departamento': g.participantDepartment || p?.department || 'General',
       'Capacitación': event.title,
       'Categoría': event.category,
-      'Tipo de Evaluación': event.evaluationType === 'score_100' ? 'Numérica (0-100)' : event.evaluationType === 'scale_1_5' ? 'Escala (1-5)' : 'Aprobado/Reprobado',
-      'Calificación Obtenida': g.score !== null && g.score !== undefined ? `${g.score} pts` : 'No asignada',
-      'Estado Académico': g.academicStatus === 'passed' ? 'APROBADO' : g.academicStatus === 'failed' ? 'REPROBADO' : 'PENDIENTE',
-      'Debilidades / Brechas Detectadas': (g.detectedSkillGaps || []).join(', ') || 'Ninguna',
-      'Notas de Debilidad': g.weaknessesNotes || '',
-      'Fortalezas Observadas': g.strengthsNotes || '',
-      'Requiere Re-capacitación': g.needsRetraining ? 'SÍ' : 'NO',
-      'Recomendaciones del Docente': g.feedback || '',
-      'Evaluado Por': g.gradedBy || 'Instructor',
-      'Fecha de Calificación': g.gradedAt || ''
+      'Tipo de Evaluación': hasModules 
+        ? `Modular (${modules.length} Módulos)` 
+        : (event.evaluationType === 'score_100' ? 'Numérica (0-100)' : event.evaluationType === 'scale_1_5' ? 'Escala (1-5)' : 'Aprobado/Reprobado'),
     };
+
+    // Si tiene módulos definidos, agregar columnas dinámicas por módulo
+    if (hasModules) {
+      modules.forEach((mod, mIdx) => {
+        const mg = (g.moduleGrades || []).find(m => m.moduleId === mod.id);
+        const colName = `Módulo ${mIdx + 1}: ${mod.title} (Mín ${mod.passingScore}/${mod.maxScore})`;
+        row[colName] = mg && mg.score !== null && mg.score !== undefined
+          ? `${mg.score} pts (${mg.academicStatus === 'passed' ? 'Aprobado' : mg.academicStatus === 'failed' ? 'Reprobado' : 'Pendiente'})`
+          : 'Pendiente';
+      });
+    }
+
+    row[hasModules ? 'Promedio Final Obtenido' : 'Calificación Obtenida'] = g.score !== null && g.score !== undefined ? `${g.score} pts` : 'No asignada';
+    row['Estado Académico'] = g.academicStatus === 'passed' ? 'APROBADO' : g.academicStatus === 'failed' ? 'REPROBADO' : 'PENDIENTE';
+    row['Debilidades / Brechas Detectadas'] = (g.detectedSkillGaps || []).join(', ') || 'Ninguna';
+    row['Notas de Debilidad'] = g.weaknessesNotes || '';
+    row['Fortalezas Observadas'] = g.strengthsNotes || '';
+    row['Requiere Re-capacitación'] = g.needsRetraining ? 'SÍ' : 'NO';
+    row['Recomendaciones del Docente'] = g.feedback || '';
+    row['Evaluado Por'] = g.gradedBy || 'Instructor';
+    row['Fecha de Calificación'] = g.gradedAt || '';
+
+    return row;
   });
 
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Calificaciones');
 
-  ws['!cols'] = [
-    { wch: 6 },
-    { wch: 18 },
-    { wch: 15 },
-    { wch: 30 },
-    { wch: 30 },
-    { wch: 20 },
-    { wch: 35 },
-    { wch: 15 },
-    { wch: 20 },
-    { wch: 20 },
-    { wch: 18 },
-    { wch: 35 },
-    { wch: 35 },
-    { wch: 35 },
-    { wch: 22 },
-    { wch: 40 },
-    { wch: 25 },
-    { wch: 20 }
-  ];
+  // Ajustar anchos de columna dinámicamente según las claves del primer registro
+  if (data.length > 0) {
+    const keys = Object.keys(data[0]);
+    ws['!cols'] = keys.map(key => {
+      if (key === 'No.') return { wch: 6 };
+      if (key === 'Cédula') return { wch: 18 };
+      if (key === 'No. Tarjeta') return { wch: 15 };
+      if (key.includes('Nombre') || key.includes('Correo')) return { wch: 30 };
+      if (key.startsWith('Módulo')) return { wch: 32 };
+      if (key.includes('Notas') || key.includes('Debilidades') || key.includes('Fortalezas') || key.includes('Recomendaciones')) return { wch: 35 };
+      return { wch: 22 };
+    });
+  }
 
   XLSX.writeFile(wb, `Libro_Calificaciones_${event.title.slice(0, 20).replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`);
 };

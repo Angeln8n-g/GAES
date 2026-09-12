@@ -55,6 +55,7 @@ interface AdminViewProps {
   onSaveProgram: (program: TrainingProgram) => Promise<void>;
   onDeleteProgram: (programId: string) => Promise<void>;
   onConfirmAttendance: (eventId: string, date: string, time: string, email: string) => Promise<void>;
+  onRevertAttendance?: (eventId: string, date: string, time: string, email: string) => Promise<void>;
   onSendNotification: (eventId: string, channel: 'Email' | 'Teams', message: string, recipients: number) => Promise<void>;
   onBulkRegisterUsers: (
     eventId: string, 
@@ -94,6 +95,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
   onSaveProgram,
   onDeleteProgram,
   onConfirmAttendance,
+  onRevertAttendance,
   onSendNotification,
   onBulkRegisterUsers,
   onShowToast
@@ -456,7 +458,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
 
       {attendeesEvent && (
         <AttendeesModal
-          event={attendeesEvent}
+          event={events.find(e => e.id === attendeesEvent.id) || attendeesEvent}
           participants={participants}
           isSuperAdmin={isSuperAdmin}
           onClose={() => setAttendeesEvent(null)}
@@ -464,6 +466,10 @@ export const AdminView: React.FC<AdminViewProps> = ({
             await onConfirmAttendance(evtId, date, time, email);
             onShowToast('Asistencia confirmada', `Se confirmó la asistencia para ${email}.`, 'success');
           }}
+          onRevertAttendance={onRevertAttendance ? async (evtId, date, time, email) => {
+            await onRevertAttendance(evtId, date, time, email);
+            onShowToast('Asistencia revertida', `Se canceló la asistencia para ${email}.`, 'info');
+          } : undefined}
           onOpenBulkEnrollment={(evtId, date, time) => handleOpenBulkEnrollment(evtId, date, time)}
           onSaveGradesSuccess={(updatedEvt) => {
             setAttendeesEvent(updatedEvt);

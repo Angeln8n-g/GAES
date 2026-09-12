@@ -20,9 +20,14 @@ import {
   RefreshCw,
   TrendingUp,
   ShieldAlert,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Tv,
+  RotateCcw,
+  Layers,
+  QrCode
 } from 'lucide-react';
-import { TrainingEvent, Participant, ParticipantGrade, AcademicStatus } from '../../types';
+import { QRCodeSVG } from 'qrcode.react';
+import { TrainingEvent, Participant, ParticipantGrade, AcademicStatus, EventModule, ParticipantModuleGrade } from '../../types';
 import { exportAttendeesToExcel, exportEventGradesToExcel, exportSessionGradesForOjtAndCalibration } from '../../utils/excelUtils';
 import { formatDateLong } from '../../utils/formatters';
 import { apiService } from '../../services/api';
@@ -31,8 +36,10 @@ interface AttendeesModalProps {
   event: TrainingEvent | null;
   participants: Participant[];
   isSuperAdmin?: boolean;
+  initialProjectorMode?: boolean;
   onClose: () => void;
   onConfirmAttendance: (eventId: string, date: string, time: string, email: string) => Promise<void>;
+  onRevertAttendance?: (eventId: string, date: string, time: string, email: string) => Promise<void>;
   onOpenBulkEnrollment?: (eventId: string, date: string, time: string) => void;
   onSaveGradesSuccess?: (updatedEvent: TrainingEvent) => void;
 }
@@ -41,8 +48,10 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
   event,
   participants,
   isSuperAdmin = false,
+  initialProjectorMode = false,
   onClose,
   onConfirmAttendance,
+  onRevertAttendance,
   onOpenBulkEnrollment,
   onSaveGradesSuccess
 }) => {
@@ -58,6 +67,11 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Estado local para calificaciones editables
+  const hasModules = Boolean(event.modules && event.modules.length > 0);
+  const eventModules = useMemo(() => event.modules || [], [event.modules]);
+  const [selectedModuleId, setSelectedModuleId] = useState<string>('summary');
+  const [isProjectorOpen, setIsProjectorOpen] = useState<boolean>(initialProjectorMode);
+
   const [gradesMap, setGradesMap] = useState<Record<string, {
     score: number | string;
     academicStatus: AcademicStatus;
@@ -67,6 +81,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
     needsRetraining: boolean;
     feedback: string;
     gradedBy: string;
+    moduleGrades: ParticipantModuleGrade[];
   }>>({});
 
   const [isSavingGrades, setIsSavingGrades] = useState(false);
@@ -76,6 +91,21 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
   useEffect(() => {
     const initialMap: Record<string, any> = {};
     (event.grades || []).forEach(g => {
+      let pModuleGrades: ParticipantModuleGrade[] = [];
+      if (eventModules.length > 0) {
+        pModuleGrades = eventModules.map(m => {
+          const existing = (g.moduleGrades || []).find(mg => mg.moduleId === m.id);
+          return existing || {
+            moduleId: m.id,
+            moduleName: m.title,
+            score: null,
+            academicStatus: 'pending',
+            feedback: '',
+            gradedBy: g.gradedBy || 'Instructor / Evaluador'
+          };
+        });
+      }
+
       initialMap[g.participantCard] = {
         score: g.score !== null && g.score !== undefined ? g.score : '',
         academicStatus: g.academicStatus || 'pending',
@@ -84,11 +114,12 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
         strengthsNotes: g.strengthsNotes || '',
         needsRetraining: g.needsRetraining || false,
         feedback: g.feedback || '',
-        gradedBy: g.gradedBy || 'Instructor / Evaluador'
+        gradedBy: g.gradedBy || 'Instructor / Evaluador',
+        moduleGrades: pModuleGrades
       };
     });
     setGradesMap(initialMap);
-  }, [event]);
+  }, [event, eventModules]);
 
   const currentSchedule = event.schedule.find(s => s.date === selectedDate);
   const currentSlot = currentSchedule?.slots.find(s => s.time === selectedTime);
@@ -138,19 +169,32 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
     return { totalGraded, passedCount, failedCount, avgScore, withGapsCount };
   }, [gradesMap]);
 
-  // Manejar cambio de puntaje por participante
-  const handleScoreChange = (card: string, val: string) => {
-    const num = val === '' ? '' : Number(val);
-    const current = gradesMap[card] || {
+  const getParticipantGrade = (card: string) => {
+    if (gradesMap[card]) return gradesMap[card];
+    return {
       score: '',
-      academicStatus: 'pending',
+      academicStatus: 'pending' as AcademicStatus,
       detectedSkillGaps: [],
       weaknessesNotes: '',
       strengthsNotes: '',
       needsRetraining: false,
       feedback: '',
-      gradedBy: 'Instructor / Evaluador'
+      gradedBy: 'Instructor / Evaluador',
+      moduleGrades: eventModules.map(m => ({
+        moduleId: m.id,
+        moduleName: m.title,
+        score: null,
+        academicStatus: 'pending' as AcademicStatus,
+        feedback: '',
+        gradedBy: 'Instructor / Evaluador'
+      }))
     };
+  };
+
+  // Manejar cambio de puntaje por participante
+  const handleScoreChange = (card: string, val: string) => {
+    const num = val === '' ? '' : Number(val);
+    const current = getParticipantGrade(card);
 
     let computedStatus: AcademicStatus = current.academicStatus;
     let computedRetraining = current.needsRetraining;
@@ -180,16 +224,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
 
   // Manejar cambio manual de estado cualitativo
   const handleStatusChange = (card: string, status: AcademicStatus) => {
-    const current = gradesMap[card] || {
-      score: status === 'passed' ? 100 : status === 'failed' ? 50 : '',
-      academicStatus: status,
-      detectedSkillGaps: [],
-      weaknessesNotes: '',
-      strengthsNotes: '',
-      needsRetraining: status === 'failed',
-      feedback: '',
-      gradedBy: 'Instructor / Evaluador'
-    };
+    const current = getParticipantGrade(card);
 
     setGradesMap(prev => ({
       ...prev,
@@ -203,16 +238,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
 
   // Toggle de debilidad en una competencia específica
   const handleToggleSkillGap = (card: string, skill: string) => {
-    const current = gradesMap[card] || {
-      score: '',
-      academicStatus: 'pending',
-      detectedSkillGaps: [],
-      weaknessesNotes: '',
-      strengthsNotes: '',
-      needsRetraining: false,
-      feedback: '',
-      gradedBy: 'Instructor / Evaluador'
-    };
+    const current = getParticipantGrade(card);
 
     const gaps = current.detectedSkillGaps || [];
     const newGaps = gaps.includes(skill)
@@ -231,16 +257,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
 
   // Manejar notas de debilidad
   const handleWeaknessNotesChange = (card: string, notes: string) => {
-    const current = gradesMap[card] || {
-      score: '',
-      academicStatus: 'pending',
-      detectedSkillGaps: [],
-      weaknessesNotes: '',
-      strengthsNotes: '',
-      needsRetraining: false,
-      feedback: '',
-      gradedBy: 'Instructor / Evaluador'
-    };
+    const current = getParticipantGrade(card);
 
     setGradesMap(prev => ({
       ...prev,
@@ -253,22 +270,88 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
 
   // Toggle de re-capacitación
   const handleToggleRetraining = (card: string) => {
-    const current = gradesMap[card] || {
-      score: '',
-      academicStatus: 'pending',
-      detectedSkillGaps: [],
-      weaknessesNotes: '',
-      strengthsNotes: '',
-      needsRetraining: false,
-      feedback: '',
-      gradedBy: 'Instructor / Evaluador'
-    };
+    const current = getParticipantGrade(card);
 
     setGradesMap(prev => ({
       ...prev,
       [card]: {
         ...current,
         needsRetraining: !current.needsRetraining
+      }
+    }));
+  };
+
+  const handleModuleScoreChange = (card: string, moduleId: string, val: string) => {
+    const num = val === '' ? null : Number(val);
+    const curr = getParticipantGrade(card);
+    const targetModule = eventModules.find(m => m.id === moduleId);
+    const modPassingScore = targetModule?.passingScore !== undefined ? targetModule.passingScore : passingScore;
+
+    let modStatus: AcademicStatus = 'pending';
+    if (num !== null) {
+      modStatus = num >= modPassingScore ? 'passed' : 'failed';
+    }
+
+    const updatedModuleGrades = curr.moduleGrades.map((mg: ParticipantModuleGrade) => {
+      if (mg.moduleId === moduleId) {
+        return {
+          ...mg,
+          score: num,
+          academicStatus: modStatus
+        };
+      }
+      return mg;
+    });
+
+    const validScores = updatedModuleGrades
+      .filter((m: ParticipantModuleGrade) => m.score !== null && m.score !== undefined)
+      .map((m: ParticipantModuleGrade) => Number(m.score));
+
+    let newAvgScore: number | string = '';
+    let newOverallStatus: AcademicStatus = curr.academicStatus;
+    let newRetraining = curr.needsRetraining;
+
+    if (validScores.length > 0) {
+      const sum = validScores.reduce((acc: number, v: number) => acc + v, 0);
+      newAvgScore = Math.round((sum / validScores.length) * 10) / 10;
+      
+      const anyFailed = updatedModuleGrades.some((m: ParticipantModuleGrade) => m.academicStatus === 'failed');
+      if (anyFailed || Number(newAvgScore) < passingScore) {
+        newOverallStatus = 'failed';
+        newRetraining = true;
+      } else if (validScores.length === eventModules.length) {
+        newOverallStatus = 'passed';
+        newRetraining = false;
+      } else {
+        newOverallStatus = 'pending';
+      }
+    }
+
+    setGradesMap(prev => ({
+      ...prev,
+      [card]: {
+        ...curr,
+        score: newAvgScore,
+        academicStatus: newOverallStatus,
+        needsRetraining: newRetraining,
+        moduleGrades: updatedModuleGrades
+      }
+    }));
+  };
+
+  const handleModuleFeedbackChange = (card: string, moduleId: string, feedback: string) => {
+    const curr = getParticipantGrade(card);
+    const updatedModuleGrades = curr.moduleGrades.map((mg: ParticipantModuleGrade) => {
+      if (mg.moduleId === moduleId) {
+        return { ...mg, feedback };
+      }
+      return mg;
+    });
+    setGradesMap(prev => ({
+      ...prev,
+      [card]: {
+        ...curr,
+        moduleGrades: updatedModuleGrades
       }
     }));
   };
@@ -289,7 +372,8 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
         strengthsNotes: data.strengthsNotes,
         needsRetraining: data.needsRetraining,
         feedback: data.feedback,
-        gradedBy: data.gradedBy || 'Instructor / Evaluador'
+        gradedBy: data.gradedBy || 'Instructor / Evaluador',
+        moduleGrades: data.moduleGrades || []
       }));
 
       const res = await apiService.saveBulkGrades(gradesPayload);
@@ -400,16 +484,28 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
               />
             </div>
 
-            {/* Excel Export Buttons */}
+            {/* Action Buttons */}
             <div className="flex items-center gap-2 flex-wrap">
               {activeTab === 'attendance' ? (
-                <button
-                  onClick={() => exportAttendeesToExcel(event, selectedDate, selectedTime, attendeesList, attendedList, participants)}
-                  className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Exportar Asistentes (.xlsx)</span>
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setIsProjectorOpen(true)}
+                    className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm shadow-purple-500/25 transition-all cursor-pointer"
+                    title="Proyectar código QR de asistencia en pantalla para que los alumnos lo escaneen"
+                  >
+                    <Tv className="w-3.5 h-3.5" />
+                    <span>Proyectar QR en Sala</span>
+                  </button>
+
+                  <button
+                    onClick={() => exportAttendeesToExcel(event, selectedDate, selectedTime, attendeesList, attendedList, participants)}
+                    className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Exportar Asistentes (.xlsx)</span>
+                  </button>
+                </>
               ) : (
                 <div className="flex items-center gap-2">
                   <button
@@ -523,13 +619,24 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                         )}
                       </span>
 
-                      {!item.isAttended && (
+                      {!item.isAttended ? (
                         <button
                           onClick={() => onConfirmAttendance(event.id, selectedDate, selectedTime, item.email)}
                           className="px-2.5 py-1 rounded-xl bg-red-50 hover:bg-red-100 text-[#DA291C] border border-red-200 text-[10px] font-bold transition-colors cursor-pointer"
                         >
                           Marcar Asistencia
                         </button>
+                      ) : (
+                        onRevertAttendance && (
+                          <button
+                            onClick={() => onRevertAttendance(event.id, selectedDate, selectedTime, item.email)}
+                            className="px-2 py-1 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200 hover:border-rose-200 text-[10px] font-semibold transition-colors cursor-pointer flex items-center gap-1"
+                            title="Revertir asistencia (marcar como pendiente)"
+                          >
+                            <RotateCcw className="w-3 h-3" />
+                            <span>Revertir</span>
+                          </button>
+                        )
                       )}
                     </div>
                   </div>
@@ -605,144 +712,380 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
               </div>
             )}
 
-            {/* Grading Table / Cards */}
-            {filteredParticipants.length > 0 ? (
-              <div className="space-y-3">
-                {filteredParticipants.map((item) => {
-                  const card = item.card;
-                  const grade = gradesMap[card] || {
-                    score: '',
-                    academicStatus: 'pending',
-                    detectedSkillGaps: [],
-                    weaknessesNotes: '',
-                    strengthsNotes: '',
-                    needsRetraining: false,
-                    feedback: '',
-                    gradedBy: 'Instructor / Evaluador'
-                  };
+            {/* Module Selector Bar (If Event Has Modules) */}
+            {hasModules && (
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setSelectedModuleId('summary')}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 whitespace-nowrap transition-all cursor-pointer ${
+                    selectedModuleId === 'summary'
+                      ? 'bg-slate-900 text-white shadow-xs'
+                      : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  <FileSpreadsheet className="w-3.5 h-3.5" />
+                  <span>Resumen Consolidado</span>
+                </button>
 
-                  const isPassed = grade.academicStatus === 'passed';
-                  const isFailed = grade.academicStatus === 'failed';
-                  const hasGaps = (grade.detectedSkillGaps || []).length > 0;
+                {eventModules.map((m, idx) => (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => setSelectedModuleId(m.id)}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 whitespace-nowrap transition-all cursor-pointer ${
+                      selectedModuleId === m.id
+                        ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
+                        : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    <Layers className="w-3.5 h-3.5" />
+                    <span>{m.title}</span>
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-md ${
+                      selectedModuleId === m.id ? 'bg-white/20 text-white font-black' : 'bg-slate-100 text-slate-600 font-bold'
+                    }`}>
+                      Mín: {m.passingScore ?? 70} pts
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
 
-                  return (
-                    <div
-                      key={card || item.email}
-                      className={`p-4 rounded-2xl border transition-all ${
-                        isFailed || grade.needsRetraining
-                          ? 'bg-rose-50/50 border-rose-200'
-                          : isPassed
-                          ? 'bg-white border-emerald-200 shadow-xs'
-                          : 'bg-white border-slate-200 shadow-xs'
-                      }`}
-                    >
-                      {/* Top row: Participant Info & Grade input */}
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs ${
-                            isPassed ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : isFailed ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-600'
-                          }`}>
-                            {item.name ? item.name.charAt(0).toUpperCase() : 'U'}
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <p className="text-xs font-bold text-slate-900">{item.name}</p>
-                              {item.isAttended && (
-                                <span className="px-1.5 py-0.2 bg-emerald-50 text-emerald-700 text-[9px] font-bold rounded-md border border-emerald-200">
-                                  Asistió
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-[11px] text-slate-500">
-                              Tarjeta: <span className="text-slate-800 font-bold">#{card || 'N/A'}</span> • {item.department}
-                            </p>
-                          </div>
-                        </div>
+            {/* CASE 1: Event has Modules & Selected Tab is Consolidated Summary */}
+            {hasModules && selectedModuleId === 'summary' ? (
+              filteredParticipants.length > 0 ? (
+                <div className="space-y-4">
+                  <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold">
+                            <th className="p-3">Colaborador</th>
+                            <th className="p-3">Tarjeta</th>
+                            <th className="p-3">Departamento</th>
+                            {eventModules.map(m => (
+                              <th key={m.id} className="p-3 text-center whitespace-nowrap">
+                                <div>{m.title}</div>
+                                <div className="text-[10px] text-slate-400 font-normal">Mín: {m.passingScore ?? 70} pts</div>
+                              </th>
+                            ))}
+                            <th className="p-3 text-center">Promedio Final</th>
+                            <th className="p-3 text-center">Estado Académico</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {filteredParticipants.map(item => {
+                            const g = getParticipantGrade(item.card);
+                            return (
+                              <tr key={item.card || item.email} className="hover:bg-slate-50/50">
+                                <td className="p-3">
+                                  <p className="font-bold text-slate-900">{item.name}</p>
+                                  <p className="text-[10px] text-slate-400">{item.email}</p>
+                                </td>
+                                <td className="p-3 text-slate-600 font-mono">#{item.card || 'N/A'}</td>
+                                <td className="p-3 text-slate-600">{item.department}</td>
+                                {eventModules.map(m => {
+                                  const mg = (g.moduleGrades || []).find((x: ParticipantModuleGrade) => x.moduleId === m.id);
+                                  const scoreVal = mg?.score;
+                                  const isPassed = mg?.academicStatus === 'passed';
+                                  const isFailed = mg?.academicStatus === 'failed';
+                                  return (
+                                    <td key={m.id} className="p-3 text-center">
+                                      {scoreVal !== null && scoreVal !== undefined ? (
+                                        <span className={`inline-block px-2 py-0.5 rounded-lg text-xs font-black ${
+                                          isPassed ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : isFailed ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-700'
+                                        }`}>
+                                          {scoreVal} pts
+                                        </span>
+                                      ) : (
+                                        <span className="text-slate-300 text-xs">—</span>
+                                      )}
+                                    </td>
+                                  );
+                                })}
+                                <td className="p-3 text-center">
+                                  <span className="font-black text-slate-900 text-xs">
+                                    {g.score !== null && g.score !== '' ? `${g.score} pts` : '—'}
+                                  </span>
+                                </td>
+                                <td className="p-3 text-center">
+                                  <span className={`px-2.5 py-1 rounded-xl text-[10px] font-black ${
+                                    g.academicStatus === 'passed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : g.academicStatus === 'failed' ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-600'
+                                  }`}>
+                                    {g.academicStatus === 'passed' ? '✓ Aprobado' : g.academicStatus === 'failed' ? '✕ Reprobado' : '⏳ Pendiente'}
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-slate-400 text-xs">
+                  No hay participantes inscritos para evaluar en este horario.
+                </div>
+              )
+            ) : hasModules && selectedModuleId !== 'summary' ? (
+              /* CASE 2: Event has Modules & Specific Module is Selected */
+              (() => {
+                const currentMod = eventModules.find(m => m.id === selectedModuleId);
+                if (!currentMod) return null;
+                const modPass = currentMod.passingScore ?? 70;
 
-                        {/* Grade Input & Status */}
-                        <div className="flex items-center gap-3">
-                          {event.evaluationType === 'score_100' && (
-                            <div className="flex items-center gap-2">
-                              <label className="text-xs font-bold text-slate-600">Nota (0-100):</label>
-                              <input
-                                type="number"
-                                min={0}
-                                max={100}
-                                value={grade.score}
-                                onChange={(e) => handleScoreChange(card, e.target.value)}
-                                placeholder="0 - 100"
-                                className="w-20 px-2.5 py-1.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold text-center focus:outline-none focus:border-[#DA291C]"
-                              />
-                            </div>
-                          )}
-
-                          {event.evaluationType === 'scale_1_5' && (
-                            <div className="flex items-center gap-2">
-                              <label className="text-xs font-bold text-slate-600">Escala (1-5):</label>
-                              <select
-                                value={grade.score}
-                                onChange={(e) => handleScoreChange(card, e.target.value)}
-                                className="px-2.5 py-1.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold focus:outline-none focus:border-[#DA291C]"
-                              >
-                                <option value="">Sin calificar</option>
-                                <option value="5">5 ★ Excelente</option>
-                                <option value="4">4 ★ Bueno</option>
-                                <option value="3">3 ★ Aceptable</option>
-                                <option value="2">2 ★ Regular</option>
-                                <option value="1">1 ★ Deficiente</option>
-                              </select>
-                            </div>
-                          )}
-
-                          {event.evaluationType === 'pass_fail' && (
-                            <div className="flex items-center gap-1.5">
-                              <button
-                                type="button"
-                                onClick={() => handleStatusChange(card, 'passed')}
-                                className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                                  isPassed
-                                    ? 'bg-emerald-600 text-white shadow-xs'
-                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                                }`}
-                              >
-                                ✓ Aprobado
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleStatusChange(card, 'failed')}
-                                className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                                  isFailed
-                                    ? 'bg-rose-600 text-white shadow-xs'
-                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                                }`}
-                              >
-                                ✕ Reprobado
-                              </button>
-                            </div>
-                          )}
-
-                          {/* Academic Status Badge */}
-                          <span className={`px-2.5 py-1 rounded-xl text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 ${
-                            isPassed
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                              : isFailed
-                              ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                              : 'bg-slate-100 text-slate-600'
-                          }`}>
-                            {isPassed ? 'Aprobado' : isFailed ? 'Requiere Refuerzo' : 'Pendiente'}
+                return (
+                  <div className="space-y-4">
+                    {/* Module Title Banner */}
+                    <div className="p-4 rounded-2xl bg-gradient-to-r from-red-50 via-slate-50 to-purple-50 border border-red-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="px-2 py-0.5 rounded-md bg-[#DA291C] text-white text-[10px] font-black uppercase tracking-wider">
+                            Calificación de Módulo
                           </span>
+                          <span className="text-xs font-black text-slate-900">{currentMod.title}</span>
                         </div>
+                        {currentMod.description && (
+                          <p className="text-xs text-slate-600">{currentMod.description}</p>
+                        )}
                       </div>
 
-                      {/* Bottom Row: Skill Gaps and Weakness Notes */}
-                      <div className="pt-3 space-y-2">
-                        {skillsList.length > 0 && (
-                          <div>
-                            <span className="text-[10px] text-slate-600 font-bold uppercase tracking-wider block mb-1">
-                              Debilidades en Competencias (Haz clic para señalar brechas observadas):
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-xs font-bold bg-white px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700">
+                          Nota Mínima: <strong className="text-[#DA291C]">{modPass} pts</strong>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Participants list for this module */}
+                    {filteredParticipants.length > 0 ? (
+                      <div className="space-y-3">
+                        {filteredParticipants.map(item => {
+                          const card = item.card;
+                          const g = getParticipantGrade(card);
+                          const mg = (g.moduleGrades || []).find((x: ParticipantModuleGrade) => x.moduleId === currentMod.id) || {
+                            moduleId: currentMod.id,
+                            moduleName: currentMod.title,
+                            score: null,
+                            academicStatus: 'pending' as AcademicStatus,
+                            feedback: ''
+                          };
+                          const modScore = mg.score !== null && mg.score !== undefined ? mg.score : '';
+                          const isPassed = mg.academicStatus === 'passed';
+                          const isFailed = mg.academicStatus === 'failed';
+
+                          return (
+                            <div
+                              key={card || item.email}
+                              className={`p-4 rounded-2xl border transition-all ${
+                                isFailed
+                                  ? 'bg-rose-50/40 border-rose-200'
+                                  : isPassed
+                                  ? 'bg-white border-emerald-200 shadow-xs'
+                                  : 'bg-white border-slate-200 shadow-xs'
+                              }`}
+                            >
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                                <div className="flex items-center gap-3">
+                                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs ${
+                                    isPassed ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : isFailed ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-600'
+                                  }`}>
+                                    {item.name ? item.name.charAt(0).toUpperCase() : 'U'}
+                                  </div>
+                                  <div>
+                                    <div className="flex items-center gap-2">
+                                      <p className="text-xs font-bold text-slate-900">{item.name}</p>
+                                      {item.isAttended && (
+                                        <span className="px-1.5 py-0.2 bg-emerald-50 text-emerald-700 text-[9px] font-bold rounded-md border border-emerald-200">
+                                          Asistió
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-[11px] text-slate-500">
+                                      Tarjeta: <span className="text-slate-800 font-bold">#{card || 'N/A'}</span> • {item.department}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                {/* Score input for this module */}
+                                <div className="flex items-center gap-3">
+                                  <div className="flex items-center gap-2">
+                                    <label className="text-xs font-bold text-slate-700">Nota (0-{currentMod.maxScore || 100}):</label>
+                                    <input
+                                      type="number"
+                                      min={0}
+                                      max={currentMod.maxScore || 100}
+                                      value={modScore}
+                                      onChange={(e) => handleModuleScoreChange(card, currentMod.id, e.target.value)}
+                                      placeholder="0 - 100"
+                                      className="w-20 px-2.5 py-1.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold text-center focus:outline-none focus:border-[#DA291C]"
+                                    />
+                                  </div>
+
+                                  <span className={`px-2.5 py-1 rounded-xl text-[10px] font-black ${
+                                    isPassed ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : isFailed ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-500'
+                                  }`}>
+                                    {isPassed ? '✓ Aprobado' : isFailed ? '✕ Reprobado' : 'Pendiente'}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Module Feedback input */}
+                              <div className="pt-2">
+                                <input
+                                  type="text"
+                                  value={mg.feedback || ''}
+                                  onChange={(e) => handleModuleFeedbackChange(card, currentMod.id, e.target.value)}
+                                  placeholder="Observaciones pedagógicas específicas de este módulo (opcional)..."
+                                  className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-slate-400 text-xs">
+                        No hay participantes inscritos para evaluar en este horario.
+                      </div>
+                    )}
+                  </div>
+                );
+              })()
+            ) : (
+              /* CASE 3: Standard Non-Modular Event Evaluation Cards */
+              filteredParticipants.length > 0 ? (
+                <div className="space-y-3">
+                  {filteredParticipants.map((item) => {
+                    const card = item.card;
+                    const grade = gradesMap[card] || {
+                      score: '',
+                      academicStatus: 'pending',
+                      detectedSkillGaps: [],
+                      weaknessesNotes: '',
+                      strengthsNotes: '',
+                      needsRetraining: false,
+                      feedback: '',
+                      gradedBy: 'Instructor / Evaluador'
+                    };
+
+                    const isPassed = grade.academicStatus === 'passed';
+                    const isFailed = grade.academicStatus === 'failed';
+                    const hasGaps = (grade.detectedSkillGaps || []).length > 0;
+
+                    return (
+                      <div
+                        key={card || item.email}
+                        className={`p-4 rounded-2xl border transition-all ${
+                          isFailed || grade.needsRetraining
+                            ? 'bg-rose-50/50 border-rose-200'
+                            : isPassed
+                            ? 'bg-white border-emerald-200 shadow-xs'
+                            : 'bg-white border-slate-200 shadow-xs'
+                        }`}
+                      >
+                        {/* Top row: Participant Info & Grade input */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs ${
+                              isPassed ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : isFailed ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-600'
+                            }`}>
+                              {item.name ? item.name.charAt(0).toUpperCase() : 'U'}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <p className="text-xs font-bold text-slate-900">{item.name}</p>
+                                {item.isAttended && (
+                                  <span className="px-1.5 py-0.2 bg-emerald-50 text-emerald-700 text-[9px] font-bold rounded-md border border-emerald-200">
+                                    Asistió
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-slate-500">
+                                Tarjeta: <span className="text-slate-800 font-bold">#{card || 'N/A'}</span> • {item.department}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Grade Input & Status */}
+                          <div className="flex items-center gap-3">
+                            {event.evaluationType === 'score_100' && (
+                              <div className="flex items-center gap-2">
+                                <label className="text-xs font-bold text-slate-600">Nota (0-100):</label>
+                                <input
+                                  type="number"
+                                  min={0}
+                                  max={100}
+                                  value={grade.score}
+                                  onChange={(e) => handleScoreChange(card, e.target.value)}
+                                  placeholder="0 - 100"
+                                  className="w-20 px-2.5 py-1.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold text-center focus:outline-none focus:border-[#DA291C]"
+                                />
+                              </div>
+                            )}
+
+                            {event.evaluationType === 'scale_1_5' && (
+                              <div className="flex items-center gap-2">
+                                <label className="text-xs font-bold text-slate-600">Escala (1-5):</label>
+                                <select
+                                  value={grade.score}
+                                  onChange={(e) => handleScoreChange(card, e.target.value)}
+                                  className="px-2.5 py-1.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold focus:outline-none focus:border-[#DA291C]"
+                                >
+                                  <option value="">Sin calificar</option>
+                                  <option value="5">5 ★ Excelente</option>
+                                  <option value="4">4 ★ Bueno</option>
+                                  <option value="3">3 ★ Aceptable</option>
+                                  <option value="2">2 ★ Regular</option>
+                                  <option value="1">1 ★ Deficiente</option>
+                                </select>
+                              </div>
+                            )}
+
+                            {event.evaluationType === 'pass_fail' && (
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => handleStatusChange(card, 'passed')}
+                                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                                    isPassed
+                                      ? 'bg-emerald-600 text-white shadow-xs'
+                                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                  }`}
+                                >
+                                  ✓ Aprobado
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleStatusChange(card, 'failed')}
+                                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                                    isFailed
+                                      ? 'bg-rose-600 text-white shadow-xs'
+                                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                  }`}
+                                >
+                                  ✕ Reprobado
+                                </button>
+                              </div>
+                            )}
+
+                            <span className={`px-2.5 py-1 rounded-xl text-[10px] font-black ${
+                              isPassed ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : isFailed ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-500'
+                            }`}>
+                              {isPassed ? '✓ Aprobado' : isFailed ? '✕ Reprobado' : 'Pendiente'}
                             </span>
+                          </div>
+                        </div>
+
+                        {/* Competencies / Skills Gap Checkers */}
+                        {skillsList.length > 0 && (
+                          <div className="py-2.5 border-b border-slate-100 space-y-1.5">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
+                              Competencias Evaluadas (Marcar si mostró debilidad):
+                            </label>
                             <div className="flex flex-wrap gap-1.5">
-                              {skillsList.map((skill) => {
+                              {skillsList.map(skill => {
                                 const isGap = (grade.detectedSkillGaps || []).includes(skill);
                                 return (
                                   <button
@@ -794,21 +1137,21 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                           </label>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-slate-400 text-xs">
-                No hay participantes inscritos para evaluar en este horario.
-              </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-slate-400 text-xs">
+                  No hay participantes inscritos para evaluar en este horario.
+                </div>
+              )
             )}
 
             {/* Save All Grades Button */}
             {filteredParticipants.length > 0 && (
               <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <p className="text-xs text-slate-500">
-                  Las calificaciones y debilidades registradas se sincronizarán inmediatamente con el perfil del participante y el panel de su supervisor.
+                  Las calificaciones registradas se sincronizarán inmediatamente en PostgreSQL con el perfil del participante y su supervisor.
                 </p>
 
                 <button
@@ -835,6 +1178,65 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
         )}
 
       </div>
+
+      {/* Projector Mode Modal for In-Person Training Room Check-In */}
+      {isProjectorOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/90 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 flex flex-col items-center text-center relative animate-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setIsProjectorOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
+              title="Cerrar Proyector"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 border border-red-200 text-[#DA291C] text-xs font-bold mb-3">
+              <span className="w-2 h-2 rounded-full bg-[#DA291C] animate-pulse" />
+              <span>MODO PROYECCIÓN EN SALA</span>
+            </div>
+
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight max-w-xl">
+              {event.title}
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Facilitador: <strong className="text-slate-700">{event.instructor}</strong> • {formatDateLong(selectedDate)} ({selectedTime})
+            </p>
+
+            {/* Large QR */}
+            <div className="my-6 p-5 bg-white rounded-3xl border-2 border-slate-200 shadow-xl inline-block">
+              <QRCodeSVG
+                value={`${window.location.origin}${window.location.pathname}?tab=attendance&event=${event.id}&date=${selectedDate}&time=${encodeURIComponent(selectedTime)}`}
+                size={260}
+                level="H"
+                includeMargin={false}
+              />
+            </div>
+
+            {/* Live Counter */}
+            <div className="w-full max-w-md bg-slate-50 border border-slate-200 rounded-2xl p-3.5 mb-4 flex items-center justify-around text-xs">
+              <div>
+                <span className="text-slate-400 font-bold block text-[10px] uppercase">Inscritos</span>
+                <span className="text-lg font-black text-slate-800">{attendeesList.length}</span>
+              </div>
+              <div className="h-8 w-px bg-slate-200" />
+              <div>
+                <span className="text-emerald-600 font-bold block text-[10px] uppercase">Confirmados</span>
+                <span className="text-lg font-black text-emerald-700">{attendedList.length}</span>
+              </div>
+              <div className="h-8 w-px bg-slate-200" />
+              <div>
+                <span className="text-slate-400 font-bold block text-[10px] uppercase">Pendientes</span>
+                <span className="text-lg font-black text-slate-600">{attendeesList.length - attendedList.length}</span>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-500 max-w-md">
+              Abre la cámara de tu smartphone y enfoca el código QR para registrar tu asistencia de forma automática.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

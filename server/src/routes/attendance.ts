@@ -75,3 +75,53 @@ attendanceRouter.post('/', async (req: Request, res: Response) => {
     client.release();
   }
 });
+
+// POST /api/attendance/revert (Revertir o desmarcar asistencia)
+attendanceRouter.post('/revert', async (req: Request, res: Response) => {
+  const { eventId, date, time, email } = req.body;
+
+  if (!eventId || !date || !time || !email) {
+    return res.status(400).json({ message: 'Todos los campos son requeridos para revertir asistencia.' });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // 1. Obtener slot ID
+    const slotQuery = `
+      SELECT sl.id 
+      FROM event_slots sl
+      JOIN event_schedules sch ON sl.schedule_id = sch.id
+      WHERE sch.event_id = $1 AND sch.date = $2 AND sl.time = $3
+    `;
+    const slotRes = await client.query(slotQuery, [eventId, date, time]);
+
+    if (slotRes.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ message: 'Horario o evento no encontrado.' });
+    }
+
+    const slotId = slotRes.rows[0].id;
+
+    // 2. Obtener tarjeta de participante
+    const partRes = await client.query('SELECT card FROM participants WHERE LOWER(email) = LOWER($1)', [email.trim()]);
+    if (partRes.rows.length > 0) {
+      const participantCard = partRes.rows[0].card;
+      await client.query(
+        'DELETE FROM attendance_logs WHERE slot_id = $1 AND participant_card = $2',
+        [slotId, participantCard]
+      );
+    }
+
+    await client.query('COMMIT');
+    const fullEvents = await fetchFullEvents();
+    res.json(fullEvents);
+  } catch (err: any) {
+    await client.query('ROLLBACK');
+    console.error('Error al revertir asistencia:', err);
+    res.status(500).json({ message: 'Error interno al revertir asistencia', error: err.message });
+  } finally {
+    client.release();
+  }
+});
