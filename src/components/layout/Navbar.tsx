@@ -19,7 +19,8 @@ import {
   Sparkles,
   KeyRound,
   GraduationCap,
-  Camera
+  Camera,
+  CreditCard
 } from 'lucide-react';
 import { UserAccount, TabView, Company } from '../../types';
 
@@ -37,6 +38,7 @@ interface NavbarProps {
   isSidebarCollapsed?: boolean;
   onOpenChangePassword?: () => void;
   onOpenQrScanner?: () => void;
+  onOpenCedulaScanner?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -52,7 +54,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenMobileSidebar,
   isSidebarCollapsed = false,
   onOpenChangePassword,
-  onOpenQrScanner
+  onOpenQrScanner,
+  onOpenCedulaScanner
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -388,6 +391,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             )}
 
+            {/* Quick Cedula Scanner / Reception Button (Desktop) */}
+            {onOpenCedulaScanner && (
+              <button
+                onClick={onOpenCedulaScanner}
+                title="Consultar / Escanear Cédula en Lobby"
+                className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
+              >
+                <CreditCard className="w-4 h-4 text-[#DA291C]" />
+                <span className="hidden xl:inline">Kiosco Cédula</span>
+              </button>
+            )}
+
             {/* Change Password Button (Desktop) */}
             {onOpenChangePassword && (
               <button
@@ -506,6 +521,22 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <span className="font-extrabold">Escanear QR de Asistencia</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-[#DA291C]" />
+              </button>
+            )}
+
+            {onOpenCedulaScanner && (
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  onOpenCedulaScanner();
+                }}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all bg-slate-100 text-slate-800 hover:bg-slate-200 border border-slate-200"
+              >
+                <div className="flex items-center gap-3">
+                  <CreditCard className="w-4 h-4 text-[#DA291C]" />
+                  <span className="font-extrabold">Consultar / Escanear Cédula</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400" />
               </button>
             )}
 

@@ -33,6 +33,10 @@ import { OfflineBanner } from './components/common/OfflineBanner';
 import { ChangePasswordModal } from './components/auth/ChangePasswordModal';
 import { TecEvaluationModal } from './components/feedback/TecEvaluationModal';
 import { QrScannerModal } from './components/scanner/QrScannerModal';
+import { findAttendeeByCedula, AttendeeLookupResult } from './utils/attendeeLookup';
+import { CedulaScannerModal } from './components/lobby/CedulaScannerModal';
+import { AttendeeScheduleModal } from './components/lobby/AttendeeScheduleModal';
+import { ReceptionLobbySection } from './components/lobby/ReceptionLobbySection';
 
 export function App() {
   const [companies, setCompanies] = useState<Company[]>(MOCK_COMPANIES);
@@ -93,10 +97,17 @@ export function App() {
   const [attendanceDate, setAttendanceDate] = useState<string | null>(null);
   const [attendanceTime, setAttendanceTime] = useState<string | null>(null);
 
-  // Modales
   const [selectedEventForModal, setSelectedEventForModal] = useState<TrainingEvent | null>(null);
   const [selectedEventForTecModal, setSelectedEventForTecModal] = useState<TrainingEvent | null>(null);
   const [isQrScannerOpen, setIsQrScannerOpen] = useState<boolean>(false);
+
+  // Estados para Lobby de Recepción y Kiosco por Cédula
+  const [isCedulaScannerOpen, setIsCedulaScannerOpen] = useState<boolean>(false);
+  const [isAttendeeScheduleModalOpen, setIsAttendeeScheduleModalOpen] = useState<boolean>(false);
+  const [attendeeLookupResult, setAttendeeLookupResult] = useState<AttendeeLookupResult | null>(null);
+  const [lastSearchedCedula, setLastSearchedCedula] = useState<string>('');
+  const [isSearchingCedula, setIsSearchingCedula] = useState<boolean>(false);
+
   const [toast, setToast] = useState<ToastNotification | null>(null);
 
   const showToast = (title: string, message: string, type: 'success' | 'error' | 'info' | 'warning' = 'success') => {
@@ -137,6 +148,16 @@ export function App() {
         if (loadedSettings) setSettings(loadedSettings);
         if (loadedChecklists) setChecklists(loadedChecklists);
         if (loadedCalibrations) setCalibrations(loadedCalibrations);
+
+        // Auto-consulta si la URL contiene ?cedula=
+        const urlParams = new URLSearchParams(window.location.search);
+        const cedulaFromUrl = urlParams.get('cedula');
+        if (cedulaFromUrl) {
+          const res = findAttendeeByCedula(cedulaFromUrl, loadedParticipants, loadedUsers, loadedEvents);
+          setAttendeeLookupResult(res);
+          setIsAttendeeScheduleModalOpen(true);
+          setLastSearchedCedula(cedulaFromUrl);
+        }
       } catch (err) {
         console.error('Error al cargar datos:', err);
       }
@@ -144,7 +165,7 @@ export function App() {
     loadData();
   }, []);
 
-  // Detección de parámetros URL (para QR Check-In)
+  // Detección de parámetros URL (para QR Check-In y Kiosco Lobby)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tabParam = params.get('tab');
@@ -157,6 +178,8 @@ export function App() {
       setAttendanceEventId(evtParam);
       setAttendanceDate(dateParam);
       setAttendanceTime(timeParam);
+    } else if (tabParam === 'kiosk' || tabParam === 'lobby') {
+      setCurrentTab('kiosk');
     }
   }, []);
 
@@ -217,6 +240,45 @@ export function App() {
   const handleRevertAttendance = async (eventId: string, date: string, time: string, email: string) => {
     const updated = await apiService.revertAttendance(eventId, date, time, email);
     setEvents(updated);
+  };
+
+  // Handlers para Lobby y Kiosco por Cédula
+  const handleLookupCedula = (query: string) => {
+    if (!query || !query.trim()) return;
+    setIsSearchingCedula(true);
+    setLastSearchedCedula(query.trim());
+    try {
+      const result = findAttendeeByCedula(query, participants, users, events);
+      setAttendeeLookupResult(result);
+      setIsAttendeeScheduleModalOpen(true);
+      if (!result.found) {
+        showToast('Documento No Registrado', `No se encontró ningún colaborador con el documento "${query}".`, 'warning');
+      } else if (result.sessions.length === 0) {
+        showToast('Sin Cursos Agendados', `${result.displayName} está registrado en el padrón pero no tiene capacitaciones activas programadas.`, 'info');
+      } else {
+        showToast('Colaborador Encontrado', `${result.displayName} tiene ${result.sessions.length} capacitación(es) en agenda.`, 'success');
+      }
+    } catch (err) {
+      console.error('Error al consultar cédula:', err);
+      showToast('Error', 'Ocurrió un error al procesar la consulta.', 'error');
+    } finally {
+      setIsSearchingCedula(false);
+    }
+  };
+
+  const handleCedulaDetected = (detectedCedula: string) => {
+    setIsCedulaScannerOpen(false);
+    handleLookupCedula(detectedCedula);
+  };
+
+  const handleConfirmAttendanceLobby = async (eventId: string, date: string, time: string, email: string) => {
+    const updated = await apiService.confirmAttendance(eventId, date, time, email);
+    setEvents(updated);
+    if (lastSearchedCedula) {
+      const refreshed = findAttendeeByCedula(lastSearchedCedula, participants, users, updated);
+      setAttendeeLookupResult(refreshed);
+    }
+    showToast('Asistencia Confirmada', 'Tu asistencia presencial ha sido validada exitosamente.', 'success');
   };
 
   const handleSubmitFeedback = async (feedback: EventFeedback) => {
@@ -359,8 +421,8 @@ export function App() {
     });
   }
 
-  // Si no está logueado, mostrar pantalla de inicio de sesión
-  if (!currentUser) {
+  // Si no está logueado y no está en modo Kiosco, mostrar pantalla de inicio de sesión
+  if (!currentUser && currentTab !== 'kiosk') {
     const targetEvent = attendanceEventId ? events.find(e => e.id === attendanceEventId) : null;
     return (
       <>
@@ -370,9 +432,76 @@ export function App() {
           onUsersUpdated={(newUsers) => setUsers(newUsers)}
           attendanceEventTitle={targetEvent?.title}
           attendanceTime={attendanceTime}
+          onOpenKiosk={() => setCurrentTab('kiosk')}
+          onOpenCedulaScanner={() => setIsCedulaScannerOpen(true)}
         />
+
+        {/* Cedula Scanner Modal */}
+        {isCedulaScannerOpen && (
+          <CedulaScannerModal
+            isOpen={isCedulaScannerOpen}
+            onClose={() => setIsCedulaScannerOpen(false)}
+            onCedulaDetected={handleCedulaDetected}
+          />
+        )}
+
+        {/* Attendee Schedule Modal */}
+        {isAttendeeScheduleModalOpen && attendeeLookupResult && (
+          <AttendeeScheduleModal
+            isOpen={isAttendeeScheduleModalOpen}
+            onClose={() => setIsAttendeeScheduleModalOpen(false)}
+            lookupResult={attendeeLookupResult}
+            onConfirmAttendance={handleConfirmAttendanceLobby}
+            onOpenTecEvaluation={(event) => setSelectedEventForTecModal(event)}
+            onExploreCatalog={() => setIsAttendeeScheduleModalOpen(false)}
+            onShowToast={showToast}
+          />
+        )}
+
         <Toast toast={toast} onClose={() => setToast(null)} />
       </>
+    );
+  }
+
+  // Si no está logueado pero está en Kiosco interactivo de Lobby
+  if (!currentUser && currentTab === 'kiosk') {
+    return (
+      <div className="min-h-screen bg-[#0B0F19] text-white flex flex-col justify-between p-4 sm:p-8">
+        <div className="max-w-5xl w-full mx-auto my-auto py-8">
+          <ReceptionLobbySection
+            onLookupCedula={handleLookupCedula}
+            onOpenCedulaScanner={() => setIsCedulaScannerOpen(true)}
+            isSearching={isSearchingCedula}
+            isKioskMode={true}
+            onExitKiosk={() => setCurrentTab('landing')}
+          />
+        </div>
+        <Footer />
+
+        {/* Cedula Scanner Modal */}
+        {isCedulaScannerOpen && (
+          <CedulaScannerModal
+            isOpen={isCedulaScannerOpen}
+            onClose={() => setIsCedulaScannerOpen(false)}
+            onCedulaDetected={handleCedulaDetected}
+          />
+        )}
+
+        {/* Attendee Schedule Modal */}
+        {isAttendeeScheduleModalOpen && attendeeLookupResult && (
+          <AttendeeScheduleModal
+            isOpen={isAttendeeScheduleModalOpen}
+            onClose={() => setIsAttendeeScheduleModalOpen(false)}
+            lookupResult={attendeeLookupResult}
+            onConfirmAttendance={handleConfirmAttendanceLobby}
+            onOpenTecEvaluation={(event) => setSelectedEventForTecModal(event)}
+            onExploreCatalog={() => setIsAttendeeScheduleModalOpen(false)}
+            onShowToast={showToast}
+          />
+        )}
+
+        <Toast toast={toast} onClose={() => setToast(null)} />
+      </div>
     );
   }
 
@@ -443,6 +572,7 @@ export function App() {
           isSidebarCollapsed={isSidebarCollapsed}
           onOpenChangePassword={() => setIsChangePasswordModalOpen(true)}
           onOpenQrScanner={() => setIsQrScannerOpen(true)}
+          onOpenCedulaScanner={() => setIsCedulaScannerOpen(true)}
         />
 
         {/* Main Content Area */}
@@ -459,7 +589,23 @@ export function App() {
             groups={groups}
             participants={participants}
             onOpenReservationModal={(event) => setSelectedEventForModal(event)}
+            onOpenCedulaScanner={() => setIsCedulaScannerOpen(true)}
+            onLookupCedula={handleLookupCedula}
+            isSearchingCedula={isSearchingCedula}
           />
+        )}
+
+        {/* Tab Kiosk: Kiosco Interactivo de Recepción / Lobby */}
+        {currentTab === 'kiosk' && (
+          <div className="py-4">
+            <ReceptionLobbySection
+              onLookupCedula={handleLookupCedula}
+              onOpenCedulaScanner={() => setIsCedulaScannerOpen(true)}
+              isSearching={isSearchingCedula}
+              isKioskMode={true}
+              onExitKiosk={() => setCurrentTab('landing')}
+            />
+          </div>
         )}
 
         {/* Tab 2: Mis Inscripciones & Rutas Formativas */}
@@ -674,6 +820,31 @@ export function App() {
           events={events}
           onConfirmAttendance={handleConfirmAttendance}
           onOpenTecEvaluation={(event) => setSelectedEventForTecModal(event)}
+          onShowToast={showToast}
+        />
+      )}
+
+      {/* Cedula Scanner Modal (Camera / Optical Reader) */}
+      {isCedulaScannerOpen && (
+        <CedulaScannerModal
+          isOpen={isCedulaScannerOpen}
+          onClose={() => setIsCedulaScannerOpen(false)}
+          onCedulaDetected={handleCedulaDetected}
+        />
+      )}
+
+      {/* Attendee Schedule & Course Grid Modal */}
+      {isAttendeeScheduleModalOpen && attendeeLookupResult && (
+        <AttendeeScheduleModal
+          isOpen={isAttendeeScheduleModalOpen}
+          onClose={() => setIsAttendeeScheduleModalOpen(false)}
+          lookupResult={attendeeLookupResult}
+          onConfirmAttendance={handleConfirmAttendanceLobby}
+          onOpenTecEvaluation={(event) => setSelectedEventForTecModal(event)}
+          onExploreCatalog={() => {
+            setIsAttendeeScheduleModalOpen(false);
+            setCurrentTab('landing');
+          }}
           onShowToast={showToast}
         />
       )}

@@ -20,6 +20,7 @@ import { TrainingEvent, UserAccount, TrainingProgram, ParticipantGroup, Particip
 import { EventCard } from './EventCard';
 import { PerpetualCalendar } from './PerpetualCalendar';
 import { HeroCarousel } from '../common/HeroCarousel';
+import { ReceptionLobbySection } from '../lobby/ReceptionLobbySection';
 
 const CATEGORIES = ["Todos", "Taller", "Curso", "Webinar", "Charla", "Cine Forum", "Evento"];
 
@@ -32,6 +33,9 @@ interface CatalogViewProps {
   groups?: ParticipantGroup[];
   participants?: Participant[];
   onOpenReservationModal: (event: TrainingEvent) => void;
+  onOpenCedulaScanner?: () => void;
+  onLookupCedula?: (cedula: string) => void;
+  isSearchingCedula?: boolean;
 }
 
 export const CatalogView: React.FC<CatalogViewProps> = ({
@@ -42,7 +46,10 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   programs = [],
   groups = [],
   participants = [],
-  onOpenReservationModal
+  onOpenReservationModal,
+  onOpenCedulaScanner,
+  onLookupCedula,
+  isSearchingCedula = false
 }) => {
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [selectedModality, setSelectedModality] = useState<string>("Todos");
@@ -179,7 +186,18 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         if (el) el.scrollIntoView({ behavior: 'smooth' });
       }} />
 
-      {/* 2. Live KPI Stats Ribbon (Modern Executive Strip) */}
+      {/* 2. Lobby & Recepción Kiosk Banner (Consulta de Cédula y Check-In) */}
+      {onLookupCedula && onOpenCedulaScanner && (
+        <section aria-label="Kiosco de Recepción y Consulta">
+          <ReceptionLobbySection
+            onLookupCedula={onLookupCedula}
+            onOpenCedulaScanner={onOpenCedulaScanner}
+            isSearching={isSearchingCedula}
+          />
+        </section>
+      )}
+
+      {/* 3. Live KPI Stats Ribbon (Modern Executive Strip) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <div className="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-red-200 transition-all flex items-center gap-4 group">
           <div className="w-12 h-12 rounded-2xl bg-red-50 text-[#DA291C] border border-red-100 flex items-center justify-center group-hover:scale-105 group-hover:bg-[#DA291C] group-hover:text-white transition-all shadow-sm">

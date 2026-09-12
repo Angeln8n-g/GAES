@@ -284,11 +284,12 @@ export const MOCK_USERS: UserAccount[] = [
 ];
 
 // URLs del Backend (Configurables)
-const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/$/, '');
-const isApiMode = import.meta.env.VITE_API_MODE === 'true';
+const API_BASE_URL = ((typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) || 'http://localhost:5000/api').replace(/\/$/, '');
+const isApiMode = typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_MODE === 'true';
 
 // Inicializar almacenamiento local si no existe para el modo local
 const initLocalStorage = () => {
+  if (typeof localStorage === 'undefined') return;
   const existingEvents = localStorage.getItem('ch_events');
   if (!existingEvents) {
     localStorage.setItem('ch_events', JSON.stringify(MOCK_EVENTS));

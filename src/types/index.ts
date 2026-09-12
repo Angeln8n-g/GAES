@@ -199,7 +199,7 @@ export interface ToastNotification {
   type: 'success' | 'error' | 'info' | 'warning';
 }
 
-export type TabView = 'landing' | 'my-registrations' | 'dashboard' | 'admin' | 'attendance' | 'team' | 'ojt' | 'evaluator-courses';
+export type TabView = 'landing' | 'my-registrations' | 'dashboard' | 'admin' | 'attendance' | 'team' | 'ojt' | 'evaluator-courses' | 'kiosk';
 
 // ==========================================
 // MÓDULO DE GRUPOS, CRONOGRAMAS Y CUMPLIMIENTO

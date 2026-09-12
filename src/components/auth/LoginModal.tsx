@@ -12,7 +12,8 @@ import {
   CheckCircle2,
   ArrowLeft,
   ShieldCheck,
-  Sparkles
+  Sparkles,
+  CreditCard
 } from 'lucide-react';
 import { UserAccount } from '../../types';
 import { apiService } from '../../services/api';
@@ -23,6 +24,8 @@ interface LoginModalProps {
   onUsersUpdated?: (users: UserAccount[]) => void;
   attendanceEventTitle?: string | null;
   attendanceTime?: string | null;
+  onOpenKiosk?: () => void;
+  onOpenCedulaScanner?: () => void;
 }
 
 type AuthViewMode = 'login' | 'recover-request' | 'recover-verify';
@@ -32,7 +35,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   onLoginSuccess,
   onUsersUpdated,
   attendanceEventTitle,
-  attendanceTime
+  attendanceTime,
+  onOpenKiosk,
+  onOpenCedulaScanner
 }) => {
   // Login form states
   const [email, setEmail] = useState('');
@@ -357,6 +362,37 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               </button>
 
             </form>
+
+            {/* Lobby / Kiosk Reception Access */}
+            {(onOpenKiosk || onOpenCedulaScanner) && (
+              <div className="mt-6 pt-5 border-t border-slate-100 text-center">
+                <p className="text-xs text-slate-500 font-medium mb-3">
+                  ¿Visitas el centro de capacitación o vienes a un curso presencial?
+                </p>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  {onOpenCedulaScanner && (
+                    <button
+                      type="button"
+                      onClick={onOpenCedulaScanner}
+                      className="flex-1 py-2.5 px-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs active:scale-95"
+                    >
+                      <CreditCard className="w-4 h-4 text-[#DA291C]" />
+                      <span>Escanear Cédula</span>
+                    </button>
+                  )}
+                  {onOpenKiosk && (
+                    <button
+                      type="button"
+                      onClick={onOpenKiosk}
+                      className="flex-1 py-2.5 px-3 rounded-2xl bg-red-50 hover:bg-red-100 text-[#DA291C] border border-red-200 text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs active:scale-95"
+                    >
+                      <Sparkles className="w-4 h-4 text-[#DA291C]" />
+                      <span>Kiosco Recepción</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
 
           </div>
         )}
