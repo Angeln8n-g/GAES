@@ -36,7 +36,6 @@ import { QrScannerModal } from './components/scanner/QrScannerModal';
 import { findAttendeeByCedula, AttendeeLookupResult } from './utils/attendeeLookup';
 import { CedulaScannerModal } from './components/lobby/CedulaScannerModal';
 import { AttendeeScheduleModal } from './components/lobby/AttendeeScheduleModal';
-import { ReceptionLobbySection } from './components/lobby/ReceptionLobbySection';
 
 export function App() {
   const [companies, setCompanies] = useState<Company[]>(MOCK_COMPANIES);
@@ -421,8 +420,8 @@ export function App() {
     });
   }
 
-  // Si no está logueado y no está en modo Kiosco, mostrar pantalla de inicio de sesión
-  if (!currentUser && currentTab !== 'kiosk') {
+  // Si no está logueado, mostrar pantalla de inicio de sesión y recepción
+  if (!currentUser) {
     const targetEvent = attendanceEventId ? events.find(e => e.id === attendanceEventId) : null;
     return (
       <>
@@ -432,11 +431,12 @@ export function App() {
           onUsersUpdated={(newUsers) => setUsers(newUsers)}
           attendanceEventTitle={targetEvent?.title}
           attendanceTime={attendanceTime}
-          onOpenKiosk={() => setCurrentTab('kiosk')}
+          onLookupCedula={handleLookupCedula}
           onOpenCedulaScanner={() => setIsCedulaScannerOpen(true)}
+          isSearchingCedula={isSearchingCedula}
         />
 
-        {/* Cedula Scanner Modal */}
+        {/* Cedula Scanner Modal (Solo disponible en Login / Recepción) */}
         {isCedulaScannerOpen && (
           <CedulaScannerModal
             isOpen={isCedulaScannerOpen}
@@ -445,7 +445,7 @@ export function App() {
           />
         )}
 
-        {/* Attendee Schedule Modal */}
+        {/* Attendee Schedule Modal (Solo disponible en Login / Recepción) */}
         {isAttendeeScheduleModalOpen && attendeeLookupResult && (
           <AttendeeScheduleModal
             isOpen={isAttendeeScheduleModalOpen}
@@ -460,48 +460,6 @@ export function App() {
 
         <Toast toast={toast} onClose={() => setToast(null)} />
       </>
-    );
-  }
-
-  // Si no está logueado pero está en Kiosco interactivo de Lobby
-  if (!currentUser && currentTab === 'kiosk') {
-    return (
-      <div className="min-h-screen bg-[#0B0F19] text-white flex flex-col justify-between p-4 sm:p-8">
-        <div className="max-w-5xl w-full mx-auto my-auto py-8">
-          <ReceptionLobbySection
-            onLookupCedula={handleLookupCedula}
-            onOpenCedulaScanner={() => setIsCedulaScannerOpen(true)}
-            isSearching={isSearchingCedula}
-            isKioskMode={true}
-            onExitKiosk={() => setCurrentTab('landing')}
-          />
-        </div>
-        <Footer />
-
-        {/* Cedula Scanner Modal */}
-        {isCedulaScannerOpen && (
-          <CedulaScannerModal
-            isOpen={isCedulaScannerOpen}
-            onClose={() => setIsCedulaScannerOpen(false)}
-            onCedulaDetected={handleCedulaDetected}
-          />
-        )}
-
-        {/* Attendee Schedule Modal */}
-        {isAttendeeScheduleModalOpen && attendeeLookupResult && (
-          <AttendeeScheduleModal
-            isOpen={isAttendeeScheduleModalOpen}
-            onClose={() => setIsAttendeeScheduleModalOpen(false)}
-            lookupResult={attendeeLookupResult}
-            onConfirmAttendance={handleConfirmAttendanceLobby}
-            onOpenTecEvaluation={(event) => setSelectedEventForTecModal(event)}
-            onExploreCatalog={() => setIsAttendeeScheduleModalOpen(false)}
-            onShowToast={showToast}
-          />
-        )}
-
-        <Toast toast={toast} onClose={() => setToast(null)} />
-      </div>
     );
   }
 
@@ -572,7 +530,6 @@ export function App() {
           isSidebarCollapsed={isSidebarCollapsed}
           onOpenChangePassword={() => setIsChangePasswordModalOpen(true)}
           onOpenQrScanner={() => setIsQrScannerOpen(true)}
-          onOpenCedulaScanner={() => setIsCedulaScannerOpen(true)}
         />
 
         {/* Main Content Area */}
@@ -589,23 +546,7 @@ export function App() {
             groups={groups}
             participants={participants}
             onOpenReservationModal={(event) => setSelectedEventForModal(event)}
-            onOpenCedulaScanner={() => setIsCedulaScannerOpen(true)}
-            onLookupCedula={handleLookupCedula}
-            isSearchingCedula={isSearchingCedula}
           />
-        )}
-
-        {/* Tab Kiosk: Kiosco Interactivo de Recepción / Lobby */}
-        {currentTab === 'kiosk' && (
-          <div className="py-4">
-            <ReceptionLobbySection
-              onLookupCedula={handleLookupCedula}
-              onOpenCedulaScanner={() => setIsCedulaScannerOpen(true)}
-              isSearching={isSearchingCedula}
-              isKioskMode={true}
-              onExitKiosk={() => setCurrentTab('landing')}
-            />
-          </div>
         )}
 
         {/* Tab 2: Mis Inscripciones & Rutas Formativas */}
@@ -820,31 +761,6 @@ export function App() {
           events={events}
           onConfirmAttendance={handleConfirmAttendance}
           onOpenTecEvaluation={(event) => setSelectedEventForTecModal(event)}
-          onShowToast={showToast}
-        />
-      )}
-
-      {/* Cedula Scanner Modal (Camera / Optical Reader) */}
-      {isCedulaScannerOpen && (
-        <CedulaScannerModal
-          isOpen={isCedulaScannerOpen}
-          onClose={() => setIsCedulaScannerOpen(false)}
-          onCedulaDetected={handleCedulaDetected}
-        />
-      )}
-
-      {/* Attendee Schedule & Course Grid Modal */}
-      {isAttendeeScheduleModalOpen && attendeeLookupResult && (
-        <AttendeeScheduleModal
-          isOpen={isAttendeeScheduleModalOpen}
-          onClose={() => setIsAttendeeScheduleModalOpen(false)}
-          lookupResult={attendeeLookupResult}
-          onConfirmAttendance={handleConfirmAttendanceLobby}
-          onOpenTecEvaluation={(event) => setSelectedEventForTecModal(event)}
-          onExploreCatalog={() => {
-            setIsAttendeeScheduleModalOpen(false);
-            setCurrentTab('landing');
-          }}
           onShowToast={showToast}
         />
       )}

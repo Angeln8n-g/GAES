@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { UserAccount } from '../../types';
 import { apiService } from '../../services/api';
+import { ReceptionLobbySection } from '../lobby/ReceptionLobbySection';
 
 interface LoginModalProps {
   users: UserAccount[];
@@ -24,8 +25,9 @@ interface LoginModalProps {
   onUsersUpdated?: (users: UserAccount[]) => void;
   attendanceEventTitle?: string | null;
   attendanceTime?: string | null;
-  onOpenKiosk?: () => void;
+  onLookupCedula?: (cedula: string) => void;
   onOpenCedulaScanner?: () => void;
+  isSearchingCedula?: boolean;
 }
 
 type AuthViewMode = 'login' | 'recover-request' | 'recover-verify';
@@ -36,9 +38,18 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   onUsersUpdated,
   attendanceEventTitle,
   attendanceTime,
-  onOpenKiosk,
-  onOpenCedulaScanner
+  onLookupCedula,
+  onOpenCedulaScanner,
+  isSearchingCedula = false
 }) => {
+  // Mode switcher: Iniciar Sesión vs Kiosco de Recepción
+  const [activeMainTab, setActiveMainTab] = useState<'login' | 'kiosk'>(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    if (tab === 'kiosk' || tab === 'lobby') return 'kiosk';
+    return 'login';
+  });
+
   // Login form states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -221,10 +232,10 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-red-100/60 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/3 w-80 h-80 bg-slate-200/50 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="w-full max-w-md relative z-10">
+      <div className={`w-full relative z-10 transition-all duration-300 ${activeMainTab === 'kiosk' ? 'max-w-4xl' : 'max-w-md'}`}>
         
         {/* Logo & Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-gradient-to-tr from-[#DA291C] via-[#EA382D] to-orange-500 shadow-xl shadow-red-500/25 mb-4 text-white ring-4 ring-white animate-in zoom-in-90 duration-500">
             <BookOpen className="w-8 h-8" />
           </div>
@@ -236,7 +247,49 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           </p>
         </div>
 
-        {/* QR Context Alert Banner if user clicked a QR code */}
+        {/* Main Mode Switcher: Iniciar Sesión vs Kiosco de Recepción */}
+        {onLookupCedula && onOpenCedulaScanner && (
+          <div className="flex p-1.5 bg-slate-200/80 rounded-2xl mb-6 shadow-inner border border-slate-300/60 max-w-sm mx-auto w-full">
+            <button
+              type="button"
+              onClick={() => setActiveMainTab('login')}
+              className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                activeMainTab === 'login'
+                  ? 'bg-white text-[#DA291C] shadow-sm scale-[1.01]'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+              }`}
+            >
+              <Lock className="w-3.5 h-3.5" />
+              <span>Iniciar Sesión</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveMainTab('kiosk')}
+              className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                activeMainTab === 'kiosk'
+                  ? 'bg-white text-[#DA291C] shadow-sm scale-[1.01]'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+              }`}
+            >
+              <CreditCard className="w-3.5 h-3.5 text-[#DA291C]" />
+              <span>Kiosco Recepción</span>
+            </button>
+          </div>
+        )}
+
+        {/* Content: Kiosk Lobby vs Login/Recovery */}
+        {activeMainTab === 'kiosk' && onLookupCedula && onOpenCedulaScanner ? (
+          <div className="animate-in fade-in zoom-in-95 duration-300">
+            <ReceptionLobbySection
+              onLookupCedula={onLookupCedula}
+              onOpenCedulaScanner={onOpenCedulaScanner}
+              isSearching={isSearchingCedula}
+              isKioskMode={false}
+            />
+          </div>
+        ) : (
+          <>
+            {/* QR Context Alert Banner if user clicked a QR code */}
         {attendanceEventTitle && viewMode === 'login' && (
           <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 shadow-sm animate-in slide-in-from-top-3 duration-300">
             <div className="flex items-start gap-3">
@@ -363,34 +416,20 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
             </form>
 
-            {/* Lobby / Kiosk Reception Access */}
-            {(onOpenKiosk || onOpenCedulaScanner) && (
+            {/* Quick Button to Switch to Kiosk */}
+            {onLookupCedula && onOpenCedulaScanner && (
               <div className="mt-6 pt-5 border-t border-slate-100 text-center">
-                <p className="text-xs text-slate-500 font-medium mb-3">
-                  ¿Visitas el centro de capacitación o vienes a un curso presencial?
+                <p className="text-xs text-slate-500 font-medium mb-2.5">
+                  ¿Visitas por primera vez o asistes a un curso presencial?
                 </p>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  {onOpenCedulaScanner && (
-                    <button
-                      type="button"
-                      onClick={onOpenCedulaScanner}
-                      className="flex-1 py-2.5 px-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs active:scale-95"
-                    >
-                      <CreditCard className="w-4 h-4 text-[#DA291C]" />
-                      <span>Escanear Cédula</span>
-                    </button>
-                  )}
-                  {onOpenKiosk && (
-                    <button
-                      type="button"
-                      onClick={onOpenKiosk}
-                      className="flex-1 py-2.5 px-3 rounded-2xl bg-red-50 hover:bg-red-100 text-[#DA291C] border border-red-200 text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs active:scale-95"
-                    >
-                      <Sparkles className="w-4 h-4 text-[#DA291C]" />
-                      <span>Kiosco Recepción</span>
-                    </button>
-                  )}
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveMainTab('kiosk')}
+                  className="w-full py-2.5 px-4 rounded-2xl bg-red-50 hover:bg-red-100 text-[#DA291C] border border-red-200 text-xs font-extrabold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs active:scale-95"
+                >
+                  <CreditCard className="w-4 h-4 text-[#DA291C]" />
+                  <span>Consultar Horario & Aula por Cédula (Kiosco)</span>
+                </button>
               </div>
             )}
 
@@ -627,6 +666,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             </form>
 
           </div>
+        )}
+
+          </>
         )}
 
       </div>
