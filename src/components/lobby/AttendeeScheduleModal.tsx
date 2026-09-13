@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { AttendeeLookupResult, ScheduledSessionItem } from '../../utils/attendeeLookup';
-import { formatDateLong } from '../../utils/formatters';
+import { formatDateLong, getEventDurationMetrics } from '../../utils/formatters';
 import { downloadIcsFile, getGoogleCalendarUrl } from '../../utils/icsUtils';
 import { TrainingEvent } from '../../types';
 
@@ -29,7 +29,7 @@ interface AttendeeScheduleModalProps {
   isOpen: boolean;
   onClose: () => void;
   lookupResult: AttendeeLookupResult | null;
-  onConfirmAttendance: (eventId: string, date: string, time: string, email: string) => Promise<void>;
+  onConfirmAttendance?: (eventId: string, date: string, time: string, email: string) => Promise<void>;
   onOpenTecEvaluation?: (event: TrainingEvent) => void;
   onExploreCatalog?: () => void;
   onShowToast?: (title: string, message: string, type?: 'success' | 'error' | 'info') => void;
@@ -45,7 +45,6 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
   onShowToast
 }) => {
   const [selectedPassSession, setSelectedPassSession] = useState<ScheduledSessionItem | null>(null);
-  const [processingAttendanceId, setProcessingAttendanceId] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<'all' | 'today' | 'upcoming'>('all');
 
   if (!isOpen || !lookupResult) return null;
@@ -60,39 +59,6 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
   });
 
   const todaySessionsCount = sessions.filter(s => s.isToday).length;
-
-  // Auto Check-in presencial con 1 clic desde el lobby
-  const handleQuickCheckIn = async (session: ScheduledSessionItem) => {
-    if (!displayEmail) return;
-    const sessionKey = `${session.event.id}-${session.schedule.date}-${session.slot.time}`;
-
-    try {
-      setProcessingAttendanceId(sessionKey);
-      await onConfirmAttendance(
-        session.event.id,
-        session.schedule.date,
-        session.slot.time,
-        displayEmail
-      );
-
-      // Actualizar estado en memoria local para feedback inmediato
-      session.hasAttended = true;
-
-      if (onShowToast) {
-        onShowToast(
-          '¡Asistencia Confirmada!',
-          `Has registrado tu presencia en: "${session.event.title}".`,
-          'success'
-        );
-      }
-    } catch (err: any) {
-      if (onShowToast) {
-        onShowToast('Error', err.message || 'No fue posible registrar tu asistencia.', 'error');
-      }
-    } finally {
-      setProcessingAttendanceId(null);
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-900/80 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
@@ -297,7 +263,7 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
                 {filteredSessions.map((session, idx) => {
                   const { event, schedule, slot, hasAttended, isMandatory, isToday, isPast } = session;
                   const sessionKey = `${event.id}-${schedule.date}-${slot.time}`;
-                  const isProcessing = processingAttendanceId === sessionKey;
+                  const metrics = getEventDurationMetrics(event);
 
                   return (
                     <div 
@@ -364,7 +330,12 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
 
                           <div className="flex items-center gap-2">
                             <Clock className="w-3.5 h-3.5 text-[#DA291C] shrink-0" />
-                            <span>Horario: <strong className="text-slate-900">{slot.time}</strong></span>
+                            <span>Horario: <strong className="text-slate-900">{slot.time}{slot.endTime ? ` - ${slot.endTime}` : ''}</strong></span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                            <span>Duración: <strong className="text-amber-900 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">{metrics.totalHours} hrs ({metrics.totalDays} {metrics.totalDays === 1 ? 'día' : 'días'})</strong></span>
                           </div>
 
                           <div className="flex items-center gap-2">
@@ -381,54 +352,76 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
 
                       </div>
 
-                      {/* Card Action Footer */}
+                      {/* Card Action Footer: Solo Pase QR / Estado Informativo (Sin auto-confirmación) */}
                       <div className="pt-4 border-t border-slate-100 space-y-2 mt-4">
-                        
-                        {/* Action 1: Confirmar Asistencia Presencial en el Lobby */}
-                        {!hasAttended ? (
-                          <button
-                            type="button"
-                            disabled={isProcessing}
-                            onClick={() => handleQuickCheckIn(session)}
-                            className="w-full py-2.5 px-3 rounded-xl bg-[#DA291C] hover:bg-red-700 text-white text-xs font-black flex items-center justify-center gap-1.5 shadow-md shadow-red-500/25 transition-all cursor-pointer disabled:opacity-50 active:scale-95"
-                          >
-                            <CheckCircle2 className="w-4 h-4" />
-                            <span>{isProcessing ? 'Confirmando...' : 'Confirmar Asistencia Presencial'}</span>
-                          </button>
-                        ) : (
-                          <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold text-center flex items-center justify-center gap-1.5">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                            <span>Asistencia Registrada Exitosamente</span>
+                        {hasAttended ? (
+                          <div className="space-y-2">
+                            <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold text-center flex items-center justify-center gap-1.5">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                              <span>Asistencia Confirmada por Facilitador</span>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setSelectedPassSession(session)}
+                                className="flex-1 py-2 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                              >
+                                <QrCode className="w-3.5 h-3.5 text-slate-600" />
+                                <span>Ver Pase QR</span>
+                              </button>
+
+                              {onOpenTecEvaluation && (() => {
+                                const attendeeEmail = (lookupResult.participant?.email || '').toLowerCase();
+                                const alreadyEvaluated = (event.feedbacks || []).find(
+                                  fb => fb.userEmail.toLowerCase() === attendeeEmail
+                                );
+
+                                if (alreadyEvaluated) {
+                                  return (
+                                    <span 
+                                      className="py-2 px-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold flex items-center gap-1 shrink-0 shadow-2xs"
+                                      title="Encuesta de satisfacción completada (1 sola respuesta permitida)"
+                                    >
+                                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                      <span>✓ Evaluado ({alreadyEvaluated.rating}★)</span>
+                                    </span>
+                                  );
+                                }
+
+                                return (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      onClose();
+                                      onOpenTecEvaluation(event);
+                                    }}
+                                    className="py-2 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                                    title="Completar Encuesta de Evaluación TEC"
+                                  >
+                                    <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                                    <span>Evaluar</span>
+                                  </button>
+                                );
+                              })()}
+                            </div>
                           </div>
-                        )}
-
-                        {/* Action 2: Ver Pase QR o Evaluar */}
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setSelectedPassSession(session)}
-                            className="flex-1 py-2 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                          >
-                            <QrCode className="w-3.5 h-3.5 text-slate-600" />
-                            <span>Pase QR</span>
-                          </button>
-
-                          {hasAttended && onOpenTecEvaluation && (
+                        ) : (
+                          <div className="space-y-2">
                             <button
                               type="button"
-                              onClick={() => {
-                                onClose();
-                                onOpenTecEvaluation(event);
-                              }}
-                              className="py-2 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0"
-                              title="Completar Encuesta de Evaluación TEC"
+                              onClick={() => setSelectedPassSession(session)}
+                              className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 hover:from-black hover:to-slate-900 text-white text-xs font-black flex items-center justify-center gap-2 shadow-md shadow-slate-900/15 transition-all cursor-pointer active:scale-95"
+                              title="Ver código QR de acceso para presentar al instructor en la puerta"
                             >
-                              <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-                              <span>Evaluar</span>
+                              <QrCode className="w-4 h-4 text-amber-400" />
+                              <span>Ver Pase QR de Acceso</span>
                             </button>
-                          )}
-                        </div>
-
+                            <p className="text-[10px] text-center text-slate-400 font-medium">
+                              Presenta este código QR al instructor en la puerta de la sala para registrar tu asistencia.
+                            </p>
+                          </div>
+                        )}
                       </div>
 
                     </div>
@@ -493,9 +486,13 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
                 {selectedPassSession.event.title}
               </h4>
               <p className="text-xs text-slate-500 font-medium mt-1">
-                {formatDateLong(selectedPassSession.schedule.date)} • {selectedPassSession.slot.time}
+                {formatDateLong(selectedPassSession.schedule.date)} • {selectedPassSession.slot.time}{selectedPassSession.slot.endTime ? ` - ${selectedPassSession.slot.endTime}` : ''}
               </p>
-              <p className="text-[11px] text-[#DA291C] font-bold mt-1">
+              <div className="mt-1.5 inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-900 bg-amber-50 px-2.5 py-0.5 rounded-lg border border-amber-200">
+                <Clock className="w-3 h-3 text-amber-600" />
+                <span>{getEventDurationMetrics(selectedPassSession.event).totalHours} hrs ({getEventDurationMetrics(selectedPassSession.event).totalDays} {getEventDurationMetrics(selectedPassSession.event).totalDays === 1 ? 'día' : 'días'})</span>
+              </div>
+              <p className="text-[11px] text-[#DA291C] font-bold mt-1.5">
                 {displayName} ({displayCedula || displayCard})
               </p>
             </div>

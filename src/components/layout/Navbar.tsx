@@ -37,6 +37,7 @@ interface NavbarProps {
   isSidebarCollapsed?: boolean;
   onOpenChangePassword?: () => void;
   onOpenQrScanner?: () => void;
+  onOpenUserProfile?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -52,7 +53,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenMobileSidebar,
   isSidebarCollapsed = false,
   onOpenChangePassword,
-  onOpenQrScanner
+  onOpenQrScanner,
+  onOpenUserProfile
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -363,18 +365,34 @@ export const Navbar: React.FC<NavbarProps> = ({
               })()
             )}
 
-            {/* User Avatar Card Pill */}
-            <div className="hidden sm:flex items-center gap-2.5 pl-2 pr-3 py-1 rounded-2xl bg-slate-50 border border-slate-200/90 shadow-xs hover:border-slate-300 transition-all shrink-0">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#DA291C] via-red-500 to-amber-500 flex items-center justify-center text-white font-black text-xs shadow-sm shrink-0">
+            {/* User Avatar Card Pill (Clickable to open profile) */}
+            <button
+              onClick={onOpenUserProfile}
+              type="button"
+              title="Ver y actualizar mi ficha de perfil"
+              className="hidden sm:flex items-center gap-2.5 pl-2 pr-3 py-1 rounded-2xl bg-slate-50 border border-slate-200/90 shadow-xs hover:border-[#DA291C] hover:bg-red-50/40 transition-all shrink-0 cursor-pointer text-left group"
+            >
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#DA291C] via-red-500 to-amber-500 flex items-center justify-center text-white font-black text-xs shadow-sm shrink-0 group-hover:scale-105 transition-transform">
                 {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
               </div>
               <div className="text-left shrink-0">
-                <p className="text-xs font-bold text-slate-900 truncate max-w-[140px] xl:max-w-[200px]">{currentUser.name}</p>
+                <p className="text-xs font-bold text-slate-900 truncate max-w-[140px] xl:max-w-[200px] group-hover:text-[#DA291C] transition-colors">{currentUser.name}</p>
                 <div className="flex items-center mt-0.5 whitespace-nowrap">
                   {getRoleBadge()}
                 </div>
               </div>
-            </div>
+            </button>
+
+            {/* User Profile Button (Desktop) */}
+            {onOpenUserProfile && (
+              <button
+                onClick={onOpenUserProfile}
+                title="Mi Perfil & Ficha Académica"
+                className="hidden sm:flex p-2 rounded-2xl text-slate-500 hover:text-[#DA291C] hover:bg-red-50 border border-slate-200 hover:border-red-200 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
+              >
+                <User className="w-4 h-4" />
+              </button>
+            )}
 
             {/* Quick QR Scanner Button (Desktop) */}
             {onOpenQrScanner && (
@@ -493,6 +511,22 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Navigation Links in Mobile Drawer */}
           <div className="space-y-2">
+            {onOpenUserProfile && (
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  onOpenUserProfile();
+                }}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all bg-slate-900 text-white hover:bg-black shadow-sm"
+              >
+                <div className="flex items-center gap-3">
+                  <User className="w-4 h-4 text-amber-400" />
+                  <span className="font-extrabold">Mi Perfil & Ficha Académica</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-amber-400" />
+              </button>
+            )}
+
             {onOpenQrScanner && (
               <button
                 onClick={() => {

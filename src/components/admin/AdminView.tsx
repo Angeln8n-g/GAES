@@ -10,7 +10,8 @@ import {
   Layers,
   Building2,
   Activity,
-  Settings
+  Settings,
+  Award
 } from 'lucide-react';
 import { TrainingEvent, Participant, UserAccount, ParticipantGroup, TrainingProgram, Company, SystemSettings, OjtChecklist, CalibrationSession } from '../../types';
 import { EventsManager } from './EventsManager';
@@ -20,6 +21,7 @@ import { GroupsManager } from './GroupsManager';
 import { ProgramsManager } from './ProgramsManager';
 import { CompaniesManager } from './CompaniesManager';
 import { SettingsManager } from './SettingsManager';
+import { FormalLettersManager } from './FormalLettersManager';
 import { OjtManager } from '../ojt/OjtManager';
 import { EventFormModal } from './EventFormModal';
 import { AttendeesModal } from './AttendeesModal';
@@ -54,8 +56,8 @@ interface AdminViewProps {
   onDeleteGroup: (groupId: string) => Promise<void>;
   onSaveProgram: (program: TrainingProgram) => Promise<void>;
   onDeleteProgram: (programId: string) => Promise<void>;
-  onConfirmAttendance: (eventId: string, date: string, time: string, email: string) => Promise<void>;
-  onRevertAttendance?: (eventId: string, date: string, time: string, email: string) => Promise<void>;
+  onConfirmAttendance: (eventId: string, date: string, time: string, email: string, type?: 'checkin' | 'checkout') => Promise<void>;
+  onRevertAttendance?: (eventId: string, date: string, time: string, email: string, type?: 'checkout' | 'all') => Promise<void>;
   onSendNotification: (eventId: string, channel: 'Email' | 'Teams', message: string, recipients: number) => Promise<void>;
   onBulkRegisterUsers: (
     eventId: string, 
@@ -100,7 +102,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
   onBulkRegisterUsers,
   onShowToast
 }) => {
-  const [adminTab, setAdminTab] = useState<'events' | 'programs' | 'groups' | 'participants' | 'users' | 'companies' | 'ojt' | 'settings'>('events');
+  const [adminTab, setAdminTab] = useState<'events' | 'programs' | 'groups' | 'participants' | 'users' | 'companies' | 'ojt' | 'letters' | 'settings'>('events');
 
   // Modals state
   const [isEventFormOpen, setIsEventFormOpen] = useState(false);
@@ -297,6 +299,20 @@ export const AdminView: React.FC<AdminViewProps> = ({
 
             {isSuperAdmin && (
               <button
+                onClick={() => setAdminTab('letters')}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                  adminTab === 'letters'
+                    ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                }`}
+              >
+                <Award className="w-4 h-4 text-amber-500" />
+                <span>Cartas & Constancias</span>
+              </button>
+            )}
+
+            {isSuperAdmin && (
+              <button
                 onClick={() => setAdminTab('settings')}
                 className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                   adminTab === 'settings'
@@ -425,6 +441,18 @@ export const AdminView: React.FC<AdminViewProps> = ({
         />
       )}
 
+      {adminTab === 'letters' && isSuperAdmin && (
+        <FormalLettersManager
+          participants={scopedParticipants}
+          users={scopedUsers}
+          events={scopedEvents}
+          programs={scopedPrograms}
+          companies={companies}
+          currentUser={currentUser}
+          onShowToast={onShowToast}
+        />
+      )}
+
       {adminTab === 'settings' && isSuperAdmin && onUpdateSettings && (
         <SettingsManager
           settings={settings}
@@ -462,13 +490,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
           participants={participants}
           isSuperAdmin={isSuperAdmin}
           onClose={() => setAttendeesEvent(null)}
-          onConfirmAttendance={async (evtId, date, time, email) => {
-            await onConfirmAttendance(evtId, date, time, email);
-            onShowToast('Asistencia confirmada', `Se confirmó la asistencia para ${email}.`, 'success');
+          onConfirmAttendance={async (evtId, date, time, email, type = 'checkin') => {
+            await onConfirmAttendance(evtId, date, time, email, type);
+            onShowToast('Asistencia registrada', `Se registró ${type === 'checkout' ? 'la salida' : 'la entrada'} para ${email}.`, 'success');
           }}
-          onRevertAttendance={onRevertAttendance ? async (evtId, date, time, email) => {
-            await onRevertAttendance(evtId, date, time, email);
-            onShowToast('Asistencia revertida', `Se canceló la asistencia para ${email}.`, 'info');
+          onRevertAttendance={onRevertAttendance ? async (evtId, date, time, email, type = 'all') => {
+            await onRevertAttendance(evtId, date, time, email, type);
+            onShowToast('Asistencia revertida', `Se actualizó la asistencia para ${email}.`, 'info');
           } : undefined}
           onOpenBulkEnrollment={(evtId, date, time) => handleOpenBulkEnrollment(evtId, date, time)}
           onSaveGradesSuccess={(updatedEvt) => {

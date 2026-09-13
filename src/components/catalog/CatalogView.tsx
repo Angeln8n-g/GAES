@@ -14,7 +14,8 @@ import {
   Calendar,
   X,
   Flame,
-  Star
+  Star,
+  History
 } from 'lucide-react';
 import { TrainingEvent, UserAccount, TrainingProgram, ParticipantGroup, Participant, Company } from '../../types';
 import { EventCard } from './EventCard';
@@ -47,8 +48,15 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [selectedModality, setSelectedModality] = useState<string>("Todos");
   const [onlyAvailable, setOnlyAvailable] = useState<boolean>(false);
+  const [includePastEvents, setIncludePastEvents] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<string | null>(null);
+
+  // Fecha actual local en formato YYYY-MM-DD
+  const todayStr = useMemo(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }, []);
 
   // Eventos requeridos en los programas del usuario logueado
   const userEmail = currentUser?.email?.toLowerCase();
@@ -74,16 +82,37 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
     ? selectedCompanyId 
     : (currentUser?.companyId || 'emp_kasino');
 
-  // Cálculos de KPIs en Vivo
+  // Helper de visibilidad multiempresa (soporta eventos globales 'all' y arrays companyIds)
+  const isEventVisibleForCompany = (e: TrainingEvent, targetCompanyId: string) => {
+    if (targetCompanyId === 'all') return true;
+    if (!e.companyId || e.companyId === 'all') return true;
+    if (e.companyId === targetCompanyId) return true;
+    if (Array.isArray(e.companyIds) && (e.companyIds.includes('all') || e.companyIds.includes(targetCompanyId))) return true;
+    return false;
+  };
+
+  // Cálculos de KPIs en Vivo (Alineados a eventos vigentes por defecto)
   const stats = useMemo(() => {
-    const activeEvents = events.filter(e => e.status === 'active' && (effectiveCompany === 'all' || !e.companyId || e.companyId === effectiveCompany));
+    const activeEvents = events.filter(e => {
+      if (e.status !== 'active') return false;
+      if (!isEventVisibleForCompany(e, effectiveCompany)) return false;
+      if (!includePastEvents && !selectedCalendarDate) {
+        return e.schedule.some(s => s.date >= todayStr);
+      }
+      return true;
+    });
+
     let totalCap = 0;
     let totalReg = 0;
     let totalSchedulesCount = 0;
 
     activeEvents.forEach(evt => {
-      totalSchedulesCount += evt.schedule.length;
-      evt.schedule.forEach(s => s.slots.forEach(sl => {
+      const relevantSchedules = (!includePastEvents && !selectedCalendarDate)
+        ? evt.schedule.filter(s => s.date >= todayStr)
+        : evt.schedule;
+
+      totalSchedulesCount += relevantSchedules.length;
+      relevantSchedules.forEach(s => s.slots.forEach(sl => {
         totalCap += sl.capacity;
         totalReg += sl.registered;
       }));
@@ -101,28 +130,52 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
       companiesCount: activeCompaniesCount,
       sessionsCount: totalSchedulesCount
     };
-  }, [events, effectiveCompany, companies]);
+  }, [events, effectiveCompany, companies, includePastEvents, selectedCalendarDate, todayStr]);
 
-  // Contadores dinámicos por categoría
+  // Contadores dinámicos por categoría (alineados a eventos vigentes)
   const categoryCounts = useMemo(() => {
+    const baseEvents = events.filter(e => {
+      if (e.status !== 'active') return false;
+      if (!isEventVisibleForCompany(e, effectiveCompany)) return false;
+      if (!includePastEvents && !selectedCalendarDate) {
+        return e.schedule.some(s => s.date >= todayStr);
+      }
+      if (selectedCalendarDate) {
+        return e.schedule.some(s => s.date === selectedCalendarDate);
+      }
+      return true;
+    });
+
     const counts: Record<string, number> = {
-      "Todos": events.filter(e => e.status === 'active' && (effectiveCompany === 'all' || !e.companyId || e.companyId === effectiveCompany)).length
+      "Todos": baseEvents.length
     };
     CATEGORIES.forEach(cat => {
       if (cat !== "Todos") {
-        counts[cat] = events.filter(e => e.status === 'active' && e.category === cat && (effectiveCompany === 'all' || !e.companyId || e.companyId === effectiveCompany)).length;
+        counts[cat] = baseEvents.filter(e => e.category === cat).length;
       }
     });
     return counts;
-  }, [events, effectiveCompany]);
+  }, [events, effectiveCompany, includePastEvents, selectedCalendarDate, todayStr]);
 
-  // Filtrado compuesto
+  // Filtrado compuesto con discriminación de fechas actuales y futuras
   const filteredEvents = events.filter(evt => {
     if (evt.status !== 'active') return false;
 
     // Filtro por empresa
-    if (effectiveCompany !== 'all' && evt.companyId && evt.companyId !== effectiveCompany) {
+    if (!isEventVisibleForCompany(evt, effectiveCompany)) {
       return false;
+    }
+
+    // Filtro de fechas actuales y futuras por defecto
+    if (!includePastEvents && !selectedCalendarDate) {
+      const hasUpcomingSchedule = evt.schedule.some(s => s.date >= todayStr);
+      if (!hasUpcomingSchedule) return false;
+    }
+
+    // Filtro por fecha específica seleccionada en el calendario
+    if (selectedCalendarDate) {
+      const hasDate = evt.schedule.some(s => s.date === selectedCalendarDate);
+      if (!hasDate) return false;
     }
 
     // Filtro por categoría
@@ -135,17 +188,15 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
       return false;
     }
 
-    // Filtro por fecha del calendario
-    if (selectedCalendarDate) {
-      const hasDate = evt.schedule.some(s => s.date === selectedCalendarDate);
-      if (!hasDate) return false;
-    }
-
     // Filtro solo con cupos disponibles
     if (onlyAvailable) {
       let totalCap = 0;
       let totalReg = 0;
-      evt.schedule.forEach(s => s.slots.forEach(sl => {
+      const relevantSchedules = (!includePastEvents && !selectedCalendarDate)
+        ? evt.schedule.filter(s => s.date >= todayStr)
+        : evt.schedule;
+
+      relevantSchedules.forEach(s => s.slots.forEach(sl => {
         totalCap += sl.capacity;
         totalReg += sl.registered;
       }));
@@ -165,10 +216,16 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
     return true;
   });
 
-  // Cursos sugeridos / destacados (Top 4 eventos)
-  const suggestedCourses = events
-    .filter(e => e.status === 'active' && (effectiveCompany === 'all' || !e.companyId || e.companyId === effectiveCompany))
-    .slice(0, 4);
+  // Cursos sugeridos / destacados (solo eventos con fechas actuales o futuras)
+  const suggestedCourses = useMemo(() => {
+    return events
+      .filter(e => {
+        if (e.status !== 'active') return false;
+        if (!isEventVisibleForCompany(e, effectiveCompany)) return false;
+        return e.schedule.some(s => s.date >= todayStr);
+      })
+      .slice(0, 4);
+  }, [events, effectiveCompany, todayStr]);
 
   return (
     <div id="maincontent" className="space-y-8 pb-20">
@@ -412,14 +469,35 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                 <CalendarCheck className="w-3.5 h-3.5" />
                 <span>Solo con cupo</span>
               </button>
+
+              {/* Include Past Events Toggle */}
+              <button
+                onClick={() => setIncludePastEvents(!includePastEvents)}
+                className={`px-3.5 py-1.5 rounded-2xl border font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs ${
+                  includePastEvents
+                    ? 'bg-slate-800 text-white border-slate-900 shadow-md shadow-slate-900/20'
+                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                }`}
+                title={includePastEvents ? "Ocultar eventos pasados" : "Mostrar también eventos pasados ya finalizados"}
+              >
+                <History className={`w-3.5 h-3.5 ${includePastEvents ? 'text-amber-400' : 'text-slate-400'}`} />
+                <span>{includePastEvents ? "Historial incluido" : "Incluir pasados"}</span>
+              </button>
             </div>
           </div>
 
           {/* Events Count Indicator */}
-          <div className="flex items-center justify-between text-xs text-slate-500 px-1">
-            <span>
-              Mostrando <strong className="text-slate-900 font-black">{filteredEvents.length}</strong> capacitaciones activas
-            </span>
+          <div className="flex items-center justify-between text-xs text-slate-500 px-1 flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <span>
+                Mostrando <strong className="text-slate-900 font-black">{filteredEvents.length}</strong> {includePastEvents ? 'capacitaciones (incluyendo historial)' : 'capacitaciones vigentes'}
+              </span>
+              {!includePastEvents && !selectedCalendarDate && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[10px]">
+                  ● Fechas actuales y futuras
+                </span>
+              )}
+            </div>
             {selectedCalendarDate && (
               <span className="text-[#DA291C] font-bold bg-red-50 px-2.5 py-0.5 rounded-full border border-red-200">
                 📅 Filtrado por fecha: {selectedCalendarDate}
@@ -455,6 +533,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   setSelectedCategory("Todos");
                   setSelectedModality("Todos");
                   setOnlyAvailable(false);
+                  setIncludePastEvents(false);
                   setSearchQuery("");
                   setSelectedCalendarDate(null);
                 }}

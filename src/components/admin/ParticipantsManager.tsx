@@ -58,6 +58,8 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
   const [selectedSuperFilter, setSelectedSuperFilter] = useState("all");
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>("all");
   const [selectedCompanyFilter, setSelectedCompanyFilter] = useState<string>("all");
+  const [selectedEducationFilter, setSelectedEducationFilter] = useState<string>("all");
+  const [selectedStudyingFilter, setSelectedStudyingFilter] = useState<string>("all");
   
   // Modals state
   const [editingParticipant, setEditingParticipant] = useState<Participant | null>(null);
@@ -166,6 +168,19 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
         if (selectedSuperFilter !== "unassigned" && p.supervisorId !== selectedSuperFilter) return false;
       }
 
+      // Filtro nivel educativo
+      if (selectedEducationFilter !== "all" && (p.educationLevel || "Secundaria / Bachiller") !== selectedEducationFilter) {
+        return false;
+      }
+
+      // Filtro si estudia actualmente
+      if (selectedStudyingFilter === "studying" && !p.isCurrentlyStudying) {
+        return false;
+      }
+      if (selectedStudyingFilter === "not_studying" && p.isCurrentlyStudying) {
+        return false;
+      }
+
       // Filtro de búsqueda
       const q = searchQuery.toLowerCase().trim();
       if (!q) return true;
@@ -182,7 +197,7 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
         compName.toLowerCase().includes(q)
       );
     });
-  }, [participants, selectedCompanyFilter, selectedStatusFilter, selectedDeptFilter, selectedSuperFilter, searchQuery, companiesMap]);
+  }, [participants, selectedCompanyFilter, selectedStatusFilter, selectedDeptFilter, selectedSuperFilter, selectedEducationFilter, selectedStudyingFilter, searchQuery, companiesMap]);
 
   const handleToggleCard = (card: string) => {
     setSelectedCards(prev => {
@@ -622,6 +637,31 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
                 <option key={s.id} value={s.id}>👤 Sup: {s.name}</option>
               ))}
             </select>
+
+            {/* Filtro Nivel Educativo */}
+            <select
+              value={selectedEducationFilter}
+              onChange={(e) => setSelectedEducationFilter(e.target.value)}
+              className="px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#DA291C]"
+            >
+              <option value="all">🎓 Todo Nivel Educativo</option>
+              <option value="Secundaria / Bachiller">Secundaria / Bachiller</option>
+              <option value="Técnico / Tecnólogo">Técnico / Tecnólogo</option>
+              <option value="Universitario en Curso">Universitario en Curso</option>
+              <option value="Profesional / Grado">Profesional / Grado</option>
+              <option value="Postgrado / Maestría">Postgrado / Maestría</option>
+            </select>
+
+            {/* Filtro Estudia Actualmente */}
+            <select
+              value={selectedStudyingFilter}
+              onChange={(e) => setSelectedStudyingFilter(e.target.value)}
+              className="px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#DA291C]"
+            >
+              <option value="all">📚 Situación Académica</option>
+              <option value="studying">🎓 Estudiando Actualmente</option>
+              <option value="not_studying">No Estudia Actualmente</option>
+            </select>
           </div>
         </div>
 
@@ -978,6 +1018,23 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
                             <Eye className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                           </p>
                           <p className="text-slate-500 font-mono text-[11px]">{p.email}</p>
+                          {(p.educationLevel || p.isCurrentlyStudying) && (
+                            <div className="flex flex-wrap items-center gap-1 mt-1">
+                              {p.educationLevel && (
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                  {p.educationLevel}
+                                </span>
+                              )}
+                              {p.isCurrentlyStudying && (
+                                <span 
+                                  className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200" 
+                                  title={p.currentStudyField ? `Estudia: ${p.currentStudyField}` : "Estudiando actualmente"}
+                                >
+                                  🎓 Estudia{p.currentStudyField ? `: ${p.currentStudyField}` : ""}
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </button>
                       </td>
 
@@ -1109,6 +1166,7 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
           events={events}
           programs={programs}
           companies={companies}
+          currentUser={currentUser}
           isOpen={Boolean(viewingProfileParticipant)}
           onClose={() => setViewingProfileParticipant(null)}
           onOpenEdit={(p) => {

@@ -134,12 +134,91 @@ export const initDbMigrations = async () => {
       ALTER TABLE IF EXISTS participants ADD COLUMN IF NOT EXISTS employment_status VARCHAR(50) DEFAULT 'contratado';
       ALTER TABLE IF EXISTS participants ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
       ALTER TABLE IF EXISTS participants ADD COLUMN IF NOT EXISTS company_id VARCHAR(100) DEFAULT 'emp_kasino';
+      ALTER TABLE IF EXISTS participants ADD COLUMN IF NOT EXISTS birth_date DATE;
+      ALTER TABLE IF EXISTS participants ADD COLUMN IF NOT EXISTS education_level VARCHAR(100);
+      ALTER TABLE IF EXISTS participants ADD COLUMN IF NOT EXISTS is_currently_studying BOOLEAN DEFAULT FALSE;
+      ALTER TABLE IF EXISTS participants ADD COLUMN IF NOT EXISTS current_study_field VARCHAR(255);
+      ALTER TABLE IF EXISTS participants ADD COLUMN IF NOT EXISTS institution_name VARCHAR(255);
+      ALTER TABLE IF EXISTS participants ADD COLUMN IF NOT EXISTS profession_title VARCHAR(255);
+      ALTER TABLE IF EXISTS participants ADD COLUMN IF NOT EXISTS current_address TEXT;
+      ALTER TABLE IF EXISTS participants ADD COLUMN IF NOT EXISTS phone VARCHAR(50);
+      ALTER TABLE IF EXISTS participants ADD COLUMN IF NOT EXISTS gender VARCHAR(50);
+      ALTER TABLE IF EXISTS participants ADD COLUMN IF NOT EXISTS training_interest_areas TEXT[] DEFAULT '{}';
+      ALTER TABLE IF EXISTS participants ADD COLUMN IF NOT EXISTS profile_completed BOOLEAN DEFAULT FALSE;
 
       ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS assigned_member_cards TEXT[];
       ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS department VARCHAR(150);
       ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS employment_status VARCHAR(50) DEFAULT 'contratado';
       ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
       ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS company_id VARCHAR(100) DEFAULT 'emp_kasino';
+      ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS birth_date DATE;
+      ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS education_level VARCHAR(100);
+      ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS is_currently_studying BOOLEAN DEFAULT FALSE;
+      ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS current_study_field VARCHAR(255);
+      ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS institution_name VARCHAR(255);
+      ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS profession_title VARCHAR(255);
+      ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS current_address TEXT;
+      ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS phone VARCHAR(50);
+      ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS gender VARCHAR(50);
+      ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS training_interest_areas TEXT[] DEFAULT '{}';
+      ALTER TABLE IF EXISTS users_simulated ADD COLUMN IF NOT EXISTS profile_completed BOOLEAN DEFAULT FALSE;
+
+      -- Semilla de datos sociodemográficos para pruebas analíticas
+      UPDATE participants 
+      SET education_level = 'Profesional / Grado', 
+          profession_title = 'Ingeniero de Software', 
+          birth_date = '1992-05-14', 
+          is_currently_studying = false, 
+          current_address = 'Av. 27 de Febrero #102, Santo Domingo', 
+          phone = '809-555-1020', 
+          gender = 'Masculino', 
+          training_interest_areas = ARRAY['Tecnología y Herramientas Digitales / IA', 'Liderazgo y Gestión de Equipos'],
+          profile_completed = true
+      WHERE card = '2010' AND education_level IS NULL;
+
+      UPDATE participants 
+      SET education_level = 'Técnico / Tecnólogo', 
+          profession_title = 'Técnica en Redes y Telecomunicaciones', 
+          birth_date = '1998-11-20', 
+          is_currently_studying = true, 
+          current_study_field = 'Licenciatura en Ciberseguridad', 
+          institution_name = 'Instituto Tecnológico de Santo Domingo (INTEC)',
+          current_address = 'Calle del Sol #45, Santiago de los Caballeros', 
+          phone = '809-555-4030', 
+          gender = 'Femenino', 
+          training_interest_areas = ARRAY['Excel y Análisis de Datos', 'Tecnología y Herramientas Digitales / IA'],
+          profile_completed = true
+      WHERE card = '2012' AND education_level IS NULL;
+
+      UPDATE participants 
+      SET education_level = 'Secundaria / Bachiller', 
+          profession_title = 'Bachiller Técnico', 
+          birth_date = '2001-03-08', 
+          is_currently_studying = true, 
+          current_study_field = 'Técnico Superior en Electricidad', 
+          institution_name = 'INFOTEP',
+          current_address = 'Av. Independencia #512, Santo Domingo', 
+          phone = '809-555-8812', 
+          gender = 'Masculino', 
+          training_interest_areas = ARRAY['Seguridad Industrial y Procesos', 'Atención al Cliente y Comunicación Asertiva'],
+          profile_completed = true
+      WHERE card = '1998' AND education_level IS NULL;
+
+      -- Sincronizar hacia usuarios_simulados existentes
+      UPDATE users_simulated u
+      SET education_level = p.education_level,
+          profession_title = p.profession_title,
+          birth_date = p.birth_date,
+          is_currently_studying = p.is_currently_studying,
+          current_study_field = p.current_study_field,
+          institution_name = p.institution_name,
+          current_address = p.current_address,
+          phone = p.phone,
+          gender = p.gender,
+          training_interest_areas = p.training_interest_areas,
+          profile_completed = p.profile_completed
+      FROM participants p
+      WHERE LOWER(u.email) = LOWER(p.email) AND u.education_level IS NULL;
 
       ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS company_id VARCHAR(100) DEFAULT 'emp_kasino';
       ALTER TABLE IF EXISTS participant_groups ADD COLUMN IF NOT EXISTS company_id VARCHAR(100) DEFAULT 'emp_kasino';
@@ -185,6 +264,42 @@ export const initDbMigrations = async () => {
       ALTER TABLE IF EXISTS event_feedbacks ADD COLUMN IF NOT EXISTS facilitator_ratings JSONB DEFAULT '{}';
       ALTER TABLE IF EXISTS event_feedbacks ADD COLUMN IF NOT EXISTS course_score NUMERIC(5, 2);
       ALTER TABLE IF EXISTS event_feedbacks ADD COLUMN IF NOT EXISTS facilitator_score NUMERIC(5, 2);
+
+      -- Restricción estricta: 1 sola respuesta de encuesta por colaborador y por evento
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_event_feedbacks_unique_user_event 
+      ON event_feedbacks(event_id, LOWER(user_email));
+
+      -- Fechas y Horas de Finalización en Eventos, Horarios y Códigos Diarios
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS start_date DATE;
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS end_date DATE;
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS start_time VARCHAR(50);
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS end_time VARCHAR(50);
+      ALTER TABLE IF EXISTS event_schedules ADD COLUMN IF NOT EXISTS end_date DATE;
+      ALTER TABLE IF EXISTS event_slots ADD COLUMN IF NOT EXISTS end_time VARCHAR(50);
+      ALTER TABLE IF EXISTS event_slots ADD COLUMN IF NOT EXISTS checkin_code VARCHAR(50);
+      ALTER TABLE IF EXISTS event_slots ADD COLUMN IF NOT EXISTS checkout_code VARCHAR(50);
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS company_ids TEXT[] DEFAULT '{}';
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS total_hours NUMERIC(5,1) DEFAULT 0;
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS session_type VARCHAR(100) DEFAULT 'Sincrónica';
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS training_type VARCHAR(100) DEFAULT 'Técnico';
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS training_format VARCHAR(100) DEFAULT 'Taller';
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS program_category VARCHAR(150) DEFAULT 'Capacitacion_seguridad_salud_en_el_trabajo_y_sustentabilidad';
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS subprogram VARCHAR(150) DEFAULT 'Sustentabilidad';
+      ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS supplier VARCHAR(255) DEFAULT 'Claro';
+
+      -- Control de Asistencia Entrada y Salida
+      ALTER TABLE IF EXISTS attendance_logs ADD COLUMN IF NOT EXISTS check_in_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+      ALTER TABLE IF EXISTS attendance_logs ADD COLUMN IF NOT EXISTS check_out_at TIMESTAMP DEFAULT NULL;
+      ALTER TABLE IF EXISTS attendance_logs ADD COLUMN IF NOT EXISTS is_completed BOOLEAN DEFAULT FALSE;
+
+      -- Backfill de códigos diarios para slots existentes que no tengan código
+      UPDATE event_slots 
+      SET checkin_code = LPAD(FLOOR(RANDOM() * 9000 + 1000)::text, 4, '0')
+      WHERE checkin_code IS NULL;
+
+      UPDATE event_slots 
+      SET checkout_code = LPAD(FLOOR(RANDOM() * 9000 + 1000)::text, 4, '0')
+      WHERE checkout_code IS NULL;
 
       -- Actualizar eventos existentes para tener competencias y tipos de evaluación demostrativos
       UPDATE events 

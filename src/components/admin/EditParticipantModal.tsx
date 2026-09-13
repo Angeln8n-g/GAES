@@ -51,6 +51,17 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
   const [employmentStatus, setEmploymentStatus] = useState<EmploymentStatus>(participant.employmentStatus || 'contratado');
   const [isActive, setIsActive] = useState<boolean>(participant.isActive !== undefined ? participant.isActive : true);
 
+  // Campos Sociodemográficos y Académicos
+  const [birthDate, setBirthDate] = useState(participant.birthDate || '');
+  const [educationLevel, setEducationLevel] = useState<any>(participant.educationLevel || 'Secundaria / Bachiller');
+  const [isCurrentlyStudying, setIsCurrentlyStudying] = useState<boolean>(Boolean(participant.isCurrentlyStudying));
+  const [currentStudyField, setCurrentStudyField] = useState(participant.currentStudyField || '');
+  const [institutionName, setInstitutionName] = useState(participant.institutionName || '');
+  const [professionTitle, setProfessionTitle] = useState(participant.professionTitle || '');
+  const [currentAddress, setCurrentAddress] = useState(participant.currentAddress || '');
+  const [phone, setPhone] = useState(participant.phone || '');
+  const [gender, setGender] = useState<any>(participant.gender || 'Prefiero no decir');
+
   // Rol del usuario vinculado
   const linkedUser = users.find(u => u.email.toLowerCase() === participant.email.toLowerCase());
   const [userRole, setUserRole] = useState<UserRole>(linkedUser?.role || 'Colaborador (User)');
@@ -98,7 +109,17 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
       supervisorId: selectedSuper ? selectedSuper.id : undefined,
       supervisorName: selectedSuper ? selectedSuper.name : undefined,
       employmentStatus,
-      isActive: employmentStatus === 'inactivo' ? false : isActive
+      isActive: employmentStatus === 'inactivo' ? false : isActive,
+      birthDate: birthDate.trim() || undefined,
+      educationLevel: educationLevel || undefined,
+      isCurrentlyStudying,
+      currentStudyField: isCurrentlyStudying ? currentStudyField.trim() : undefined,
+      institutionName: isCurrentlyStudying ? institutionName.trim() : undefined,
+      professionTitle: professionTitle.trim() || undefined,
+      currentAddress: currentAddress.trim() || undefined,
+      phone: phone.trim() || undefined,
+      gender: gender || undefined,
+      profileCompleted: Boolean(birthDate && educationLevel)
     };
 
     try {
@@ -312,6 +333,128 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Ficha Académica & Sociodemográfica */}
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3.5">
+            <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              🎓 Ficha Académica & Sociodemográfica
+            </h4>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                  Nivel de Estudio
+                </label>
+                <select
+                  value={educationLevel}
+                  onChange={(e) => setEducationLevel(e.target.value)}
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-[#DA291C]"
+                >
+                  <option value="Secundaria / Bachiller">Secundaria / Bachiller</option>
+                  <option value="Técnico / Tecnólogo">Técnico / Tecnólogo</option>
+                  <option value="Universitario en Curso">Universitario en Curso</option>
+                  <option value="Profesional / Grado">Profesional / Grado</option>
+                  <option value="Postgrado / Maestría">Postgrado / Maestría</option>
+                  <option value="Doctorado">Doctorado</option>
+                  <option value="Primaria">Primaria</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                  Título / Profesión
+                </label>
+                <input
+                  type="text"
+                  value={professionTitle}
+                  onChange={(e) => setProfessionTitle(e.target.value)}
+                  placeholder="ej. Lic. en Contabilidad"
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-[#DA291C]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                  Fecha de Nacimiento
+                </label>
+                <input
+                  type="date"
+                  value={birthDate}
+                  onChange={(e) => setBirthDate(e.target.value)}
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-[#DA291C]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                  Teléfono / WhatsApp
+                </label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="ej. (809) 555-1234"
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-[#DA291C]"
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                  Dirección / Sector
+                </label>
+                <input
+                  type="text"
+                  value={currentAddress}
+                  onChange={(e) => setCurrentAddress(e.target.value)}
+                  placeholder="ej. Ensanche Naco, Santo Domingo"
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-[#DA291C]"
+                />
+              </div>
+
+              {/* ¿Estudia actualmente? */}
+              <div className="sm:col-span-2 pt-1 border-t border-slate-200/80">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-700">¿Estudia actualmente?</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsCurrentlyStudying(false)}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold ${!isCurrentlyStudying ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-700'}`}
+                    >
+                      No
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsCurrentlyStudying(true)}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold ${isCurrentlyStudying ? 'bg-[#DA291C] text-white' : 'bg-slate-200 text-slate-700'}`}
+                    >
+                      Sí
+                    </button>
+                  </div>
+                </div>
+
+                {isCurrentlyStudying && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 pt-2 border-t border-slate-200/60">
+                    <input
+                      type="text"
+                      value={currentStudyField}
+                      onChange={(e) => setCurrentStudyField(e.target.value)}
+                      placeholder="Carrera / Curso que estudia"
+                      className="px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-800"
+                    />
+                    <input
+                      type="text"
+                      value={institutionName}
+                      onChange={(e) => setInstitutionName(e.target.value)}
+                      placeholder="Universidad / Instituto"
+                      className="px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-800"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Rol del Usuario Vinculado */}

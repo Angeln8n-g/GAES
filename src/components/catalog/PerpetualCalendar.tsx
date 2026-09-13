@@ -15,8 +15,19 @@ export const PerpetualCalendar: React.FC<PerpetualCalendarProps> = ({
   selectedDate,
   onSelectDate
 }) => {
-  const [currentYear, setCurrentYear] = useState<number>(2026);
-  const [currentMonth, setCurrentMonth] = useState<number>(7);
+  const today = new Date();
+  const todayYear = today.getFullYear();
+  const todayMonth = today.getMonth() + 1;
+
+  const [currentYear, setCurrentYear] = useState<number>(todayYear);
+  const [currentMonth, setCurrentMonth] = useState<number>(todayMonth);
+
+  const isCurrentMonthView = currentYear === todayYear && currentMonth === todayMonth;
+
+  const handleResetToCurrentMonth = () => {
+    setCurrentYear(todayYear);
+    setCurrentMonth(todayMonth);
+  };
 
   const handlePrevMonth = () => {
     if (currentMonth === 1) {
@@ -65,6 +76,17 @@ export const PerpetualCalendar: React.FC<PerpetualCalendarProps> = ({
             >
               <RotateCcw className="w-3 h-3 text-[#DA291C]" />
               <span>Ver todos</span>
+            </button>
+          )}
+
+          {!isCurrentMonthView && (
+            <button
+              onClick={handleResetToCurrentMonth}
+              className="px-2.5 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-[11px] font-bold text-[#DA291C] border border-red-200 transition-colors flex items-center gap-1 cursor-pointer"
+              title="Volver al mes actual"
+            >
+              <CalendarIcon className="w-3 h-3" />
+              <span>Hoy</span>
             </button>
           )}
 
@@ -127,7 +149,10 @@ export const PerpetualCalendar: React.FC<PerpetualCalendarProps> = ({
                 ${day.isToday && !isSelected ? 'ring-2 ring-[#DA291C]' : ''}
               `}
             >
-              <span>{day.dayNumber}</span>
+              <span className="leading-tight">{day.dayNumber}</span>
+              {day.isToday && !isSelected && (
+                <span className="text-[7.5px] font-black text-[#DA291C] leading-none uppercase tracking-tighter">Hoy</span>
+              )}
               
               {/* Event Dots */}
               {hasEvents && day.isCurrentMonth && (

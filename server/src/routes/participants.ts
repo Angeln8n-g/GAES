@@ -18,7 +18,18 @@ participantsRouter.get("/", async (req: Request, res: Response) => {
         supervisor_name as "supervisorName",
         COALESCE(employment_status, 'contratado') as "employmentStatus",
         COALESCE(is_active, true) as "isActive",
-        COALESCE(company_id, 'emp_kasino') as "companyId"
+        COALESCE(company_id, 'emp_kasino') as "companyId",
+        TO_CHAR(birth_date, 'YYYY-MM-DD') as "birthDate",
+        education_level as "educationLevel",
+        COALESCE(is_currently_studying, false) as "isCurrentlyStudying",
+        current_study_field as "currentStudyField",
+        institution_name as "institutionName",
+        profession_title as "professionTitle",
+        current_address as "currentAddress",
+        phone,
+        gender,
+        COALESCE(training_interest_areas, '{}') as "trainingInterestAreas",
+        COALESCE(profile_completed, false) as "profileCompleted"
       FROM participants 
     `;
     const params: any[] = [];
@@ -59,11 +70,27 @@ participantsRouter.post("/bulk", async (req: Request, res: Response) => {
       const employmentStatus = p.employmentStatus || 'contratado';
       const isActive = p.isActive !== undefined ? Boolean(p.isActive) : true;
       const companyId = p.companyId ? p.companyId.trim() : 'emp_kasino';
+      const birthDate = p.birthDate ? p.birthDate.trim() : null;
+      const educationLevel = p.educationLevel ? p.educationLevel.trim() : null;
+      const isCurrentlyStudying = Boolean(p.isCurrentlyStudying);
+      const currentStudyField = p.currentStudyField ? p.currentStudyField.trim() : null;
+      const institutionName = p.institutionName ? p.institutionName.trim() : null;
+      const professionTitle = p.professionTitle ? p.professionTitle.trim() : null;
+      const currentAddress = p.currentAddress ? p.currentAddress.trim() : null;
+      const phone = p.phone ? p.phone.trim() : null;
+      const gender = p.gender ? p.gender.trim() : null;
+      const trainingInterestAreas = Array.isArray(p.trainingInterestAreas) ? p.trainingInterestAreas : [];
+      const profileCompleted = p.profileCompleted !== undefined ? Boolean(p.profileCompleted) : (Boolean(educationLevel && birthDate));
 
       // 1. Guardar en participants
       await client.query(
-        `INSERT INTO participants (card, name, email, cedula, department, supervisor_id, supervisor_name, employment_status, is_active, company_id)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        `INSERT INTO participants (
+          card, name, email, cedula, department, supervisor_id, supervisor_name, 
+          employment_status, is_active, company_id, birth_date, education_level, 
+          is_currently_studying, current_study_field, institution_name, profession_title, 
+          current_address, phone, gender, training_interest_areas, profile_completed
+        )
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
          ON CONFLICT (card) DO UPDATE SET
            name = EXCLUDED.name,
            email = EXCLUDED.email,
@@ -73,8 +100,24 @@ participantsRouter.post("/bulk", async (req: Request, res: Response) => {
            supervisor_name = EXCLUDED.supervisor_name,
            employment_status = EXCLUDED.employment_status,
            is_active = EXCLUDED.is_active,
-           company_id = EXCLUDED.company_id`,
-        [card, name, email, cedula, department, supervisorId, supervisorName, employmentStatus, isActive, companyId]
+           company_id = EXCLUDED.company_id,
+           birth_date = COALESCE(EXCLUDED.birth_date, participants.birth_date),
+           education_level = COALESCE(EXCLUDED.education_level, participants.education_level),
+           is_currently_studying = EXCLUDED.is_currently_studying,
+           current_study_field = COALESCE(EXCLUDED.current_study_field, participants.current_study_field),
+           institution_name = COALESCE(EXCLUDED.institution_name, participants.institution_name),
+           profession_title = COALESCE(EXCLUDED.profession_title, participants.profession_title),
+           current_address = COALESCE(EXCLUDED.current_address, participants.current_address),
+           phone = COALESCE(EXCLUDED.phone, participants.phone),
+           gender = COALESCE(EXCLUDED.gender, participants.gender),
+           training_interest_areas = EXCLUDED.training_interest_areas,
+           profile_completed = EXCLUDED.profile_completed`,
+        [
+          card, name, email, cedula, department, supervisorId, supervisorName, 
+          employmentStatus, isActive, companyId, birthDate, educationLevel, 
+          isCurrentlyStudying, currentStudyField, institutionName, professionTitle, 
+          currentAddress, phone, gender, trainingInterestAreas, profileCompleted
+        ]
       );
 
       // 2. Auto-aprovisionar o sincronizar en users_simulated
@@ -82,10 +125,20 @@ participantsRouter.post("/bulk", async (req: Request, res: Response) => {
       if (userExists.rows.length === 0) {
         const newUserId = `usr_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
         await client.query(
-          `INSERT INTO users_simulated (id, email, name, role, password, cedula, department, employment_status, is_active, company_id)
-           VALUES ($1, $2, $3, 'Colaborador (User)', '123', $4, $5, $6, $7, $8)
+          `INSERT INTO users_simulated (
+            id, email, name, role, password, cedula, department, employment_status, 
+            is_active, company_id, birth_date, education_level, is_currently_studying, 
+            current_study_field, institution_name, profession_title, current_address, 
+            phone, gender, training_interest_areas, profile_completed
+          )
+           VALUES ($1, $2, $3, 'Colaborador (User)', '123', $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
            ON CONFLICT (email) DO NOTHING`,
-          [newUserId, email, name, cedula, department, employmentStatus, isActive, companyId]
+          [
+            newUserId, email, name, cedula, department, employmentStatus, 
+            isActive, companyId, birthDate, educationLevel, isCurrentlyStudying, 
+            currentStudyField, institutionName, professionTitle, currentAddress, 
+            phone, gender, trainingInterestAreas, profileCompleted
+          ]
         );
       } else {
         await client.query(
@@ -95,9 +148,25 @@ participantsRouter.post("/bulk", async (req: Request, res: Response) => {
                department = COALESCE($3, department),
                employment_status = $4,
                is_active = $5,
-               company_id = $6
-           WHERE LOWER(email) = $7`,
-          [name, cedula, department, employmentStatus, isActive, companyId, email]
+               company_id = $6,
+               birth_date = COALESCE($7, birth_date),
+               education_level = COALESCE($8, education_level),
+               is_currently_studying = $9,
+               current_study_field = COALESCE($10, current_study_field),
+               institution_name = COALESCE($11, institution_name),
+               profession_title = COALESCE($12, profession_title),
+               current_address = COALESCE($13, current_address),
+               phone = COALESCE($14, phone),
+               gender = COALESCE($15, gender),
+               training_interest_areas = $16,
+               profile_completed = $17
+           WHERE LOWER(email) = $18`,
+          [
+            name, cedula, department, employmentStatus, isActive, companyId, 
+            birthDate, educationLevel, isCurrentlyStudying, currentStudyField, 
+            institutionName, professionTitle, currentAddress, phone, gender, 
+            trainingInterestAreas, profileCompleted, email
+          ]
         );
       }
     }
@@ -114,7 +183,18 @@ participantsRouter.post("/bulk", async (req: Request, res: Response) => {
         supervisor_name as "supervisorName",
         COALESCE(employment_status, 'contratado') as "employmentStatus",
         COALESCE(is_active, true) as "isActive",
-        COALESCE(company_id, 'emp_kasino') as "companyId"
+        COALESCE(company_id, 'emp_kasino') as "companyId",
+        TO_CHAR(birth_date, 'YYYY-MM-DD') as "birthDate",
+        education_level as "educationLevel",
+        COALESCE(is_currently_studying, false) as "isCurrentlyStudying",
+        current_study_field as "currentStudyField",
+        institution_name as "institutionName",
+        profession_title as "professionTitle",
+        current_address as "currentAddress",
+        phone,
+        gender,
+        COALESCE(training_interest_areas, '{}') as "trainingInterestAreas",
+        COALESCE(profile_completed, false) as "profileCompleted"
       FROM participants 
       ORDER BY name ASC
     `);
@@ -133,7 +213,12 @@ participantsRouter.put("/:card", async (req: Request, res: Response) => {
   const client = await pool.connect();
   try {
     const { card } = req.params;
-    const { name, email, cedula, department, supervisorId, supervisorName, employmentStatus, isActive, companyId } = req.body;
+    const { 
+      name, email, cedula, department, supervisorId, supervisorName, 
+      employmentStatus, isActive, companyId, birthDate, educationLevel, 
+      isCurrentlyStudying, currentStudyField, institutionName, professionTitle, 
+      currentAddress, phone, gender, trainingInterestAreas, profileCompleted 
+    } = req.body;
 
     if (!name || !email) {
       return res.status(400).json({ error: "Nombre y correo son obligatorios." });
@@ -149,6 +234,17 @@ participantsRouter.put("/:card", async (req: Request, res: Response) => {
     const cleanEmpStatus = employmentStatus || 'contratado';
     const cleanIsActive = isActive !== undefined ? Boolean(isActive) : true;
     const cleanCompanyId = companyId ? companyId.trim() : 'emp_kasino';
+    const cleanBirthDate = birthDate ? birthDate.trim() : null;
+    const cleanEduLevel = educationLevel ? educationLevel.trim() : null;
+    const cleanStudying = Boolean(isCurrentlyStudying);
+    const cleanStudyField = currentStudyField ? currentStudyField.trim() : null;
+    const cleanInstName = institutionName ? institutionName.trim() : null;
+    const cleanProfTitle = professionTitle ? professionTitle.trim() : null;
+    const cleanAddress = currentAddress ? currentAddress.trim() : null;
+    const cleanPhone = phone ? phone.trim() : null;
+    const cleanGender = gender ? gender.trim() : null;
+    const cleanInterests = Array.isArray(trainingInterestAreas) ? trainingInterestAreas : [];
+    const cleanCompleted = profileCompleted !== undefined ? Boolean(profileCompleted) : (Boolean(cleanEduLevel && cleanBirthDate));
 
     await client.query("BEGIN");
 
@@ -162,9 +258,25 @@ participantsRouter.put("/:card", async (req: Request, res: Response) => {
            supervisor_name = $6,
            employment_status = $7,
            is_active = $8,
-           company_id = $9
-       WHERE card = $10`,
-      [cleanName, cleanEmail, cleanCedula, cleanDept, cleanSuperId, cleanSuperName, cleanEmpStatus, cleanIsActive, cleanCompanyId, cleanCard]
+           company_id = $9,
+           birth_date = $10,
+           education_level = $11,
+           is_currently_studying = $12,
+           current_study_field = $13,
+           institution_name = $14,
+           profession_title = $15,
+           current_address = $16,
+           phone = $17,
+           gender = $18,
+           training_interest_areas = $19,
+           profile_completed = $20
+       WHERE card = $21`,
+      [
+        cleanName, cleanEmail, cleanCedula, cleanDept, cleanSuperId, cleanSuperName, 
+        cleanEmpStatus, cleanIsActive, cleanCompanyId, cleanBirthDate, cleanEduLevel, 
+        cleanStudying, cleanStudyField, cleanInstName, cleanProfTitle, cleanAddress, 
+        cleanPhone, cleanGender, cleanInterests, cleanCompleted, cleanCard
+      ]
     );
 
     // Sync corresponding user in users_simulated
@@ -175,9 +287,24 @@ participantsRouter.put("/:card", async (req: Request, res: Response) => {
            department = COALESCE($3, department),
            employment_status = $4,
            is_active = $5,
-           company_id = $6
-       WHERE LOWER(email) = $7`,
-      [cleanName, cleanCedula, cleanDept, cleanEmpStatus, cleanIsActive, cleanCompanyId, cleanEmail]
+           company_id = $6,
+           birth_date = COALESCE($7, birth_date),
+           education_level = COALESCE($8, education_level),
+           is_currently_studying = $9,
+           current_study_field = COALESCE($10, current_study_field),
+           institution_name = COALESCE($11, institution_name),
+           profession_title = COALESCE($12, profession_title),
+           current_address = COALESCE($13, current_address),
+           phone = COALESCE($14, phone),
+           gender = COALESCE($15, gender),
+           training_interest_areas = $16,
+           profile_completed = $17
+       WHERE LOWER(email) = $18`,
+      [
+        cleanName, cleanCedula, cleanDept, cleanEmpStatus, cleanIsActive, cleanCompanyId, 
+        cleanBirthDate, cleanEduLevel, cleanStudying, cleanStudyField, cleanInstName, 
+        cleanProfTitle, cleanAddress, cleanPhone, cleanGender, cleanInterests, cleanCompleted, cleanEmail
+      ]
     );
 
     await client.query("COMMIT");
@@ -193,7 +320,18 @@ participantsRouter.put("/:card", async (req: Request, res: Response) => {
         supervisor_name as "supervisorName",
         COALESCE(employment_status, 'contratado') as "employmentStatus",
         COALESCE(is_active, true) as "isActive",
-        COALESCE(company_id, 'emp_kasino') as "companyId"
+        COALESCE(company_id, 'emp_kasino') as "companyId",
+        TO_CHAR(birth_date, 'YYYY-MM-DD') as "birthDate",
+        education_level as "educationLevel",
+        COALESCE(is_currently_studying, false) as "isCurrentlyStudying",
+        current_study_field as "currentStudyField",
+        institution_name as "institutionName",
+        profession_title as "professionTitle",
+        current_address as "currentAddress",
+        phone,
+        gender,
+        COALESCE(training_interest_areas, '{}') as "trainingInterestAreas",
+        COALESCE(profile_completed, false) as "profileCompleted"
       FROM participants 
       ORDER BY name ASC
     `);

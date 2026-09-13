@@ -24,11 +24,21 @@ export const exportAttendeesToExcel = (
   timeStr: string,
   attendeeEmails: string[],
   attendedList: string[] = [],
-  allParticipants: Participant[] = []
+  allParticipants: Participant[] = [],
+  checkInList: string[] = [],
+  checkOutList: string[] = [],
+  completedList: string[] = []
 ): void => {
+  const activeCheckIn = checkInList.length > 0 ? checkInList : attendedList;
+  const activeCheckOut = checkOutList;
+  const activeCompleted = completedList.length > 0 ? completedList : attendedList;
+
   const data = attendeeEmails.map((email, idx) => {
     const participant = allParticipants.find(p => p.email.toLowerCase() === email.toLowerCase());
-    const hasAttended = attendedList.includes(email);
+    const cleanEmail = email.toLowerCase();
+    const hasCheckIn = activeCheckIn.map(a => a.toLowerCase()).includes(cleanEmail);
+    const hasCheckOut = activeCheckOut.map(a => a.toLowerCase()).includes(cleanEmail);
+    const hasCompleted = activeCompleted.map(a => a.toLowerCase()).includes(cleanEmail) || (hasCheckIn && hasCheckOut);
     
     return {
       'No.': idx + 1,
@@ -41,7 +51,9 @@ export const exportAttendeesToExcel = (
       'Horario': timeStr,
       'Modalidad': event.modality,
       'Instructor': event.instructor,
-      'Asistencia Confirmada': hasAttended ? 'SÍ (Confirmado)' : 'NO (Pendiente)'
+      'Entrada (Check-In)': hasCheckIn ? 'SÍ (Registrada)' : 'NO (Pendiente)',
+      'Salida (Check-Out)': hasCheckOut ? 'SÍ (Registrada)' : 'NO (Pendiente)',
+      'Estado Asistencia': hasCompleted ? 'COMPLETA' : (hasCheckIn ? 'EN CURSO' : 'NO ASISTIÓ')
     };
   });
 
@@ -58,10 +70,12 @@ export const exportAttendeesToExcel = (
     { wch: 30 }, // Correo
     { wch: 30 }, // Evento
     { wch: 12 }, // Fecha
-    { wch: 12 }, // Horario
+    { wch: 14 }, // Horario
     { wch: 12 }, // Modalidad
     { wch: 25 }, // Instructor
-    { wch: 20 }  // Asistencia
+    { wch: 22 }, // Entrada
+    { wch: 22 }, // Salida
+    { wch: 20 }  // Estado Asistencia
   ];
 
   const fileName = `Asistencia_${event.title.slice(0, 20).replace(/\s+/g, '_')}_${dateStr}.xlsx`;
@@ -79,7 +93,17 @@ export const exportParticipantsToExcel = (participants: Participant[]): void => 
     'Nombre Completo': p.name,
     'Correo Corporativo': p.email,
     'Departamento': p.department || 'General',
-    'Supervisor Asignado': p.supervisorName || 'Sin asignar'
+    'Supervisor Asignado': p.supervisorName || 'Sin asignar',
+    'Nivel Educativo': p.educationLevel || 'No especificado',
+    'Profesión / Título': p.professionTitle || 'No especificado',
+    'Estudia Actualmente': p.isCurrentlyStudying ? 'SÍ' : 'NO',
+    'Qué Estudia': p.currentStudyField || '',
+    'Institución / Universidad': p.institutionName || '',
+    'Fecha de Nacimiento': p.birthDate || '',
+    'Teléfono': p.phone || '',
+    'Dirección': p.currentAddress || '',
+    'Intereses de Desarrollo': (p.trainingInterestAreas || []).join(', '),
+    'Ficha Completa': p.profileCompleted ? 'SÍ' : 'NO'
   }));
 
   const ws = XLSX.utils.json_to_sheet(data);
@@ -92,7 +116,17 @@ export const exportParticipantsToExcel = (participants: Participant[]): void => 
     { wch: 35 }, 
     { wch: 35 }, 
     { wch: 22 }, 
-    { wch: 30 }
+    { wch: 25 },
+    { wch: 24 },
+    { wch: 26 },
+    { wch: 20 },
+    { wch: 28 },
+    { wch: 28 },
+    { wch: 18 },
+    { wch: 18 },
+    { wch: 32 },
+    { wch: 40 },
+    { wch: 16 }
   ];
   XLSX.writeFile(wb, 'Padron_Colaboradores_CapacitaHub.xlsx');
 };
@@ -1490,4 +1524,333 @@ export const exportSessionGradesForOjtAndCalibration = (
   XLSX.writeFile(wb, `Reporte_OJT_Calibracion_${safeEventTitle}_${new Date().toISOString().slice(0, 10)}.xlsx`);
 };
 
+/**
+ * Exporta el Diagnóstico de Necesidades de Capacitación (DNC) Ejecutivo en un libro Excel (.xlsx) con 4 hojas profesionales.
+ */
+export const exportDncReportToExcel = (
+  participants: Participant[],
+  events: TrainingEvent[],
+  educationStats: Array<{
+    level: string;
+    membersCount: number;
+    percentageOfTotal: number;
+    avgScore: number;
+    passRate: number;
+    totalHours: number;
+    avgHoursPerMember: string;
+  }>,
+  trainingInterestsAnalysis: Array<{
+    topic: string;
+    requestCount: number;
+    percentage: number;
+    isCovered: boolean;
+    coveredEventTitle?: string;
+  }>,
+  improvementOpportunities: Array<{
+    id: string;
+    category: string;
+    title: string;
+    description: string;
+    recommendation: string;
+    impact: string;
+  }>,
+  activeStudents: Participant[],
+  generalStats: {
+    totalParticipants: number;
+    completedProfilesCount: number;
+    profileCompletionRate: number;
+    avgAge: number;
+    activeStudentsRate: number;
+  }
+): void => {
+  const wb = XLSX.utils.book_new();
+  const dateToday = new Date().toISOString().slice(0, 10);
 
+  // -----------------------------------------------------------------
+  // HOJA 1: RESUMEN EJECUTIVO DNC & PLANES DE ACCIÓN
+  // -----------------------------------------------------------------
+  const sheet1Data: any[] = [
+    { 'SECCIÓN': 'DIAGNÓSTICO GENERAL DE LA PLANTILLA', 'INDICADOR / VARIABLE': 'Total Colaboradores en Padrón', 'VALOR / RESULTADO': generalStats.totalParticipants, 'NOTAS / INTERPRETACIÓN': 'Población total registrada en el sistema' },
+    { 'SECCIÓN': 'DIAGNÓSTICO GENERAL DE LA PLANTILLA', 'INDICADOR / VARIABLE': 'Censo Formativo Completado', 'VALOR / RESULTADO': `${generalStats.profileCompletionRate}% (${generalStats.completedProfilesCount} colaboradores)`, 'NOTAS / INTERPRETACIÓN': 'Colaboradores con ficha sociodemográfica y académica completa' },
+    { 'SECCIÓN': 'DIAGNÓSTICO GENERAL DE LA PLANTILLA', 'INDICADOR / VARIABLE': 'Colaboradores Cursando Estudios', 'VALOR / RESULTADO': `${generalStats.activeStudentsRate}% (${activeStudents.length} colaboradores)`, 'NOTAS / INTERPRETACIÓN': 'Plantilla activa cursando carreras universitarias o técnicas' },
+    { 'SECCIÓN': 'DIAGNÓSTICO GENERAL DE LA PLANTILLA', 'INDICADOR / VARIABLE': 'Edad Promedio de la Plantilla', 'VALOR / RESULTADO': `${generalStats.avgAge} años`, 'NOTAS / INTERPRETACIÓN': 'Población mayoritariamente en desarrollo laboral continuo' },
+    { 'SECCIÓN': '', 'INDICADOR / VARIABLE': '', 'VALOR / RESULTADO': '', 'NOTAS / INTERPRETACIÓN': '' },
+    { 'SECCIÓN': 'DISTRIBUCIÓN ACADÉMICA', 'INDICADOR / VARIABLE': 'Nivel Educativo', 'VALOR / RESULTADO': 'Colaboradores (% Población)', 'NOTAS / INTERPRETACIÓN': 'Horas Formación Acumuladas' },
+    ...educationStats.map(e => ({
+      'SECCIÓN': 'DISTRIBUCIÓN ACADÉMICA',
+      'INDICADOR / VARIABLE': e.level,
+      'VALOR / RESULTADO': `${e.membersCount} colaboradores (${e.percentageOfTotal}%)`,
+      'NOTAS / INTERPRETACIÓN': `${e.totalHours} hrs acumuladas (Promedio: ${e.avgHoursPerMember} hrs/colaborador)`
+    })),
+    { 'SECCIÓN': '', 'INDICADOR / VARIABLE': '', 'VALOR / RESULTADO': '', 'NOTAS / INTERPRETACIÓN': '' },
+    { 'SECCIÓN': 'PLAN DE ACCIÓN RECOMENDADO', 'INDICADOR / VARIABLE': 'Prioridad & Categoría', 'VALOR / RESULTADO': 'Hallazgo / Brecha Detectada', 'NOTAS / INTERPRETACIÓN': 'Recomendación Estratégica' },
+    ...improvementOpportunities.map(opp => ({
+      'SECCIÓN': 'PLAN DE ACCIÓN RECOMENDADO',
+      'INDICADOR / VARIABLE': `[${opp.impact.toUpperCase()}] ${opp.category}`,
+      'VALOR / RESULTADO': `${opp.title}: ${opp.description}`,
+      'NOTAS / INTERPRETACIÓN': opp.recommendation
+    }))
+  ];
+
+  const wsSummary = XLSX.utils.json_to_sheet(sheet1Data);
+  wsSummary['!cols'] = [
+    { wch: 32 }, // Sección
+    { wch: 35 }, // Indicador / Variable
+    { wch: 45 }, // Valor / Resultado
+    { wch: 65 }  // Notas / Interpretación
+  ];
+
+  // -----------------------------------------------------------------
+  // HOJA 2: MATRIZ DNC (DEMANDA DE CAPACITACIÓN VS OFERTA EN CATÁLOGO)
+  // -----------------------------------------------------------------
+  const sheet2Data = trainingInterestsAnalysis.map((item, idx) => ({
+    'No.': idx + 1,
+    'Temática / Área Formativa Solicitada': item.topic,
+    'Colaboradores Solicitantes': item.requestCount,
+    '% de Plantilla que lo Solicita': `${item.percentage}%`,
+    'Estatus en Catálogo Actual': item.isCovered ? 'CUBIERTO EN CATÁLOGO' : 'BRECHA DE OFERTA',
+    'Curso Asociado en Catálogo': item.coveredEventTitle || 'Ninguno (No existe en catálogo actual)',
+    'Acción Formativa Sugerida': item.isCovered 
+      ? 'Aperturar nuevos grupos / horarios para atender la alta demanda' 
+      : 'Diseñar y programar nuevo evento o taller en el plan del próximo trimestre'
+  }));
+
+  const wsDncMatrix = XLSX.utils.json_to_sheet(sheet2Data);
+  wsDncMatrix['!cols'] = [
+    { wch: 6 },
+    { wch: 42 },
+    { wch: 25 },
+    { wch: 28 },
+    { wch: 24 },
+    { wch: 40 },
+    { wch: 55 }
+  ];
+
+  // -----------------------------------------------------------------
+  // HOJA 3: CORRELACIÓN DE RENDIMIENTO POR NIVEL EDUCATIVO
+  // -----------------------------------------------------------------
+  const sheet3Data = educationStats.map((item, idx) => {
+    let diagnostico = 'Desempeño estándar';
+    let recomendacion = 'Continuar con el itinerario de capacitación planificado.';
+    if (item.level === 'Secundaria / Bachiller') {
+      diagnostico = item.avgScore < 75 ? 'Brecha técnica detectada' : 'Desempeño satisfactorio';
+      recomendacion = 'Se recomienda programar módulos propedéuticos y talleres de nivelación previa para fortalecer fundamentos.';
+    } else if (item.level.includes('Universitario') || item.level.includes('Profesional')) {
+      diagnostico = 'Alto desempeño técnico y velocidad de asimilación';
+      recomendacion = 'Perfil idóneo para cursos avanzados, certificaciones especializadas y liderazgo de proyectos OJT.';
+    }
+
+    return {
+      'No.': idx + 1,
+      'Nivel Educativo de los Colaboradores': item.level,
+      'Total de Colaboradores en este Nivel': item.membersCount,
+      '% del Padrón': `${item.percentageOfTotal}%`,
+      'Nota Promedio en Evaluaciones': `${item.avgScore} / 100`,
+      'Tasa de Aprobación Global': `${item.passRate}%`,
+      'Horas de Capacitación Acumuladas': `${item.totalHours} hrs`,
+      'Promedio de Horas / Colaborador': `${item.avgHoursPerMember} hrs`,
+      'Diagnóstico Pedagógico': diagnostico,
+      'Recomendación Estratégica': recomendacion
+    };
+  });
+
+  const wsCorrelation = XLSX.utils.json_to_sheet(sheet3Data);
+  wsCorrelation['!cols'] = [
+    { wch: 6 },
+    { wch: 35 },
+    { wch: 25 },
+    { wch: 14 },
+    { wch: 25 },
+    { wch: 22 },
+    { wch: 26 },
+    { wch: 25 },
+    { wch: 35 },
+    { wch: 55 }
+  ];
+
+  // -----------------------------------------------------------------
+  // HOJA 4: DIRECTORIO DE ESTUDIANTES ACTIVOS & SINERGIA OJT
+  // -----------------------------------------------------------------
+  const sheet4Data = activeStudents.map((s, idx) => ({
+    'No.': idx + 1,
+    'No. Tarjeta': s.card,
+    'Cédula': s.cedula || 'N/A',
+    'Colaborador': s.name,
+    'Correo Electrónico': s.email,
+    'Departamento': s.department || 'Sin Depto',
+    'Nivel Educativo Actual': s.educationLevel || 'Universitario en Curso',
+    'Carrera / Especialidad que Cursa': s.currentStudyField || 'No especificada',
+    'Institución Educativa': s.institutionName || 'No especificada',
+    'Teléfono': s.phone || 'N/A',
+    'Dirección': s.currentAddress || 'N/A',
+    'Áreas de Interés Formativo': (s.trainingInterestAreas || []).join(', ') || 'General',
+    'Oportunidad Sinergia OJT (70-20-10)': `Alinear asignaciones de campo con sus estudios de ${s.currentStudyField || 'su carrera'}`
+  }));
+
+  const wsStudents = XLSX.utils.json_to_sheet(sheet4Data);
+  wsStudents['!cols'] = [
+    { wch: 6 },
+    { wch: 14 },
+    { wch: 18 },
+    { wch: 32 },
+    { wch: 30 },
+    { wch: 24 },
+    { wch: 26 },
+    { wch: 35 },
+    { wch: 28 },
+    { wch: 16 },
+    { wch: 30 },
+    { wch: 35 },
+    { wch: 45 }
+  ];
+
+  // Ensamblar libro de trabajo
+  XLSX.utils.book_append_sheet(wb, wsSummary, 'Resumen Ejecutivo DNC');
+  XLSX.utils.book_append_sheet(wb, wsDncMatrix, 'Matriz DNC Demanda');
+  XLSX.utils.book_append_sheet(wb, wsCorrelation, 'Correlación Rendimiento');
+  XLSX.utils.book_append_sheet(wb, wsStudents, 'Estudiantes Activos OJT');
+
+  const fileName = `Informe_Ejecutivo_DNC_${dateToday}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+};
+
+/**
+ * Exporta el Reporte Oficial del Programa de Sustentabilidad y Capacitaciones
+ * con las 11 dimensiones requeridas para auditorías corporativas Claro.
+ */
+export const exportSustainabilityAndTrainingReportToExcel = (
+  events: TrainingEvent[],
+  allParticipants: Participant[] = []
+): void => {
+  const wb = XLSX.utils.book_new();
+  const dateToday = new Date().toISOString().split('T')[0];
+
+  // 1. Hoja Principal: Matriz Oficial de 11 Columnas
+  const mainSheetData = events.map((evt, idx) => {
+    const isSust = (
+      evt.subprogram?.toLowerCase().includes('sustentabilidad') ||
+      evt.programCategory === 'Capacitacion_seguridad_salud_en_el_trabajo_y_sustentabilidad'
+    );
+
+    // Calcular cupos, inscritos y asistencias
+    let totalCap = 0;
+    let totalReg = 0;
+    let totalAtt = 0;
+
+    evt.schedule.forEach(sch => {
+      sch.slots.forEach(sl => {
+        totalCap += sl.capacity;
+        totalReg += sl.registered;
+        totalAtt += (sl.completedAttendanceList || sl.attendedList || []).length;
+      });
+    });
+
+    const hours = Number(evt.totalHours) || 0;
+    const manHours = hours * (totalAtt > 0 ? totalAtt : totalReg);
+
+    const fDesde = evt.startDate || (evt.schedule[0] ? evt.schedule[0].date : '');
+    const lastSch = evt.schedule[evt.schedule.length - 1];
+    const fHasta = evt.endDate || (lastSch ? (lastSch.endDate || lastSch.date) : '');
+
+    return {
+      'No.': idx + 1,
+      'Tipo de sesión': evt.sessionType || 'Sincrónica',
+      'Tipo de entrenamiento': evt.trainingType || 'Técnico',
+      'Formato capacitación': evt.trainingFormat || evt.category || 'Taller',
+      'Modalidad': evt.modality === 'Híbrida' ? 'Mixta' : evt.modality,
+      'Programa': evt.programCategory || 'Capacitacion_seguridad_salud_en_el_trabajo_y_sustentabilidad',
+      'Subprograma': evt.subprogram || 'Sustentabilidad',
+      'Fecha desde': fDesde,
+      'Fecha hasta': fHasta,
+      'Duración horas': hours,
+      'Suplidor': evt.supplier || 'Claro',
+      'Descripción': evt.description || 'Sin descripción detallada',
+      'Título Capacitación': evt.title,
+      'Facilitador': evt.instructor,
+      'Cupos Ofertados': totalCap,
+      'Inscritos': totalReg,
+      'Asistencias Confirmadas': totalAtt,
+      'Horas-Hombre Totales': manHours,
+      'Alineado a Sustentabilidad': isSust ? 'SÍ (Prioritario)' : 'NO'
+    };
+  });
+
+  const wsMain = XLSX.utils.json_to_sheet(mainSheetData);
+  wsMain['!cols'] = [
+    { wch: 6 },  // No.
+    { wch: 16 }, // Tipo de sesión
+    { wch: 22 }, // Tipo de entrenamiento
+    { wch: 22 }, // Formato capacitación
+    { wch: 14 }, // Modalidad
+    { wch: 45 }, // Programa
+    { wch: 30 }, // Subprograma
+    { wch: 14 }, // Fecha desde
+    { wch: 14 }, // Fecha hasta
+    { wch: 16 }, // Duración horas
+    { wch: 18 }, // Suplidor
+    { wch: 55 }, // Descripción
+    { wch: 35 }, // Título
+    { wch: 28 }, // Facilitador
+    { wch: 16 }, // Cupos
+    { wch: 14 }, // Inscritos
+    { wch: 22 }, // Asistencias
+    { wch: 22 }, // Horas-Hombre
+    { wch: 24 }  // Sustentabilidad
+  ];
+
+  // 2. Hoja 2: Resumen Consolidado por Programa
+  const programTotals: Record<string, { count: number; hours: number; reg: number; att: number; manHours: number }> = {};
+  
+  events.forEach(evt => {
+    const pKey = evt.programCategory || 'Capacitacion_seguridad_salud_en_el_trabajo_y_sustentabilidad';
+    if (!programTotals[pKey]) {
+      programTotals[pKey] = { count: 0, hours: 0, reg: 0, att: 0, manHours: 0 };
+    }
+    const h = Number(evt.totalHours) || 0;
+    let reg = 0;
+    let att = 0;
+    evt.schedule.forEach(s => s.slots.forEach(sl => {
+      reg += sl.registered;
+      att += (sl.completedAttendanceList || sl.attendedList || []).length;
+    }));
+    programTotals[pKey].count += 1;
+    programTotals[pKey].hours += h;
+    programTotals[pKey].reg += reg;
+    programTotals[pKey].att += att;
+    programTotals[pKey].manHours += (h * (att > 0 ? att : reg));
+  });
+
+  const totalAllHours = Object.values(programTotals).reduce((a, b) => a + b.hours, 0) || 1;
+
+  const summarySheetData = Object.entries(programTotals).map(([pKey, stat], i) => ({
+    'No.': i + 1,
+    'Programa Corporativo': pKey,
+    'Cantidad de Cursos': stat.count,
+    'Horas Formativas': stat.hours,
+    '% del Total de Horas': `${Math.round((stat.hours / totalAllHours) * 100)}%`,
+    'Inscritos': stat.reg,
+    'Asistencias Confirmadas': stat.att,
+    'Horas-Hombre Totales': stat.manHours,
+    'Enfoque Sustentabilidad': pKey === 'Capacitacion_seguridad_salud_en_el_trabajo_y_sustentabilidad' ? 'ALINEADO ESG' : 'OPERATIVO'
+  }));
+
+  const wsSummary = XLSX.utils.json_to_sheet(summarySheetData);
+  wsSummary['!cols'] = [
+    { wch: 6 },
+    { wch: 50 },
+    { wch: 18 },
+    { wch: 18 },
+    { wch: 22 },
+    { wch: 14 },
+    { wch: 24 },
+    { wch: 22 },
+    { wch: 24 }
+  ];
+
+  // Ensamblar libro de trabajo
+  XLSX.utils.book_append_sheet(wb, wsMain, 'Reporte Sustentabilidad Oficial');
+  XLSX.utils.book_append_sheet(wb, wsSummary, 'Resumen por Programas');
+
+  const fileName = `Reporte_Sustentabilidad_Capacitaciones_Claro_${dateToday}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+};

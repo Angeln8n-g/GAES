@@ -12,7 +12,7 @@ import {
   Lock
 } from 'lucide-react';
 import { TrainingEvent, UserAccount, Slot } from '../../types';
-import { formatDateLong } from '../../utils/formatters';
+import { formatDateLong, getEventDurationMetrics, calculateTimeDurationHours } from '../../utils/formatters';
 import { downloadIcsFile, getGoogleCalendarUrl } from '../../utils/icsUtils';
 
 interface ReservationModalProps {
@@ -30,12 +30,18 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 }) => {
   if (!event) return null;
 
-  const [selectedDate, setSelectedDate] = useState<string>(event.schedule[0]?.date || '');
-  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(event.schedule[0]?.slots[0] || null);
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const initialSchedule = event.schedule.find(s => s.date >= todayStr) || event.schedule[0];
+
+  const [selectedDate, setSelectedDate] = useState<string>(initialSchedule?.date || '');
+  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(initialSchedule?.slots[0] || null);
   const [emailInput, setEmailInput] = useState<string>(currentUser?.email || '');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
+
+  const durationMetrics = getEventDurationMetrics(event);
 
   // Verificar si el usuario actual tiene una asignación obligatoria en algún horario de este evento
   const mandatoryAssignment = useMemo(() => {
@@ -146,7 +152,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               <div>
                 <h3 className="text-xl font-extrabold text-slate-900">¡Inscripción Confirmada!</h3>
                 <p className="text-xs text-slate-600 max-w-sm mx-auto mt-1 leading-relaxed">
-                  Hemos confirmado tu lugar para <strong>{event.title}</strong> el día <strong>{formatDateLong(selectedDate)}</strong> a las <strong>{selectedSlot?.time}</strong>.
+                  Hemos confirmado tu lugar para <strong>{event.title}</strong> ({durationMetrics.totalHours} hrs lectivas en {durationMetrics.totalDays} {durationMetrics.totalDays === 1 ? 'día' : 'días'}) el día <strong>{formatDateLong(selectedDate)}</strong> a las <strong>{selectedSlot?.time}{selectedSlot?.endTime ? ` - ${selectedSlot.endTime}` : ''}</strong>.
                 </p>
               </div>
 
@@ -206,6 +212,13 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               {/* Event Details Quick Summary */}
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-xs text-slate-700">
                 <div className="flex items-center justify-between">
+                  <span className="text-slate-500">Duración del Programa:</span>
+                  <span className="font-extrabold text-amber-900 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200 flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-amber-600" />
+                    {durationMetrics.totalHours} hrs lectivas ({durationMetrics.totalDays} {durationMetrics.totalDays === 1 ? 'día' : 'días'})
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
                   <span className="text-slate-500">Instructor:</span>
                   <span className="font-bold text-slate-900">{event.instructor}</span>
                 </div>
@@ -231,6 +244,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {event.schedule.map(sch => {
                     const isSelected = selectedDate === sch.date;
+                    const isPast = sch.date < todayStr;
                     const totalSlots = sch.slots.length;
                     return (
                       <button
@@ -240,10 +254,24 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                         className={`p-3 rounded-2xl border text-left transition-all ${
                           isSelected
                             ? 'bg-red-50 border-[#DA291C] text-[#DA291C] font-bold ring-1 ring-[#DA291C]'
+                            : isPast
+                            ? 'bg-slate-100/70 border-slate-200 text-slate-400 hover:bg-slate-100'
                             : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                         }`}
                       >
-                        <p className="text-xs font-bold">{formatDateLong(sch.date)}</p>
+                        <div className="flex items-center justify-between gap-1">
+                          <p className="text-xs font-bold">{formatDateLong(sch.date)}</p>
+                          {sch.date === todayStr && (
+                            <span className="px-1.5 py-0.2 rounded-md bg-red-100 text-[#DA291C] text-[9px] font-black uppercase">
+                              Hoy
+                            </span>
+                          )}
+                          {isPast && (
+                            <span className="px-1.5 py-0.2 rounded-md bg-slate-200 text-slate-600 text-[9px] font-bold">
+                              Pasada
+                            </span>
+                          )}
+                        </div>
                         <p className="text-[10px] text-slate-500 mt-0.5">{totalSlots} horario(s) disponible(s)</p>
                       </button>
                     );
@@ -279,7 +307,9 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                           }`}
                         >
                           <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold">{slot.time}</span>
+                            <span className="text-xs font-bold">
+                              {slot.time}{slot.endTime ? ` - ${slot.endTime}` : ''}
+                            </span>
                             <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold ${
                               isFull
                                 ? 'bg-rose-100 text-rose-700'
@@ -290,9 +320,16 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                               {isFull ? 'Agotado' : `${remaining} libres`}
                             </span>
                           </div>
-                          <p className={`text-[10px] mt-1 ${isSelected ? 'text-white/80' : 'text-slate-500'}`}>
-                            Capacidad: {slot.registered} / {slot.capacity}
-                          </p>
+                          <div className="flex items-center justify-between text-[10px] mt-1">
+                            <span className={isSelected ? 'text-white/80' : 'text-slate-500'}>
+                              Capacidad: {slot.registered} / {slot.capacity}
+                            </span>
+                            {slot.endTime && (
+                              <span className={`font-semibold ${isSelected ? 'text-white/90' : 'text-amber-700'}`}>
+                                {calculateTimeDurationHours(slot.time, slot.endTime)} hrs
+                              </span>
+                            )}
+                          </div>
                         </button>
                       );
                     })}

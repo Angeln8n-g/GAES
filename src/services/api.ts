@@ -184,6 +184,19 @@ export const MOCK_EVENTS: TrainingEvent[] = [
         slots: [
           { time: "11:00 AM", capacity: 25, registered: 0, attendees: [], attendedList: [] }
         ]
+      },
+      {
+        date: "2026-09-18",
+        slots: [
+          { time: "09:00 AM", capacity: 20, registered: 0, attendees: [], attendedList: [] },
+          { time: "03:00 PM", capacity: 20, registered: 0, attendees: [], attendedList: [] }
+        ]
+      },
+      {
+        date: "2026-10-08",
+        slots: [
+          { time: "10:00 AM", capacity: 25, registered: 0, attendees: [], attendedList: [] }
+        ]
       }
     ],
     feedbacks: [
@@ -260,6 +273,12 @@ export const MOCK_EVENTS: TrainingEvent[] = [
         slots: [
           { time: "10:00 AM", capacity: 100, registered: 0, attendees: [], attendedList: [] }
         ]
+      },
+      {
+        date: "2026-09-22",
+        slots: [
+          { time: "11:00 AM", capacity: 100, registered: 0, attendees: [], attendedList: [] }
+        ]
       }
     ],
     feedbacks: []
@@ -283,21 +302,64 @@ export const MOCK_USERS: UserAccount[] = [
   { id: "usr_4", email: "marta.perez@empresa.com", name: "Marta Pérez", role: "Colaborador (User)", password: "123", cedula: "223-8765432-1" }
 ];
 
-// URLs del Backend (Configurables)
-const API_BASE_URL = ((typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) || 'http://localhost:5000/api').replace(/\/$/, '');
-const isApiMode = typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_MODE === 'true';
+// Helper seguro para parsear JSON de localStorage o fuentes externas sin lanzar SyntaxError
+export function safeJsonParse<T>(rawOrKey: string | null, fallback: T): T {
+  if (!rawOrKey || rawOrKey === 'undefined' || rawOrKey === 'null' || rawOrKey.trim() === '') return fallback;
+  
+  // Si parece una clave de localStorage (ej. 'ch_events', 'ch_users', etc.)
+  if (typeof localStorage !== 'undefined' && (rawOrKey.startsWith('ch_') || rawOrKey.startsWith('user_'))) {
+    try {
+      const stored = localStorage.getItem(rawOrKey);
+      if (!stored || stored === 'undefined' || stored === 'null' || stored.trim() === '') return fallback;
+      return JSON.parse(stored) as T;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  // Parseo directo de cadena JSON
+  try {
+    return JSON.parse(rawOrKey) as T;
+  } catch (e) {
+    return fallback;
+  }
+}
+
+export function safeGetLocalStorage<T>(key: string, fallback: T): T {
+  return safeJsonParse(key, fallback);
+}
+
+// URLs del Backend (Configurables y autodetectadas)
+const getApiBaseUrl = (): string => {
+  if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL.replace(/\/$/, '');
+  }
+  // En producción detrás de Nginx en un dominio real (ej. gaes.kasino21.com)
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    return '/api';
+  }
+  return 'http://localhost:5000/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+const isApiMode = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_MODE === 'true') ||
+  (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1');
 
 // Inicializar almacenamiento local si no existe para el modo local
 const initLocalStorage = () => {
   if (typeof localStorage === 'undefined') return;
   const existingEvents = localStorage.getItem('ch_events');
-  if (!existingEvents) {
+  if (!existingEvents || existingEvents === 'undefined' || existingEvents === 'null') {
     localStorage.setItem('ch_events', JSON.stringify(MOCK_EVENTS));
   } else {
     try {
       const parsed = JSON.parse(existingEvents);
-      const needsMigration = parsed.some((e: any) => e.id === 'evt_1' && e.surveyUrl === undefined && e.survey_url === undefined);
-      if (needsMigration) {
+      if (Array.isArray(parsed)) {
+        const needsMigration = parsed.some((e: any) => e.id === 'evt_1' && e.surveyUrl === undefined && e.survey_url === undefined);
+        if (needsMigration) {
+          localStorage.setItem('ch_events', JSON.stringify(MOCK_EVENTS));
+        }
+      } else {
         localStorage.setItem('ch_events', JSON.stringify(MOCK_EVENTS));
       }
     } catch (e) {
@@ -306,12 +368,16 @@ const initLocalStorage = () => {
   }
 
   const existingParticipants = localStorage.getItem('ch_participants');
-  if (!existingParticipants) {
+  if (!existingParticipants || existingParticipants === 'undefined' || existingParticipants === 'null') {
     localStorage.setItem('ch_participants', JSON.stringify(MOCK_PARTICIPANTS));
   } else {
     try {
       const parsed = JSON.parse(existingParticipants);
-      if (!parsed.some((p: any) => p.cedula)) {
+      if (Array.isArray(parsed)) {
+        if (!parsed.some((p: any) => p.cedula)) {
+          localStorage.setItem('ch_participants', JSON.stringify(MOCK_PARTICIPANTS));
+        }
+      } else {
         localStorage.setItem('ch_participants', JSON.stringify(MOCK_PARTICIPANTS));
       }
     } catch (e) {
@@ -320,13 +386,17 @@ const initLocalStorage = () => {
   }
   
   const existingUsers = localStorage.getItem('ch_users');
-  if (!existingUsers) {
+  if (!existingUsers || existingUsers === 'undefined' || existingUsers === 'null') {
     localStorage.setItem('ch_users', JSON.stringify(MOCK_USERS));
   } else {
     try {
       const parsed = JSON.parse(existingUsers);
-      const needsMigration = parsed.some((u: any) => !u.password) || !parsed.some((u: any) => u.email === 'superadmin@empresa.com') || !parsed.some((u: any) => u.cedula);
-      if (needsMigration) {
+      if (Array.isArray(parsed)) {
+        const needsMigration = parsed.some((u: any) => !u.password) || !parsed.some((u: any) => u.email === 'superadmin@empresa.com') || !parsed.some((u: any) => u.cedula);
+        if (needsMigration) {
+          localStorage.setItem('ch_users', JSON.stringify(MOCK_USERS));
+        }
+      } else {
         localStorage.setItem('ch_users', JSON.stringify(MOCK_USERS));
       }
     } catch (e) {
@@ -335,12 +405,12 @@ const initLocalStorage = () => {
   }
 
   const existingGroups = localStorage.getItem('ch_groups');
-  if (!existingGroups) {
+  if (!existingGroups || existingGroups === 'undefined' || existingGroups === 'null') {
     localStorage.setItem('ch_groups', JSON.stringify(MOCK_GROUPS));
   }
 
   const existingPrograms = localStorage.getItem('ch_programs');
-  if (!existingPrograms) {
+  if (!existingPrograms || existingPrograms === 'undefined' || existingPrograms === 'null') {
     localStorage.setItem('ch_programs', JSON.stringify(MOCK_PROGRAMS));
   }
 };
@@ -358,7 +428,7 @@ export const apiService = {
       if (!res.ok) throw new Error('Error al obtener eventos de Postgres');
       return res.json();
     } else {
-      const list: TrainingEvent[] = JSON.parse(localStorage.getItem('ch_events') || '[]');
+      const list: TrainingEvent[] = safeJsonParse('ch_events', []);
       if (companyId && companyId !== 'all') {
         return list.filter(e => (e.companyId || 'emp_kasino') === companyId);
       }
@@ -389,7 +459,7 @@ export const apiService = {
       if (!res.ok) throw new Error('Error al guardar evento en Postgres');
       return this.getEvents();
     } else {
-      const events = JSON.parse(localStorage.getItem('ch_events') || '[]');
+      const events = safeJsonParse('ch_events', []);
       const index = events.findIndex((e: any) => e.id === event.id);
       if (index > -1) {
         events[index] = event;
@@ -409,7 +479,7 @@ export const apiService = {
       if (!res.ok) throw new Error('Error al eliminar evento de Postgres');
       return this.getEvents();
     } else {
-      const events = JSON.parse(localStorage.getItem('ch_events') || '[]');
+      const events = safeJsonParse('ch_events', []);
       const filtered = events.filter((e: any) => e.id !== eventId);
       localStorage.setItem('ch_events', JSON.stringify(filtered));
       return filtered;
@@ -429,7 +499,7 @@ export const apiService = {
       if (!res.ok) throw new Error('Error al obtener calificaciones');
       return res.json();
     } else {
-      const grades: ParticipantGrade[] = JSON.parse(localStorage.getItem('ch_grades') || '[]');
+      const grades: ParticipantGrade[] = safeJsonParse('ch_grades', []);
       return grades.filter(g => {
         if (params?.eventId && g.eventId !== params.eventId) return false;
         if (params?.participantCard && g.participantCard !== params.participantCard) return false;
@@ -449,7 +519,7 @@ export const apiService = {
       if (!res.ok) throw new Error('Error al guardar calificación');
       return res.json();
     } else {
-      const grades: ParticipantGrade[] = JSON.parse(localStorage.getItem('ch_grades') || '[]');
+      const grades: ParticipantGrade[] = safeJsonParse('ch_grades', []);
       const idx = grades.findIndex(g => g.eventId === grade.eventId && g.participantCard === grade.participantCard);
       const updated = {
         id: grade.id || `grd_${Date.now()}`,
@@ -490,7 +560,7 @@ export const apiService = {
       for (const g of grades) {
         await this.saveGrade(g);
       }
-      const allGrades = JSON.parse(localStorage.getItem('ch_grades') || '[]');
+      const allGrades = safeJsonParse('ch_grades', []);
       return { message: 'Calificaciones actualizadas', grades: allGrades };
     }
   },
@@ -500,7 +570,7 @@ export const apiService = {
       const res = await fetch(`${API_BASE_URL}/grades/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Error al eliminar calificación');
     } else {
-      const grades: ParticipantGrade[] = JSON.parse(localStorage.getItem('ch_grades') || '[]');
+      const grades: ParticipantGrade[] = safeJsonParse('ch_grades', []);
       const filtered = grades.filter(g => g.id !== id);
       localStorage.setItem('ch_grades', JSON.stringify(filtered));
     }
@@ -514,7 +584,7 @@ export const apiService = {
       if (!res.ok) throw new Error('Error al obtener participantes de Postgres');
       return res.json();
     } else {
-      const list: Participant[] = JSON.parse(localStorage.getItem('ch_participants') || '[]');
+      const list: Participant[] = safeJsonParse('ch_participants', []);
       if (companyId && companyId !== 'all') {
         return list.filter(p => (p.companyId || 'emp_kasino') === companyId);
       }
@@ -549,7 +619,7 @@ export const apiService = {
       }
       return this.getEvents();
     } else {
-      const events: TrainingEvent[] = JSON.parse(localStorage.getItem('ch_events') || '[]');
+      const events: TrainingEvent[] = safeJsonParse('ch_events', []);
       const updated = events.map(evt => {
         if (evt.id === eventId) {
           const updatedSchedule = evt.schedule.map(sch => {
@@ -604,9 +674,9 @@ export const apiService = {
         skippedAlreadyEnrolled: data.skippedAlreadyEnrolled || []
       };
     } else {
-      const events: TrainingEvent[] = JSON.parse(localStorage.getItem('ch_events') || '[]');
-      const participants: Participant[] = JSON.parse(localStorage.getItem('ch_participants') || '[]');
-      const users: UserAccount[] = JSON.parse(localStorage.getItem('ch_users') || '[]');
+      const events: TrainingEvent[] = safeJsonParse('ch_events', []);
+      const participants: Participant[] = safeJsonParse('ch_participants', []);
+      const users: UserAccount[] = safeJsonParse('ch_users', []);
       
       let enrolledCount = 0;
       const skippedAlreadyEnrolled: string[] = [];
@@ -703,9 +773,9 @@ export const apiService = {
         skippedAlreadyEnrolled: data.skippedAlreadyEnrolled || []
       };
     } else {
-      const events: TrainingEvent[] = JSON.parse(localStorage.getItem('ch_events') || '[]');
-      const participants: Participant[] = JSON.parse(localStorage.getItem('ch_participants') || '[]');
-      const users: UserAccount[] = JSON.parse(localStorage.getItem('ch_users') || '[]');
+      const events: TrainingEvent[] = safeJsonParse('ch_events', []);
+      const participants: Participant[] = safeJsonParse('ch_participants', []);
+      const users: UserAccount[] = safeJsonParse('ch_users', []);
 
       let assignedCount = 0;
       const skippedAlreadyEnrolled: string[] = [];
@@ -819,7 +889,7 @@ export const apiService = {
       }
       return this.getEvents();
     } else {
-      const events: TrainingEvent[] = JSON.parse(localStorage.getItem('ch_events') || '[]');
+      const events: TrainingEvent[] = safeJsonParse('ch_events', []);
       const updated = events.map(evt => {
         if (evt.id === eventId) {
           const updatedSchedule = evt.schedule.map(sch => {
@@ -858,21 +928,29 @@ export const apiService = {
     }
   },
 
-  // --- MÉTODOS DE ASISTENCIA PRESENCIAL (QR CHECK-IN) ---
-  async confirmAttendance(eventId: string, date: string, time: string, participantEmail: string): Promise<TrainingEvent[]> {
+  // --- MÉTODOS DE ASISTENCIA PRESENCIAL (QR CHECK-IN Y CHECK-OUT) ---
+  async confirmAttendance(
+    eventId: string, 
+    date: string, 
+    time: string, 
+    participantEmail: string,
+    type: 'checkin' | 'checkout' = 'checkin',
+    code?: string
+  ): Promise<TrainingEvent[]> {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/attendance`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ eventId, date, time, email: participantEmail })
+        body: JSON.stringify({ eventId, date, time, email: participantEmail, type, code })
       });
       if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.message || 'Error al registrar asistencia en Postgres');
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || 'Error al registrar asistencia');
       }
       return this.getEvents();
     } else {
-      const events: TrainingEvent[] = JSON.parse(localStorage.getItem('ch_events') || '[]');
+      const events: TrainingEvent[] = safeJsonParse('ch_events', []);
+      const cleanEmail = participantEmail.toLowerCase();
       const updated = events.map(evt => {
         if (evt.id === eventId) {
           const updatedSchedule = evt.schedule.map(sch => {
@@ -880,12 +958,37 @@ export const apiService = {
               const updatedSlots = sch.slots.map(sl => {
                 if (sl.time === time) {
                   const attendedList = sl.attendedList || [];
-                  if (!attendedList.includes(participantEmail)) {
-                    return {
-                      ...sl,
-                      attendedList: [...attendedList, participantEmail]
-                    };
+                  const checkInList = sl.checkInList || attendedList;
+                  const checkOutList = sl.checkOutList || [];
+                  const completedAttendanceList = sl.completedAttendanceList || [];
+
+                  let newCheckInList = [...checkInList];
+                  let newCheckOutList = [...checkOutList];
+                  let newCompletedList = [...completedAttendanceList];
+
+                  if (type === 'checkout') {
+                    if (!newCheckOutList.includes(cleanEmail)) {
+                      newCheckOutList.push(cleanEmail);
+                    }
+                    if (!newCheckInList.includes(cleanEmail)) {
+                      newCheckInList.push(cleanEmail);
+                    }
+                    if (!newCompletedList.includes(cleanEmail)) {
+                      newCompletedList.push(cleanEmail);
+                    }
+                  } else {
+                    if (!newCheckInList.includes(cleanEmail)) {
+                      newCheckInList.push(cleanEmail);
+                    }
                   }
+
+                  return {
+                    ...sl,
+                    attendedList: newCheckInList,
+                    checkInList: newCheckInList,
+                    checkOutList: newCheckOutList,
+                    completedAttendanceList: newCompletedList
+                  };
                 }
                 return sl;
               });
@@ -902,28 +1005,53 @@ export const apiService = {
     }
   },
 
-  async revertAttendance(eventId: string, date: string, time: string, participantEmail: string): Promise<TrainingEvent[]> {
+  async revertAttendance(
+    eventId: string, 
+    date: string, 
+    time: string, 
+    participantEmail: string,
+    revertType: 'checkout' | 'all' = 'all'
+  ): Promise<TrainingEvent[]> {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/attendance/revert`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ eventId, date, time, email: participantEmail })
+        body: JSON.stringify({ eventId, date, time, email: participantEmail, revertType })
       });
       if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.message || 'Error al revertir asistencia en Postgres');
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || 'Error al revertir asistencia');
       }
       return this.getEvents();
     } else {
-      const events: TrainingEvent[] = JSON.parse(localStorage.getItem('ch_events') || '[]');
+      const events: TrainingEvent[] = safeJsonParse('ch_events', []);
+      const cleanEmail = participantEmail.toLowerCase();
       const updated = events.map(evt => {
         if (evt.id === eventId) {
           const updatedSchedule = evt.schedule.map(sch => {
             if (sch.date === date) {
               const updatedSlots = sch.slots.map(sl => {
                 if (sl.time === time) {
-                  const attendedList = (sl.attendedList || []).filter(e => e.toLowerCase() !== participantEmail.toLowerCase());
-                  return { ...sl, attendedList };
+                  let checkInList = sl.checkInList || sl.attendedList || [];
+                  let checkOutList = sl.checkOutList || [];
+                  let completedList = sl.completedAttendanceList || [];
+
+                  if (revertType === 'checkout') {
+                    checkOutList = checkOutList.filter(e => e.toLowerCase() !== cleanEmail);
+                    completedList = completedList.filter(e => e.toLowerCase() !== cleanEmail);
+                  } else {
+                    checkInList = checkInList.filter(e => e.toLowerCase() !== cleanEmail);
+                    checkOutList = checkOutList.filter(e => e.toLowerCase() !== cleanEmail);
+                    completedList = completedList.filter(e => e.toLowerCase() !== cleanEmail);
+                  }
+
+                  return {
+                    ...sl,
+                    attendedList: checkInList,
+                    checkInList,
+                    checkOutList,
+                    completedAttendanceList: completedList
+                  };
                 }
                 return sl;
               });
@@ -937,6 +1065,31 @@ export const apiService = {
       });
       localStorage.setItem('ch_events', JSON.stringify(updated));
       return updated;
+    }
+  },
+
+  async verifyDailyCode(eventId: string, date: string, time: string, code: string): Promise<{ valid: boolean; type?: 'checkin' | 'checkout'; message?: string }> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/attendance/verify-code`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventId, date, time, code })
+      });
+      return res.json();
+    } else {
+      const events: TrainingEvent[] = safeJsonParse('ch_events', []);
+      const evt = events.find(e => e.id === eventId);
+      const sch = evt?.schedule.find(s => s.date === date);
+      const slot = sch?.slots.find(s => s.time === time);
+      if (!slot) return { valid: false, message: 'Horario no encontrado' };
+
+      const cleanCode = code.trim();
+      if (slot.checkinCode && slot.checkinCode === cleanCode) {
+        return { valid: true, type: 'checkin', message: 'Código de entrada válido' };
+      } else if (slot.checkoutCode && slot.checkoutCode === cleanCode) {
+        return { valid: true, type: 'checkout', message: 'Código de salida válido' };
+      }
+      return { valid: false, message: 'El código no coincide con este turno' };
     }
   },
 
@@ -948,24 +1101,28 @@ export const apiService = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(feedback)
       });
-      if (!res.ok) throw new Error('Error al enviar retroalimentación');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Error al enviar retroalimentación');
+      }
       return this.getEvents();
     } else {
-      const events: TrainingEvent[] = JSON.parse(localStorage.getItem('ch_events') || '[]');
+      const events: TrainingEvent[] = safeJsonParse('ch_events', []);
+      const targetEvt = events.find(e => e.id === feedback.eventId);
+      if (targetEvt) {
+        const existingFeedbacks = targetEvt.feedbacks || [];
+        const alreadySubmitted = existingFeedbacks.some(f => f.userEmail.toLowerCase() === feedback.userEmail.toLowerCase());
+        if (alreadySubmitted) {
+          throw new Error('Ya has completado la encuesta de satisfacción para esta capacitación. Solo se permite 1 respuesta por colaborador.');
+        }
+      }
+
       const updated = events.map(evt => {
         if (evt.id === feedback.eventId) {
           const existingFeedbacks = evt.feedbacks || [];
-          const matchIdx = existingFeedbacks.findIndex(f => f.userEmail.toLowerCase() === feedback.userEmail.toLowerCase());
-          let newFeedbacks;
-          if (matchIdx >= 0) {
-            newFeedbacks = [...existingFeedbacks];
-            newFeedbacks[matchIdx] = { ...existingFeedbacks[matchIdx], ...feedback };
-          } else {
-            newFeedbacks = [...existingFeedbacks, { ...feedback, id: `fb_${Date.now()}` }];
-          }
           return {
             ...evt,
-            feedbacks: newFeedbacks
+            feedbacks: [...existingFeedbacks, { ...feedback, id: `fb_${Date.now()}` }]
           };
         }
         return evt;
@@ -983,7 +1140,7 @@ export const apiService = {
       if (!res.ok) throw new Error('Error al obtener usuarios de la base de datos');
       return res.json();
     } else {
-      const list: UserAccount[] = JSON.parse(localStorage.getItem('ch_users') || '[]');
+      const list: UserAccount[] = safeJsonParse('ch_users', []);
       if (companyId && companyId !== 'all') {
         return list.filter(u => (u.companyId || 'emp_kasino') === companyId);
       }
@@ -1014,10 +1171,70 @@ export const apiService = {
       if (!res.ok) throw new Error('Error al cambiar la contraseña en la base de datos');
       return this.getUsers();
     } else {
-      const users: UserAccount[] = JSON.parse(localStorage.getItem('ch_users') || '[]');
+      const users: UserAccount[] = safeJsonParse('ch_users', []);
       const updated = users.map(u => u.id === userId ? { ...u, password: newPassword } : u);
       localStorage.setItem('ch_users', JSON.stringify(updated));
       return updated;
+    }
+  },
+
+  async updateUserProfile(userId: string, profileData: Partial<UserAccount>): Promise<{ user: UserAccount; participants: Participant[]; users: UserAccount[] }> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/users/${userId}/profile`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profileData)
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Error al actualizar el perfil en la base de datos');
+      }
+      const data = await res.json();
+      const updatedUsers = await this.getUsers();
+      const updatedParticipants = await this.getParticipants();
+      const resolvedUser: UserAccount = data.user || updatedUsers.find(u => u.id === userId) || {
+        id: userId,
+        email: '',
+        name: 'Colaborador',
+        role: 'Colaborador (User)',
+        password: '',
+        ...profileData,
+        profileCompleted: true
+      };
+      return { user: resolvedUser, users: updatedUsers, participants: updatedParticipants };
+    } else {
+      const users: UserAccount[] = safeJsonParse('ch_users', []);
+      const participants: Participant[] = safeJsonParse('ch_participants', []);
+      let updatedUser = users.find(u => u.id === userId);
+      if (updatedUser) {
+        updatedUser = { ...updatedUser, ...profileData, profileCompleted: true };
+      } else {
+        let savedSession: any = null;
+        try {
+          const s = localStorage.getItem('ch_logged_user');
+          if (s && s !== 'undefined' && s !== 'null') savedSession = JSON.parse(s);
+        } catch {}
+        updatedUser = {
+          id: userId,
+          email: savedSession?.email || '',
+          name: savedSession?.name || 'Colaborador',
+          role: savedSession?.role || 'Colaborador (User)',
+          password: '',
+          ...profileData,
+          profileCompleted: true
+        };
+        users.push(updatedUser);
+      }
+      const newUsers = users.map(u => u.id === userId ? updatedUser! : u);
+      const newParticipants = participants.map(p => {
+        if (updatedUser && updatedUser.email && p.email.toLowerCase() === updatedUser.email.toLowerCase()) {
+          return { ...p, ...profileData, profileCompleted: true };
+        }
+        return p;
+      });
+      localStorage.setItem('ch_users', JSON.stringify(newUsers));
+      localStorage.setItem('ch_participants', JSON.stringify(newParticipants));
+      return { user: updatedUser, users: newUsers, participants: newParticipants };
     }
   },
 
@@ -1029,7 +1246,7 @@ export const apiService = {
       if (!res.ok) throw new Error('Error al obtener grupos de Postgres');
       return res.json();
     } else {
-      const list: ParticipantGroup[] = JSON.parse(localStorage.getItem('ch_groups') || '[]');
+      const list: ParticipantGroup[] = safeJsonParse('ch_groups', []);
       if (companyId && companyId !== 'all') {
         return list.filter(g => (g.companyId || 'emp_kasino') === companyId);
       }
@@ -1047,7 +1264,7 @@ export const apiService = {
       if (!res.ok) throw new Error('Error al guardar grupo en Postgres');
       return this.getGroups();
     } else {
-      const groups: ParticipantGroup[] = JSON.parse(localStorage.getItem('ch_groups') || '[]');
+      const groups: ParticipantGroup[] = safeJsonParse('ch_groups', []);
       const idx = groups.findIndex(g => g.id === group.id);
       if (idx > -1) {
         groups[idx] = group;
@@ -1080,7 +1297,7 @@ export const apiService = {
       if (!res.ok) throw new Error('Error al eliminar grupo en Postgres');
       return this.getGroups();
     } else {
-      const groups: ParticipantGroup[] = JSON.parse(localStorage.getItem('ch_groups') || '[]');
+      const groups: ParticipantGroup[] = safeJsonParse('ch_groups', []);
       const updated = groups.filter(g => g.id !== groupId);
       localStorage.setItem('ch_groups', JSON.stringify(updated));
       return updated;
@@ -1095,7 +1312,7 @@ export const apiService = {
       if (!res.ok) throw new Error('Error al obtener programas formativos de Postgres');
       return res.json();
     } else {
-      const list: TrainingProgram[] = JSON.parse(localStorage.getItem('ch_programs') || '[]');
+      const list: TrainingProgram[] = safeJsonParse('ch_programs', []);
       if (companyId && companyId !== 'all') {
         return list.filter(p => (p.companyId || 'emp_kasino') === companyId);
       }
@@ -1113,7 +1330,7 @@ export const apiService = {
       if (!res.ok) throw new Error('Error al guardar programa formativo en Postgres');
       return res.json();
     } else {
-      const programs: TrainingProgram[] = JSON.parse(localStorage.getItem('ch_programs') || '[]');
+      const programs: TrainingProgram[] = safeJsonParse('ch_programs', []);
       const idx = programs.findIndex(p => p.id === program.id);
       if (idx > -1) {
         programs[idx] = program;
@@ -1133,7 +1350,7 @@ export const apiService = {
       if (!res.ok) throw new Error('Error al eliminar programa formativo en Postgres');
       return res.json();
     } else {
-      const programs: TrainingProgram[] = JSON.parse(localStorage.getItem('ch_programs') || '[]');
+      const programs: TrainingProgram[] = safeJsonParse('ch_programs', []);
       const updated = programs.filter(p => p.id !== programId);
       localStorage.setItem('ch_programs', JSON.stringify(updated));
       return updated;
@@ -1147,7 +1364,7 @@ export const apiService = {
       if (!res.ok) throw new Error('Error al obtener empresas de Postgres');
       return res.json();
     } else {
-      return JSON.parse(localStorage.getItem('ch_companies') || JSON.stringify(MOCK_COMPANIES));
+      return safeJsonParse('ch_companies', MOCK_COMPANIES);
     }
   },
 
@@ -1161,7 +1378,7 @@ export const apiService = {
       if (!res.ok) throw new Error('Error al guardar empresa en Postgres');
       return this.getCompanies();
     } else {
-      const companies: Company[] = JSON.parse(localStorage.getItem('ch_companies') || JSON.stringify(MOCK_COMPANIES));
+      const companies: Company[] = safeJsonParse('ch_companies', MOCK_COMPANIES);
       const idx = companies.findIndex(c => c.id === company.id);
       if (idx > -1) {
         companies[idx] = company;
@@ -1181,7 +1398,7 @@ export const apiService = {
       if (!res.ok) throw new Error('Error al eliminar empresa en Postgres');
       return this.getCompanies();
     } else {
-      const companies: Company[] = JSON.parse(localStorage.getItem('ch_companies') || JSON.stringify(MOCK_COMPANIES));
+      const companies: Company[] = safeJsonParse('ch_companies', MOCK_COMPANIES);
       const updated = companies.filter(c => c.id !== companyId);
       localStorage.setItem('ch_companies', JSON.stringify(updated));
       return updated;

@@ -27,18 +27,48 @@ export interface TeamAssignmentPayload {
   notes?: string;
 }
 
+export interface SlotAttendanceDetail {
+  email: string;
+  checkInAt: string;
+  checkOutAt?: string | null;
+  isCompleted: boolean;
+}
+
+export interface AttendanceWsEvent {
+  type: 'ATTENDANCE_CHECK_IN' | 'ATTENDANCE_CHECK_OUT' | 'ATTENDANCE_REVERT' | 'EVENTS_UPDATED';
+  eventId?: string;
+  date?: string;
+  time?: string;
+  email?: string;
+  participantCard?: string;
+  participantName?: string;
+  timestamp: string;
+  checkInAt?: string;
+  checkOutAt?: string;
+  isCompleted?: boolean;
+  message?: string;
+}
+
 export interface Slot {
   time: string;
+  endTime?: string;
   capacity: number;
   registered: number;
   attendees: string[]; // Emails de colaboradores inscritos
-  attendedList?: string[]; // Emails con asistencia confirmada (QR)
+  attendedList?: string[]; // Emails con asistencia confirmada (QR) (retrocompatibilidad)
+  checkInList?: string[]; // Emails con entrada registrada
+  checkOutList?: string[]; // Emails con salida registrada
+  completedAttendanceList?: string[]; // Emails con entrada y salida
+  attendanceDetails?: SlotAttendanceDetail[]; // Detalles con timestamps
+  checkinCode?: string; // Código PIN diario de Entrada (4 dígitos)
+  checkoutCode?: string; // Código PIN diario de Salida (4 dígitos)
   attendeesDetails?: RegistrationAttendeeDetail[]; // Metadatos de asignación
   waitlist?: string[]; // Emails en lista de espera
 }
 
 export interface Schedule {
   date: string; // Formato YYYY-MM-DD
+  endDate?: string; // Formato YYYY-MM-DD
   slots: Slot[];
 }
 
@@ -148,6 +178,7 @@ export interface TrainingEvent {
   location: string;
   surveyUrl?: string;
   companyId?: string;
+  companyIds?: string[];
   evaluationType?: EvaluationType;
   passingScore?: number;
   skillsEvaluated?: string[];
@@ -155,14 +186,37 @@ export interface TrainingEvent {
   notificationSettings?: NotificationSettings;
   notificationHistory?: NotificationHistoryItem[];
   schedule: Schedule[];
+  startDate?: string;
+  endDate?: string;
+  startTime?: string;
+  endTime?: string;
   feedbacks?: EventFeedback[];
   grades?: ParticipantGrade[];
   ojtEvaluatorId?: string;
   ojtEvaluatorName?: string;
   ojtEvaluatorEmail?: string;
+  totalHours?: number;
+  sessionType?: 'Asincrónica' | 'Sincrónica' | 'Híbrido' | string;
+  trainingType?: 'Conductual' | 'Técnico' | string;
+  trainingFormat?: 'Taller' | 'Webinar' | 'Curso' | 'Cinefórum' | 'Charla' | 'Workshop' | 'Diplomado' | 'Certificación' | 'Seminario' | string;
+  programCategory?: string;
+  subprogram?: string;
+  supplier?: string;
 }
 
 export type EmploymentStatus = 'contratado' | 'en_proceso' | 'inactivo';
+
+export type EducationLevel = 
+  | 'Primaria'
+  | 'Secundaria / Bachiller'
+  | 'Técnico / Tecnólogo'
+  | 'Universitario en Curso'
+  | 'Profesional / Grado'
+  | 'Postgrado / Maestría'
+  | 'Doctorado'
+  | 'Otro';
+
+export type Gender = 'Masculino' | 'Femenino' | 'Otro' | 'Prefiero no decir';
 
 export interface Participant {
   card: string;
@@ -175,6 +229,17 @@ export interface Participant {
   employmentStatus?: EmploymentStatus;
   isActive?: boolean;
   companyId?: string;
+  birthDate?: string;
+  educationLevel?: EducationLevel;
+  isCurrentlyStudying?: boolean;
+  currentStudyField?: string;
+  institutionName?: string;
+  professionTitle?: string;
+  currentAddress?: string;
+  phone?: string;
+  gender?: Gender;
+  trainingInterestAreas?: string[];
+  profileCompleted?: boolean;
 }
 
 export interface UserAccount {
@@ -190,6 +255,17 @@ export interface UserAccount {
   employmentStatus?: EmploymentStatus;
   isActive?: boolean;
   companyId?: string;
+  birthDate?: string;
+  educationLevel?: EducationLevel;
+  isCurrentlyStudying?: boolean;
+  currentStudyField?: string;
+  institutionName?: string;
+  professionTitle?: string;
+  currentAddress?: string;
+  phone?: string;
+  gender?: Gender;
+  trainingInterestAreas?: string[];
+  profileCompleted?: boolean;
 }
 
 export interface ToastNotification {

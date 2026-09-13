@@ -22,7 +22,7 @@ interface QrScannerModalProps {
   onClose: () => void;
   currentUser: UserAccount;
   events: TrainingEvent[];
-  onConfirmAttendance: (eventId: string, date: string, time: string, email: string) => Promise<void>;
+  onConfirmAttendance: (eventId: string, date: string, time: string, email: string, type?: 'checkin' | 'checkout', code?: string) => Promise<any>;
   onOpenTecEvaluation: (event: TrainingEvent) => void;
   onShowToast?: (title: string, message: string, type?: 'success' | 'error' | 'info') => void;
 }
@@ -31,6 +31,8 @@ interface ParsedQrResult {
   eventId: string;
   date: string;
   time: string;
+  type?: 'checkin' | 'checkout';
+  code?: string;
   event?: TrainingEvent;
 }
 
@@ -88,6 +90,8 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
         const eventId = params.get('event') || params.get('eventId');
         const date = params.get('date') || '';
         const time = params.get('time') || '';
+        const type = (params.get('type') === 'checkout' ? 'checkout' : 'checkin') as 'checkin' | 'checkout';
+        const code = params.get('code') || '';
 
         if (eventId) {
           const found = events.find(e => e.id === eventId);
@@ -95,6 +99,8 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
             eventId,
             date,
             time,
+            type,
+            code,
             event: found
           };
         }
@@ -109,6 +115,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
           eventId: directEvent.id,
           date: firstSchedule?.date || '',
           time: firstSlot?.time || '',
+          type: 'checkin',
           event: directEvent
         };
       }
@@ -148,16 +155,21 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
     await stopScannerSafe();
     setDetectedSession(result);
 
-    // Auto-confirmar asistencia
+    // Auto-confirmar asistencia (Entrada o Salida)
     try {
       setIsProcessingAttendance(true);
       const matchedDate = result.date || result.event?.schedule[0]?.date || '';
       const matchedTime = result.time || result.event?.schedule[0]?.slots[0]?.time || '';
+      const actionType = result.type || 'checkin';
 
-      await onConfirmAttendance(result.eventId, matchedDate, matchedTime, currentUser.email);
+      await onConfirmAttendance(result.eventId, matchedDate, matchedTime, currentUser.email, actionType, result.code);
       setAttendanceConfirmed(true);
       if (onShowToast) {
-        onShowToast('¡Asistencia confirmada!', 'Tu presencia en la sesión ha sido validada.', 'success');
+        if (actionType === 'checkout') {
+          onShowToast('¡Salida confirmada!', 'Tu asistencia está completa. Ya puedes calificar al facilitador.', 'success');
+        } else {
+          onShowToast('¡Entrada confirmada!', 'Tu presencia ha sido validada. Recuerda marcar salida al terminar.', 'success');
+        }
       }
     } catch (err: any) {
       setScannerError(err.message || 'Error al validar la asistencia en el servidor.');
@@ -364,31 +376,83 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
                 )}
               </div>
 
-              {/* ACTION: Lanzar Encuesta TEC directamente */}
-              {detectedSession.event && (
-                <div className="p-4 rounded-2xl bg-red-50 border border-red-200 space-y-3">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#DA291C]">
-                    <Sparkles className="w-4 h-4 text-[#DA291C]" />
-                    <span>Evaluación de Calidad TEC</span>
+              {/* ACTION: Lanzar Encuesta TEC directamente o mostrar completada */}
+              {detectedSession.event && (() => {
+                const existingFeedback = (detectedSession.event.feedbacks || []).find(
+                  f => f.userEmail?.toLowerCase() === currentUser.email?.toLowerCase()
+                );
+
+                if (existingFeedback) {
+                  return (
+                    <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-xs font-bold text-emerald-800">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                          <span>Encuesta de Calidad Completada</span>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-900">
+                          {existingFeedback.rating} ★
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-emerald-700 font-medium leading-relaxed">
+                        Tu asistencia y evaluación de calidad para este evento ya fueron registradas previamente. ¡Muchas gracias!
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const evt = detectedSession.event;
+                          stopScannerSafe();
+                          onClose();
+                          if (evt) onOpenTecEvaluation(evt);
+                        }}
+                        className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
+                      >
+                        <Star className="w-4 h-4 fill-white" />
+                        <span>Ver Respuestas Registradas</span>
+                      </button>
+                    </div>
+                  );
+                }
+
+                if (detectedSession.type === 'checkin') {
+                  return (
+                    <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2">
+                      <div className="flex items-center gap-2 text-xs font-bold text-emerald-800">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <span>Entrada Registrada (Inicio de Sesión)</span>
+                      </div>
+                      <p className="text-[11px] text-emerald-700 font-medium leading-relaxed">
+                        Tu asistencia de ingreso ha sido confirmada exitosamente. Para acceder a la encuesta de satisfacción y evaluación del facilitador, recuerda registrar tu Salida al terminar el evento.
+                      </p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="p-4 rounded-2xl bg-red-50 border border-red-200 space-y-3">
+                    <div className="flex items-center gap-2 text-xs font-bold text-[#DA291C]">
+                      <Sparkles className="w-4 h-4 text-[#DA291C]" />
+                      <span>Evaluación de Calidad TEC</span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 font-medium leading-relaxed">
+                      ¡Asistencia Completa Verificada! Ya confirmaste tu entrada y salida. Ahora por favor califica al curso y al facilitador para asegurar los estándares de excelencia.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const evt = detectedSession.event;
+                        stopScannerSafe();
+                        onClose();
+                        if (evt) onOpenTecEvaluation(evt);
+                      }}
+                      className="w-full py-3 bg-[#DA291C] hover:bg-red-700 text-white text-xs font-black rounded-xl flex items-center justify-center gap-2 shadow-md shadow-red-500/25 transition-all cursor-pointer"
+                    >
+                      <Star className="w-4 h-4 fill-white" />
+                      <span>Evaluar Curso y Facilitador Ahora</span>
+                    </button>
                   </div>
-                  <p className="text-[11px] text-slate-600 font-medium leading-relaxed">
-                    Ya confirmaste tu asistencia. Ahora por favor califica al curso y al facilitador para asegurar los estándares de excelencia.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const evt = detectedSession.event;
-                      stopScannerSafe();
-                      onClose();
-                      if (evt) onOpenTecEvaluation(evt);
-                    }}
-                    className="w-full py-3 bg-[#DA291C] hover:bg-red-700 text-white text-xs font-black rounded-xl flex items-center justify-center gap-2 shadow-md shadow-red-500/25 transition-all cursor-pointer"
-                  >
-                    <Star className="w-4 h-4 fill-white" />
-                    <span>Evaluar Curso y Facilitador Ahora</span>
-                  </button>
-                </div>
-              )}
+                );
+              })()}
 
               <button
                 type="button"

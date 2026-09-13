@@ -24,13 +24,16 @@ import {
   Tv,
   RotateCcw,
   Layers,
-  QrCode
+  QrCode,
+  LogIn,
+  LogOut
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { TrainingEvent, Participant, ParticipantGrade, AcademicStatus, EventModule, ParticipantModuleGrade } from '../../types';
 import { exportAttendeesToExcel, exportEventGradesToExcel, exportSessionGradesForOjtAndCalibration } from '../../utils/excelUtils';
 import { formatDateLong } from '../../utils/formatters';
 import { apiService } from '../../services/api';
+import { attendanceWs } from '../../services/websocket';
 
 interface AttendeesModalProps {
   event: TrainingEvent | null;
@@ -38,8 +41,8 @@ interface AttendeesModalProps {
   isSuperAdmin?: boolean;
   initialProjectorMode?: boolean;
   onClose: () => void;
-  onConfirmAttendance: (eventId: string, date: string, time: string, email: string) => Promise<void>;
-  onRevertAttendance?: (eventId: string, date: string, time: string, email: string) => Promise<void>;
+  onConfirmAttendance: (eventId: string, date: string, time: string, email: string, type?: 'checkin' | 'checkout') => Promise<void>;
+  onRevertAttendance?: (eventId: string, date: string, time: string, email: string, type?: 'checkout' | 'all') => Promise<void>;
   onOpenBulkEnrollment?: (eventId: string, date: string, time: string) => void;
   onSaveGradesSuccess?: (updatedEvent: TrainingEvent) => void;
 }
@@ -71,6 +74,25 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
   const eventModules = useMemo(() => event.modules || [], [event.modules]);
   const [selectedModuleId, setSelectedModuleId] = useState<string>('summary');
   const [isProjectorOpen, setIsProjectorOpen] = useState<boolean>(initialProjectorMode);
+  const [projectorMode, setProjectorMode] = useState<'checkin' | 'checkout'>('checkin');
+  const [liveToast, setLiveToast] = useState<string | null>(null);
+
+  // Escuchar eventos en vivo de WebSocket para asistencia
+  useEffect(() => {
+    const unsub = attendanceWs.onAttendanceEvent((wsEvt) => {
+      if (wsEvt.eventId === event.id && wsEvt.date === selectedDate && wsEvt.time === selectedTime) {
+        const action = wsEvt.type === 'ATTENDANCE_CHECK_IN' 
+          ? 'Entrada registrada' 
+          : wsEvt.type === 'ATTENDANCE_CHECK_OUT' 
+            ? 'Salida registrada' 
+            : 'Asistencia revertida';
+        setLiveToast(`⚡ En tiempo real: ${wsEvt.participantName || wsEvt.email || 'Colaborador'} (${action})`);
+        const timer = setTimeout(() => setLiveToast(null), 4000);
+        return () => clearTimeout(timer);
+      }
+    });
+    return () => unsub();
+  }, [event.id, selectedDate, selectedTime]);
 
   const [gradesMap, setGradesMap] = useState<Record<string, {
     score: number | string;
@@ -126,21 +148,36 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
 
   const attendeesList = currentSlot?.attendees || [];
   const attendedList = currentSlot?.attendedList || [];
+  const checkInList = currentSlot?.checkInList || attendedList;
+  const checkOutList = currentSlot?.checkOutList || [];
+  const completedAttendanceList = currentSlot?.completedAttendanceList || [];
+  const attendanceDetails = currentSlot?.attendanceDetails || [];
 
-  // Lista de todos los inscritos en el horario actual con datos de participante
+  // Lista de todos los inscritos en el horario actual con datos de participante y asistencia detallada
   const currentSlotParticipants = useMemo(() => {
     return attendeesList.map(email => {
       const p = participants.find(part => part.email.toLowerCase() === email.toLowerCase());
+      const cleanEmail = email.toLowerCase();
+      const isCheckedIn = checkInList.map(a => a.toLowerCase()).includes(cleanEmail);
+      const isCheckedOut = checkOutList.map(a => a.toLowerCase()).includes(cleanEmail);
+      const isCompleted = completedAttendanceList.map(a => a.toLowerCase()).includes(cleanEmail) || (isCheckedIn && isCheckedOut);
+      const detail = attendanceDetails.find(d => d.email.toLowerCase() === cleanEmail);
+
       return {
         email,
         participant: p,
         card: p?.card || '',
         name: p?.name || email.split('@')[0],
         department: p?.department || 'General',
-        isAttended: attendedList.map(a => a.toLowerCase()).includes(email.toLowerCase())
+        isCheckedIn,
+        isCheckedOut,
+        isCompleted,
+        isAttended: isCompleted,
+        checkInAt: detail?.checkInAt || null,
+        checkOutAt: detail?.checkOutAt || null
       };
     });
-  }, [attendeesList, attendedList, participants]);
+  }, [attendeesList, checkInList, checkOutList, completedAttendanceList, attendanceDetails, participants]);
 
   // Filtrado por búsqueda
   const filteredParticipants = currentSlotParticipants.filter(item => {
@@ -400,6 +437,14 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
         
+        {/* Real-time WebSocket Live Alert Toast */}
+        {liveToast && (
+          <div className="bg-emerald-600 text-white text-xs font-bold px-4 py-2 text-center animate-in slide-in-from-top duration-200 flex items-center justify-center gap-2">
+            <Sparkles className="w-4 h-4 animate-bounce" />
+            <span>{liveToast}</span>
+          </div>
+        )}
+
         {/* Header & Tabs */}
         <div className="p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50">
           <div>
@@ -437,7 +482,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                   }`}
                 >
                   <Users className="w-3.5 h-3.5" />
-                  <span>Asistencia ({attendedList.length}/{attendeesList.length})</span>
+                  <span>Asistencia ({completedAttendanceList.length}/{attendeesList.length})</span>
                 </button>
 
                 <button
@@ -499,7 +544,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                   </button>
 
                   <button
-                    onClick={() => exportAttendeesToExcel(event, selectedDate, selectedTime, attendeesList, attendedList, participants)}
+                    onClick={() => exportAttendeesToExcel(event, selectedDate, selectedTime, attendeesList, attendedList, participants, checkInList, checkOutList, completedAttendanceList)}
                     className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
                   >
                     <Download className="w-3.5 h-3.5" />
@@ -540,21 +585,36 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
           </div>
 
           {currentSchedule && (
-            <div className="flex items-center gap-2 pt-1 overflow-x-auto">
-              <span className="text-[11px] font-bold text-slate-500">Horarios:</span>
-              {currentSchedule.slots.map(s => (
-                <button
-                  key={s.time}
-                  onClick={() => setSelectedTime(s.time)}
-                  className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    selectedTime === s.time
-                      ? 'bg-red-50 border border-red-200 text-[#DA291C]'
-                      : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  {s.time} ({s.registered}/{s.capacity})
-                </button>
-              ))}
+            <div className="flex items-center justify-between gap-3 pt-1 flex-wrap">
+              <div className="flex items-center gap-2 overflow-x-auto">
+                <span className="text-[11px] font-bold text-slate-500">Horarios:</span>
+                {currentSchedule.slots.map(s => (
+                  <button
+                    key={s.time}
+                    onClick={() => setSelectedTime(s.time)}
+                    className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      selectedTime === s.time
+                        ? 'bg-red-50 border border-red-200 text-[#DA291C]'
+                        : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-100'
+                    }`}
+                  >
+                    {s.time}{s.endTime ? ` - ${s.endTime}` : ''} ({s.registered}/{s.capacity})
+                  </button>
+                ))}
+              </div>
+
+              {currentSlot && (
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="px-2.5 py-1 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-mono font-bold text-[11px] flex items-center gap-1.5" title="Código PIN diario para registrar Entrada">
+                    <span className="text-emerald-600 uppercase font-sans text-[10px]">PIN Entrada:</span>
+                    <strong className="tracking-widest">{currentSlot.checkinCode || '----'}</strong>
+                  </span>
+                  <span className="px-2.5 py-1 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 font-mono font-bold text-[11px] flex items-center gap-1.5" title="Código PIN diario para registrar Salida">
+                    <span className="text-blue-600 uppercase font-sans text-[10px]">PIN Salida:</span>
+                    <strong className="tracking-widest">{currentSlot.checkoutCode || '----'}</strong>
+                  </span>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -582,61 +642,97 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                 {filteredParticipants.map((item, idx) => (
                   <div
                     key={idx}
-                    className="p-3.5 rounded-2xl bg-white border border-slate-200 flex items-center justify-between gap-3 shadow-xs hover:border-slate-300 transition-colors"
+                    className="p-3.5 rounded-2xl bg-white border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs hover:border-slate-300 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs ${
-                        item.isAttended ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600'
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
+                        item.isCompleted 
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                          : item.isCheckedIn 
+                            ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                            : 'bg-slate-100 text-slate-600'
                       }`}>
                         {item.name ? item.name.charAt(0).toUpperCase() : 'U'}
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-slate-900">
-                          {item.name}
-                        </p>
-                        <p className="text-[11px] text-slate-500">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="text-xs font-bold text-slate-900">{item.name}</p>
+                          {item.isCompleted ? (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                              Completa
+                            </span>
+                          ) : item.isCheckedIn ? (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-1 animate-pulse">
+                              <Clock className="w-3 h-3 text-amber-600" />
+                              En Curso (Entrada OK)
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                              Pendiente
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-slate-500 mt-0.5">
                           {item.email} {item.card && `• Tarjeta: #${item.card}`} • <span className="text-slate-700 font-semibold">{item.department}</span>
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2.5 py-1 rounded-xl text-[10px] font-bold flex items-center gap-1 ${
-                        item.isAttended
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-slate-100 text-slate-600'
-                      }`}>
-                        {item.isAttended ? (
-                          <>
-                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                            <span>Confirmado</span>
-                          </>
+                    <div className="flex items-center gap-2 flex-wrap sm:justify-end">
+                      {/* Check-In Action / Status */}
+                      <div className="flex items-center gap-1.5">
+                        {item.isCheckedIn ? (
+                          <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1" title={item.checkInAt ? `Entrada: ${new Date(item.checkInAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}` : 'Entrada registrada'}>
+                            <Check className="w-3 h-3 text-emerald-600" />
+                            <span>Entrada: {item.checkInAt ? new Date(item.checkInAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'OK'}</span>
+                          </span>
                         ) : (
-                          <>
-                            <Clock className="w-3 h-3 text-slate-400" />
-                            <span>Pendiente</span>
-                          </>
-                        )}
-                      </span>
-
-                      {!item.isAttended ? (
-                        <button
-                          onClick={() => onConfirmAttendance(event.id, selectedDate, selectedTime, item.email)}
-                          className="px-2.5 py-1 rounded-xl bg-red-50 hover:bg-red-100 text-[#DA291C] border border-red-200 text-[10px] font-bold transition-colors cursor-pointer"
-                        >
-                          Marcar Asistencia
-                        </button>
-                      ) : (
-                        onRevertAttendance && (
                           <button
-                            onClick={() => onRevertAttendance(event.id, selectedDate, selectedTime, item.email)}
-                            className="px-2 py-1 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200 hover:border-rose-200 text-[10px] font-semibold transition-colors cursor-pointer flex items-center gap-1"
-                            title="Revertir asistencia (marcar como pendiente)"
+                            type="button"
+                            onClick={() => onConfirmAttendance(event.id, selectedDate, selectedTime, item.email, 'checkin')}
+                            className="px-2.5 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold transition-colors cursor-pointer shadow-xs flex items-center gap-1"
                           >
-                            <RotateCcw className="w-3 h-3" />
-                            <span>Revertir</span>
+                            <LogIn className="w-3 h-3" />
+                            <span>+ Entrada</span>
                           </button>
-                        )
+                        )}
+                      </div>
+
+                      {/* Check-Out Action / Status */}
+                      <div className="flex items-center gap-1.5">
+                        {item.isCheckedOut ? (
+                          <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1" title={item.checkOutAt ? `Salida: ${new Date(item.checkOutAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}` : 'Salida registrada'}>
+                            <Check className="w-3 h-3 text-blue-600" />
+                            <span>Salida: {item.checkOutAt ? new Date(item.checkOutAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'OK'}</span>
+                          </span>
+                        ) : item.isCheckedIn ? (
+                          <button
+                            type="button"
+                            onClick={() => onConfirmAttendance(event.id, selectedDate, selectedTime, item.email, 'checkout')}
+                            className="px-2.5 py-1 rounded-xl bg-[#DA291C] hover:bg-red-700 text-white text-[10px] font-bold transition-colors cursor-pointer shadow-xs flex items-center gap-1"
+                          >
+                            <LogOut className="w-3 h-3" />
+                            <span>+ Salida</span>
+                          </button>
+                        ) : (
+                          <span className="px-2.5 py-1 rounded-xl text-[10px] font-medium bg-slate-50 text-slate-400 border border-slate-200">
+                            Salida Pendiente
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Revert Action */}
+                      {onRevertAttendance && (item.isCheckedIn || item.isCheckedOut) && (
+                        <button
+                          type="button"
+                          onClick={() => onRevertAttendance(event.id, selectedDate, selectedTime, item.email, item.isCheckedOut ? 'checkout' : 'all')}
+                          className="px-2 py-1 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200 hover:border-rose-200 text-[10px] font-semibold transition-colors cursor-pointer flex items-center gap-1"
+                          title={item.isCheckedOut ? 'Revertir solo la salida (mantener entrada)' : 'Revertir asistencia'}
+                        >
+                          <RotateCcw className="w-3 h-3" />
+                          <span>Revertir {item.isCheckedOut ? 'Salida' : ''}</span>
+                        </button>
                       )}
                     </div>
                   </div>
@@ -1199,40 +1295,82 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
             <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight max-w-xl">
               {event.title}
             </h2>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Facilitador: <strong className="text-slate-700">{event.instructor}</strong> • {formatDateLong(selectedDate)} ({selectedTime})
+            <p className="text-xs sm:text-sm text-slate-500 mt-1 mb-4">
+              Facilitador: <strong className="text-slate-700">{event.instructor}</strong> • {formatDateLong(selectedDate)} ({selectedTime}{currentSlot?.endTime ? ` - ${currentSlot.endTime}` : ''})
             </p>
 
+            {/* Mode Switcher */}
+            <div className="flex items-center gap-2 p-1.5 bg-slate-100 rounded-2xl mb-4 border border-slate-200">
+              <button
+                type="button"
+                onClick={() => setProjectorMode('checkin')}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  projectorMode === 'checkin'
+                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Modo Entrada (Check-In)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setProjectorMode('checkout')}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  projectorMode === 'checkout'
+                    ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/30'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Modo Salida (Check-Out)</span>
+              </button>
+            </div>
+
             {/* Large QR */}
-            <div className="my-6 p-5 bg-white rounded-3xl border-2 border-slate-200 shadow-xl inline-block">
+            <div className="my-2 p-5 bg-white rounded-3xl border-2 border-slate-200 shadow-xl inline-block">
               <QRCodeSVG
-                value={`${window.location.origin}${window.location.pathname}?tab=attendance&event=${event.id}&date=${selectedDate}&time=${encodeURIComponent(selectedTime)}`}
-                size={260}
+                value={`${window.location.origin}${window.location.pathname}?tab=attendance&event=${event.id}&date=${selectedDate}&time=${encodeURIComponent(selectedTime)}&type=${projectorMode}`}
+                size={240}
                 level="H"
                 includeMargin={false}
               />
             </div>
 
-            {/* Live Counter */}
-            <div className="w-full max-w-md bg-slate-50 border border-slate-200 rounded-2xl p-3.5 mb-4 flex items-center justify-around text-xs">
+            {/* PIN Prominently Displayed */}
+            <div className="mt-3 mb-4 inline-flex items-center gap-3 px-5 py-2 rounded-2xl bg-slate-50 border border-slate-200 shadow-xs">
+              <span className="text-xs font-bold text-slate-500">
+                O ingresa el PIN de {projectorMode === 'checkin' ? 'Entrada' : 'Salida'}:
+              </span>
+              <span className={`text-2xl font-black font-mono tracking-widest ${
+                projectorMode === 'checkin' ? 'text-emerald-700' : 'text-[#DA291C]'
+              }`}>
+                {projectorMode === 'checkin' ? (currentSlot?.checkinCode || '----') : (currentSlot?.checkoutCode || '----')}
+              </span>
+            </div>
+
+            {/* Live Counters */}
+            <div className="w-full max-w-md bg-slate-50 border border-slate-200 rounded-2xl p-3.5 mb-4 grid grid-cols-4 gap-2 text-center text-xs">
               <div>
                 <span className="text-slate-400 font-bold block text-[10px] uppercase">Inscritos</span>
                 <span className="text-lg font-black text-slate-800">{attendeesList.length}</span>
               </div>
-              <div className="h-8 w-px bg-slate-200" />
-              <div>
-                <span className="text-emerald-600 font-bold block text-[10px] uppercase">Confirmados</span>
-                <span className="text-lg font-black text-emerald-700">{attendedList.length}</span>
+              <div className="border-l border-slate-200">
+                <span className="text-emerald-600 font-bold block text-[10px] uppercase">Entradas</span>
+                <span className="text-lg font-black text-emerald-700">{checkInList.length}</span>
               </div>
-              <div className="h-8 w-px bg-slate-200" />
-              <div>
-                <span className="text-slate-400 font-bold block text-[10px] uppercase">Pendientes</span>
-                <span className="text-lg font-black text-slate-600">{attendeesList.length - attendedList.length}</span>
+              <div className="border-l border-slate-200">
+                <span className="text-blue-600 font-bold block text-[10px] uppercase">Salidas</span>
+                <span className="text-lg font-black text-blue-700">{checkOutList.length}</span>
+              </div>
+              <div className="border-l border-slate-200">
+                <span className="text-purple-600 font-bold block text-[10px] uppercase">Completas</span>
+                <span className="text-lg font-black text-purple-700">{completedAttendanceList.length}</span>
               </div>
             </div>
 
             <p className="text-xs text-slate-500 max-w-md">
-              Abre la cámara de tu smartphone y enfoca el código QR para registrar tu asistencia de forma automática.
+              Abre la cámara de tu smartphone y enfoca el código QR o digita el PIN de 4 dígitos para registrar tu {projectorMode === 'checkin' ? 'entrada' : 'salida'}.
             </p>
           </div>
         </div>

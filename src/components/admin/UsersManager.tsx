@@ -923,6 +923,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
           events={events}
           programs={programs}
           companies={companies}
+          currentUser={currentUser}
           isOpen={Boolean(viewingProfileParticipant)}
           onClose={() => setViewingProfileParticipant(null)}
         />

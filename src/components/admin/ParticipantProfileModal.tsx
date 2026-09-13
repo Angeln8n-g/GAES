@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { 
   X, 
   User, 
@@ -6,7 +6,7 @@ import {
   CreditCard, 
   Building, 
   ShieldCheck, 
-  ShieldAlert,
+  ShieldAlert, 
   CheckCircle2, 
   Clock, 
   UserX, 
@@ -16,15 +16,19 @@ import {
   MessageSquare, 
   Send, 
   Edit3, 
-  Sparkles,
-  Layers,
-  BookOpen,
-  GraduationCap,
-  Target,
-  TrendingUp,
-  AlertTriangle
+  Sparkles, 
+  Layers, 
+  BookOpen, 
+  GraduationCap, 
+  Target, 
+  TrendingUp, 
+  AlertTriangle,
+  FileText,
+  MapPin,
+  Phone
 } from "lucide-react";
 import { Participant, UserAccount, TrainingEvent, TrainingProgram, Company, ParticipantGrade } from "../../types";
+import { FormalLetterModal, TrainingHistoryRecord } from "../history/FormalLetterModal";
 
 interface ParticipantProfileModalProps {
   participant: Participant | null;
@@ -35,6 +39,7 @@ interface ParticipantProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenEdit?: (participant: Participant) => void;
+  currentUser?: UserAccount | null;
 }
 
 export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = ({
@@ -45,9 +50,12 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
   companies = [],
   isOpen,
   onClose,
-  onOpenEdit
+  onOpenEdit,
+  currentUser
 }) => {
   if (!isOpen || !participant) return null;
+
+  const isSuperAdmin = currentUser?.role === 'Super Administrador';
 
   const emailLower = participant.email.toLowerCase();
   const cardStr = participant.card;
@@ -130,6 +138,39 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
     };
   }, [events, emailLower, cardStr]);
 
+  const [isFormalLetterOpen, setIsFormalLetterOpen] = useState(false);
+
+  const participantHistoryRecords: TrainingHistoryRecord[] = useMemo(() => {
+    const list: TrainingHistoryRecord[] = [];
+    attendedEvents.forEach((att, idx) => {
+      list.push({
+        id: `att-${att.event.id}-${att.date}-${idx}`,
+        title: att.event.title,
+        category: att.event.category,
+        modality: att.event.modality,
+        instructor: att.event.instructor,
+        date: att.date,
+        time: att.time,
+        hasAttended: true,
+        hours: 2
+      });
+    });
+    registeredEvents.forEach((reg, idx) => {
+      list.push({
+        id: `reg-${reg.event.id}-${reg.date}-${idx}`,
+        title: reg.event.title,
+        category: reg.event.category,
+        modality: reg.event.modality,
+        instructor: reg.event.instructor,
+        date: reg.date,
+        time: reg.time,
+        hasAttended: false,
+        hours: 2
+      });
+    });
+    return list;
+  }, [attendedEvents, registeredEvents]);
+
   const empStatus = participant.employmentStatus || "contratado";
 
   return (
@@ -194,21 +235,35 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
 
               <p className="text-xs text-slate-500 font-mono">{participant.email}</p>
               
-              <div className="flex items-center gap-3 text-xs text-slate-500 pt-1 flex-wrap font-medium">
-                <span className="flex items-center gap-1 font-mono text-[#DA291C] font-bold">
-                  <CreditCard className="w-3.5 h-3.5 text-slate-400" />
-                  Tarj: #{participant.card}
-                </span>
-                {participant.cedula && (
-                  <span className="flex items-center gap-1 font-mono text-slate-700 font-bold">
-                    Cédula: {participant.cedula}
+              <div className="flex items-center justify-between gap-3 text-xs text-slate-500 pt-1 flex-wrap font-medium">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="flex items-center gap-1 font-mono text-[#DA291C] font-bold">
+                    <CreditCard className="w-3.5 h-3.5 text-slate-400" />
+                    Tarj: #{participant.card}
                   </span>
-                )}
-                {participant.department && (
-                  <span className="flex items-center gap-1 text-slate-700">
-                    <Building className="w-3.5 h-3.5 text-slate-400" />
-                    {participant.department}
-                  </span>
+                  {participant.cedula && (
+                    <span className="flex items-center gap-1 font-mono text-slate-700 font-bold">
+                      Cédula: {participant.cedula}
+                    </span>
+                  )}
+                  {participant.department && (
+                    <span className="flex items-center gap-1 text-slate-700">
+                      <Building className="w-3.5 h-3.5 text-slate-400" />
+                      {participant.department}
+                    </span>
+                  )}
+                </div>
+
+                {isSuperAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => setIsFormalLetterOpen(true)}
+                    className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white text-[11px] font-black flex items-center gap-1.5 shadow-xs cursor-pointer transition-all active:scale-95"
+                    title="Expedir carta formal de constancia para este colaborador (Exclusivo Super Administrador)"
+                  >
+                    <FileText className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Expedir Carta Formal</span>
+                  </button>
                 )}
               </div>
             </div>
@@ -240,6 +295,78 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
         {/* Body Content */}
         <div className="p-6 overflow-y-auto space-y-6 flex-1 custom-scrollbar">
           
+          {/* Ficha Académica & Sociodemográfica 360° */}
+          <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-50 to-amber-50/20 border border-slate-200/90 space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                <BookOpen className="w-3.5 h-3.5 text-[#DA291C]" />
+                <span>Perfil Académico & Sociodemográfico</span>
+              </h4>
+              {participant.profileCompleted ? (
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Ficha Completa
+                </span>
+              ) : (
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1">
+                  <AlertTriangle className="w-3 h-3 text-amber-600" /> Ficha Incompleta
+                </span>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs">
+                <span className="text-[10px] text-slate-400 font-bold block uppercase">Nivel de Estudio</span>
+                <span className="font-bold text-slate-800">{participant.educationLevel || 'No especificado'}</span>
+              </div>
+              <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs">
+                <span className="text-[10px] text-slate-400 font-bold block uppercase">Profesión / Título</span>
+                <span className="font-bold text-slate-800">{participant.professionTitle || 'No especificado'}</span>
+              </div>
+              <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs">
+                <span className="text-[10px] text-slate-400 font-bold block uppercase">Fecha Nacimiento</span>
+                <span className="font-bold text-slate-800">
+                  {participant.birthDate || 'No especificada'}
+                </span>
+              </div>
+              <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs">
+                <span className="text-[10px] text-slate-400 font-bold block uppercase">Teléfono</span>
+                <span className="font-bold text-slate-800 font-mono">{participant.phone || 'No especificado'}</span>
+              </div>
+            </div>
+
+            {participant.isCurrentlyStudying && (
+              <div className="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200 text-xs flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+                <div>
+                  <span className="font-bold text-amber-950 block">Estudia Actualmente: {participant.currentStudyField || 'En curso'}</span>
+                  {participant.institutionName && (
+                    <span className="text-[11px] text-amber-800">Centro / Universidad: {participant.institutionName}</span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {participant.currentAddress && (
+              <div className="text-xs text-slate-600 flex items-center gap-1.5 pt-0.5">
+                <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <span>Dirección: <strong className="text-slate-800">{participant.currentAddress}</strong></span>
+              </div>
+            )}
+
+            {participant.trainingInterestAreas && participant.trainingInterestAreas.length > 0 && (
+              <div className="pt-2 border-t border-slate-200/80">
+                <span className="text-[10px] font-bold text-slate-500 block mb-1 uppercase tracking-wider">Intereses Formativos & Oportunidades de Desarrollo:</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {participant.trainingInterestAreas.map(interest => (
+                    <span key={interest} className="px-2 py-0.5 rounded-lg bg-white border border-slate-200 text-[10px] font-bold text-slate-700 shadow-2xs">
+                      {interest}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Alerta de Re-capacitación / Debilidades */}
           {hasRetrainingAlert && (
             <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 space-y-2">
@@ -518,6 +645,19 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
         </div>
 
       </div>
+
+      {/* Módulo de Elaboración de Carta Formal (Exclusivo Super Administrador) */}
+      {isSuperAdmin && (
+        <FormalLetterModal
+          isOpen={isFormalLetterOpen}
+          onClose={() => setIsFormalLetterOpen(false)}
+          currentUser={linkedUser || null}
+          participant={participant}
+          companies={companies}
+          trainingRecords={participantHistoryRecords}
+        />
+      )}
+
     </div>
   );
 };

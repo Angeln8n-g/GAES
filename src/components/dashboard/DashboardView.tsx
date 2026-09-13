@@ -21,7 +21,8 @@ import {
   ShieldAlert,
   Search,
   BookOpen,
-  Activity
+  Activity,
+  Leaf
 } from 'lucide-react';
 import { 
   TrainingEvent, 
@@ -44,7 +45,8 @@ import {
   exportComplianceReportToExcel, 
   exportInstructorsAndFeedbackReportToExcel, 
   exportGroupsToExcel,
-  exportSkillsGapReportToExcel
+  exportSkillsGapReportToExcel,
+  exportSustainabilityAndTrainingReportToExcel
 } from '../../utils/excelUtils';
 import { OjtTtpSection } from './OjtTtpSection';
 import { 
@@ -52,17 +54,22 @@ import {
   FACILITATOR_QUESTIONS, 
   TEC_SURVEY_INFO 
 } from '../../constants/tecSurveyQuestions';
+import { DemographicsOpportunitiesSection } from './DemographicsOpportunitiesSection';
+import { SustainabilityReportSection } from './SustainabilityReportSection';
+import { EventFormModal } from '../admin/EventFormModal';
 
 interface DashboardViewProps {
   events: TrainingEvent[];
   programs: TrainingProgram[];
   groups: ParticipantGroup[];
   participants: Participant[];
+  users?: UserAccount[];
   currentUser?: UserAccount | null;
   companies?: Company[];
   selectedCompanyId?: string;
   onSelectCompanyScope?: (companyId: string) => void;
   onShowToast?: (title: string, message: string, type?: 'success' | 'error' | 'info') => void;
+  onSaveEvent?: (event: TrainingEvent) => Promise<void>;
   settings?: SystemSettings;
   checklists?: OjtChecklist[];
   calibrations?: CalibrationSession[];
@@ -73,19 +80,88 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   programs,
   groups,
   participants,
+  users = [],
   currentUser,
   companies = [],
   selectedCompanyId = 'all',
   onSelectCompanyScope,
   onShowToast,
+  onSaveEvent,
   settings,
   checklists = [],
   calibrations = []
 }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'compliance' | 'instructors' | 'skills' | 'reports' | 'ojt_ttp'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'compliance' | 'instructors' | 'skills' | 'demographics' | 'sustainability' | 'reports' | 'ojt_ttp'>('overview');
   const [selectedProgramId, setSelectedProgramId] = useState<string>(programs[0]?.id || '');
   const [skillsSearchQuery, setSkillsSearchQuery] = useState<string>('');
   const [selectedSurveyEventId, setSelectedSurveyEventId] = useState<string>('all');
+
+  // Estado para Programación 1-Clic desde Oportunidades DNC
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [suggestedEvent, setSuggestedEvent] = useState<TrainingEvent | null>(null);
+  const [pendingEnrolEmails, setPendingEnrolEmails] = useState<string[]>([]);
+
+  const handleCreateEventFromOpportunity = (suggested: Partial<TrainingEvent>, targetEmails?: string[]) => {
+    const today = new Date();
+    today.setDate(today.getDate() + 7); // Programar para 1 semana adelante
+    const nextDateStr = today.toISOString().split('T')[0];
+
+    const newEventDraft: TrainingEvent = {
+      id: `evt_dnc_${Date.now()}`,
+      title: suggested.title || 'Nuevo Taller',
+      category: suggested.category || 'Taller',
+      modality: 'Híbrida',
+      location: 'Sala de Capacitación Piso 2 / Teams',
+      instructor: 'Por Asignar (Equipo L&D)',
+      status: 'active',
+      companyId: selectedCompanyId !== 'all' ? selectedCompanyId : 'emp_kasino',
+      imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80',
+      description: suggested.description || '',
+      skillsEvaluated: suggested.skillsEvaluated || [],
+      evaluationType: 'score_100',
+      passingScore: 70,
+      schedule: [
+        {
+          date: nextDateStr,
+          slots: [
+            {
+              time: '09:00 AM - 11:00 AM',
+              capacity: Math.max(25, (targetEmails?.length || 0) + 5),
+              registered: 0,
+              attendees: [],
+              attendedList: []
+            }
+          ]
+        }
+      ],
+      feedbacks: []
+    };
+
+    setSuggestedEvent(newEventDraft);
+    setPendingEnrolEmails(targetEmails || []);
+    setIsEventModalOpen(true);
+  };
+
+  const handleSaveOpportunityEvent = async (eventToSave: TrainingEvent) => {
+    if (onSaveEvent) {
+      await onSaveEvent(eventToSave);
+      if (pendingEnrolEmails.length > 0 && eventToSave.schedule[0]?.slots[0]) {
+        try {
+          const firstSch = eventToSave.schedule[0];
+          const firstSlot = firstSch.slots[0];
+          await apiService.bulkRegisterUsers(eventToSave.id, firstSch.date, firstSlot.time, pendingEnrolEmails, true);
+          onShowToast?.('Curso Creado & Pre-inscripción Exitosa', `Se programó "${eventToSave.title}" y se preinscribieron ${pendingEnrolEmails.length} colaboradores automáticamente.`, 'success');
+        } catch (e) {
+          onShowToast?.('Curso Creado', `Se programó con éxito el curso "${eventToSave.title}".`, 'success');
+        }
+      } else {
+        onShowToast?.('Curso Creado', `Se programó con éxito el curso "${eventToSave.title}".`, 'success');
+      }
+    }
+    setIsEventModalOpen(false);
+    setSuggestedEvent(null);
+    setPendingEnrolEmails([]);
+  };
 
   // 1. Métricas Globales de Eventos
   const totalCapacity = useMemo(() => {
@@ -641,6 +717,30 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   {skillsGapGlobalMetrics.totalMembersNeedingRetraining}
                 </span>
               )}
+            </button>
+
+            <button
+              onClick={() => setActiveTab('demographics')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
+                activeTab === 'demographics'
+                  ? 'bg-amber-600 text-white shadow-md shadow-amber-600/25'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+              }`}
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>Demografía & Oportunidades</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('sustainability')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
+                activeTab === 'sustainability'
+                  ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25'
+                  : 'text-slate-600 hover:text-emerald-700 hover:bg-white'
+              }`}
+            >
+              <Leaf className="w-3.5 h-3.5" />
+              <span>Sustentabilidad & Capacitaciones</span>
             </button>
 
             {settings?.ojt_plan_90d?.enabled !== false && (currentUser?.role === 'Super Administrador' || currentUser?.role === 'Evaluador / Tutor OJT') && (
@@ -1571,6 +1671,32 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       )}
 
       {/* ==========================================
+          TAB: DEMOGRAFÍA & OPORTUNIDADES DE MEJORA
+          ========================================== */}
+      {activeTab === 'demographics' && (
+        <DemographicsOpportunitiesSection
+          participants={participants}
+          events={events}
+          currentUser={currentUser}
+          onShowToast={onShowToast}
+          onCreateEventFromOpportunity={handleCreateEventFromOpportunity}
+        />
+      )}
+
+      {/* ==========================================
+          TAB: PROGRAMA DE SUSTENTABILIDAD & REPORTES
+          ========================================== */}
+      {activeTab === 'sustainability' && (
+        <SustainabilityReportSection
+          events={events}
+          participants={participants}
+          companies={companies}
+          currentUser={currentUser}
+          onShowToast={onShowToast}
+        />
+      )}
+
+      {/* ==========================================
           TAB 5: CENTRO DE REPORTES EXCEL
           ========================================== */}
       {activeTab === 'reports' && (
@@ -1590,6 +1716,42 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             
+            {/* Report 0: Sustentabilidad y Taxonomía Formativa */}
+            <div className="bg-white border border-emerald-300 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-emerald-600 hover:shadow-md transition-all group bg-gradient-to-b from-emerald-50/30 to-white">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-700">
+                    <Leaf className="w-5 h-5" />
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    ESG & Sustentable
+                  </span>
+                </div>
+                <h4 className="text-base font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">
+                  Reporte de Sustentabilidad & Capacitaciones
+                </h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Matriz oficial de 11 dimensiones requerida para programas corporativos: Tipo de sesión, Tipo de entrenamiento, Formato, Modalidad, Programa, Subprograma, Fechas, Horas y Suplidor.
+                </p>
+                <div className="text-[11px] text-slate-500 space-y-1">
+                  <div>• Hoja 1: Matriz de 11 Dimensiones + Horas-Hombre</div>
+                  <div>• Hoja 2: Resumen Consolidado por Programas</div>
+                  <div>• Clasificación de impacto ambiental y ESG</div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  exportSustainabilityAndTrainingReportToExcel(events, participants);
+                  handleToast('Reporte generado', 'Reporte Oficial de Sustentabilidad descargado.', 'success');
+                }}
+                className="mt-6 w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Download className="w-4 h-4" />
+                <span>Descargar Reporte Sustentabilidad</span>
+              </button>
+            </div>
+
             {/* Report 1: Consolidado Global */}
             <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-[#DA291C] hover:shadow-md transition-all group">
               <div className="space-y-3">
@@ -1796,6 +1958,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           checklists={checklists}
           calibrations={calibrations}
           selectedCompany={companies.find(c => c.id === selectedCompanyId)}
+        />
+      )}
+
+      {/* Modal de Creación de Evento desde Oportunidades DNC */}
+      {isEventModalOpen && suggestedEvent && (
+        <EventFormModal
+          initialEvent={suggestedEvent}
+          companies={companies}
+          users={users}
+          currentUser={currentUser}
+          isSuperAdmin={currentUser?.role === 'Super Administrador'}
+          onClose={() => {
+            setIsEventModalOpen(false);
+            setSuggestedEvent(null);
+            setPendingEnrolEmails([]);
+          }}
+          onSaveEvent={handleSaveOpportunityEvent}
         />
       )}
 

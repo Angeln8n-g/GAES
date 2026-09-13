@@ -47,45 +47,46 @@ feedbackRouter.post('/', async (req: Request, res: Response) => {
     );
 
     if (existing.rows.length > 0) {
-      await pool.query(
-        `UPDATE event_feedbacks 
-         SET user_name = COALESCE($1, user_name),
-             rating = $2,
-             comment = $3,
-             course_ratings = $4,
-             facilitator_ratings = $5,
-             course_score = $6,
-             facilitator_score = $7,
-             created_at = CURRENT_TIMESTAMP
-         WHERE id = $8`,
-        [
-          userName || null,
-          intRating,
-          comment || null,
-          JSON.stringify(courseRatings || {}),
-          JSON.stringify(facilitatorRatings || {}),
-          courseScore !== undefined && courseScore !== null ? Number(courseScore) : null,
-          facilitatorScore !== undefined && facilitatorScore !== null ? Number(facilitatorScore) : null,
-          existing.rows[0].id
-        ]
-      );
-    } else {
-      await pool.query(
-        `INSERT INTO event_feedbacks (event_id, user_email, user_name, rating, comment, course_ratings, facilitator_ratings, course_score, facilitator_score)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-        [
-          eventId, 
-          normalizedEmail, 
-          userName || null, 
-          intRating, 
-          comment || null,
-          JSON.stringify(courseRatings || {}),
-          JSON.stringify(facilitatorRatings || {}),
-          courseScore !== undefined && courseScore !== null ? Number(courseScore) : null,
-          facilitatorScore !== undefined && facilitatorScore !== null ? Number(facilitatorScore) : null
-        ]
-      );
+      return res.status(409).json({
+        error: 'Ya has completado la encuesta de satisfacción para esta capacitación. Solo se permite 1 respuesta por colaborador.',
+        alreadySubmitted: true
+      });
     }
+
+    // Comprobar que el usuario haya asistido al evento completo (registro de entrada y salida obligatorio)
+    const attendanceCheck = await pool.query(
+      `SELECT a.id, a.check_in_at, a.check_out_at, a.is_completed
+       FROM attendance_logs a
+       JOIN event_slots sl ON a.slot_id = sl.id
+       JOIN event_schedules sch ON sl.schedule_id = sch.id
+       JOIN participants p ON a.participant_card = p.card
+       WHERE sch.event_id = $1 AND LOWER(p.email) = $2 AND (a.is_completed = TRUE OR a.check_out_at IS NOT NULL)
+       LIMIT 1`,
+      [eventId, normalizedEmail]
+    );
+
+    if (attendanceCheck.rows.length === 0) {
+      return res.status(403).json({
+        error: 'Solo los participantes que hayan completado la asistencia integral al evento (registro de entrada y salida) pueden responder la encuesta de satisfacción.',
+        requiresFullAttendance: true
+      });
+    }
+
+    await pool.query(
+      `INSERT INTO event_feedbacks (event_id, user_email, user_name, rating, comment, course_ratings, facilitator_ratings, course_score, facilitator_score)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      [
+        eventId, 
+        normalizedEmail, 
+        userName || null, 
+        intRating, 
+        comment || null,
+        JSON.stringify(courseRatings || {}),
+        JSON.stringify(facilitatorRatings || {}),
+        courseScore !== undefined && courseScore !== null ? Number(courseScore) : null,
+        facilitatorScore !== undefined && facilitatorScore !== null ? Number(facilitatorScore) : null
+      ]
+    );
 
     const fullEvents = await fetchFullEvents();
     res.json(fullEvents);

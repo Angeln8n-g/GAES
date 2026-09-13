@@ -103,7 +103,7 @@ export const ReceptionLobbySection: React.FC<ReceptionLobbySectionProps> = ({
           </h2>
 
           <p className="mt-2 text-xs sm:text-sm text-slate-300 font-medium max-w-2xl leading-relaxed">
-            ¿Llegaste a tu entrenamiento presencial? Ingresa tu documento de identidad o escanéalo para ubicar tu aula, ver tus horarios asignados y confirmar tu asistencia en el lobby.
+            ¿Llegaste a tu entrenamiento presencial? Ingresa tu documento de identidad o escanéalo para ubicar tu aula, ver tus horarios asignados y obtener tu pase QR de acceso.
           </p>
         </div>
 
@@ -216,8 +216,8 @@ export const ReceptionLobbySection: React.FC<ReceptionLobbySectionProps> = ({
               <QrCode className="w-4 h-4" />
             </div>
             <div>
-              <div className="text-xs font-bold text-white">Check-in de 1 Clic</div>
-              <p className="text-[11px] text-slate-400">Confirma tu asistencia presencial directamente en lobby</p>
+              <div className="text-xs font-bold text-white">Pase QR de Acceso</div>
+              <p className="text-[11px] text-slate-400">Obtén tu código QR para presentar al facilitador en puerta</p>
             </div>
           </div>
         </div>

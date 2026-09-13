@@ -48,11 +48,16 @@ app.use('/api/feedback', feedback_js_1.feedbackRouter);
 app.use('/api/notifications', notifications_js_1.notificationsRouter);
 app.use('/api/groups', groups_js_1.groupsRouter);
 app.use('/api/programs', programs_js_1.programsRouter);
-// Iniciar Servidor
-app.listen(PORT, async () => {
+const http_1 = __importDefault(require("http"));
+const websocket_js_1 = require("./websocket.js");
+// Iniciar Servidor HTTP + WebSocket
+const server = http_1.default.createServer(app);
+(0, websocket_js_1.initWebSocketServer)(server);
+server.listen(PORT, async () => {
     console.log(`=========================================`);
-    console.log(`🚀 Servidor CapacitaHub API en ejecución`);
-    console.log(`📡 Puerto: http://localhost:${PORT}`);
+    console.log(`🚀 Servidor CapacitaHub API & WebSockets en ejecución`);
+    console.log(`📡 Puerto HTTP: http://localhost:${PORT}`);
+    console.log(`⚡ WebSocket: ws://localhost:${PORT}/ws`);
     console.log(`🌐 Health check: http://localhost:${PORT}/api/health`);
     console.log(`=========================================`);
     await (0, db_js_1.initDbMigrations)();

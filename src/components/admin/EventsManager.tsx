@@ -55,9 +55,12 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
 
   const filteredEvents = events.filter(evt => {
     const q = searchQuery.toLowerCase();
-    const evtCompany = evt.companyId || 'emp_kasino';
+    const isGlobal = !evt.companyId || evt.companyId === 'all' || (Array.isArray(evt.companyIds) && evt.companyIds.includes('all'));
+    const matchesCompany = isGlobal || 
+      evt.companyId === selectedCompanyFilter || 
+      (Array.isArray(evt.companyIds) && evt.companyIds.includes(selectedCompanyFilter));
 
-    if (selectedCompanyFilter !== 'all' && evtCompany !== selectedCompanyFilter) {
+    if (selectedCompanyFilter !== 'all' && !matchesCompany) {
       return false;
     }
 
@@ -170,12 +173,17 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
                       {event.modality === 'Virtual' ? <Video className="w-2.5 h-2.5" /> : <MapPin className="w-2.5 h-2.5" />}
                       {event.modality}
                     </span>
-                    {comp && (
+                    {event.companyId === 'all' || !event.companyId ? (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1">
+                        <Building2 className="w-3 h-3 text-indigo-600" />
+                        Todas las Empresas
+                      </span>
+                    ) : comp ? (
                       <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1">
                         <Building2 className="w-3 h-3 text-[#DA291C]" />
                         {comp.name}
                       </span>
-                    )}
+                    ) : null}
                     {event.ojtEvaluatorName && (
                       <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200 flex items-center gap-1" title="Tutor / Evaluador OJT Asignado">
                         <UserCheck className="w-3 h-3 text-purple-600" />

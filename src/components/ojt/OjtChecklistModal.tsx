@@ -13,7 +13,8 @@ import {
   Layers,
   Wrench,
   Clock,
-  ShieldAlert
+  ShieldAlert,
+  GraduationCap
 } from 'lucide-react';
 import { OjtChecklist, Participant, UserAccount, Company, OjtRubricItem, OjtObservationType, OjtOperationalStatus } from '../../types';
 
@@ -205,6 +206,37 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
               </select>
             </div>
           </div>
+
+          {/* Ficha Académica del Tutorado (Sinergia OJT) */}
+          {selectedParticipant && (selectedParticipant.educationLevel || selectedParticipant.isCurrentlyStudying) && (
+            <div className="p-3.5 bg-gradient-to-r from-indigo-50/90 to-blue-50/90 border border-indigo-200/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-2xs">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
+                  <GraduationCap className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-black text-indigo-950">Perfil Formativo del Tutorado:</span>
+                    <span className="px-2 py-0.2 rounded-md bg-white border border-indigo-200 text-indigo-800 font-bold text-[10px]">
+                      {selectedParticipant.educationLevel || 'Bachiller'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-indigo-700 mt-0.5">
+                    {selectedParticipant.isCurrentlyStudying ? (
+                      <span>
+                        🎓 Cursa: <strong>{selectedParticipant.currentStudyField || 'Carrera'}</strong> en {selectedParticipant.institutionName || 'Institución'}
+                      </span>
+                    ) : (
+                      <span>No reporta estudios activos actualmente</span>
+                    )}
+                  </p>
+                </div>
+              </div>
+              <span className="px-2.5 py-1 rounded-xl text-[10px] font-black bg-indigo-600 text-white shrink-0 self-start sm:self-center shadow-xs">
+                Sinergia 70-20-10
+              </span>
+            </div>
+          )}
 
           {/* Quick Check Flags: Safety & First-Time Fix */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

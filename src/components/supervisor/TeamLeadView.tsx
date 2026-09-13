@@ -434,6 +434,10 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
         supervisorName: p.supervisorName || effectiveSupervisor.name,
         isDirect,
         isDept,
+        educationLevel: p.educationLevel,
+        isCurrentlyStudying: p.isCurrentlyStudying,
+        currentStudyField: p.currentStudyField,
+        institutionName: p.institutionName,
         attendedCount,
         registeredFutureCount,
         totalHours,
@@ -915,6 +919,23 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                                   )}
                                 </div>
                                 <p className="text-[11px] text-slate-500 truncate">{p.participantEmail}</p>
+                                {(participantObj?.isCurrentlyStudying || participantObj?.educationLevel) && (
+                                  <div className="flex flex-wrap items-center gap-1 mt-1">
+                                    {participantObj.educationLevel && (
+                                      <span className="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                        {participantObj.educationLevel}
+                                      </span>
+                                    )}
+                                    {participantObj.isCurrentlyStudying && (
+                                      <span 
+                                        className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200" 
+                                        title={`Estudia: ${participantObj.currentStudyField || ''} en ${participantObj.institutionName || ''}`}
+                                      >
+                                        🎓 Estudia: {participantObj.currentStudyField || 'En curso'}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
                               </div>
                             </button>
                           </td>
@@ -1116,6 +1137,23 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                               )}
                             </div>
                             <p className="text-[11px] text-slate-500">{item.email}</p>
+                            {(item.isCurrentlyStudying || item.educationLevel) && (
+                              <div className="flex flex-wrap items-center gap-1 mt-1">
+                                {item.educationLevel && (
+                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                    {item.educationLevel}
+                                  </span>
+                                )}
+                                {item.isCurrentlyStudying && (
+                                  <span 
+                                    className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200" 
+                                    title={`Estudia: ${item.currentStudyField || ''} en ${item.institutionName || ''}`}
+                                  >
+                                    🎓 Estudia: {item.currentStudyField || 'En curso'}
+                                  </span>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </td>
@@ -1316,6 +1354,23 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                             <span>ID: #{item.participant.card}</span>
                             {item.participant.cedula && <span>• Céd: {item.participant.cedula}</span>}
                           </div>
+                          {(item.participant.isCurrentlyStudying || item.participant.educationLevel) && (
+                            <div className="flex flex-wrap items-center gap-1 mt-1">
+                              {item.participant.educationLevel && (
+                                <span className="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                  {item.participant.educationLevel}
+                                </span>
+                              )}
+                              {item.participant.isCurrentlyStudying && (
+                                <span 
+                                  className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200" 
+                                  title={`Estudia: ${item.participant.currentStudyField || ''} en ${item.participant.institutionName || ''}`}
+                                >
+                                  🎓 Estudia: {item.participant.currentStudyField || 'En curso'}
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </td>
 
                         {/* Evento */}
@@ -1790,6 +1845,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
           events={events}
           programs={programs}
           companies={companies}
+          currentUser={currentUser}
           isOpen={Boolean(viewingProfileParticipant)}
           onClose={() => setViewingProfileParticipant(null)}
         />

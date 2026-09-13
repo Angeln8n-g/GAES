@@ -36,6 +36,30 @@ import { QrScannerModal } from './components/scanner/QrScannerModal';
 import { findAttendeeByCedula, AttendeeLookupResult } from './utils/attendeeLookup';
 import { CedulaScannerModal } from './components/lobby/CedulaScannerModal';
 import { AttendeeScheduleModal } from './components/lobby/AttendeeScheduleModal';
+import { UserProfileModal } from './components/profile/UserProfileModal';
+import { attendanceWs } from './services/websocket';
+
+// Helper seguro para obtener el usuario autenticado desde localStorage
+const getSafeStoredUser = (): UserAccount | null => {
+  if (typeof localStorage === 'undefined') return null;
+  const saved = localStorage.getItem('ch_logged_user');
+  if (!saved || saved === 'undefined' || saved === 'null' || saved.trim() === '') {
+    try { localStorage.removeItem('ch_logged_user'); } catch {}
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(saved);
+    if (!parsed || typeof parsed !== 'object') {
+      localStorage.removeItem('ch_logged_user');
+      return null;
+    }
+    return parsed;
+  } catch (e) {
+    console.warn('Usuario inválido en localStorage, reseteando sesión:', e);
+    try { localStorage.removeItem('ch_logged_user'); } catch {}
+    return null;
+  }
+};
 
 export function App() {
   const [companies, setCompanies] = useState<Company[]>(MOCK_COMPANIES);
@@ -53,20 +77,12 @@ export function App() {
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState<boolean>(false);
 
   // Sesión del usuario autenticado
-  const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
-    const saved = localStorage.getItem('ch_logged_user');
-    return saved ? JSON.parse(saved) : null;
-  });
+  const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => getSafeStoredUser());
 
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>(() => {
-    const saved = localStorage.getItem('ch_logged_user');
-    if (saved) {
-      try {
-        const u = JSON.parse(saved);
-        if (u && u.role !== 'Super Administrador') {
-          return u.companyId || 'emp_kasino';
-        }
-      } catch (e) {}
+    const u = getSafeStoredUser();
+    if (u && u.role !== 'Super Administrador') {
+      return u.companyId || 'emp_kasino';
     }
     return 'all';
   });
@@ -79,14 +95,9 @@ export function App() {
 
   // Vista actual / Navegación
   const [currentTab, setCurrentTab] = useState<TabView>(() => {
-    const saved = localStorage.getItem('ch_logged_user');
-    if (saved) {
-      try {
-        const u = JSON.parse(saved);
-        if (u && u.role === 'Evaluador / Tutor OJT') {
-          return 'evaluator-courses';
-        }
-      } catch (e) {}
+    const u = getSafeStoredUser();
+    if (u && u.role === 'Evaluador / Tutor OJT') {
+      return 'evaluator-courses';
     }
     return 'landing';
   });
@@ -106,6 +117,22 @@ export function App() {
   const [attendeeLookupResult, setAttendeeLookupResult] = useState<AttendeeLookupResult | null>(null);
   const [lastSearchedCedula, setLastSearchedCedula] = useState<string>('');
   const [isSearchingCedula, setIsSearchingCedula] = useState<boolean>(false);
+
+  // Estados para Ficha y Perfil Sociodemográfico / Académico (Obligatorio en primer ingreso)
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
+  const [isProfileMandatory, setIsProfileMandatory] = useState<boolean>(false);
+
+  // Helper para validar si el perfil del colaborador está completo
+  const isUserProfileComplete = (user: UserAccount | null, participantList: Participant[]) => {
+    if (!user) return true;
+    const linkedParticipant = participantList.find(p => p.email.toLowerCase() === user.email.toLowerCase());
+    if (user.profileCompleted || linkedParticipant?.profileCompleted) return true;
+    const hasBirth = Boolean(user.birthDate || linkedParticipant?.birthDate);
+    const hasEdu = Boolean(user.educationLevel || linkedParticipant?.educationLevel);
+    const hasPhone = Boolean(user.phone || linkedParticipant?.phone);
+    const hasAddress = Boolean(user.currentAddress || linkedParticipant?.currentAddress);
+    return Boolean(hasBirth && hasEdu && hasPhone && hasAddress);
+  };
 
   const [toast, setToast] = useState<ToastNotification | null>(null);
 
@@ -157,6 +184,17 @@ export function App() {
           setIsAttendeeScheduleModalOpen(true);
           setLastSearchedCedula(cedulaFromUrl);
         }
+
+        // Verificar si el usuario autenticado tiene perfil incompleto
+        const savedUser = getSafeStoredUser();
+        if (savedUser) {
+          const freshUser = loadedUsers.find(u => u.id === savedUser.id) || savedUser;
+          setCurrentUser(freshUser);
+          if (!isUserProfileComplete(freshUser, loadedParticipants)) {
+            setIsProfileMandatory(true);
+            setIsProfileModalOpen(true);
+          }
+        }
       } catch (err) {
         console.error('Error al cargar datos:', err);
       }
@@ -182,6 +220,37 @@ export function App() {
     }
   }, []);
 
+  // Suscripción reactiva a eventos en tiempo real de asistencia vía WebSocket
+  useEffect(() => {
+    attendanceWs.connect();
+
+    const unsubscribe = attendanceWs.onAttendanceEvent((eventData) => {
+      console.log('App received WebSocket attendance event:', eventData);
+
+      // Refrescar automáticamente la lista de eventos desde el servidor
+      apiService.getEvents().then(freshEvents => {
+        setEvents(freshEvents);
+      }).catch(err => {
+        console.error('Error al sincronizar eventos en tiempo real:', err);
+      });
+
+      // Si el usuario actual es Super Administrador o Administrador, mostrar un toast discreto
+      if (currentUser && (currentUser.role === 'Super Administrador' || currentUser.role === 'Administrador / Editor')) {
+        const action = eventData.type === 'ATTENDANCE_CHECK_IN'
+          ? 'Entrada registrada'
+          : eventData.type === 'ATTENDANCE_CHECK_OUT'
+            ? 'Salida registrada'
+            : 'Asistencia actualizada';
+        const label = eventData.participantName || eventData.email || 'Colaborador';
+        showToast(`⚡ En vivo: ${action}`, `${label} ha marcado asistencia en tiempo real.`, 'info');
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [currentUser]);
+
   // Handlers de Sesión
   const handleLoginSuccess = (user: UserAccount) => {
     setCurrentUser(user);
@@ -193,6 +262,46 @@ export function App() {
       setCurrentTab('evaluator-courses');
     }
     showToast('¡Bienvenido!', `Has iniciado sesión como ${user.name}.`, 'success');
+
+    // Validación de Onboarding Obligatorio
+    if (!isUserProfileComplete(user, participants)) {
+      setIsProfileMandatory(true);
+      setIsProfileModalOpen(true);
+    }
+  };
+
+  const handleSaveProfile = async (profileData: any) => {
+    if (!currentUser) return;
+    try {
+      const { user: updatedUser, users: updatedUsers, participants: updatedParticipants } = 
+        await apiService.updateUserProfile(currentUser.id, profileData);
+
+      const finalUser: UserAccount = updatedUser || {
+        ...currentUser,
+        ...profileData,
+        profileCompleted: true
+      };
+
+      setCurrentUser(finalUser);
+      if (updatedUsers && updatedUsers.length > 0) setUsers(updatedUsers);
+      if (updatedParticipants && updatedParticipants.length > 0) setParticipants(updatedParticipants);
+      localStorage.setItem('ch_logged_user', JSON.stringify(finalUser));
+      setIsProfileMandatory(false);
+      setIsProfileModalOpen(false);
+    } catch (err: any) {
+      console.error('Error al guardar perfil:', err);
+      // Respaldo resiliente: actualizar estado local para que el usuario no quede bloqueado
+      const fallbackUser: UserAccount = {
+        ...currentUser,
+        ...profileData,
+        profileCompleted: true
+      };
+      setCurrentUser(fallbackUser);
+      localStorage.setItem('ch_logged_user', JSON.stringify(fallbackUser));
+      setIsProfileMandatory(false);
+      setIsProfileModalOpen(false);
+      showToast('Aviso', 'Tu información de perfil se ha actualizado.', 'info');
+    }
   };
 
   const handleLogout = () => {
@@ -231,13 +340,26 @@ export function App() {
     return res;
   };
 
-  const handleConfirmAttendance = async (eventId: string, date: string, time: string, email: string) => {
-    const updated = await apiService.confirmAttendance(eventId, date, time, email);
+  const handleConfirmAttendance = async (
+    eventId: string, 
+    date: string, 
+    time: string, 
+    email: string, 
+    type: 'checkin' | 'checkout' = 'checkin',
+    code?: string
+  ) => {
+    const updated = await apiService.confirmAttendance(eventId, date, time, email, type, code);
     setEvents(updated);
   };
 
-  const handleRevertAttendance = async (eventId: string, date: string, time: string, email: string) => {
-    const updated = await apiService.revertAttendance(eventId, date, time, email);
+  const handleRevertAttendance = async (
+    eventId: string, 
+    date: string, 
+    time: string, 
+    email: string, 
+    type: 'checkout' | 'all' = 'all'
+  ) => {
+    const updated = await apiService.revertAttendance(eventId, date, time, email, type);
     setEvents(updated);
   };
 
@@ -270,20 +392,31 @@ export function App() {
     handleLookupCedula(detectedCedula);
   };
 
-  const handleConfirmAttendanceLobby = async (eventId: string, date: string, time: string, email: string) => {
-    const updated = await apiService.confirmAttendance(eventId, date, time, email);
+  const handleConfirmAttendanceLobby = async (
+    eventId: string, 
+    date: string, 
+    time: string, 
+    email: string, 
+    type: 'checkin' | 'checkout' = 'checkin'
+  ) => {
+    const updated = await apiService.confirmAttendance(eventId, date, time, email, type);
     setEvents(updated);
     if (lastSearchedCedula) {
       const refreshed = findAttendeeByCedula(lastSearchedCedula, participants, users, updated);
       setAttendeeLookupResult(refreshed);
     }
-    showToast('Asistencia Confirmada', 'Tu asistencia presencial ha sido validada exitosamente.', 'success');
+    showToast('Asistencia Confirmada', `Tu ${type === 'checkout' ? 'salida' : 'entrada'} presencial ha sido validada exitosamente.`, 'success');
   };
 
   const handleSubmitFeedback = async (feedback: EventFeedback) => {
-    const updated = await apiService.submitFeedback(feedback);
-    setEvents(updated);
-    showToast('¡Gracias por tu opinión!', 'Tu evaluación ha sido registrada.', 'success');
+    try {
+      const updated = await apiService.submitFeedback(feedback);
+      setEvents(updated);
+      showToast('¡Gracias por tu opinión!', 'Tu evaluación ha sido registrada exitosamente.', 'success');
+    } catch (err: any) {
+      showToast('Encuesta ya respondida', err.message || 'Solo se permite una respuesta por colaborador.', 'error');
+      throw err;
+    }
   };
 
   const handleSaveEvent = async (event: TrainingEvent) => {
@@ -530,6 +663,10 @@ export function App() {
           isSidebarCollapsed={isSidebarCollapsed}
           onOpenChangePassword={() => setIsChangePasswordModalOpen(true)}
           onOpenQrScanner={() => setIsQrScannerOpen(true)}
+          onOpenUserProfile={() => {
+            setIsProfileMandatory(false);
+            setIsProfileModalOpen(true);
+          }}
         />
 
         {/* Main Content Area */}
@@ -554,6 +691,7 @@ export function App() {
           <MyRegistrationsView
             events={events}
             currentUser={currentUser}
+            companies={companies}
             programs={programs}
             groups={groups}
             participants={participants}
@@ -562,6 +700,10 @@ export function App() {
             onOpenReservationModal={(event) => setSelectedEventForModal(event)}
             onOpenQrScanner={() => setIsQrScannerOpen(true)}
             onOpenTecEvaluation={(event) => setSelectedEventForTecModal(event)}
+            onOpenUserProfile={() => {
+              setIsProfileMandatory(false);
+              setIsProfileModalOpen(true);
+            }}
           />
         )}
 
@@ -570,6 +712,7 @@ export function App() {
           <DashboardView
             events={events}
             participants={participants}
+            users={users}
             groups={groups}
             programs={programs}
             companies={companies}
@@ -579,6 +722,7 @@ export function App() {
             selectedCompanyId={currentUser.role === 'Super Administrador' ? selectedCompanyId : (currentUser.companyId || 'emp_kasino')}
             currentUser={currentUser}
             onSelectCompanyScope={currentUser.role === 'Super Administrador' ? ((cId) => setSelectedCompanyId(cId)) : undefined}
+            onSaveEvent={handleSaveEvent}
             onShowToast={showToast}
           />
         )}
@@ -761,6 +905,21 @@ export function App() {
           events={events}
           onConfirmAttendance={handleConfirmAttendance}
           onOpenTecEvaluation={(event) => setSelectedEventForTecModal(event)}
+          onShowToast={showToast}
+        />
+      )}
+
+      {/* Modal de Ficha y Perfil Sociodemográfico / Académico (Obligatorio en primer ingreso / Edición libre) */}
+      {currentUser && (
+        <UserProfileModal
+          isOpen={isProfileModalOpen}
+          onClose={() => {
+            if (!isProfileMandatory) setIsProfileModalOpen(false);
+          }}
+          currentUser={currentUser}
+          participant={participants.find(p => p.email.toLowerCase() === currentUser.email.toLowerCase()) || null}
+          isMandatory={isProfileMandatory}
+          onSaveProfile={handleSaveProfile}
           onShowToast={showToast}
         />
       )}

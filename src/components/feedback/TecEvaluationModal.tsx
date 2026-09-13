@@ -11,7 +11,9 @@ import {
   Award, 
   BookOpen, 
   UserCheck, 
-  MessageSquareQuote
+  MessageSquareQuote,
+  Lock,
+  AlertCircle
 } from 'lucide-react';
 import { TrainingEvent, UserAccount, EventFeedback } from '../../types';
 import { 
@@ -43,6 +45,7 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
 }) => {
   const [step, setStep] = useState<'course' | 'facilitator' | 'comments' | 'success'>('course');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isReadOnly = Boolean(existingFeedback);
 
   // Inicializar respuestas con las existentes o con valor por defecto 5
   const [courseRatings, setCourseRatings] = useState<Record<string, number>>(() => {
@@ -73,14 +76,24 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
   );
 
   const handleCourseRatingChange = (qId: string, val: number) => {
+    if (isReadOnly) return;
     setCourseRatings(prev => ({ ...prev, [qId]: val }));
   };
 
   const handleFacilitatorRatingChange = (qId: string, val: number) => {
+    if (isReadOnly) return;
     setFacilitatorRatings(prev => ({ ...prev, [qId]: val }));
   };
 
   const handleSave = async () => {
+    if (isReadOnly) {
+      if (onShowToast) {
+        onShowToast('Encuesta ya registrada', 'Esta evaluación ya fue guardada previamente y no puede ser modificada.', 'info');
+      }
+      onClose();
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       const feedbackPayload: EventFeedback = {
@@ -127,13 +140,19 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
             <X className="w-5 h-5" />
           </button>
 
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/20 backdrop-blur-md">
               Encuesta de Satisfacción Oficial
             </span>
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-400 text-slate-950">
               TEC - Calidad Educativa
             </span>
+            {isReadOnly && (
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500 text-white flex items-center gap-1 shadow-xs">
+                <Lock className="w-3 h-3" />
+                <span>Respuesta Registrada (Solo Lectura)</span>
+              </span>
+            )}
           </div>
 
           <h2 className="text-lg sm:text-xl font-black leading-tight">
@@ -197,6 +216,26 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
         {/* Modal Scrollable Body */}
         <div className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-6">
 
+          {/* Banner de Solo Lectura si ya fue respondida */}
+          {isReadOnly && (
+            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200">
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="font-black text-emerald-950 text-sm">Encuesta Completada (1 Sola Respuesta Permitida)</span>
+                  <p className="text-[11px] text-emerald-800 mt-0.5">
+                    Tu evaluación ya fue registrada y procesada para los indicadores de calidad. Las calificaciones se muestran en modo consulta y no pueden ser alteradas.
+                  </p>
+                </div>
+              </div>
+              <span className="px-3 py-1 rounded-xl text-[10px] font-black bg-emerald-600 text-white shrink-0 self-start sm:self-center shadow-xs">
+                🔒 Registro Definitivo
+              </span>
+            </div>
+          )}
+
           {/* ===================== PASO 1: CURSO ===================== */}
           {step === 'course' && (
             <div className="space-y-5 animate-in fade-in duration-200">
@@ -236,8 +275,11 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
                             <button
                               key={scale.value}
                               type="button"
+                              disabled={isReadOnly}
                               onClick={() => handleCourseRatingChange(q.id, scale.value)}
-                              className={`py-2 px-1 rounded-xl text-center border text-xs font-bold transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                              className={`py-2 px-1 rounded-xl text-center border text-xs font-bold transition-all flex flex-col items-center justify-center gap-1 ${
+                                isReadOnly ? 'cursor-default' : 'cursor-pointer'
+                              } ${
                                 isSelected
                                   ? 'bg-[#DA291C] text-white border-[#DA291C] shadow-md shadow-red-500/25 scale-[1.02]'
                                   : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
@@ -299,8 +341,11 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
                             <button
                               key={scale.value}
                               type="button"
+                              disabled={isReadOnly}
                               onClick={() => handleFacilitatorRatingChange(q.id, scale.value)}
-                              className={`py-2 px-1 rounded-xl text-center border text-xs font-bold transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                              className={`py-2 px-1 rounded-xl text-center border text-xs font-bold transition-all flex flex-col items-center justify-center gap-1 ${
+                                isReadOnly ? 'cursor-default' : 'cursor-pointer'
+                              } ${
                                 isSelected
                                   ? 'bg-amber-500 text-slate-950 border-amber-500 shadow-md shadow-amber-500/25 scale-[1.02]'
                                   : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
@@ -356,9 +401,15 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
                 <textarea
                   rows={4}
                   value={comment}
+                  readOnly={isReadOnly}
+                  disabled={isReadOnly}
                   onChange={(e) => setComment(e.target.value)}
-                  placeholder="¿Qué te pareció el contenido, la dinámica o qué sugerencias tienes para próximas sesiones? Tu opinión nos ayuda a mejorar continuamente..."
-                  className="w-full p-4 rounded-2xl border border-slate-300 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] focus:ring-2 focus:ring-red-100 resize-none"
+                  placeholder={isReadOnly ? "Sin comentarios registrados." : "¿Qué te pareció el contenido, la dinámica o qué sugerencias tienes para próximas sesiones? Tu opinión nos ayuda a mejorar continuamente..."}
+                  className={`w-full p-4 rounded-2xl border border-slate-300 text-xs text-slate-900 resize-none ${
+                    isReadOnly 
+                      ? 'bg-slate-100 text-slate-600 cursor-not-allowed border-slate-200' 
+                      : 'placeholder-slate-400 focus:outline-none focus:border-[#DA291C] focus:ring-2 focus:ring-red-100'
+                  }`}
                 />
               </div>
 
@@ -423,7 +474,7 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
                 onClick={onClose}
                 className="px-4 py-2 rounded-xl text-slate-500 hover:text-slate-800 text-xs font-bold transition-colors cursor-pointer"
               >
-                Cancelar
+                {isReadOnly ? 'Cerrar' : 'Cancelar'}
               </button>
             ) : (
               <button
@@ -444,6 +495,15 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
               >
                 <span>{step === 'course' ? 'Siguiente: Evaluar Facilitador' : 'Siguiente: Resumen & Comentarios'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            ) : isReadOnly ? (
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold flex items-center gap-2 shadow-md transition-all cursor-pointer"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Cerrar Consulta (Encuesta ya enviada)</span>
               </button>
             ) : (
               <button

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   CalendarCheck2, 
   Calendar as CalendarIcon, 
@@ -22,18 +22,26 @@ import {
   ShieldCheck,
   GraduationCap,
   Camera,
-  Star
+  Star,
+  FileText,
+  Search,
+  Filter,
+  TrendingUp,
+  Layers
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import { TrainingEvent, UserAccount, Slot, Schedule, TrainingProgram, ParticipantGroup, Participant } from '../../types';
-import { formatDateLong } from '../../utils/formatters';
+import { TrainingEvent, UserAccount, Slot, Schedule, TrainingProgram, ParticipantGroup, Participant, Company } from '../../types';
+import { formatDateLong, formatDateShort, formatCedula, getEventDurationMetrics } from '../../utils/formatters';
 import { downloadIcsFile, getGoogleCalendarUrl } from '../../utils/icsUtils';
+import { FormalLetterModal, TrainingHistoryRecord } from '../history/FormalLetterModal';
 
 interface UserRegistrationItem {
   event: TrainingEvent;
   schedule: Schedule;
   slot: Slot;
   hasAttended: boolean;
+  isCheckedIn?: boolean;
+  isCheckedOut?: boolean;
   isMandatory?: boolean;
   assignedBy?: string | null;
   assignmentType?: 'mandatory' | 'voluntary' | 'self';
@@ -43,6 +51,7 @@ interface UserRegistrationItem {
 interface MyRegistrationsViewProps {
   events: TrainingEvent[];
   currentUser: UserAccount | null;
+  companies?: Company[];
   programs?: TrainingProgram[];
   groups?: ParticipantGroup[];
   participants?: Participant[];
@@ -51,11 +60,13 @@ interface MyRegistrationsViewProps {
   onOpenReservationModal?: (event: TrainingEvent) => void;
   onOpenQrScanner?: () => void;
   onOpenTecEvaluation?: (event: TrainingEvent) => void;
+  onOpenUserProfile?: () => void;
 }
 
 export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
   events,
   currentUser,
+  companies = [],
   programs = [],
   groups = [],
   participants = [],
@@ -63,13 +74,31 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
   onExploreCatalog,
   onOpenReservationModal,
   onOpenQrScanner,
-  onOpenTecEvaluation
+  onOpenTecEvaluation,
+  onOpenUserProfile
 }) => {
   const [cancelingItem, setCancelingItem] = useState<UserRegistrationItem | null>(null);
   const [selectedPassItem, setSelectedPassItem] = useState<UserRegistrationItem | null>(null);
   const [isProcessingCancel, setIsProcessingCancel] = useState(false);
 
+  // Sub-Pestañas: Sesiones Activas vs Histórico
+  const [currentSubTab, setCurrentSubTab] = useState<'active' | 'history'>('active');
+  const [isFormalLetterModalOpen, setIsFormalLetterModalOpen] = useState(false);
+  const [selectedRecordsForLetter, setSelectedRecordsForLetter] = useState<TrainingHistoryRecord[] | null>(null);
+
+  // Filtros del Histórico
+  const [historyStatusFilter, setHistoryStatusFilter] = useState<'all' | 'attended' | 'upcoming' | 'missed'>('all');
+  const [historySearchQuery, setHistorySearchQuery] = useState('');
+
   if (!currentUser) return null;
+
+  const isSuperAdmin = currentUser?.role === 'Super Administrador';
+
+  // Fecha actual local YYYY-MM-DD
+  const todayStr = useMemo(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }, []);
 
   // Extraer todas las inscripciones del usuario actual
   const userRegistrations: UserRegistrationItem[] = [];
@@ -79,13 +108,18 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
       sch.slots.forEach(slot => {
         const isEnrolled = slot.attendees.map(a => a.toLowerCase()).includes(currentUser.email.toLowerCase());
         if (isEnrolled) {
-          const hasAttended = (slot.attendedList || []).map(a => a.toLowerCase()).includes(currentUser.email.toLowerCase());
-          const detail = (slot.attendeesDetails || []).find(d => d.email.toLowerCase() === currentUser.email.toLowerCase());
+          const cleanEmail = currentUser.email.toLowerCase();
+          const isCheckedIn = (slot.checkInList || slot.attendedList || []).map(a => a.toLowerCase()).includes(cleanEmail);
+          const isCheckedOut = (slot.checkOutList || []).map(a => a.toLowerCase()).includes(cleanEmail);
+          const hasAttended = (slot.completedAttendanceList || []).map(a => a.toLowerCase()).includes(cleanEmail) || (isCheckedIn && isCheckedOut);
+          const detail = (slot.attendeesDetails || []).find(d => d.email.toLowerCase() === cleanEmail);
           userRegistrations.push({
             event: evt,
             schedule: sch,
             slot: slot,
             hasAttended,
+            isCheckedIn,
+            isCheckedOut,
             isMandatory: detail ? Boolean(detail.isMandatory) : false,
             assignedBy: detail?.assignedBy || null,
             assignmentType: detail?.assignmentType || (detail?.isMandatory ? 'mandatory' : 'self'),
@@ -128,6 +162,145 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
     return isTargetGroup || isTargetDirect;
   });
 
+  // Generar lista de registros históricos
+  const trainingHistoryRecords: TrainingHistoryRecord[] = useMemo(() => {
+    return userRegistrations.map((item, idx) => {
+      const isPast = item.schedule.date < todayStr;
+      const gradeObj = (item.event.grades || []).find(g => 
+        (userCard && g.participantCard === userCard) || 
+        (g.participantEmail && g.participantEmail.toLowerCase() === userEmail)
+      );
+
+      return {
+        id: `${item.event.id}-${item.schedule.date}-${item.slot.time}-${idx}`,
+        title: item.event.title,
+        category: item.event.category,
+        modality: item.event.modality,
+        instructor: item.event.instructor,
+        date: item.schedule.date,
+        time: item.slot.time,
+        hasAttended: item.hasAttended,
+        hours: 2,
+        gradeScore: gradeObj ? gradeObj.score : null,
+        academicStatus: gradeObj ? gradeObj.academicStatus : (item.hasAttended ? 'passed' : isPast ? 'failed' : 'pending')
+      };
+    });
+  }, [userRegistrations, todayStr, userCard, userEmail]);
+
+  // Métricas del Histórico
+  const historyMetrics = useMemo(() => {
+    const totalCount = trainingHistoryRecords.length;
+    const attendedCount = trainingHistoryRecords.filter(r => r.hasAttended).length;
+    const upcomingCount = trainingHistoryRecords.filter(r => !r.hasAttended && r.date >= todayStr).length;
+    const missedCount = trainingHistoryRecords.filter(r => !r.hasAttended && r.date < todayStr).length;
+    const totalHours = attendedCount * 2;
+    const rate = totalCount > 0 ? Math.round((attendedCount / totalCount) * 100) : 0;
+
+    return {
+      totalCount,
+      attendedCount,
+      upcomingCount,
+      missedCount,
+      totalHours,
+      rate
+    };
+  }, [trainingHistoryRecords, todayStr]);
+
+  // Registros filtrados para la tabla del histórico
+  const filteredHistoryRecords = useMemo(() => {
+    return trainingHistoryRecords.filter(rec => {
+      if (historyStatusFilter === 'attended' && !rec.hasAttended) return false;
+      if (historyStatusFilter === 'upcoming' && (rec.hasAttended || rec.date < todayStr)) return false;
+      if (historyStatusFilter === 'missed' && (rec.hasAttended || rec.date >= todayStr)) return false;
+
+      if (historySearchQuery.trim()) {
+        const q = historySearchQuery.toLowerCase();
+        const matchTitle = rec.title.toLowerCase().includes(q);
+        const matchInst = rec.instructor.toLowerCase().includes(q);
+        const matchCat = rec.category.toLowerCase().includes(q);
+        return matchTitle || matchInst || matchCat;
+      }
+      return true;
+    });
+  }, [trainingHistoryRecords, historyStatusFilter, historySearchQuery, todayStr]);
+
+  // Cursos recomendados inteligentemente basados en intereses formativos y carrera
+  const recommendedEvents = useMemo(() => {
+    const userInterests = (currentUser?.trainingInterestAreas || []).map(i => i.toLowerCase());
+    const isStudying = Boolean(currentUser?.isCurrentlyStudying);
+    const studyField = (currentUser?.currentStudyField || '').toLowerCase();
+    const userEmail = (currentUser?.email || '').toLowerCase();
+
+    // Eventos donde el usuario NO está inscrito actualmente
+    const availableEvents = events.filter(evt => {
+      const isEnrolled = evt.schedule.some(sch => 
+        sch.slots.some(sl => (sl.attendees || []).some(att => att.toLowerCase() === userEmail))
+      );
+      if (isEnrolled) return false;
+      // Que tenga al menos un horario futuro con cupo
+      const hasOpenSlot = evt.schedule.some(sch => 
+        sch.date >= todayStr && sch.slots.some(sl => sl.registered < sl.capacity)
+      );
+      return hasOpenSlot;
+    });
+
+    const matches: Array<{
+      event: TrainingEvent;
+      matchReason: string;
+      matchType: 'interest' | 'study' | 'foundation';
+      score: number;
+    }> = [];
+
+    availableEvents.forEach(evt => {
+      const titleLower = evt.title.toLowerCase();
+      const catLower = evt.category.toLowerCase();
+      const skillsLower = (evt.skillsEvaluated || []).map(s => s.toLowerCase());
+
+      // 1. Coincidencia por áreas de interés
+      const matchedInterest = userInterests.find(interest => {
+        const words = interest.split(' ').filter(w => w.length > 3);
+        return words.some(w => titleLower.includes(w) || catLower.includes(w) || skillsLower.some(s => s.includes(w)));
+      });
+
+      if (matchedInterest) {
+        matches.push({
+          event: evt,
+          matchReason: `Basado en tu interés por "${matchedInterest}"`,
+          matchType: 'interest',
+          score: 10
+        });
+        return;
+      }
+
+      // 2. Coincidencia por lo que estudia
+      if (isStudying && studyField) {
+        const studyWords = studyField.split(' ').filter(w => w.length > 3);
+        const matchedStudy = studyWords.some(w => titleLower.includes(w) || skillsLower.some(s => s.includes(w)));
+        if (matchedStudy) {
+          matches.push({
+            event: evt,
+            matchReason: `Alineado a tus estudios de "${currentUser?.currentStudyField}"`,
+            matchType: 'study',
+            score: 8
+          });
+          return;
+        }
+      }
+
+      // 3. Recomendación base para Bachilleres
+      if (currentUser?.educationLevel === 'Secundaria / Bachiller' && (catLower.includes('taller') || titleLower.includes('fundamento') || titleLower.includes('básico'))) {
+        matches.push({
+          event: evt,
+          matchReason: 'Curso de fundamentación técnica recomendado',
+          matchType: 'foundation',
+          score: 5
+        });
+      }
+    });
+
+    return matches.sort((a, b) => b.score - a.score).slice(0, 3);
+  }, [events, currentUser, todayStr]);
+
   return (
     <div className="space-y-8 pb-16">
       
@@ -142,9 +315,54 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Consulta tus horarios agendados, monitorea el cumplimiento de tus cronogramas y genera tus pases de acceso QR.
           </p>
+
+          {/* Ficha rápida de perfil formativo */}
+          <div className="flex items-center gap-2 mt-2.5 flex-wrap text-xs">
+            {currentUser.educationLevel && (
+              <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold border border-slate-200 flex items-center gap-1.5 shadow-2xs">
+                <GraduationCap className="w-3.5 h-3.5 text-amber-500" />
+                <span>{currentUser.educationLevel}</span>
+              </span>
+            )}
+            {currentUser.isCurrentlyStudying && (
+              <span className="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-900 font-bold border border-amber-200 flex items-center gap-1.5 shadow-2xs">
+                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                <span>Estudiando: {currentUser.currentStudyField || 'En curso'}</span>
+              </span>
+            )}
+            {currentUser.professionTitle && (
+              <span className="px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-900 font-bold border border-sky-200 flex items-center gap-1.5 shadow-2xs">
+                <span>{currentUser.professionTitle}</span>
+              </span>
+            )}
+            {onOpenUserProfile && (
+              <button
+                type="button"
+                onClick={onOpenUserProfile}
+                className="text-[#DA291C] hover:underline font-bold text-xs cursor-pointer ml-1 inline-flex items-center gap-1"
+              >
+                <span>Editar Mi Ficha</span>
+                <span className="text-[10px]">→</span>
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
+          {isSuperAdmin && (
+            <button
+              onClick={() => {
+                setSelectedRecordsForLetter(null);
+                setIsFormalLetterModalOpen(true);
+              }}
+              className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 hover:from-black hover:to-slate-900 text-white text-xs font-black flex items-center gap-2 shadow-md shadow-slate-900/20 transition-all cursor-pointer active:scale-95"
+              title="Generar constancia formal con membrete Claro (Exclusivo Super Administrador)"
+            >
+              <Award className="w-4 h-4 text-amber-400" />
+              <span>Elaborar Carta Formal</span>
+            </button>
+          )}
+
           {onOpenQrScanner && (
             <button
               onClick={onOpenQrScanner}
@@ -161,6 +379,130 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
           </div>
         </div>
       </div>
+
+      {/* SECCIÓN DE CURSOS RECOMENDADOS (PLAN DE CRECIMIENTO INTELIGENTE) */}
+      {recommendedEvents.length > 0 && (
+        <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-[#DA291C]/85 rounded-3xl p-6 text-white shadow-xl space-y-4 animate-in fade-in duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="p-1.5 rounded-xl bg-amber-400 text-slate-950 shadow-inner">
+                  <Sparkles className="w-4 h-4" />
+                </span>
+                <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
+                  Cursos Sugeridos para Tu Plan de Crecimiento
+                </h2>
+              </div>
+              <p className="text-xs text-slate-300 mt-0.5">
+                Recomendaciones personalizadas basadas en tus áreas de interés y grado formativo.
+              </p>
+            </div>
+            <button
+              onClick={onExploreCatalog}
+              className="text-xs font-bold text-amber-300 hover:text-white flex items-center gap-1 cursor-pointer transition-colors self-start sm:self-auto"
+            >
+              <span>Ver Catálogo Completo</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+            {recommendedEvents.map(({ event, matchReason }) => {
+              const nextSlot = event.schedule
+                .flatMap(s => s.slots.map(sl => ({ date: s.date, ...sl })))
+                .find(s => s.date >= todayStr && s.registered < s.capacity);
+
+              return (
+                <div 
+                  key={event.id}
+                  className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 flex flex-col justify-between space-y-3 hover:bg-white/15 transition-all shadow-sm"
+                >
+                  <div className="space-y-2">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/30 inline-flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" />
+                      <span className="truncate max-w-[200px]">{matchReason}</span>
+                    </span>
+                    <h3 className="font-bold text-sm text-white line-clamp-2 leading-snug">{event.title}</h3>
+                    {nextSlot && (
+                      <div className="flex items-center gap-2 text-xs text-slate-300">
+                        <CalendarIcon className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+                        <span>{formatDateShort(nextSlot.date)} • {nextSlot.time}{nextSlot.endTime ? ` - ${nextSlot.endTime}` : ''}</span>
+                        <span className="text-amber-300 font-semibold">({getEventDurationMetrics(event).totalHours}h)</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="pt-2 border-t border-white/10 flex items-center justify-between gap-2">
+                    <span className="text-[11px] text-slate-300 font-medium">
+                      {nextSlot ? `${nextSlot.capacity - nextSlot.registered} cupos disp.` : 'Cupos disp.'}
+                    </span>
+                    <button
+                      onClick={() => onOpenReservationModal ? onOpenReservationModal(event) : onExploreCatalog()}
+                      className="px-3 py-1.5 rounded-xl bg-white text-slate-900 hover:bg-amber-300 text-xs font-black transition-colors cursor-pointer active:scale-95 flex items-center gap-1 shadow-sm"
+                    >
+                      <span>Reservar Cupo</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Sub-Tab Navigation Bar & Action CTA */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-2 sm:p-2.5 rounded-3xl border border-slate-200/90 shadow-xs">
+        <div className="flex items-center gap-1.5 w-full sm:w-auto">
+          <button
+            onClick={() => setCurrentSubTab('active')}
+            className={`flex-1 sm:flex-initial px-5 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              currentSubTab === 'active'
+                ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
+                : 'text-slate-600 hover:text-slate-950 hover:bg-slate-100'
+            }`}
+          >
+            <CalendarIcon className="w-4 h-4" />
+            <span>Sesiones Activas & Rutas ({userRegistrations.filter(r => r.schedule.date >= todayStr).length})</span>
+          </button>
+
+          <button
+            onClick={() => setCurrentSubTab('history')}
+            className={`flex-1 sm:flex-initial px-5 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              currentSubTab === 'history'
+                ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
+                : 'text-slate-600 hover:text-slate-950 hover:bg-slate-100'
+            }`}
+          >
+            <FileText className="w-4 h-4" />
+            <span>Histórico de Capacitaciones ({trainingHistoryRecords.length})</span>
+          </button>
+        </div>
+
+        {currentSubTab === 'history' ? (
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end text-xs">
+            <span className="text-slate-500 font-medium">
+              Horas Acumuladas: <strong className="text-slate-900 font-black">{historyMetrics.totalHours} hrs</strong>
+            </span>
+          </div>
+        ) : isSuperAdmin ? (
+          <button
+            onClick={() => {
+              setSelectedRecordsForLetter(null);
+              setIsFormalLetterModalOpen(true);
+            }}
+            className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-red-50 hover:bg-red-100 text-[#DA291C] border border-red-200 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer transition-all"
+            title="Ver constancia formal (Exclusivo Super Administrador)"
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span>Ver Constancia Formal</span>
+          </button>
+        ) : null}
+      </div>
+
+      {/* VISTA 1: SESIONES ACTIVAS & RUTAS FORMATIVAS */}
+      {currentSubTab === 'active' && (
+        <div className="space-y-8 animate-in fade-in duration-150">
 
       {/* SECCIÓN: RUTAS Y CRONOGRAMAS ASIGNADOS */}
       {assignedPrograms.length > 0 && (
@@ -395,13 +737,18 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
 
                       {hasAttended ? (
                         <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 flex items-center gap-1.5">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          Confirmado
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          ✓ Asistencia Completa
+                        </span>
+                      ) : item.isCheckedIn ? (
+                        <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-300 flex items-center gap-1.5 animate-pulse">
+                          <Clock className="w-3.5 h-3.5 text-amber-600" />
+                          🟢 En Curso (Entrada)
                         </span>
                       ) : (
                         <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1.5">
                           <Clock className="w-3.5 h-3.5" />
-                          Activo
+                          Agendado
                         </span>
                       )}
                     </div>
@@ -433,7 +780,11 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="w-3.5 h-3.5 text-[#DA291C] shrink-0" />
-                        <span>Horario: <strong className="text-slate-800">{slot.time}</strong></span>
+                        <span>Horario: <strong className="text-slate-800">{slot.time}{slot.endTime ? ` - ${slot.endTime}` : ''}</strong></span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                        <span>Duración: <strong className="text-amber-900 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">{getEventDurationMetrics(event).totalHours} hrs lectivas ({getEventDurationMetrics(event).totalDays} {getEventDurationMetrics(event).totalDays === 1 ? 'día' : 'días'})</strong></span>
                       </div>
                       <div className="flex items-center gap-2">
                         {event.modality === 'Virtual' ? (
@@ -490,7 +841,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                           <Lock className="w-3.5 h-3.5 text-red-600 shrink-0" />
                           <span>Obligatorio</span>
                         </div>
-                      ) : !hasAttended ? (
+                      ) : !hasAttended && !item.isCheckedIn ? (
                         <button
                           onClick={() => setCancelingItem(item)}
                           className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
@@ -501,36 +852,46 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                       ) : null}
                     </div>
 
-                    {/* Botón de Evaluación TEC si el colaborador asistió */}
-                    {hasAttended && onOpenTecEvaluation && (
-                      (() => {
-                        const userFeedback = (event.feedbacks || []).find(
-                          fb => fb.userEmail.toLowerCase() === currentUser.email.toLowerCase()
-                        );
-                        return (
-                          <div className="pt-2">
-                            {userFeedback ? (
-                              <button
-                                type="button"
-                                onClick={() => onOpenTecEvaluation(event)}
-                                className="w-full py-2 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                              >
-                                <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-                                <span>Evaluado ({userFeedback.rating}★) - Ver / Modificar</span>
-                              </button>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => onOpenTecEvaluation(event)}
-                                className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 text-xs font-black flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20 transition-all cursor-pointer"
-                              >
-                                <Star className="w-3.5 h-3.5 fill-slate-950 text-slate-950" />
-                                <span>Evaluar Curso & Facilitador (TEC)</span>
-                              </button>
-                            )}
+                    {/* Botón de Evaluación TEC / Aviso de Salida Pendiente */}
+                    {onOpenTecEvaluation && (
+                      item.hasAttended ? (
+                        (() => {
+                          const userFeedback = (event.feedbacks || []).find(
+                            fb => fb.userEmail.toLowerCase() === currentUser.email.toLowerCase()
+                          );
+                          return (
+                            <div className="pt-2">
+                              {userFeedback ? (
+                                <button
+                                  type="button"
+                                  onClick={() => onOpenTecEvaluation(event)}
+                                  className="w-full py-2 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-900 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                                  title="Encuesta completada (1 sola respuesta permitida). Haz clic para consultar tus calificaciones."
+                                >
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                  <span>✓ Encuesta Completada ({userFeedback.rating}★) - Ver Respuestas</span>
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => onOpenTecEvaluation(event)}
+                                  className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 text-xs font-black flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20 transition-all cursor-pointer"
+                                >
+                                  <Star className="w-3.5 h-3.5 fill-slate-950 text-slate-950" />
+                                  <span>Evaluar Curso & Facilitador (TEC)</span>
+                                </button>
+                              )}
+                            </div>
+                          );
+                        })()
+                      ) : item.isCheckedIn ? (
+                        <div className="pt-2">
+                          <div className="w-full py-2 px-3 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs font-semibold flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-amber-600 shrink-0" />
+                            <span>⏳ Entrada registrada. Registra tu salida para habilitar la evaluación TEC.</span>
                           </div>
-                        );
-                      })()
+                        </div>
+                      ) : null
                     )}
 
                   </div>
@@ -559,6 +920,238 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
           </div>
         )}
       </div>
+
+        </div>
+      )}
+
+      {/* VISTA 2: HISTÓRICO COMPLETO DE CAPACITACIONES & FORMACIÓN CONTINUA */}
+      {currentSubTab === 'history' && (
+        <div className="space-y-6 animate-in fade-in duration-150">
+          
+          {/* 1. KPIs del Histórico */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs hover:shadow-md transition-all flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-red-50 text-[#DA291C] border border-red-100 flex items-center justify-center shadow-2xs">
+                <GraduationCap className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="text-2xl font-black text-slate-900 tracking-tight">{historyMetrics.totalCount}</div>
+                <p className="text-xs font-semibold text-slate-500">Capacitaciones Totales</p>
+              </div>
+            </div>
+
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs hover:shadow-md transition-all flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center shadow-2xs">
+                <Clock className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="text-2xl font-black text-slate-900 tracking-tight">
+                  {historyMetrics.totalHours} <span className="text-xs font-bold text-slate-500">hrs</span>
+                </div>
+                <p className="text-xs font-semibold text-slate-500">Horas Acumuladas</p>
+              </div>
+            </div>
+
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs hover:shadow-md transition-all flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shadow-2xs">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="text-2xl font-black text-slate-900 tracking-tight">{historyMetrics.attendedCount}</div>
+                <p className="text-xs font-semibold text-slate-500">Sesiones Asistidas</p>
+              </div>
+            </div>
+
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs hover:shadow-md transition-all flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 border border-sky-100 flex items-center justify-center shadow-2xs">
+                <TrendingUp className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="text-2xl font-black text-slate-900 tracking-tight">{historyMetrics.rate}%</div>
+                <p className="text-xs font-semibold text-slate-500">Tasa de Asistencia</p>
+              </div>
+            </div>
+          </div>
+
+          {/* 2. Barra de Búsqueda y Filtros Rápidos */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 rounded-3xl border border-slate-200/90 shadow-xs">
+            <div className="relative w-full sm:w-80">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <Search className="w-4 h-4 text-slate-400" />
+              </div>
+              <input
+                type="text"
+                value={historySearchQuery}
+                onChange={(e) => setHistorySearchQuery(e.target.value)}
+                placeholder="Buscar por curso, facilitador o categoría..."
+                className="w-full pl-10 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+              />
+              {historySearchQuery && (
+                <button
+                  onClick={() => setHistorySearchQuery('')}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-700 cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 scrollbar-thin">
+              <button
+                onClick={() => setHistoryStatusFilter('all')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  historyStatusFilter === 'all'
+                    ? 'bg-[#DA291C] text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                Todos ({historyMetrics.totalCount})
+              </button>
+              <button
+                onClick={() => setHistoryStatusFilter('attended')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1 ${
+                  historyStatusFilter === 'attended'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                <CheckCircle2 className="w-3 h-3" />
+                <span>Asistidos ({historyMetrics.attendedCount})</span>
+              </button>
+              <button
+                onClick={() => setHistoryStatusFilter('upcoming')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1 ${
+                  historyStatusFilter === 'upcoming'
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                <Clock className="w-3 h-3" />
+                <span>Agendados ({historyMetrics.upcomingCount})</span>
+              </button>
+              <button
+                onClick={() => setHistoryStatusFilter('missed')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1 ${
+                  historyStatusFilter === 'missed'
+                    ? 'bg-amber-600 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                <AlertTriangle className="w-3 h-3" />
+                <span>No Asistió ({historyMetrics.missedCount})</span>
+              </button>
+            </div>
+          </div>
+
+          {/* 3. Tabla / Listado de Registros del Histórico */}
+          {filteredHistoryRecords.length > 0 ? (
+            <div className="bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-xs">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase text-[10px] tracking-wider">
+                      <th className="py-3.5 px-4">Capacitación</th>
+                      <th className="py-3.5 px-4">Modalidad</th>
+                      <th className="py-3.5 px-4">Fecha & Hora</th>
+                      <th className="py-3.5 px-4">Facilitador</th>
+                      <th className="py-3.5 px-3 text-center">Horas</th>
+                      <th className="py-3.5 px-4 text-center">Estado</th>
+                      {isSuperAdmin && <th className="py-3.5 px-4 text-right">Constancia</th>}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {filteredHistoryRecords.map((rec) => {
+                      const isPast = rec.date < todayStr;
+                      return (
+                        <tr key={rec.id} className="hover:bg-slate-50/75 transition-colors">
+                          <td className="py-4 px-4 font-bold text-slate-900 max-w-xs">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-red-50 text-[#DA291C] border border-red-200">
+                                {rec.category}
+                              </span>
+                              {rec.gradeScore !== null && rec.gradeScore !== undefined && (
+                                <span className={`px-2 py-0.5 rounded-full text-[9px] font-black ${
+                                  rec.gradeScore >= 70 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'
+                                }`}>
+                                  Nota: {rec.gradeScore} pts
+                                </span>
+                              )}
+                            </div>
+                            <p className="line-clamp-1 text-slate-900 font-extrabold text-xs">{rec.title}</p>
+                          </td>
+                          <td className="py-4 px-4 text-slate-600">
+                            <span className="font-semibold block text-slate-800">{rec.modality}</span>
+                          </td>
+                          <td className="py-4 px-4 text-slate-600 whitespace-nowrap">
+                            <span className="font-bold text-slate-900 block">{formatDateShort(rec.date)}</span>
+                            <span className="text-[11px] text-slate-400 font-medium">{rec.time}</span>
+                          </td>
+                          <td className="py-4 px-4 text-slate-700">
+                            <span className="font-medium line-clamp-1">{rec.instructor}</span>
+                          </td>
+                          <td className="py-4 px-3 text-center font-black text-slate-900">
+                            {rec.hours} hrs
+                          </td>
+                          <td className="py-4 px-4 text-center whitespace-nowrap">
+                            {rec.hasAttended ? (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
+                                <CheckCircle2 className="w-3.5 h-3.5" /> Asistió
+                              </span>
+                            ) : !isPast ? (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                <Clock className="w-3.5 h-3.5" /> Agendado
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                <AlertTriangle className="w-3.5 h-3.5" /> No Asistió
+                              </span>
+                            )}
+                          </td>
+                          {isSuperAdmin && (
+                            <td className="py-4 px-4 text-right whitespace-nowrap">
+                              <button
+                                onClick={() => {
+                                  setSelectedRecordsForLetter([rec]);
+                                  setIsFormalLetterModalOpen(true);
+                                }}
+                                className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-red-50 hover:text-[#DA291C] text-slate-700 text-[11px] font-bold transition-all cursor-pointer inline-flex items-center gap-1.5"
+                                title="Elaborar constancia formal para esta capacitación (Exclusivo Super Administrador)"
+                              >
+                                <FileText className="w-3.5 h-3.5 text-[#DA291C]" />
+                                <span>Emitir Carta</span>
+                              </button>
+                            </td>
+                          )}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center shadow-xs">
+              <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                <FileText className="w-6 h-6" />
+              </div>
+              <h4 className="text-sm font-bold text-slate-800">No se encontraron capacitaciones en el historial</h4>
+              <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                No hay registros que coincidan con el filtro seleccionado o los términos de búsqueda.
+              </p>
+              <button
+                onClick={() => {
+                  setHistoryStatusFilter('all');
+                  setHistorySearchQuery('');
+                }}
+                className="mt-4 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all cursor-pointer"
+              >
+                Limpiar Filtros
+              </button>
+            </div>
+          )}
+
+        </div>
+      )}
 
       {/* Cancel Confirmation Modal */}
       {cancelingItem && (
@@ -616,8 +1209,12 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
 
             <div>
               <h4 className="text-sm font-bold text-slate-900 line-clamp-1">{selectedPassItem.event.title}</h4>
-              <p className="text-xs text-slate-500 mt-0.5">{selectedPassItem.schedule.date} • {selectedPassItem.slot.time}</p>
-              <p className="text-[11px] font-bold text-slate-800 mt-1">{currentUser.name} ({currentUser.email})</p>
+              <p className="text-xs text-slate-500 mt-0.5">{selectedPassItem.schedule.date} • {selectedPassItem.slot.time}{selectedPassItem.slot.endTime ? ` - ${selectedPassItem.slot.endTime}` : ''}</p>
+              <div className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-bold text-amber-900 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200">
+                <Clock className="w-3 h-3 text-amber-600" />
+                <span>{getEventDurationMetrics(selectedPassItem.event).totalHours} hrs lectivas ({getEventDurationMetrics(selectedPassItem.event).totalDays} {getEventDurationMetrics(selectedPassItem.event).totalDays === 1 ? 'día' : 'días'})</span>
+              </div>
+              <p className="text-[11px] font-bold text-slate-800 mt-1.5">{currentUser.name} ({currentUser.email})</p>
             </div>
 
             <p className="text-[10px] text-slate-400">
@@ -632,6 +1229,21 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
             </button>
           </div>
         </div>
+      )}
+
+      {/* Módulo de Elaboración de Carta Formal de Histórico de Participación (Exclusivo Super Administrador) */}
+      {isSuperAdmin && (
+        <FormalLetterModal
+          isOpen={isFormalLetterModalOpen}
+          onClose={() => {
+            setIsFormalLetterModalOpen(false);
+            setSelectedRecordsForLetter(null);
+          }}
+          currentUser={currentUser}
+          participant={currentParticipant}
+          companies={companies}
+          trainingRecords={selectedRecordsForLetter || trainingHistoryRecords}
+        />
       )}
 
     </div>

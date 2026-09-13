@@ -343,6 +343,7 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {filteredChecklists.map(c => {
+                      const part = participants.find(p => p.card === c.participantCard);
                       return (
                         <tr key={c.id} className="hover:bg-slate-50/80 transition-colors">
                           
@@ -353,6 +354,23 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
                               <p className="text-[11px] text-slate-500 font-mono">
                                 ID: #{c.participantCard} • {c.department || 'Sin Depto'}
                               </p>
+                              {(part?.isCurrentlyStudying || part?.educationLevel) && (
+                                <div className="flex flex-wrap items-center gap-1 mt-1">
+                                  {part.educationLevel && (
+                                    <span className="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                      {part.educationLevel}
+                                    </span>
+                                  )}
+                                  {part.isCurrentlyStudying && (
+                                    <span 
+                                      className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200" 
+                                      title={`Estudia: ${part.currentStudyField || ''} en ${part.institutionName || ''}`}
+                                    >
+                                      🎓 Estudia: {part.currentStudyField || 'En curso'}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           </td>
 

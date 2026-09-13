@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   X, 
   UserPlus, 
@@ -13,7 +13,8 @@ import {
   Sparkles, 
   RefreshCw,
   BookOpen,
-  Layers
+  Layers,
+  GraduationCap
 } from 'lucide-react';
 import { TrainingEvent, Participant, UserAccount } from '../../types';
 import { formatDateLong } from '../../utils/formatters';
@@ -77,6 +78,8 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
   const [selectedEmails, setSelectedEmails] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [educationFilter, setEducationFilter] = useState<string>('all');
+  const [studyingFilter, setStudyingFilter] = useState<string>('all');
 
   // Tab 2: Text State
   const [rawText, setRawText] = useState('');
@@ -91,7 +94,17 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
 
   // Combine users and participants into unified directory
   const unifiedDirectory = React.useMemo(() => {
-    const map = new Map<string, { email: string; name: string; card?: string; cedula?: string; role?: string }>();
+    const map = new Map<string, {
+      email: string;
+      name: string;
+      card?: string;
+      cedula?: string;
+      role?: string;
+      educationLevel?: string;
+      isCurrentlyStudying?: boolean;
+      currentStudyField?: string;
+      trainingInterestAreas?: string[];
+    }>();
     
     // Add users
     users.forEach(u => {
@@ -99,7 +112,11 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
         email: u.email.toLowerCase(),
         name: u.name,
         cedula: u.cedula,
-        role: u.role
+        role: u.role,
+        educationLevel: u.educationLevel,
+        isCurrentlyStudying: u.isCurrentlyStudying,
+        currentStudyField: u.currentStudyField,
+        trainingInterestAreas: u.trainingInterestAreas || []
       });
     });
 
@@ -110,13 +127,23 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
       if (existing) {
         existing.card = p.card;
         if (!existing.cedula && p.cedula) existing.cedula = p.cedula;
+        if (!existing.educationLevel && p.educationLevel) existing.educationLevel = p.educationLevel;
+        if (existing.isCurrentlyStudying === undefined && p.isCurrentlyStudying !== undefined) existing.isCurrentlyStudying = p.isCurrentlyStudying;
+        if (!existing.currentStudyField && p.currentStudyField) existing.currentStudyField = p.currentStudyField;
+        if ((!existing.trainingInterestAreas || existing.trainingInterestAreas.length === 0) && p.trainingInterestAreas?.length) {
+          existing.trainingInterestAreas = p.trainingInterestAreas;
+        }
       } else {
         map.set(email, {
           email,
           name: p.name,
           card: p.card,
           cedula: p.cedula,
-          role: 'Colaborador (User)'
+          role: 'Colaborador (User)',
+          educationLevel: p.educationLevel,
+          isCurrentlyStudying: p.isCurrentlyStudying,
+          currentStudyField: p.currentStudyField,
+          trainingInterestAreas: p.trainingInterestAreas || []
         });
       }
     });
@@ -134,9 +161,42 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
       (item.card && item.card.includes(q));
 
     const matchesRole = roleFilter === 'all' || item.role === roleFilter;
+    const matchesEdu = educationFilter === 'all' || (item.educationLevel || 'Secundaria / Bachiller') === educationFilter;
+    const matchesStudying = studyingFilter === 'all' || 
+      (studyingFilter === 'studying' ? Boolean(item.isCurrentlyStudying) : !item.isCurrentlyStudying);
 
-    return matchesSearch && matchesRole;
+    return matchesSearch && matchesRole && matchesEdu && matchesStudying;
   });
+
+  // Colaboradores con interés coincidente con el evento actual
+  const matchingInterestEmails = useMemo(() => {
+    if (!currentEvent) return [];
+    const title = currentEvent.title.toLowerCase();
+    const cat = currentEvent.category.toLowerCase();
+    const skills = (currentEvent.skillsEvaluated || []).map(s => s.toLowerCase());
+
+    return filteredDirectory
+      .filter(item => !alreadyEnrolledSet.has(item.email))
+      .filter(item => {
+        const interests = (item.trainingInterestAreas || []).map(i => i.toLowerCase());
+        return interests.some(interest => {
+          const words = interest.split(' ').filter(w => w.length > 3);
+          return words.some(w => title.includes(w) || cat.includes(w) || skills.some(s => s.includes(w)));
+        });
+      })
+      .map(item => item.email);
+  }, [currentEvent, filteredDirectory, alreadyEnrolledSet]);
+
+  const selectMatchingInterestEmails = () => {
+    if (matchingInterestEmails.length === 0) {
+      onShowToast('Aviso', 'No se encontraron colaboradores disponibles con interés explícito en este tema.', 'info');
+      return;
+    }
+    const next = new Set(selectedEmails);
+    matchingInterestEmails.forEach(e => next.add(e));
+    setSelectedEmails(next);
+    onShowToast('Selección Inteligente', `Se seleccionaron ${matchingInterestEmails.length} colaboradores interesados en este tema.`, 'success');
+  };
 
   // Handle Selection
   const toggleEmail = (email: string) => {
@@ -462,31 +522,72 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
           {/* TAB 1: VISUAL DIRECTORY */}
           {activeTab === 'select' && (
             <div className="space-y-4">
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-200">
-                <div className="relative flex-1 max-w-sm">
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute inset-y-0 left-3 my-auto" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Buscar por nombre, correo o cédula..."
-                    className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
-                  />
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+                  <div className="relative flex-1">
+                    <Search className="w-3.5 h-3.5 text-slate-400 absolute inset-y-0 left-3 my-auto" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Buscar por nombre, correo o cédula..."
+                      className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                    />
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    <select
+                      value={roleFilter}
+                      onChange={(e) => setRoleFilter(e.target.value)}
+                      className="px-2.5 py-1.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none"
+                    >
+                      <option value="all">Todos los Roles</option>
+                      <option value="Colaborador (User)">Colaborador (User)</option>
+                      <option value="Evaluador / Tutor OJT">Evaluador / Tutor OJT</option>
+                      <option value="Líder de Área / Supervisor">Líder / Supervisor</option>
+                      <option value="Administrador / Editor">Admin / Editor</option>
+                    </select>
+
+                    <select
+                      value={educationFilter}
+                      onChange={(e) => setEducationFilter(e.target.value)}
+                      className="px-2.5 py-1.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none"
+                    >
+                      <option value="all">Todo Grado de Estudio</option>
+                      <option value="Secundaria / Bachiller">Secundaria / Bachiller</option>
+                      <option value="Técnico / Tecnólogo">Técnico / Tecnólogo</option>
+                      <option value="Universitario en Curso">Universitario en Curso</option>
+                      <option value="Profesional / Grado">Profesional / Grado</option>
+                      <option value="Postgrado / Maestría">Postgrado / Maestría</option>
+                    </select>
+
+                    <select
+                      value={studyingFilter}
+                      onChange={(e) => setStudyingFilter(e.target.value)}
+                      className="px-2.5 py-1.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none"
+                    >
+                      <option value="all">Estudios (Todos)</option>
+                      <option value="studying">🎓 Estudiando Actualmente</option>
+                      <option value="not_studying">No estudia</option>
+                    </select>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <select
-                    value={roleFilter}
-                    onChange={(e) => setRoleFilter(e.target.value)}
-                    className="px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none"
-                  >
-                    <option value="all">Todos los Roles</option>
-                    <option value="Colaborador (User)">Colaborador (User)</option>
-                    <option value="Evaluador / Tutor OJT">Evaluador / Tutor OJT</option>
-                    <option value="Líder de Área / Supervisor">Líder de Área / Supervisor</option>
-                    <option value="Administrador / Editor">Administrador / Editor</option>
-                    <option value="Super Administrador">Super Administrador</option>
-                  </select>
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200/80">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={selectMatchingInterestEmails}
+                      className="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-xs font-black text-purple-700 whitespace-nowrap cursor-pointer flex items-center gap-1.5 transition-colors active:scale-95 shadow-2xs"
+                      title="Seleccionar colaboradores cuya ficha formativa coincide con este curso"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                      <span>⚡ Interesados en este Tema ({matchingInterestEmails.length})</span>
+                    </button>
+                    <span className="text-[11px] text-slate-500 font-medium">
+                      Mostrando {filteredDirectory.length} de {unifiedDirectory.length} colaboradores
+                    </span>
+                  </div>
 
                   <button
                     type="button"
@@ -494,8 +595,8 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
                     className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-300 text-xs font-bold text-slate-700 whitespace-nowrap cursor-pointer"
                   >
                     {selectedEmails.size === filteredDirectory.filter(i => !alreadyEnrolledSet.has(i.email)).length && selectedEmails.size > 0
-                      ? 'Deseleccionar'
-                      : 'Seleccionar Disponibles'}
+                      ? 'Deseleccionar Todos'
+                      : 'Seleccionar Filtrados'}
                   </button>
                 </div>
               </div>
@@ -536,6 +637,18 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
                             )}
                           </div>
                           <p className="text-[11px] text-slate-500">{item.email} • {item.role || 'Colaborador'}</p>
+                          <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                            {item.educationLevel && (
+                              <span className="px-2 py-0.2 rounded-md bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-semibold">
+                                {item.educationLevel}
+                              </span>
+                            )}
+                            {item.isCurrentlyStudying && (
+                              <span className="px-2 py-0.2 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold">
+                                🎓 {item.currentStudyField || 'Estudiando'}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
 

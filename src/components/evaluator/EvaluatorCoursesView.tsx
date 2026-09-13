@@ -27,8 +27,8 @@ interface EvaluatorCoursesViewProps {
   participants: Participant[];
   currentUser: UserAccount | null;
   isSuperAdmin?: boolean;
-  onConfirmAttendance: (eventId: string, date: string, time: string, email: string) => Promise<void>;
-  onRevertAttendance?: (eventId: string, date: string, time: string, email: string) => Promise<void>;
+  onConfirmAttendance: (eventId: string, date: string, time: string, email: string, type?: 'checkin' | 'checkout') => Promise<void>;
+  onRevertAttendance?: (eventId: string, date: string, time: string, email: string, type?: 'checkout' | 'all') => Promise<void>;
   onSaveEvent?: (event: TrainingEvent) => Promise<void>;
   onShowToast: (title: string, message: string, type: 'success' | 'error' | 'info' | 'warning') => void;
 }
@@ -460,13 +460,13 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
             setSelectedModalEvent(null);
             setIsDirectProjector(false);
           }}
-          onConfirmAttendance={async (evtId, date, time, email) => {
-            await onConfirmAttendance(evtId, date, time, email);
-            onShowToast('Asistencia confirmada', `Se confirmó la asistencia para ${email}.`, 'success');
+          onConfirmAttendance={async (evtId, date, time, email, type = 'checkin') => {
+            await onConfirmAttendance(evtId, date, time, email, type);
+            onShowToast('Asistencia registrada', `Se registró ${type === 'checkout' ? 'la salida' : 'la entrada'} para ${email}.`, 'success');
           }}
-          onRevertAttendance={onRevertAttendance ? async (evtId, date, time, email) => {
-            await onRevertAttendance(evtId, date, time, email);
-            onShowToast('Asistencia revertida', `Se canceló la asistencia para ${email}.`, 'info');
+          onRevertAttendance={onRevertAttendance ? async (evtId, date, time, email, type = 'all') => {
+            await onRevertAttendance(evtId, date, time, email, type);
+            onShowToast('Asistencia revertida', `Se actualizó la asistencia para ${email}.`, 'info');
           } : undefined}
           onSaveGradesSuccess={(updatedEvt) => {
             setSelectedModalEvent(updatedEvt);
