@@ -5,6 +5,17 @@ exports.fetchTechnicalCohorts = fetchTechnicalCohorts;
 const express_1 = require("express");
 const db_js_1 = require("../db.js");
 exports.technicalAcademyRouter = (0, express_1.Router)();
+// Validador de permisos: sólo administradores pueden crear, modificar o eliminar cursos y cohortes
+function checkAdminPermission(req, res) {
+    const role = (req.headers['x-user-role'] || req.body?.userRole);
+    if (role && role !== 'Super Administrador' && role !== 'Administrador / Editor') {
+        res.status(403).json({
+            error: 'Acceso denegado: sólo los administradores tienen permiso para crear, modificar o eliminar cursos y cohortes.'
+        });
+        return false;
+    }
+    return true;
+}
 // ==========================================
 // 1. CURSOS TÉCNICOS DE LA ACADEMIA
 // ==========================================
@@ -43,6 +54,8 @@ exports.technicalAcademyRouter.get('/courses', async (req, res) => {
 });
 // POST /api/technical-academy/courses
 exports.technicalAcademyRouter.post('/courses', async (req, res) => {
+    if (!checkAdminPermission(req, res))
+        return;
     try {
         const { id, title, code, description, category, dailyHours, durationDays, modality, location, companyId } = req.body;
         if (!title || !title.trim()) {
@@ -91,6 +104,8 @@ exports.technicalAcademyRouter.post('/courses', async (req, res) => {
 });
 // DELETE /api/technical-academy/courses/:id
 exports.technicalAcademyRouter.delete('/courses/:id', async (req, res) => {
+    if (!checkAdminPermission(req, res))
+        return;
     try {
         const { id } = req.params;
         await db_js_1.pool.query('DELETE FROM technical_academy_courses WHERE id = $1', [id]);
@@ -169,6 +184,8 @@ exports.technicalAcademyRouter.get('/cohorts', async (req, res) => {
 });
 // POST /api/technical-academy/cohorts
 exports.technicalAcademyRouter.post('/cohorts', async (req, res) => {
+    if (!checkAdminPermission(req, res))
+        return;
     const client = await db_js_1.pool.connect();
     try {
         await client.query('BEGIN');
@@ -257,9 +274,11 @@ exports.technicalAcademyRouter.post('/cohorts', async (req, res) => {
         client.release();
     }
 });
-// PUT /api/technical-academy/cohorts/:id/reassign
+// PUT & PATCH /api/technical-academy/cohorts/:id/reassign
 // Permite reasignar facilitador, grupo (con opción de re-enrolar), horario o ubicación
-exports.technicalAcademyRouter.put('/cohorts/:id/reassign', async (req, res) => {
+const handleReassign = async (req, res) => {
+    if (!checkAdminPermission(req, res))
+        return;
     const client = await db_js_1.pool.connect();
     try {
         await client.query('BEGIN');
@@ -321,9 +340,13 @@ exports.technicalAcademyRouter.put('/cohorts/:id/reassign', async (req, res) => 
     finally {
         client.release();
     }
-});
-// PUT /api/technical-academy/cohorts/:id/status
-exports.technicalAcademyRouter.put('/cohorts/:id/status', async (req, res) => {
+};
+exports.technicalAcademyRouter.put('/cohorts/:id/reassign', handleReassign);
+exports.technicalAcademyRouter.patch('/cohorts/:id/reassign', handleReassign);
+// PUT & PATCH /api/technical-academy/cohorts/:id/status
+const handleStatusUpdate = async (req, res) => {
+    if (!checkAdminPermission(req, res))
+        return;
     try {
         const { id } = req.params;
         const { status } = req.body;
@@ -337,9 +360,13 @@ exports.technicalAcademyRouter.put('/cohorts/:id/status', async (req, res) => {
         console.error('Error al actualizar estado:', err);
         res.status(500).json({ error: 'Error al actualizar estado', details: err.message });
     }
-});
+};
+exports.technicalAcademyRouter.put('/cohorts/:id/status', handleStatusUpdate);
+exports.technicalAcademyRouter.patch('/cohorts/:id/status', handleStatusUpdate);
 // DELETE /api/technical-academy/cohorts/:id
 exports.technicalAcademyRouter.delete('/cohorts/:id', async (req, res) => {
+    if (!checkAdminPermission(req, res))
+        return;
     try {
         const { id } = req.params;
         await db_js_1.pool.query('DELETE FROM technical_academy_cohorts WHERE id = $1', [id]);
@@ -353,6 +380,8 @@ exports.technicalAcademyRouter.delete('/cohorts/:id', async (req, res) => {
 // POST /api/technical-academy/cohorts/:id/duplicate
 // Duplica una cohorte para la siguiente semana (desplaza fechas +7 días)
 exports.technicalAcademyRouter.post('/cohorts/:id/duplicate', async (req, res) => {
+    if (!checkAdminPermission(req, res))
+        return;
     const client = await db_js_1.pool.connect();
     try {
         await client.query('BEGIN');

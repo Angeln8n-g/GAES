@@ -21,6 +21,7 @@ interface ReassignCohortModalProps {
   cohort: TechnicalAcademyCohort | null;
   groups: ParticipantGroup[];
   users: UserAccount[];
+  isAdminOrSuper?: boolean;
   onSuccess: () => void;
 }
 
@@ -30,9 +31,10 @@ export const ReassignCohortModal: React.FC<ReassignCohortModalProps> = ({
   cohort,
   groups,
   users,
+  isAdminOrSuper = false,
   onSuccess
 }) => {
-  if (!isOpen || !cohort) return null;
+  if (!isOpen || !cohort || !isAdminOrSuper) return null;
 
   const [selectedGroupId, setSelectedGroupId] = useState<string>(cohort.groupId || '');
   const [selectedFacilitatorId, setSelectedFacilitatorId] = useState<string>(cohort.facilitatorId || '');

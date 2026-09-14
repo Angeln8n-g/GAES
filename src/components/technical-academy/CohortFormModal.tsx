@@ -30,6 +30,7 @@ interface CohortFormModalProps {
   users: UserAccount[];
   companies?: Company[];
   cohortToEdit?: TechnicalAcademyCohort | null;
+  isAdminOrSuper?: boolean;
   onSuccess: () => void;
 }
 
@@ -41,9 +42,10 @@ export const CohortFormModal: React.FC<CohortFormModalProps> = ({
   users,
   companies = [],
   cohortToEdit = null,
+  isAdminOrSuper = false,
   onSuccess
 }) => {
-  if (!isOpen) return null;
+  if (!isOpen || !isAdminOrSuper) return null;
 
   const isEdit = Boolean(cohortToEdit);
 

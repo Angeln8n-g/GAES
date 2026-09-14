@@ -18,6 +18,7 @@ interface TechnicalCourseModalProps {
   onClose: () => void;
   courseToEdit?: TechnicalAcademyCourse | null;
   companies?: Company[];
+  isAdminOrSuper?: boolean;
   onSuccess: () => void;
 }
 
@@ -37,9 +38,10 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
   onClose,
   courseToEdit = null,
   companies = [],
+  isAdminOrSuper = false,
   onSuccess
 }) => {
-  if (!isOpen) return null;
+  if (!isOpen || !isAdminOrSuper) return null;
 
   const isEdit = Boolean(courseToEdit);
 

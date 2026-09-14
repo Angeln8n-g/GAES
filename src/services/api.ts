@@ -1811,9 +1811,20 @@ export const apiService = {
   },
 
   saveTechnicalCourse: async (course: Partial<TechnicalAcademyCourse>): Promise<{ message: string; courseId: string }> => {
+    let roleHeader: Record<string, string> = {};
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const u = localStorage.getItem('ch_logged_user');
+        if (u) {
+          const parsed = JSON.parse(u);
+          if (parsed?.role) roleHeader['X-User-Role'] = parsed.role;
+        }
+      } catch (_) {}
+    }
+
     const res = await fetch(`${API_BASE_URL}/technical-academy/courses`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...roleHeader },
       body: JSON.stringify(course)
     });
     if (!res.ok) {
@@ -1824,8 +1835,20 @@ export const apiService = {
   },
 
   deleteTechnicalCourse: async (id: string): Promise<void> => {
+    let roleHeader: Record<string, string> = {};
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const u = localStorage.getItem('ch_logged_user');
+        if (u) {
+          const parsed = JSON.parse(u);
+          if (parsed?.role) roleHeader['X-User-Role'] = parsed.role;
+        }
+      } catch (_) {}
+    }
+
     const res = await fetch(`${API_BASE_URL}/technical-academy/courses/${encodeURIComponent(id)}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: { ...roleHeader }
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
@@ -1844,9 +1867,20 @@ export const apiService = {
   },
 
   saveTechnicalCohort: async (cohort: Partial<TechnicalAcademyCohort> & { autoEnrollGroupMembers?: boolean }): Promise<{ message: string; cohortId: string }> => {
+    let roleHeader: Record<string, string> = {};
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const u = localStorage.getItem('ch_logged_user');
+        if (u) {
+          const parsed = JSON.parse(u);
+          if (parsed?.role) roleHeader['X-User-Role'] = parsed.role;
+        }
+      } catch (_) {}
+    }
+
     const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...roleHeader },
       body: JSON.stringify(cohort)
     });
     if (!res.ok) {
@@ -1868,9 +1902,20 @@ export const apiService = {
       notes?: string;
     }
   ): Promise<{ message: string; enrolledCount?: number }> => {
+    let roleHeader: Record<string, string> = {};
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const u = localStorage.getItem('ch_logged_user');
+        if (u) {
+          const parsed = JSON.parse(u);
+          if (parsed?.role) roleHeader['X-User-Role'] = parsed.role;
+        }
+      } catch (_) {}
+    }
+
     const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(id)}/reassign`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...roleHeader },
       body: JSON.stringify(payload)
     });
     if (!res.ok) {
@@ -1881,9 +1926,20 @@ export const apiService = {
   },
 
   updateTechnicalCohortStatus: async (id: string, status: string): Promise<{ message: string; status: string }> => {
+    let roleHeader: Record<string, string> = {};
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const u = localStorage.getItem('ch_logged_user');
+        if (u) {
+          const parsed = JSON.parse(u);
+          if (parsed?.role) roleHeader['X-User-Role'] = parsed.role;
+        }
+      } catch (_) {}
+    }
+
     const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(id)}/status`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...roleHeader },
       body: JSON.stringify({ status })
     });
     if (!res.ok) {
@@ -1894,8 +1950,20 @@ export const apiService = {
   },
 
   deleteTechnicalCohort: async (id: string): Promise<void> => {
+    let roleHeader: Record<string, string> = {};
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const u = localStorage.getItem('ch_logged_user');
+        if (u) {
+          const parsed = JSON.parse(u);
+          if (parsed?.role) roleHeader['X-User-Role'] = parsed.role;
+        }
+      } catch (_) {}
+    }
+
     const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(id)}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: { ...roleHeader }
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
@@ -1913,9 +1981,20 @@ export const apiService = {
       newFacilitatorEmail?: string;
     }
   ): Promise<{ message: string; newCohortId: string; startDate: string; endDate: string }> => {
+    let roleHeader: Record<string, string> = {};
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const u = localStorage.getItem('ch_logged_user');
+        if (u) {
+          const parsed = JSON.parse(u);
+          if (parsed?.role) roleHeader['X-User-Role'] = parsed.role;
+        }
+      } catch (_) {}
+    }
+
     const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(id)}/duplicate`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...roleHeader },
       body: JSON.stringify(payload || {})
     });
     if (!res.ok) {

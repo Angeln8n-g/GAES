@@ -61,6 +61,12 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
   participants = [],
   onShowToast
 }) => {
+  // Roles y permisos
+  const isSuperAdmin = currentUser?.role === 'Super Administrador';
+  const isAdmin = currentUser?.role === 'Administrador / Editor';
+  const isAdminOrSuper = isSuperAdmin || isAdmin;
+  const isFacilitator = !isAdminOrSuper;
+
   // Tabs: attendance (Marcado Diario), cohorts (Planificador), courses (Catálogo), accreditation (Acreditación)
   const [activeTab, setActiveTab] = useState<'attendance' | 'cohorts' | 'courses' | 'accreditation'>('attendance');
 
@@ -79,6 +85,20 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
   const [cohortSearch, setCohortSearch] = useState<string>('');
   const [cohortStatusFilter, setCohortStatusFilter] = useState<string>('all');
   const [courseCategoryFilter, setCourseCategoryFilter] = useState<string>('all');
+  const [onlyMyCohorts, setOnlyMyCohorts] = useState<boolean>(false);
+
+  // Helper para verificar si la cohorte está asignada al facilitador actual
+  const isUserFacilitatorOfCohort = (coh: TechnicalAcademyCohort | null) => {
+    if (!coh || !currentUser) return false;
+    const uid = currentUser.id;
+    const uemail = (currentUser.email || '').toLowerCase().trim();
+    const uname = (currentUser.name || '').toLowerCase().trim();
+    return Boolean(
+      (coh.facilitatorId && coh.facilitatorId === uid) ||
+      (coh.facilitatorEmail && coh.facilitatorEmail.toLowerCase().trim() === uemail) ||
+      (coh.facilitatorName && coh.facilitatorName.toLowerCase().trim() === uname)
+    );
+  };
 
   // Modales
   const [isQrModalOpen, setIsQrModalOpen] = useState<boolean>(false);
@@ -100,10 +120,17 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
       setCourses(cList);
       setCohorts(cohList);
 
-      // Si no hay cohorte seleccionada, seleccionar la primera activa o la primera de la lista
+      // Si el usuario es facilitador, priorizar seleccionar una cohorte asignada a su cargo
       if (!selectedCohortId && cohList.length > 0) {
-        const active = cohList.find(c => c.status === 'in_progress') || cohList[0];
-        setSelectedCohortId(active.id);
+        let chosen = cohList[0];
+        if (isFacilitator) {
+          const myCoh = cohList.find(c => isUserFacilitatorOfCohort(c) && (c.status === 'in_progress' || c.status === 'scheduled'));
+          if (myCoh) chosen = myCoh;
+        } else {
+          const active = cohList.find(c => c.status === 'in_progress') || cohList[0];
+          if (active) chosen = active;
+        }
+        setSelectedCohortId(chosen.id);
       }
     } catch (err: any) {
       console.error('Error al cargar datos de Academia Técnica:', err);
@@ -313,9 +340,17 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
     );
   }, [attendanceMatrix, searchParticipant]);
 
+  // Cohortes disponibles según perfil (si es facilitador y activa filtro personal)
+  const availableCohorts = useMemo(() => {
+    if (isFacilitator && onlyMyCohorts) {
+      return cohorts.filter(c => isUserFacilitatorOfCohort(c));
+    }
+    return cohorts;
+  }, [cohorts, isFacilitator, onlyMyCohorts, currentUser]);
+
   // Cohortes filtradas
   const filteredCohorts = useMemo(() => {
-    return cohorts.filter(c => {
+    return availableCohorts.filter(c => {
       const matchSearch = 
         !cohortSearch.trim() ||
         (c.courseTitle && c.courseTitle.toLowerCase().includes(cohortSearch.toLowerCase())) ||
@@ -326,7 +361,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
 
       return matchSearch && matchStatus;
     });
-  }, [cohorts, cohortSearch, cohortStatusFilter]);
+  }, [availableCohorts, cohortSearch, cohortStatusFilter]);
 
   // Cursos filtrados
   const filteredCourses = useMemo(() => {
@@ -386,28 +421,37 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
 
           {/* Quick Header Actions */}
           <div className="flex flex-wrap items-center gap-2.5">
-            <button
-              type="button"
-              onClick={() => {
-                setCohortToEdit(null);
-                setIsCohortModalOpen(true);
-              }}
-              className="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-xs font-bold transition-all shadow-sm shadow-red-600/20 flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Programar Cohorte</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setCourseToEdit(null);
-                setIsCourseModalOpen(true);
-              }}
-              className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl text-xs font-bold transition-all shadow-sm flex items-center gap-2"
-            >
-              <BookOpen className="w-4 h-4 text-slate-300" />
-              <span>Nuevo Curso Técnico</span>
-            </button>
+            {isAdminOrSuper ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCohortToEdit(null);
+                    setIsCohortModalOpen(true);
+                  }}
+                  className="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-xs font-bold transition-all shadow-sm shadow-red-600/20 flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Programar Cohorte</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCourseToEdit(null);
+                    setIsCourseModalOpen(true);
+                  }}
+                  className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl text-xs font-bold transition-all shadow-sm flex items-center gap-2"
+                >
+                  <BookOpen className="w-4 h-4 text-slate-300" />
+                  <span>Nuevo Curso Técnico</span>
+                </button>
+              </>
+            ) : (
+              <div className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold shadow-xs">
+                <UserCheck className="w-4 h-4 text-amber-700" />
+                <span>Perfil Facilitador • Registro y Pase de Asistencia</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -517,40 +561,60 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
           <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div className="w-full md:w-80">
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                  Seleccionar Cohorte / Semana
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                    Seleccionar Cohorte / Semana
+                  </label>
+                  {isFacilitator && (
+                    <button
+                      type="button"
+                      onClick={() => setOnlyMyCohorts(!onlyMyCohorts)}
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border transition-colors ${
+                        onlyMyCohorts
+                          ? 'bg-red-50 text-red-700 border-red-200 font-extrabold'
+                          : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
+                      }`}
+                    >
+                      {onlyMyCohorts ? '★ Mis Talleres Asignados' : 'Ver Todos'}
+                    </button>
+                  )}
+                </div>
                 <select
                   value={selectedCohortId}
                   onChange={(e) => setSelectedCohortId(e.target.value)}
                   className="w-full px-3 py-2 text-xs font-bold rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-slate-800 bg-white"
                 >
-                  {cohorts.length === 0 ? (
-                    <option value="">No hay cohortes programadas</option>
+                  {availableCohorts.length === 0 ? (
+                    <option value="">No hay cohortes disponibles</option>
                   ) : (
-                    cohorts.map(c => (
-                      <option key={c.id} value={c.id}>
-                        {c.courseTitle} • Sem {c.weekNumber || 'N/A'} ({c.groupName || 'Sin Grupo'})
-                      </option>
-                    ))
+                    availableCohorts.map(c => {
+                      const isMine = isUserFacilitatorOfCohort(c);
+                      return (
+                        <option key={c.id} value={c.id}>
+                          {isMine ? '★ [Mi Taller] ' : ''}{c.courseTitle} • Sem {c.weekNumber || 'N/A'} ({c.groupName || 'Sin Grupo'})
+                        </option>
+                      );
+                    })
                   )}
                 </select>
               </div>
 
               {activeCohort && (
                 <div className="flex flex-wrap items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCohortToReassign(activeCohort);
-                      setIsReassignModalOpen(true);
-                    }}
-                    className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5"
-                    title="Reasignar Facilitador o Grupo para esta cohorte"
-                  >
-                    <ArrowRightLeft className="w-3.5 h-3.5 text-slate-600" />
-                    <span>Reasignar Facilitador / Grupo</span>
-                  </button>
+                  {isAdminOrSuper && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCohortToReassign(activeCohort);
+                        setIsReassignModalOpen(true);
+                      }}
+                      className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5"
+                      title="Reasignar Facilitador o Grupo para esta cohorte"
+                    >
+                      <ArrowRightLeft className="w-3.5 h-3.5 text-slate-600" />
+                      <span>Reasignar Facilitador / Grupo</span>
+                    </button>
+                  )}
 
                   <button
                     type="button"
@@ -578,7 +642,14 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 text-xs">
                 <div>
                   <span className="text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Facilitador Asignado</span>
-                  <span className="font-bold text-slate-800 truncate block">{activeCohort.facilitatorName || 'No Asignado'}</span>
+                  <span className="font-bold text-slate-800 truncate block">
+                    {activeCohort.facilitatorName || 'No Asignado'}
+                    {isUserFacilitatorOfCohort(activeCohort) && (
+                      <span className="ml-1.5 text-[9px] font-black bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-full">
+                        Tú
+                      </span>
+                    )}
+                  </span>
                 </div>
                 <div>
                   <span className="text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Grupo / Cuadrilla</span>
@@ -873,17 +944,19 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                 <option value="completed">Completadas</option>
               </select>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setCohortToEdit(null);
-                  setIsCohortModalOpen(true);
-                }}
-                className="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 whitespace-nowrap"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Programar Semana</span>
-              </button>
+              {isAdminOrSuper && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCohortToEdit(null);
+                    setIsCohortModalOpen(true);
+                  }}
+                  className="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 whitespace-nowrap"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Programar Semana</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -976,51 +1049,65 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                           <span>Pasar Asistencia</span>
                         </button>
 
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setCohortToReassign(coh);
-                            setIsReassignModalOpen(true);
-                          }}
-                          title="Reasignar Facilitador o Grupo Semanal"
-                          className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors"
-                          aria-label="Reasignar Facilitador o Grupo"
-                        >
-                          <ArrowRightLeft className="w-4 h-4" />
-                        </button>
+                        {isAdminOrSuper ? (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCohortToReassign(coh);
+                                setIsReassignModalOpen(true);
+                              }}
+                              title="Reasignar Facilitador o Grupo Semanal"
+                              className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors"
+                              aria-label="Reasignar Facilitador o Grupo"
+                            >
+                              <ArrowRightLeft className="w-4 h-4" />
+                            </button>
 
-                        <button
-                          type="button"
-                          onClick={() => handleDuplicateCohort(coh.id)}
-                          title="Duplicar para siguiente semana (+7 días)"
-                          className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors"
-                          aria-label="Duplicar para siguiente semana"
-                        >
-                          <Copy className="w-4 h-4" />
-                        </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDuplicateCohort(coh.id)}
+                              title="Duplicar para siguiente semana (+7 días)"
+                              className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors"
+                              aria-label="Duplicar para siguiente semana"
+                            >
+                              <Copy className="w-4 h-4" />
+                            </button>
 
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setCohortToEdit(coh);
-                            setIsCohortModalOpen(true);
-                          }}
-                          title="Editar Cohorte"
-                          className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors"
-                          aria-label="Editar Cohorte"
-                        >
-                          <Edit3 className="w-4 h-4" />
-                        </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCohortToEdit(coh);
+                                setIsCohortModalOpen(true);
+                              }}
+                              title="Editar Cohorte"
+                              className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors"
+                              aria-label="Editar Cohorte"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
 
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteCohort(coh.id, coh.courseTitle)}
-                          title="Eliminar Cohorte"
-                          className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-red-700 rounded-xl transition-colors"
-                          aria-label="Eliminar Cohorte"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteCohort(coh.id, coh.courseTitle)}
+                              title="Eliminar Cohorte"
+                              className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-red-700 rounded-xl transition-colors"
+                              aria-label="Eliminar Cohorte"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </>
+                        ) : (
+                          isUserFacilitatorOfCohort(coh) ? (
+                            <span className="px-2.5 py-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 rounded-xl border border-emerald-200 flex items-center gap-1 shrink-0">
+                              <span>Tu Asignación</span>
+                            </span>
+                          ) : (
+                            <span className="px-2.5 py-1 text-[11px] font-semibold text-slate-500 bg-slate-100 rounded-xl border border-slate-200 flex items-center gap-1 shrink-0">
+                              <span>Solo Lectura</span>
+                            </span>
+                          )
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1051,17 +1138,19 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
               </select>
             </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                setCourseToEdit(null);
-                setIsCourseModalOpen(true);
-              }}
-              className="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Registrar Curso Técnico</span>
-            </button>
+            {isAdminOrSuper && (
+              <button
+                type="button"
+                onClick={() => {
+                  setCourseToEdit(null);
+                  setIsCourseModalOpen(true);
+                }}
+                className="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Registrar Curso Técnico</span>
+              </button>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1106,52 +1195,61 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                 </div>
 
                 <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCohortToEdit({
-                        id: '',
-                        courseId: course.id,
-                        courseTitle: course.title,
-                        startDate: new Date().toISOString().slice(0, 10),
-                        endDate: new Date().toISOString().slice(0, 10),
-                        dailyTime: '08:00 AM - 12:00 PM',
-                        location: course.location,
-                        capacity: 20,
-                        dailyPin: Math.floor(1000 + Math.random() * 9000).toString(),
-                        status: 'scheduled',
-                        companyId: 'emp_kasino'
-                      });
-                      setIsCohortModalOpen(true);
-                    }}
-                    className="flex-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1"
-                  >
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>Programar Cohorte</span>
-                  </button>
+                  {isAdminOrSuper ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCohortToEdit({
+                            id: '',
+                            courseId: course.id,
+                            courseTitle: course.title,
+                            startDate: new Date().toISOString().slice(0, 10),
+                            endDate: new Date().toISOString().slice(0, 10),
+                            dailyTime: '08:00 AM - 12:00 PM',
+                            location: course.location,
+                            capacity: 20,
+                            dailyPin: Math.floor(1000 + Math.random() * 9000).toString(),
+                            status: 'scheduled',
+                            companyId: 'emp_kasino'
+                          });
+                          setIsCohortModalOpen(true);
+                        }}
+                        className="flex-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1"
+                      >
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span>Programar Cohorte</span>
+                      </button>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCourseToEdit(course);
-                      setIsCourseModalOpen(true);
-                    }}
-                    className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors"
-                    title="Editar Curso"
-                    aria-label="Editar Curso"
-                  >
-                    <Edit3 className="w-3.5 h-3.5" />
-                  </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCourseToEdit(course);
+                          setIsCourseModalOpen(true);
+                        }}
+                        className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors"
+                        title="Editar Curso"
+                        aria-label="Editar Curso"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </button>
 
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteCourse(course.id, course.title)}
-                    className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-red-700 rounded-xl transition-colors"
-                    title="Eliminar Curso"
-                    aria-label="Eliminar Curso"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteCourse(course.id, course.title)}
+                        className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-red-700 rounded-xl transition-colors"
+                        title="Eliminar Curso"
+                        aria-label="Eliminar Curso"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </>
+                  ) : (
+                    <div className="flex-1 px-3 py-1.5 bg-slate-50 text-slate-600 rounded-xl text-[11px] font-medium border border-slate-200 flex items-center justify-center gap-1.5">
+                      <BookOpen className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Taller Oficial de Especialidad • Consulta</span>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -1260,6 +1358,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
       {/* MODAL 2: COHORT FORM (CREATE / EDIT) */}
       <CohortFormModal
         isOpen={isCohortModalOpen}
+        isAdminOrSuper={isAdminOrSuper}
         onClose={() => setIsCohortModalOpen(false)}
         courses={courses}
         groups={groups}
@@ -1275,6 +1374,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
       {/* MODAL 3: REASSIGN FACILITATOR / GROUP */}
       <ReassignCohortModal
         isOpen={isReassignModalOpen}
+        isAdminOrSuper={isAdminOrSuper}
         onClose={() => setIsReassignModalOpen(false)}
         cohort={cohortToReassign}
         groups={groups}
@@ -1289,6 +1389,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
       {/* MODAL 4: TECHNICAL COURSE (CREATE / EDIT) */}
       <TechnicalCourseModal
         isOpen={isCourseModalOpen}
+        isAdminOrSuper={isAdminOrSuper}
         onClose={() => setIsCourseModalOpen(false)}
         courseToEdit={courseToEdit}
         companies={companies}
