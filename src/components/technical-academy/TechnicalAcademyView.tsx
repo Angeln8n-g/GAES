@@ -165,6 +165,13 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
     }
   }, [initialEventToMakeRecurrent]);
 
+  // Proteger la pestaña Planificador & Rotación para uso exclusivo de administradores
+  useEffect(() => {
+    if (!isAdminOrSuper && activeTab === 'cohorts') {
+      setActiveTab('attendance');
+    }
+  }, [isAdminOrSuper, activeTab]);
+
   // 2. Cargar Matriz de Asistencia cuando cambia la cohorte seleccionada
   const fetchAttendance = async (cohortId: string) => {
     if (!cohortId) {
@@ -606,18 +613,20 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
             <span>Marcado Diario de Asistencia</span>
           </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveTab('cohorts')}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'cohorts'
-                ? 'bg-slate-900 text-white shadow-sm'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-            }`}
-          >
-            <Calendar className="w-4 h-4 text-slate-400" />
-            <span>Planificador & Rotación ({cohorts.length})</span>
-          </button>
+          {isAdminOrSuper && (
+            <button
+              type="button"
+              onClick={() => setActiveTab('cohorts')}
+              className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
+                activeTab === 'cohorts'
+                  ? 'bg-slate-900 text-white shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              <Calendar className="w-4 h-4 text-slate-400" />
+              <span>Planificador & Rotación ({cohorts.length})</span>
+            </button>
+          )}
 
           <button
             type="button"
@@ -1025,7 +1034,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
       {/* ========================================================================= */}
       {/* TAB 2: PLANIFICADOR DE COHORTES & ROTACIÓN SEMANAL */}
       {/* ========================================================================= */}
-      {activeTab === 'cohorts' && (
+      {activeTab === 'cohorts' && isAdminOrSuper && (
         <div className="space-y-4">
           {/* Filter Bar */}
           <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
