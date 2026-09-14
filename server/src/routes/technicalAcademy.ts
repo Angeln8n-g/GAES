@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { pool } from '../db.js';
+import { broadcastAttendanceEvent } from '../websocket.js';
 
 export const technicalAcademyRouter = Router();
 
@@ -988,6 +989,15 @@ technicalAcademyRouter.post('/cohorts/:id/attendance', async (req: Request, res:
     `, [id]);
 
     await client.query('COMMIT');
+
+    broadcastAttendanceEvent({
+      type: 'TECHNICAL_ATTENDANCE_MARKED',
+      cohortId: id,
+      sessionDate,
+      message: `Asistencia actualizada para ${records.length} participante(s).`,
+      timestamp: new Date().toISOString()
+    });
+
     res.json({ message: 'Asistencia registrada correctamente.', updatedCount: records.length });
   } catch (err: any) {
     await client.query('ROLLBACK');
@@ -1062,6 +1072,18 @@ technicalAcademyRouter.post('/cohorts/:id/qr-checkin', async (req: Request, res:
         method = EXCLUDED.method,
         marked_at = CURRENT_TIMESTAMP
     `, [id, participant.card, date, method, participant.name]);
+
+    broadcastAttendanceEvent({
+      type: 'TECHNICAL_QR_CHECKIN',
+      cohortId: id,
+      sessionDate: date,
+      participantCard: participant.card,
+      participantName: participant.name,
+      method: method as 'qr_scan' | 'pin',
+      status: 'present',
+      message: `¡Asistencia confirmada para ${participant.name}!`,
+      timestamp: new Date().toISOString()
+    });
 
     res.json({
       success: true,
@@ -1163,6 +1185,14 @@ const handleSaveGrades = async (req: Request, res: Response) => {
     }
 
     await client.query('COMMIT');
+
+    broadcastAttendanceEvent({
+      type: 'TECHNICAL_GRADES_UPDATED',
+      cohortId: id,
+      message: `${updatedCount} calificación(es) registrada(s) exitosamente.`,
+      timestamp: new Date().toISOString()
+    });
+
     res.json({
       message: `${updatedCount} calificación(es) registrada(s) exitosamente.`,
       cohortId: id,

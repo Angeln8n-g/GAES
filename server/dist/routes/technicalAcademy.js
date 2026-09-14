@@ -4,6 +4,7 @@ exports.technicalAcademyRouter = void 0;
 exports.fetchTechnicalCohorts = fetchTechnicalCohorts;
 const express_1 = require("express");
 const db_js_1 = require("../db.js");
+const websocket_js_1 = require("../websocket.js");
 exports.technicalAcademyRouter = (0, express_1.Router)();
 // Validador de permisos: sólo administradores pueden crear, modificar o eliminar cursos y cohortes
 function checkAdminPermission(req, res) {
@@ -884,6 +885,13 @@ exports.technicalAcademyRouter.post('/cohorts/:id/attendance', async (req, res) 
       WHERE id = $1 AND status = 'scheduled'
     `, [id]);
         await client.query('COMMIT');
+        (0, websocket_js_1.broadcastAttendanceEvent)({
+            type: 'TECHNICAL_ATTENDANCE_MARKED',
+            cohortId: id,
+            sessionDate,
+            message: `Asistencia actualizada para ${records.length} participante(s).`,
+            timestamp: new Date().toISOString()
+        });
         res.json({ message: 'Asistencia registrada correctamente.', updatedCount: records.length });
     }
     catch (err) {
@@ -949,6 +957,17 @@ exports.technicalAcademyRouter.post('/cohorts/:id/qr-checkin', async (req, res) 
         method = EXCLUDED.method,
         marked_at = CURRENT_TIMESTAMP
     `, [id, participant.card, date, method, participant.name]);
+        (0, websocket_js_1.broadcastAttendanceEvent)({
+            type: 'TECHNICAL_QR_CHECKIN',
+            cohortId: id,
+            sessionDate: date,
+            participantCard: participant.card,
+            participantName: participant.name,
+            method: method,
+            status: 'present',
+            message: `¡Asistencia confirmada para ${participant.name}!`,
+            timestamp: new Date().toISOString()
+        });
         res.json({
             success: true,
             message: `¡Asistencia confirmada para ${participant.name}!`,
@@ -1037,6 +1056,12 @@ const handleSaveGrades = async (req, res) => {
             updatedCount++;
         }
         await client.query('COMMIT');
+        (0, websocket_js_1.broadcastAttendanceEvent)({
+            type: 'TECHNICAL_GRADES_UPDATED',
+            cohortId: id,
+            message: `${updatedCount} calificación(es) registrada(s) exitosamente.`,
+            timestamp: new Date().toISOString()
+        });
         res.json({
             message: `${updatedCount} calificación(es) registrada(s) exitosamente.`,
             cohortId: id,

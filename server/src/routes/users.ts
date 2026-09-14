@@ -1,9 +1,124 @@
 import { Router, Request, Response } from "express";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import { pool } from "../db.js";
+
+const JWT_SECRET = process.env.JWT_SECRET || "gaes_super_secret_jwt_key_2026";
 
 export const usersRouter = Router();
 
-// GET /api/users
+// POST /api/users/login (o /api/auth/login)
+usersRouter.post("/login", async (req: Request, res: Response) => {
+  try {
+    const { identifier, email, password } = req.body;
+    const loginId = (identifier || email || "").trim();
+
+    if (!loginId || !password) {
+      return res.status(400).json({ error: "Debe ingresar su correo o cédula y su contraseña." });
+    }
+
+    const cleanInput = loginId.toLowerCase();
+    const unformattedCedula = cleanInput.replace(/[^a-z0-9]/g, "");
+
+    const query = `
+      SELECT 
+        id, 
+        email, 
+        name, 
+        role, 
+        password,
+        cedula, 
+        department, 
+        assigned_member_cards as "assignedMemberCards",
+        COALESCE(employment_status, 'contratado') as "employmentStatus",
+        COALESCE(is_active, true) as "isActive",
+        COALESCE(company_id, 'emp_kasino') as "companyId",
+        TO_CHAR(birth_date, 'YYYY-MM-DD') as "birthDate",
+        education_level as "educationLevel",
+        COALESCE(is_currently_studying, false) as "isCurrentlyStudying",
+        current_study_field as "currentStudyField",
+        institution_name as "institutionName",
+        profession_title as "professionTitle",
+        current_address as "currentAddress",
+        phone,
+        gender,
+        COALESCE(training_interest_areas, '{}') as "trainingInterestAreas",
+        COALESCE(profile_completed, false) as "profileCompleted"
+      FROM users_simulated 
+      WHERE LOWER(email) = $1 
+         OR (cedula IS NOT NULL AND (LOWER(cedula) = $1 OR REPLACE(REPLACE(LOWER(cedula), '-', ''), ' ', '') = $2))
+      LIMIT 1
+    `;
+
+    const result = await pool.query(query, [cleanInput, unformattedCedula]);
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: "Credenciales incorrectas. Verifique su correo/cédula o contraseña." });
+    }
+
+    const user = result.rows[0];
+
+    // Verificar si la cuenta está inactiva o desvinculada
+    if (user.isActive === false || user.employmentStatus === "inactivo") {
+      return res.status(403).json({
+        error: "Tu cuenta se encuentra inactiva o desvinculada. Contacta al departamento de Recursos Humanos."
+      });
+    }
+
+    // Comprobación de contraseña con soporte para migración transparente
+    const dbPassword = user.password || "";
+    const isBcrypt = dbPassword.startsWith("$2a$") || dbPassword.startsWith("$2b$");
+    let passwordValid = false;
+
+    if (isBcrypt) {
+      passwordValid = bcrypt.compareSync(password, dbPassword);
+    } else {
+      // Contraseña legada en texto plano
+      passwordValid = (dbPassword === password);
+      if (passwordValid) {
+        // Auto-upgrade automático e inmediato a hash Bcrypt en la base de datos
+        try {
+          const newHash = bcrypt.hashSync(password, 10);
+          await pool.query("UPDATE users_simulated SET password = $1 WHERE id = $2", [newHash, user.id]);
+          console.log(`[AUTH] Contraseña de usuario ${user.email} migrada exitosamente a Bcrypt.`);
+        } catch (migErr) {
+          console.error("[AUTH] Error migrando hash de contraseña:", migErr);
+        }
+      }
+    }
+
+    if (!passwordValid) {
+      return res.status(401).json({ error: "Credenciales incorrectas. Verifique su correo/cédula o contraseña." });
+    }
+
+    // Excluir la contraseña del objeto de usuario retornado
+    const { password: _, ...sanitizedUser } = user;
+
+    // Generar JWT
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        companyId: user.companyId
+      },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.json({
+      message: "Autenticación exitosa",
+      token,
+      user: sanitizedUser
+    });
+  } catch (err: any) {
+    console.error("Error en login:", err);
+    res.status(500).json({ error: "Error en el servidor durante la autenticación", details: err.message });
+  }
+});
+
+// GET /api/users (PROTEGIDO: nunca expone hashes ni contraseñas)
 usersRouter.get("/", async (req: Request, res: Response) => {
   try {
     const { companyId } = req.query;
@@ -13,7 +128,6 @@ usersRouter.get("/", async (req: Request, res: Response) => {
         email, 
         name, 
         role, 
-        password, 
         cedula, 
         department, 
         assigned_member_cards as "assignedMemberCards",
@@ -65,7 +179,9 @@ usersRouter.post("/bulk", async (req: Request, res: Response) => {
       const cleanEmail = u.email.trim().toLowerCase();
       const cleanName = u.name.trim();
       const role = u.role || "Colaborador (User)";
-      const password = u.password || "123";
+      const rawPassword = u.password || "123";
+      const isAlreadyBcrypt = rawPassword.startsWith("$2a$") || rawPassword.startsWith("$2b$");
+      const password = isAlreadyBcrypt ? rawPassword : bcrypt.hashSync(rawPassword, 10);
       const cedula = u.cedula ? u.cedula.trim() : null;
       const department = u.department ? u.department.trim() : null;
       const assignedMemberCards = Array.isArray(u.assignedMemberCards) ? u.assignedMemberCards : null;
@@ -194,7 +310,6 @@ usersRouter.post("/bulk", async (req: Request, res: Response) => {
         email, 
         name, 
         role, 
-        password, 
         cedula, 
         department, 
         assigned_member_cards as "assignedMemberCards",
@@ -264,37 +379,79 @@ usersRouter.put("/:id", async (req: Request, res: Response) => {
 
     await client.query("BEGIN");
 
-    await client.query(
-      `UPDATE users_simulated 
-       SET name = $1, 
-           email = $2, 
-           role = $3, 
-           password = COALESCE(NULLIF($4, ''), password),
-           cedula = $5, 
-           department = $6, 
-           assigned_member_cards = $7,
-           employment_status = $8,
-           is_active = $9,
-           company_id = $10,
-           birth_date = $11,
-           education_level = $12,
-           is_currently_studying = $13,
-           current_study_field = $14,
-           institution_name = $15,
-           profession_title = $16,
-           current_address = $17,
-           phone = $18,
-           gender = $19,
-           training_interest_areas = $20,
-           profile_completed = $21
-       WHERE id = $22`,
-      [
-        cleanName, cleanEmail, cleanRole, password ? password.trim() : '', cleanCedula, 
+    let finalPasswordClause = "";
+    let finalParams: any[] = [];
+
+    if (password && password.trim()) {
+      const trimmed = password.trim();
+      const isAlreadyBcrypt = trimmed.startsWith("$2a$") || trimmed.startsWith("$2b$");
+      const hashedPwd = isAlreadyBcrypt ? trimmed : bcrypt.hashSync(trimmed, 10);
+      finalPasswordClause = "password = $21,";
+      finalParams = [
+        cleanName, cleanEmail, cleanRole, cleanCedula, 
         cleanDept, cleanCards, cleanEmpStatus, cleanIsActive, cleanCompanyId, 
         cleanBirthDate, cleanEduLevel, cleanStudying, cleanStudyField, cleanInstName, 
-        cleanProfTitle, cleanAddress, cleanPhone, cleanGender, cleanInterests, cleanCompleted, id
-      ]
-    );
+        cleanProfTitle, cleanAddress, cleanPhone, cleanGender, cleanInterests, cleanCompleted,
+        hashedPwd, id
+      ];
+    } else {
+      finalParams = [
+        cleanName, cleanEmail, cleanRole, cleanCedula, 
+        cleanDept, cleanCards, cleanEmpStatus, cleanIsActive, cleanCompanyId, 
+        cleanBirthDate, cleanEduLevel, cleanStudying, cleanStudyField, cleanInstName, 
+        cleanProfTitle, cleanAddress, cleanPhone, cleanGender, cleanInterests, cleanCompleted,
+        id
+      ];
+    }
+
+    const updateQuery = password && password.trim()
+      ? `UPDATE users_simulated 
+         SET name = $1, 
+             email = $2, 
+             role = $3, 
+             cedula = $4, 
+             department = $5, 
+             assigned_member_cards = $6, 
+             employment_status = $7, 
+             is_active = $8, 
+             company_id = $9, 
+             birth_date = $10, 
+             education_level = $11, 
+             is_currently_studying = $12, 
+             current_study_field = $13, 
+             institution_name = $14, 
+             profession_title = $15, 
+             current_address = $16, 
+             phone = $17, 
+             gender = $18, 
+             training_interest_areas = $19, 
+             profile_completed = $20,
+             password = $21
+         WHERE id = $22`
+      : `UPDATE users_simulated 
+         SET name = $1, 
+             email = $2, 
+             role = $3, 
+             cedula = $4, 
+             department = $5, 
+             assigned_member_cards = $6, 
+             employment_status = $7, 
+             is_active = $8, 
+             company_id = $9, 
+             birth_date = $10, 
+             education_level = $11, 
+             is_currently_studying = $12, 
+             current_study_field = $13, 
+             institution_name = $14, 
+             profession_title = $15, 
+             current_address = $16, 
+             phone = $17, 
+             gender = $18, 
+             training_interest_areas = $19, 
+             profile_completed = $20
+         WHERE id = $21`;
+
+    await client.query(updateQuery, finalParams);
 
     // Sincronizar en participants
     await client.query(
@@ -332,7 +489,6 @@ usersRouter.put("/:id", async (req: Request, res: Response) => {
         email, 
         name, 
         role, 
-        password, 
         cedula, 
         department, 
         assigned_member_cards as "assignedMemberCards",
@@ -410,7 +566,7 @@ usersRouter.put("/:id/profile", async (req: Request, res: Response) => {
            profile_completed = $11
        WHERE id = $12
        RETURNING 
-         id, email, name, role, password, cedula, department, 
+         id, email, name, role, cedula, department, 
          assigned_member_cards as "assignedMemberCards",
          COALESCE(employment_status, 'contratado') as "employmentStatus",
          COALESCE(is_active, true) as "isActive",
@@ -475,20 +631,32 @@ usersRouter.put("/:id/profile", async (req: Request, res: Response) => {
 usersRouter.put("/:id/password", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { newPassword } = req.body;
+    const { currentPassword, newPassword } = req.body;
 
-    if (!newPassword) {
+    if (!newPassword || !newPassword.trim()) {
       return res.status(400).json({ error: "La nueva contraseña es requerida." });
     }
 
-    await pool.query("UPDATE users_simulated SET password = $1 WHERE id = $2", [newPassword.trim(), id]);
+    if (currentPassword) {
+      const userCheck = await pool.query("SELECT password FROM users_simulated WHERE id = $1", [id]);
+      if (userCheck.rows.length > 0) {
+        const dbPwd = userCheck.rows[0].password || "";
+        const isBcrypt = dbPwd.startsWith("$2a$") || dbPwd.startsWith("$2b$");
+        const isMatch = isBcrypt ? bcrypt.compareSync(currentPassword, dbPwd) : (dbPwd === currentPassword);
+        if (!isMatch) {
+          return res.status(401).json({ error: "La contraseña actual es incorrecta." });
+        }
+      }
+    }
+
+    const hashed = bcrypt.hashSync(newPassword.trim(), 10);
+    await pool.query("UPDATE users_simulated SET password = $1 WHERE id = $2", [hashed, id]);
     const result = await pool.query(`
       SELECT 
         id, 
         email, 
         name, 
         role, 
-        password, 
         cedula, 
         department, 
         assigned_member_cards as "assignedMemberCards",
@@ -516,7 +684,6 @@ usersRouter.delete("/:id", async (req: Request, res: Response) => {
         email, 
         name, 
         role, 
-        password, 
         cedula, 
         department, 
         assigned_member_cards as "assignedMemberCards",

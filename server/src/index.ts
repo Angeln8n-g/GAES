@@ -47,6 +47,7 @@ app.use('/api/participants', participantsRouter);
 app.use('/api/registrations', registrationsRouter);
 app.use('/api/attendance', attendanceRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/auth', usersRouter);
 app.use('/api/feedback', feedbackRouter);
 app.use('/api/notifications', notificationsRouter);
 app.use('/api/groups', groupsRouter);

@@ -2,7 +2,14 @@ import { Server as HttpServer } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
 
 export interface AttendanceWsMessage {
-  type: 'ATTENDANCE_CHECK_IN' | 'ATTENDANCE_CHECK_OUT' | 'ATTENDANCE_REVERT' | 'EVENTS_UPDATED';
+  type: 
+    | 'ATTENDANCE_CHECK_IN' 
+    | 'ATTENDANCE_CHECK_OUT' 
+    | 'ATTENDANCE_REVERT' 
+    | 'EVENTS_UPDATED'
+    | 'TECHNICAL_ATTENDANCE_MARKED'
+    | 'TECHNICAL_QR_CHECKIN'
+    | 'TECHNICAL_GRADES_UPDATED';
   eventId?: string;
   date?: string;
   time?: string;
@@ -15,6 +22,13 @@ export interface AttendanceWsMessage {
   isCompleted?: boolean;
   message?: string;
   events?: any[];
+  cohortId?: string;
+  sessionDate?: string;
+  status?: string;
+  method?: 'manual' | 'qr_scan' | 'pin';
+  score?: number | null;
+  academicStatus?: string;
+  feedback?: string;
 }
 
 interface ExtWebSocket extends WebSocket {

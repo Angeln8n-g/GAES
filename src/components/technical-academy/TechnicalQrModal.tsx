@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   QrCode, 
@@ -18,6 +18,7 @@ import {
 import { QRCodeSVG } from 'qrcode.react';
 import { TechnicalAcademyCohort } from '../../types';
 import { apiService } from '../../services/api';
+import { attendanceWs } from '../../services/websocket';
 
 interface TechnicalQrModalProps {
   isOpen: boolean;
@@ -42,6 +43,12 @@ export const TechnicalQrModal: React.FC<TechnicalQrModalProps> = ({
   const [feedback, setFeedback] = useState<{ success: boolean; message: string } | null>(null);
   const [copiedPin, setCopiedPin] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [liveCheckIns, setLiveCheckIns] = useState<Array<{
+    card: string;
+    name: string;
+    method: string;
+    timestamp: string;
+  }>>([]);
 
   // Payload for QR scan
   const qrPayload = JSON.stringify({
@@ -57,6 +64,34 @@ export const TechnicalQrModal: React.FC<TechnicalQrModalProps> = ({
     setCopiedPin(true);
     setTimeout(() => setCopiedPin(false), 2000);
   };
+
+  // Sincronización en vivo vía WebSockets para escaneos y marcados
+  useEffect(() => {
+    if (!isOpen || !cohort) return;
+
+    const unsubscribe = attendanceWs.onAttendanceEvent((evt) => {
+      if (!evt || evt.cohortId !== cohort.id) return;
+
+      if (evt.type === 'TECHNICAL_QR_CHECKIN' || evt.type === 'TECHNICAL_ATTENDANCE_MARKED') {
+        if (evt.participantName || evt.participantCard) {
+          const newEntry = {
+            card: evt.participantCard || '',
+            name: evt.participantName || 'Colaborador',
+            method: evt.method === 'pin' ? 'PIN Diario' : (evt.method === 'qr_scan' ? 'Código QR' : 'Manual'),
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+          };
+          setLiveCheckIns(prev => [newEntry, ...prev.filter(p => p.card !== newEntry.card)].slice(0, 15));
+        }
+        if (onCheckInSuccess) {
+          onCheckInSuccess();
+        }
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [isOpen, cohort?.id, onCheckInSuccess]);
 
   const handleManualCheckIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,6 +111,17 @@ export const TechnicalQrModal: React.FC<TechnicalQrModalProps> = ({
         success: true,
         message: res.message || `¡Asistencia confirmada para ${res.participant?.name}!`
       });
+
+      if (res.participant) {
+        const manualEntry = {
+          card: res.participant.card || identifier.trim(),
+          name: res.participant.name || 'Colaborador',
+          method: 'Carnet / Cédula',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        };
+        setLiveCheckIns(prev => [manualEntry, ...prev.filter(p => p.card !== manualEntry.card)].slice(0, 15));
+      }
+
       setIdentifier('');
       if (onCheckInSuccess) {
         onCheckInSuccess();
@@ -258,6 +304,60 @@ export const TechnicalQrModal: React.FC<TechnicalQrModalProps> = ({
                 )}
               </div>
             </div>
+          </div>
+
+          {/* Transmisión en Vivo de Asistencias (WebSockets) */}
+          <div className="bg-slate-50/80 rounded-2xl border border-slate-200 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                  Asistencia en Vivo (WebSockets)
+                </h4>
+                {liveCheckIns.length > 0 && (
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">
+                    {liveCheckIns.length} registrado{liveCheckIns.length !== 1 ? 's' : ''} en esta sesión
+                  </span>
+                )}
+              </div>
+              <span className="text-[11px] text-slate-400 hidden sm:inline">
+                Sincronización instantánea en pantalla
+              </span>
+            </div>
+
+            {liveCheckIns.length === 0 ? (
+              <div className="text-center py-4 text-xs text-slate-400 italic bg-white/60 rounded-xl border border-dashed border-slate-200">
+                Esperando escaneos de código QR o ingresos con PIN diario...
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-48 overflow-y-auto pr-1">
+                {liveCheckIns.map((item, idx) => (
+                  <div
+                    key={`${item.card}-${idx}`}
+                    className="flex items-center justify-between p-2.5 bg-white rounded-xl border border-slate-200/90 shadow-xs animate-in fade-in slide-in-from-top-2 duration-300"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold shrink-0">
+                        {item.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-slate-800 truncate">{item.name}</p>
+                        <p className="text-[10px] text-slate-400">Carnet: {item.card}</p>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-100 text-slate-600">
+                        {item.method}
+                      </span>
+                      <p className="text-[9px] text-slate-400 font-mono mt-0.5">{item.timestamp}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

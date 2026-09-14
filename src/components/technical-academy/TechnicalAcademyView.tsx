@@ -40,6 +40,7 @@ import {
   TrainingEvent
 } from '../../types';
 import { apiService } from '../../services/api';
+import { attendanceWs } from '../../services/websocket';
 import { exportTechnicalAcademyAttendanceToExcel } from '../../utils/excelUtils';
 import { TechnicalQrModal } from './TechnicalQrModal';
 import { CohortFormModal } from './CohortFormModal';
@@ -214,6 +215,35 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
       fetchAttendance(selectedCohortId);
     }
   }, [selectedCohortId]);
+
+  // Sincronización en vivo vía WebSockets para Academia Técnica
+  useEffect(() => {
+    const unsubscribe = attendanceWs.onAttendanceEvent((evt) => {
+      if (!evt) return;
+
+      // Si el evento corresponde a la cohorte activa seleccionada
+      if (evt.cohortId && evt.cohortId === selectedCohortId) {
+        if (evt.type === 'TECHNICAL_QR_CHECKIN') {
+          if (onShowToast) {
+            onShowToast(
+              'Asistencia Registrada (En Vivo)',
+              evt.message || `¡${evt.participantName || 'Colaborador'} registró asistencia!`,
+              'success'
+            );
+          }
+          fetchAttendance(selectedCohortId);
+        } else if (evt.type === 'TECHNICAL_ATTENDANCE_MARKED') {
+          fetchAttendance(selectedCohortId);
+        } else if (evt.type === 'TECHNICAL_GRADES_UPDATED') {
+          fetchAttendance(selectedCohortId);
+        }
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [selectedCohortId, onShowToast]);
 
   const activeCohort = useMemo(() => {
     return cohorts.find(c => c.id === selectedCohortId) || null;

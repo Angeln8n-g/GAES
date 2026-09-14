@@ -331,6 +331,7 @@ export function App() {
     setCurrentUser(null);
     setSelectedCompanyId('all');
     localStorage.removeItem('ch_logged_user');
+    localStorage.removeItem('ch_token');
     setCurrentTab('landing');
     showToast('Sesión cerrada', 'Has salido de tu cuenta correctamente.', 'info');
   };

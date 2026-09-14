@@ -355,6 +355,32 @@ const API_BASE_URL = getApiBaseUrl();
 const isApiMode = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_MODE === 'true') ||
   (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1');
 
+/**
+ * Helper centralizado para adjuntar token JWT y headers de rol/usuario a las peticiones
+ */
+export function getAuthHeaders(contentTypeJson: boolean = true): Record<string, string> {
+  const headers: Record<string, string> = {};
+  if (contentTypeJson) {
+    headers['Content-Type'] = 'application/json';
+  }
+  if (typeof localStorage !== 'undefined') {
+    try {
+      const token = localStorage.getItem('ch_token');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      const rawUser = localStorage.getItem('ch_logged_user') || localStorage.getItem('capacitahub_user');
+      if (rawUser) {
+        const parsed = JSON.parse(rawUser);
+        if (parsed?.role) headers['X-User-Role'] = parsed.role;
+        if (parsed?.email) headers['X-User-Email'] = parsed.email;
+        if (parsed?.name) headers['X-User-Name'] = parsed.name;
+      }
+    } catch (_) {}
+  }
+  return headers;
+}
+
 // Inicializar almacenamiento local si no existe para el modo local
 const initLocalStorage = () => {
   if (typeof localStorage === 'undefined') return;
@@ -1143,10 +1169,56 @@ export const apiService = {
   },
 
   // --- MÉTODOS DE USUARIOS DE LA PLATAFORMA ---
+  async login(identifier: string, password: string): Promise<{ user: UserAccount; token: string }> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/users/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, password })
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Credenciales inválidas.');
+      }
+      const data = await res.json();
+      if (data.token && typeof localStorage !== 'undefined') {
+        localStorage.setItem('ch_token', data.token);
+      }
+      return data;
+    } else {
+      const cleanInput = identifier.trim().toLowerCase();
+      const unformattedInput = cleanInput.replace(/[^a-z0-9]/g, '');
+      const users: UserAccount[] = safeJsonParse('ch_users', []);
+      const user = users.find(u => {
+        const uEmail = u.email?.toLowerCase() || '';
+        const uCedula = u.cedula ? u.cedula.toLowerCase() : '';
+        const uCedulaClean = uCedula.replace(/[^a-z0-9]/g, '');
+        const matchesIdentifier = 
+          uEmail === cleanInput || 
+          (uCedula && uCedula === cleanInput) || 
+          (uCedulaClean && uCedulaClean === unformattedInput);
+        return matchesIdentifier && u.password === password;
+      });
+      if (!user) {
+        throw new Error('Credenciales incorrectas. Verifica tu correo corporativo / cédula o contraseña.');
+      }
+      if (user.isActive === false || user.employmentStatus === 'inactivo') {
+        throw new Error('Tu cuenta se encuentra inactiva o desvinculada. Contacta al departamento de Recursos Humanos.');
+      }
+      const token = 'mock_jwt_token_' + Date.now();
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('ch_token', token);
+      }
+      return { user, token };
+    }
+  },
+
   async getUsers(companyId?: string): Promise<UserAccount[]> {
     if (isApiMode) {
       const query = companyId && companyId !== 'all' ? `?companyId=${encodeURIComponent(companyId)}` : '';
-      const res = await fetch(`${API_BASE_URL}/users${query}`);
+      const res = await fetch(`${API_BASE_URL}/users${query}`, {
+        headers: getAuthHeaders(false)
+      });
       if (!res.ok) throw new Error('Error al obtener usuarios de la base de datos');
       return res.json();
     } else {
@@ -1162,7 +1234,7 @@ export const apiService = {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/users/bulk`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(true),
         body: JSON.stringify({ users })
       });
       if (!res.ok) throw new Error('Error al actualizar usuarios en Postgres');
@@ -1175,7 +1247,7 @@ export const apiService = {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/users/${userId}/password`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(true),
         body: JSON.stringify({ newPassword })
       });
       if (!res.ok) throw new Error('Error al cambiar la contraseña en la base de datos');
@@ -1192,7 +1264,7 @@ export const apiService = {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/users/${userId}/profile`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(true),
         body: JSON.stringify(profileData)
       });
       if (!res.ok) {
@@ -1814,20 +1886,9 @@ export const apiService = {
   },
 
   saveTechnicalCourse: async (course: Partial<TechnicalAcademyCourse>): Promise<{ message: string; courseId: string }> => {
-    let roleHeader: Record<string, string> = {};
-    if (typeof localStorage !== 'undefined') {
-      try {
-        const u = localStorage.getItem('ch_logged_user');
-        if (u) {
-          const parsed = JSON.parse(u);
-          if (parsed?.role) roleHeader['X-User-Role'] = parsed.role;
-        }
-      } catch (_) {}
-    }
-
     const res = await fetch(`${API_BASE_URL}/technical-academy/courses`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...roleHeader },
+      headers: getAuthHeaders(true),
       body: JSON.stringify(course)
     });
     if (!res.ok) {
@@ -1838,20 +1899,9 @@ export const apiService = {
   },
 
   deleteTechnicalCourse: async (id: string): Promise<void> => {
-    let roleHeader: Record<string, string> = {};
-    if (typeof localStorage !== 'undefined') {
-      try {
-        const u = localStorage.getItem('ch_logged_user');
-        if (u) {
-          const parsed = JSON.parse(u);
-          if (parsed?.role) roleHeader['X-User-Role'] = parsed.role;
-        }
-      } catch (_) {}
-    }
-
     const res = await fetch(`${API_BASE_URL}/technical-academy/courses/${encodeURIComponent(id)}`, {
       method: 'DELETE',
-      headers: { ...roleHeader }
+      headers: getAuthHeaders(false)
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
@@ -1870,20 +1920,9 @@ export const apiService = {
   },
 
   saveTechnicalCohort: async (cohort: Partial<TechnicalAcademyCohort> & { autoEnrollGroupMembers?: boolean }): Promise<{ message: string; cohortId: string }> => {
-    let roleHeader: Record<string, string> = {};
-    if (typeof localStorage !== 'undefined') {
-      try {
-        const u = localStorage.getItem('ch_logged_user');
-        if (u) {
-          const parsed = JSON.parse(u);
-          if (parsed?.role) roleHeader['X-User-Role'] = parsed.role;
-        }
-      } catch (_) {}
-    }
-
     const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...roleHeader },
+      headers: getAuthHeaders(true),
       body: JSON.stringify(cohort)
     });
     if (!res.ok) {
@@ -1905,20 +1944,9 @@ export const apiService = {
       notes?: string;
     }
   ): Promise<{ message: string; enrolledCount?: number }> => {
-    let roleHeader: Record<string, string> = {};
-    if (typeof localStorage !== 'undefined') {
-      try {
-        const u = localStorage.getItem('ch_logged_user');
-        if (u) {
-          const parsed = JSON.parse(u);
-          if (parsed?.role) roleHeader['X-User-Role'] = parsed.role;
-        }
-      } catch (_) {}
-    }
-
     const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(id)}/reassign`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', ...roleHeader },
+      headers: getAuthHeaders(true),
       body: JSON.stringify(payload)
     });
     if (!res.ok) {
@@ -1929,20 +1957,9 @@ export const apiService = {
   },
 
   updateTechnicalCohortStatus: async (id: string, status: string): Promise<{ message: string; status: string }> => {
-    let roleHeader: Record<string, string> = {};
-    if (typeof localStorage !== 'undefined') {
-      try {
-        const u = localStorage.getItem('ch_logged_user');
-        if (u) {
-          const parsed = JSON.parse(u);
-          if (parsed?.role) roleHeader['X-User-Role'] = parsed.role;
-        }
-      } catch (_) {}
-    }
-
     const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(id)}/status`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', ...roleHeader },
+      headers: getAuthHeaders(true),
       body: JSON.stringify({ status })
     });
     if (!res.ok) {
@@ -1953,20 +1970,9 @@ export const apiService = {
   },
 
   deleteTechnicalCohort: async (id: string): Promise<void> => {
-    let roleHeader: Record<string, string> = {};
-    if (typeof localStorage !== 'undefined') {
-      try {
-        const u = localStorage.getItem('ch_logged_user');
-        if (u) {
-          const parsed = JSON.parse(u);
-          if (parsed?.role) roleHeader['X-User-Role'] = parsed.role;
-        }
-      } catch (_) {}
-    }
-
     const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(id)}`, {
       method: 'DELETE',
-      headers: { ...roleHeader }
+      headers: getAuthHeaders(false)
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
@@ -1984,20 +1990,9 @@ export const apiService = {
       newFacilitatorEmail?: string;
     }
   ): Promise<{ message: string; newCohortId: string; startDate: string; endDate: string }> => {
-    let roleHeader: Record<string, string> = {};
-    if (typeof localStorage !== 'undefined') {
-      try {
-        const u = localStorage.getItem('ch_logged_user');
-        if (u) {
-          const parsed = JSON.parse(u);
-          if (parsed?.role) roleHeader['X-User-Role'] = parsed.role;
-        }
-      } catch (_) {}
-    }
-
     const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(id)}/duplicate`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...roleHeader },
+      headers: getAuthHeaders(true),
       body: JSON.stringify(payload || {})
     });
     if (!res.ok) {
@@ -2008,7 +2003,9 @@ export const apiService = {
   },
 
   getCohortDailyAttendance: async (cohortId: string): Promise<TechnicalCohortAttendanceMatrix> => {
-    const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/attendance`);
+    const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/attendance`, {
+      headers: getAuthHeaders(false)
+    });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error || 'Error al consultar asistencia de la cohorte');
@@ -2031,7 +2028,7 @@ export const apiService = {
   ): Promise<{ message: string; updatedCount: number }> => {
     const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/attendance`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(true),
       body: JSON.stringify(payload)
     });
     if (!res.ok) {
@@ -2052,7 +2049,7 @@ export const apiService = {
   }> => {
     const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/qr-checkin`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(true),
       body: JSON.stringify(payload)
     });
     if (!res.ok) {
@@ -2063,7 +2060,9 @@ export const apiService = {
   },
 
   getCohortParticipants: async (cohortId: string): Promise<TechnicalCohortParticipantsResponse> => {
-    const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/participants`);
+    const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/participants`, {
+      headers: getAuthHeaders(false)
+    });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error || 'Error al consultar participantes de la cohorte');
@@ -2075,20 +2074,9 @@ export const apiService = {
     cohortId: string,
     payload: { participantCards?: string[]; identifiers?: string[] }
   ): Promise<{ message: string; cohortId: string; newlyEnrolled: number; totalRequested: number }> => {
-    const roleHeader: Record<string, string> = {};
-    if (typeof window !== 'undefined') {
-      try {
-        const u = localStorage.getItem('capacitahub_user');
-        if (u) {
-          const parsed = JSON.parse(u);
-          if (parsed?.role) roleHeader['X-User-Role'] = parsed.role;
-        }
-      } catch (_) {}
-    }
-
     const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/participants`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...roleHeader },
+      headers: getAuthHeaders(true),
       body: JSON.stringify(payload)
     });
     if (!res.ok) {
@@ -2102,22 +2090,11 @@ export const apiService = {
     cohortId: string,
     participantCard: string
   ): Promise<{ message: string; cohortId: string; participantCard: string }> => {
-    const roleHeader: Record<string, string> = {};
-    if (typeof window !== 'undefined') {
-      try {
-        const u = localStorage.getItem('capacitahub_user');
-        if (u) {
-          const parsed = JSON.parse(u);
-          if (parsed?.role) roleHeader['X-User-Role'] = parsed.role;
-        }
-      } catch (_) {}
-    }
-
     const res = await fetch(
       `${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/participants/${encodeURIComponent(participantCard)}`,
       {
         method: 'DELETE',
-        headers: roleHeader
+        headers: getAuthHeaders(false)
       }
     );
     if (!res.ok) {
@@ -2139,22 +2116,9 @@ export const apiService = {
       gradedBy?: string;
     }
   ): Promise<{ message: string; cohortId: string; updatedCount: number }> => {
-    const roleHeader: Record<string, string> = {};
-    if (typeof window !== 'undefined') {
-      try {
-        const u = localStorage.getItem('capacitahub_user');
-        if (u) {
-          const parsed = JSON.parse(u);
-          if (parsed?.role) roleHeader['X-User-Role'] = parsed.role;
-          if (parsed?.email) roleHeader['X-User-Email'] = parsed.email;
-          if (parsed?.name) roleHeader['X-User-Name'] = parsed.name;
-        }
-      } catch (_) {}
-    }
-
     const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/grades`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', ...roleHeader },
+      headers: getAuthHeaders(true),
       body: JSON.stringify(payload)
     });
     if (!res.ok) {

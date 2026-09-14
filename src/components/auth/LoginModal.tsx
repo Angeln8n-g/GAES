@@ -89,47 +89,33 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   const recoveryStrength = getStrength(newPassword);
 
   // 1. Submit Login
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccessMessage('');
 
-    if (!email || !password) {
+    if (!email.trim() || !password) {
       setError('Por favor ingresa tu correo corporativo o cédula y tu contraseña.');
       return;
     }
 
     setIsLoading(true);
 
-    setTimeout(() => {
-      const cleanInput = email.trim().toLowerCase();
-      const unformattedInput = cleanInput.replace(/[^a-z0-9]/g, '');
-
-      const user = users.find(u => {
-        const uEmail = u.email.toLowerCase();
-        const uCedula = u.cedula ? u.cedula.toLowerCase() : '';
-        const uCedulaClean = uCedula.replace(/[^a-z0-9]/g, '');
-
-        const matchesIdentifier = 
-          uEmail === cleanInput || 
-          (uCedula && uCedula === cleanInput) || 
-          (uCedulaClean && uCedulaClean === unformattedInput);
-
-        return matchesIdentifier && u.password === password;
-      });
-
-      if (user) {
-        if (user.isActive === false || user.employmentStatus === 'inactivo') {
+    try {
+      const response = await apiService.login(email.trim(), password);
+      if (response && response.user) {
+        if (response.user.isActive === false || response.user.employmentStatus === 'inactivo') {
           setError('Tu cuenta se encuentra inactiva o desvinculada. Contacta al departamento de Recursos Humanos.');
           setIsLoading(false);
           return;
         }
-        onLoginSuccess(user);
-      } else {
-        setError('Credenciales incorrectas. Verifica tu correo corporativo / cédula o contraseña.');
-        setIsLoading(false);
+        onLoginSuccess(response.user);
       }
-    }, 350);
+    } catch (err: any) {
+      setError(err.message || 'Credenciales incorrectas. Verifica tu correo corporativo / cédula o contraseña.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // 2. Request Recovery OTP

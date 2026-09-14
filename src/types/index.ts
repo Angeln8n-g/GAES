@@ -35,7 +35,14 @@ export interface SlotAttendanceDetail {
 }
 
 export interface AttendanceWsEvent {
-  type: 'ATTENDANCE_CHECK_IN' | 'ATTENDANCE_CHECK_OUT' | 'ATTENDANCE_REVERT' | 'EVENTS_UPDATED';
+  type: 
+    | 'ATTENDANCE_CHECK_IN' 
+    | 'ATTENDANCE_CHECK_OUT' 
+    | 'ATTENDANCE_REVERT' 
+    | 'EVENTS_UPDATED'
+    | 'TECHNICAL_ATTENDANCE_MARKED'
+    | 'TECHNICAL_QR_CHECKIN'
+    | 'TECHNICAL_GRADES_UPDATED';
   eventId?: string;
   date?: string;
   time?: string;
@@ -47,6 +54,13 @@ export interface AttendanceWsEvent {
   checkOutAt?: string;
   isCompleted?: boolean;
   message?: string;
+  cohortId?: string;
+  sessionDate?: string;
+  status?: string;
+  method?: 'manual' | 'qr_scan' | 'pin';
+  score?: number | null;
+  academicStatus?: string;
+  feedback?: string;
 }
 
 export interface Slot {
