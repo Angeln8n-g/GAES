@@ -44,6 +44,7 @@ import { TechnicalQrModal } from './TechnicalQrModal';
 import { CohortFormModal } from './CohortFormModal';
 import { ReassignCohortModal } from './ReassignCohortModal';
 import { TechnicalCourseModal } from './TechnicalCourseModal';
+import { TechnicalCohortEnrollmentModal } from './TechnicalCohortEnrollmentModal';
 
 interface TechnicalAcademyViewProps {
   currentUser: UserAccount | null;
@@ -115,6 +116,8 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
   const [cohortToReassign, setCohortToReassign] = useState<TechnicalAcademyCohort | null>(null);
   const [isCourseModalOpen, setIsCourseModalOpen] = useState<boolean>(false);
   const [courseToEdit, setCourseToEdit] = useState<TechnicalAcademyCourse | null>(null);
+  const [isEnrollmentModalOpen, setIsEnrollmentModalOpen] = useState<boolean>(false);
+  const [cohortForEnrollment, setCohortForEnrollment] = useState<TechnicalAcademyCohort | null>(null);
 
   // 1. Cargar Cursos y Cohortes
   const fetchData = async () => {
@@ -633,6 +636,19 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
 
                   <button
                     type="button"
+                    onClick={() => {
+                      setCohortForEnrollment(activeCohort);
+                      setIsEnrollmentModalOpen(true);
+                    }}
+                    className="px-3.5 py-2 bg-red-50 hover:bg-red-100 text-[#DA291C] border border-red-200/80 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-xs"
+                    title="Ver listado, cargar masivamente o exportar participantes de esta cohorte"
+                  >
+                    <Users className="w-3.5 h-3.5 text-[#DA291C]" />
+                    <span>Participantes ({attendanceMatrix?.participants.length || activeCohort.enrolledCount || 0})</span>
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={() => setIsQrModalOpen(true)}
                     className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm"
                   >
@@ -1064,6 +1080,19 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                           <span>Pasar Asistencia</span>
                         </button>
 
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCohortForEnrollment(coh);
+                            setIsEnrollmentModalOpen(true);
+                          }}
+                          className="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-[#DA291C] border border-red-200 rounded-xl text-xs font-bold transition-colors flex items-center gap-1 shrink-0"
+                          title="Gestionar participantes (enlistar, cargar lista, exportar)"
+                        >
+                          <Users className="w-3.5 h-3.5" />
+                          <span>Participantes ({coh.enrolledCount || 0})</span>
+                        </button>
+
                         {isAdminOrSuper ? (
                           <>
                             <button
@@ -1418,6 +1447,22 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
           if (onShowToast) onShowToast('Éxito', 'Curso técnico guardado en el catálogo', 'success');
           if (onClearEventToMakeRecurrent) onClearEventToMakeRecurrent();
           await fetchData();
+        }}
+      />
+
+      {/* MODAL 5: COHORT PARTICIPANTS MANAGEMENT */}
+      <TechnicalCohortEnrollmentModal
+        isOpen={isEnrollmentModalOpen}
+        isAdminOrSuper={isAdminOrSuper}
+        onClose={() => {
+          setIsEnrollmentModalOpen(false);
+          setCohortForEnrollment(null);
+        }}
+        cohort={cohortForEnrollment}
+        allParticipants={participants}
+        onSuccess={async () => {
+          await fetchData();
+          if (selectedCohortId) await fetchAttendance(selectedCohortId);
         }}
       />
     </div>

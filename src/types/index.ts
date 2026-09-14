@@ -614,3 +614,40 @@ export interface TechnicalCohortAttendanceMatrix {
   dailyPin: string;
   participants: TechnicalCohortParticipant[];
 }
+
+export interface TechnicalCohortEnrolledParticipant {
+  card: string;
+  name: string;
+  email: string;
+  cedula?: string;
+  department?: string;
+  companyId?: string;
+  enrolledAt?: string;
+  enrollmentStatus: string;
+  attendedDays: number;
+  totalDays: number;
+  attendancePercentage: number;
+  totalHoursEarned: number;
+  academicCondition: 'APROBADO' | 'EN RIESGO' | 'REPROBADO';
+}
+
+export interface TechnicalCohortParticipantsResponse {
+  cohort: {
+    id: string;
+    courseId: string;
+    courseTitle: string;
+    courseCategory?: string;
+    groupId?: string;
+    groupName?: string;
+    facilitatorName?: string;
+    startDate: string;
+    endDate: string;
+    dailyTime: string;
+    dailyHours: number;
+    totalDays: number;
+    location?: string;
+    capacity: number;
+    enrolledCount: number;
+  };
+  participants: TechnicalCohortEnrolledParticipant[];
+}

@@ -195,7 +195,7 @@ exports.technicalAcademyRouter.post('/cohorts', async (req, res) => {
     const client = await db_js_1.pool.connect();
     try {
         await client.query('BEGIN');
-        const { id, eventId, courseId, groupId, groupName, facilitatorId, facilitatorName, facilitatorEmail, startDate, endDate, weekNumber, year, dailyTime, location, capacity, notes, dailyPin, companyId, autoEnrollGroupMembers = true } = req.body;
+        const { id, eventId, courseId, groupId, groupName, facilitatorId, facilitatorName, facilitatorEmail, startDate, endDate, weekNumber, year, dailyTime, location, capacity, notes, dailyPin, companyId, autoEnrollGroupMembers = true, participantCards } = req.body;
         if (!courseId || !startDate || !endDate) {
             await client.query('ROLLBACK');
             return res.status(400).json({ error: 'Curso, fecha de inicio y fecha de fin son obligatorios.' });
@@ -265,6 +265,23 @@ exports.technicalAcademyRouter.post('/cohorts', async (req, res) => {
           ON CONFLICT (cohort_id, participant_card) DO NOTHING
         `, [cohortId, m.participant_card]);
                 enrolledCount++;
+            }
+        }
+        // Auto-enrolamiento si se especificaron tarjetas individuales directamente
+        if (Array.isArray(participantCards) && participantCards.length > 0) {
+            for (const card of participantCards) {
+                const cleanCard = String(card).trim();
+                if (cleanCard) {
+                    const insRes = await client.query(`
+            INSERT INTO technical_academy_enrollments (cohort_id, participant_card, status)
+            VALUES ($1, $2, 'enrolled')
+            ON CONFLICT (cohort_id, participant_card) DO NOTHING
+            RETURNING participant_card
+          `, [cohortId, cleanCard]);
+                    if (insRes.rows.length > 0) {
+                        enrolledCount++;
+                    }
+                }
             }
         }
         await client.query('COMMIT');
@@ -463,6 +480,217 @@ exports.technicalAcademyRouter.post('/cohorts/:id/duplicate', async (req, res) =
         await client.query('ROLLBACK');
         console.error('Error al duplicar cohorte técnica:', err);
         res.status(500).json({ error: 'Error al duplicar cohorte', details: err.message });
+    }
+    finally {
+        client.release();
+    }
+});
+// ==========================================
+// 2.1 GESTIÓN DE PARTICIPANTES POR COHORTE
+// ==========================================
+// GET /api/technical-academy/cohorts/:id/participants
+// Retorna la lista de participantes enrolados en la cohorte con métricas detalladas
+exports.technicalAcademyRouter.get('/cohorts/:id/participants', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const cohortRes = await db_js_1.pool.query(`
+      SELECT c.*, cr.daily_hours, cr.duration_days, cr.title as course_title, cr.category as course_category
+      FROM technical_academy_cohorts c
+      JOIN technical_academy_courses cr ON c.course_id = cr.id
+      WHERE c.id = $1
+    `, [id]);
+        if (cohortRes.rows.length === 0) {
+            return res.status(404).json({ error: 'Cohorte no encontrada' });
+        }
+        const cohort = cohortRes.rows[0];
+        // Fechas hábiles de sesión (lunes a viernes)
+        const dates = [];
+        const curr = new Date(cohort.start_date);
+        const end = new Date(cohort.end_date);
+        while (curr <= end) {
+            const dayOfWeek = curr.getDay();
+            if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                dates.push(curr.toISOString().slice(0, 10));
+            }
+            curr.setDate(curr.getDate() + 1);
+        }
+        const totalDays = dates.length || 1;
+        const dailyHours = parseFloat(cohort.daily_hours) || 4;
+        // Participantes enrolados
+        const enrollmentsRes = await db_js_1.pool.query(`
+      SELECT 
+        e.participant_card,
+        e.enrolled_at,
+        e.status as enrollment_status,
+        e.attendance_percentage,
+        p.name as participant_name,
+        p.email as participant_email,
+        p.cedula as participant_cedula,
+        p.department as participant_department,
+        p.company_id as participant_company_id
+      FROM technical_academy_enrollments e
+      JOIN participants p ON e.participant_card = p.card
+      WHERE e.cohort_id = $1
+      ORDER BY p.name ASC
+    `, [id]);
+        // Resumen de asistencias
+        const attendanceRes = await db_js_1.pool.query(`
+      SELECT participant_card, COUNT(*) as attended_days
+      FROM technical_academy_attendance
+      WHERE cohort_id = $1 AND status IN ('present', 'late')
+      GROUP BY participant_card
+    `, [id]);
+        const attendanceMap = new Map();
+        attendanceRes.rows.forEach(r => {
+            attendanceMap.set(r.participant_card, parseInt(r.attended_days, 10));
+        });
+        const participants = enrollmentsRes.rows.map(e => {
+            const attendedDays = attendanceMap.get(e.participant_card) || 0;
+            const attendancePercentage = Math.round((attendedDays / totalDays) * 100);
+            const totalHoursEarned = attendedDays * dailyHours;
+            const academicCondition = attendancePercentage >= 80 ? 'APROBADO' : (attendancePercentage >= 50 ? 'EN RIESGO' : 'REPROBADO');
+            return {
+                card: e.participant_card,
+                name: e.participant_name,
+                email: e.participant_email,
+                cedula: e.participant_cedula || '',
+                department: e.participant_department || '',
+                companyId: e.participant_company_id || '',
+                enrolledAt: e.enrolled_at,
+                enrollmentStatus: e.enrollment_status,
+                attendedDays,
+                totalDays,
+                attendancePercentage,
+                totalHoursEarned,
+                academicCondition
+            };
+        });
+        res.json({
+            cohort: {
+                id: cohort.id,
+                courseId: cohort.course_id,
+                courseTitle: cohort.course_title,
+                courseCategory: cohort.course_category,
+                groupId: cohort.group_id,
+                groupName: cohort.group_name,
+                facilitatorName: cohort.facilitator_name,
+                startDate: new Date(cohort.start_date).toISOString().slice(0, 10),
+                endDate: new Date(cohort.end_date).toISOString().slice(0, 10),
+                dailyTime: cohort.daily_time,
+                dailyHours,
+                totalDays,
+                location: cohort.location,
+                capacity: cohort.capacity,
+                enrolledCount: participants.length
+            },
+            participants
+        });
+    }
+    catch (err) {
+        console.error('Error al consultar participantes de cohorte técnica:', err);
+        res.status(500).json({ error: 'Error al consultar participantes', details: err.message });
+    }
+});
+// POST /api/technical-academy/cohorts/:id/participants
+// Enrola uno o múltiples participantes a la cohorte (por lista de tarjetas o identificadores)
+exports.technicalAcademyRouter.post('/cohorts/:id/participants', async (req, res) => {
+    if (!checkAdminPermission(req, res))
+        return;
+    const client = await db_js_1.pool.connect();
+    try {
+        await client.query('BEGIN');
+        const { id } = req.params;
+        const { participantCards, identifiers } = req.body;
+        const cohortRes = await client.query('SELECT * FROM technical_academy_cohorts WHERE id = $1', [id]);
+        if (cohortRes.rows.length === 0) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ error: 'Cohorte no encontrada' });
+        }
+        let cardsToEnroll = [];
+        if (Array.isArray(participantCards) && participantCards.length > 0) {
+            cardsToEnroll = participantCards.map((c) => String(c).trim()).filter(Boolean);
+        }
+        else if (Array.isArray(identifiers) && identifiers.length > 0) {
+            const cleanIdentifiers = identifiers.map((i) => String(i).trim()).filter(Boolean);
+            if (cleanIdentifiers.length > 0) {
+                const found = await client.query(`
+          SELECT card FROM participants
+          WHERE card = ANY($1) OR cedula = ANY($1) OR LOWER(email) = ANY(SELECT LOWER(unnest($1::text[])))
+        `, [cleanIdentifiers]);
+                cardsToEnroll = found.rows.map(r => r.card);
+            }
+        }
+        if (cardsToEnroll.length === 0) {
+            await client.query('ROLLBACK');
+            return res.status(400).json({ error: 'No se proporcionaron participantes válidos para enrolar.' });
+        }
+        let newlyEnrolled = 0;
+        const enrolledCards = [];
+        for (const card of cardsToEnroll) {
+            const insRes = await client.query(`
+        INSERT INTO technical_academy_enrollments (cohort_id, participant_card, status)
+        VALUES ($1, $2, 'enrolled')
+        ON CONFLICT (cohort_id, participant_card) DO NOTHING
+        RETURNING participant_card
+      `, [id, card]);
+            if (insRes.rows.length > 0) {
+                newlyEnrolled++;
+                enrolledCards.push(card);
+            }
+        }
+        await client.query('COMMIT');
+        res.status(201).json({
+            message: `${newlyEnrolled} participante(s) enrolado(s) exitosamente.`,
+            cohortId: id,
+            newlyEnrolled,
+            totalRequested: cardsToEnroll.length,
+            enrolledCards
+        });
+    }
+    catch (err) {
+        await client.query('ROLLBACK');
+        console.error('Error al enrolar participantes en cohorte:', err);
+        res.status(500).json({ error: 'Error al enrolar participantes', details: err.message });
+    }
+    finally {
+        client.release();
+    }
+});
+// DELETE /api/technical-academy/cohorts/:id/participants/:card
+// Desmatricula a un participante de la cohorte y remueve sus registros de asistencia en la misma
+exports.technicalAcademyRouter.delete('/cohorts/:id/participants/:card', async (req, res) => {
+    if (!checkAdminPermission(req, res))
+        return;
+    const client = await db_js_1.pool.connect();
+    try {
+        await client.query('BEGIN');
+        const { id, card } = req.params;
+        // 1. Eliminar asistencias asociadas a esta cohorte y participante
+        await client.query(`
+      DELETE FROM technical_academy_attendance
+      WHERE cohort_id = $1 AND participant_card = $2
+    `, [id, card]);
+        // 2. Eliminar enrolamiento
+        const delRes = await client.query(`
+      DELETE FROM technical_academy_enrollments
+      WHERE cohort_id = $1 AND participant_card = $2
+      RETURNING participant_card
+    `, [id, card]);
+        if (delRes.rows.length === 0) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ error: 'El participante no estaba enrolado en esta cohorte.' });
+        }
+        await client.query('COMMIT');
+        res.json({
+            message: 'Participante desmatriculado correctamente.',
+            cohortId: id,
+            participantCard: card
+        });
+    }
+    catch (err) {
+        await client.query('ROLLBACK');
+        console.error('Error al desmatricular participante:', err);
+        res.status(500).json({ error: 'Error al desmatricular participante', details: err.message });
     }
     finally {
         client.release();

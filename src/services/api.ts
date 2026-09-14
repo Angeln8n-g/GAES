@@ -29,7 +29,9 @@ import {
   TechnicalDailyAttendance,
   TechnicalCohortAttendanceMatrix,
   TechnicalCohortParticipant,
-  TechnicalAcademyHistoryRecord
+  TechnicalAcademyHistoryRecord,
+  TechnicalCohortEnrolledParticipant,
+  TechnicalCohortParticipantsResponse
 } from '../types';
 
 export const MOCK_COMPANIES: Company[] = [
@@ -2056,6 +2058,71 @@ export const apiService = {
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error || 'Error al procesar asistencia por QR o PIN');
+    }
+    return await res.json();
+  },
+
+  getCohortParticipants: async (cohortId: string): Promise<TechnicalCohortParticipantsResponse> => {
+    const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/participants`);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al consultar participantes de la cohorte');
+    }
+    return await res.json();
+  },
+
+  enrollCohortParticipants: async (
+    cohortId: string,
+    payload: { participantCards?: string[]; identifiers?: string[] }
+  ): Promise<{ message: string; cohortId: string; newlyEnrolled: number; totalRequested: number }> => {
+    const roleHeader: Record<string, string> = {};
+    if (typeof window !== 'undefined') {
+      try {
+        const u = localStorage.getItem('capacitahub_user');
+        if (u) {
+          const parsed = JSON.parse(u);
+          if (parsed?.role) roleHeader['X-User-Role'] = parsed.role;
+        }
+      } catch (_) {}
+    }
+
+    const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/participants`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...roleHeader },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al enrolar participantes en la cohorte');
+    }
+    return await res.json();
+  },
+
+  unenrollCohortParticipant: async (
+    cohortId: string,
+    participantCard: string
+  ): Promise<{ message: string; cohortId: string; participantCard: string }> => {
+    const roleHeader: Record<string, string> = {};
+    if (typeof window !== 'undefined') {
+      try {
+        const u = localStorage.getItem('capacitahub_user');
+        if (u) {
+          const parsed = JSON.parse(u);
+          if (parsed?.role) roleHeader['X-User-Role'] = parsed.role;
+        }
+      } catch (_) {}
+    }
+
+    const res = await fetch(
+      `${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/participants/${encodeURIComponent(participantCard)}`,
+      {
+        method: 'DELETE',
+        headers: roleHeader
+      }
+    );
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al desmatricular participante de la cohorte');
     }
     return await res.json();
   },

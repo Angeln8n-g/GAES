@@ -14,7 +14,8 @@ import {
   Company,
   ExternalTraining,
   CreateExternalTrainingPayload,
-  TechnicalCohortAttendanceMatrix
+  TechnicalCohortAttendanceMatrix,
+  TechnicalCohortEnrolledParticipant
 } from '../types';
 import { formatDateLong, formatCedula, isValidCedula, formatDateShort } from './formatters';
 import {
@@ -2541,5 +2542,279 @@ export const exportTechnicalAcademyAttendanceToExcel = (matrix: TechnicalCohortA
   const cleanCourse = (matrix.courseTitle || 'Curso_Tecnico').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 20);
   const cleanGroup = (matrix.groupName || 'Grupo').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 15);
   XLSX.writeFile(wb, `Academia_Tecnica_${cleanCourse}_${cleanGroup}_${matrix.startDate}.xlsx`);
+};
+
+/**
+ * Exporta el listado de participantes matriculados en una cohorte técnica a Excel
+ */
+export const exportCohortParticipantsToExcel = (
+  cohort: {
+    id: string;
+    courseTitle?: string;
+    groupName?: string;
+    facilitatorName?: string;
+    startDate: string;
+    endDate: string;
+    dailyTime?: string;
+    location?: string;
+    capacity?: number;
+    dailyHours?: number;
+  },
+  participants: TechnicalCohortEnrolledParticipant[]
+): void => {
+  const rows = participants.map((p, idx) => ({
+    'No.': idx + 1,
+    'Carnet / Tarjeta': p.card,
+    'Cédula': p.cedula ? formatCedula(p.cedula) : 'N/A',
+    'Nombre Completo': p.name,
+    'Correo Electrónico': p.email,
+    'Departamento / Área': p.department || 'N/A',
+    'Estado Matrícula': p.enrollmentStatus === 'enrolled' ? 'MATRICULADO' : p.enrollmentStatus.toUpperCase(),
+    'Fecha Matrícula': p.enrolledAt ? formatDateShort(p.enrolledAt) : 'N/A',
+    'Días Asistidos': p.attendedDays ?? 0,
+    'Total Días Taller': p.totalDays ?? 0,
+    '% Asistencia': `${p.attendancePercentage ?? 0}%`,
+    'Horas Acreditadas': p.totalHoursEarned ?? 0,
+    'Condición Académica': p.academicCondition || ((p.attendancePercentage ?? 0) >= 80 ? 'APROBADO' : (p.attendancePercentage ?? 0) >= 50 ? 'EN RIESGO' : 'REPROBADO')
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+
+  ws['!cols'] = [
+    { wch: 6 },  // No.
+    { wch: 16 }, // Carnet
+    { wch: 18 }, // Cédula
+    { wch: 32 }, // Nombre
+    { wch: 30 }, // Correo
+    { wch: 24 }, // Departamento
+    { wch: 18 }, // Estado Matrícula
+    { wch: 16 }, // Fecha Matrícula
+    { wch: 15 }, // Días Asistidos
+    { wch: 16 }, // Total Días
+    { wch: 14 }, // % Asistencia
+    { wch: 18 }, // Horas Acreditadas
+    { wch: 20 }  // Condición
+  ];
+
+  // Ficha de cohorte
+  const summaryData = [
+    { 'Parámetro': 'Curso Técnico', 'Valor': cohort.courseTitle || 'Curso Técnico' },
+    { 'Parámetro': 'Grupo Técnico', 'Valor': cohort.groupName || 'Sin Grupo Asignado' },
+    { 'Parámetro': 'Facilitador / Instructor', 'Valor': cohort.facilitatorName || 'No Asignado' },
+    { 'Parámetro': 'Fecha de Inicio', 'Valor': cohort.startDate },
+    { 'Parámetro': 'Fecha de Finalización', 'Valor': cohort.endDate },
+    { 'Parámetro': 'Horario Diario', 'Valor': cohort.dailyTime || '08:00 AM - 12:00 PM' },
+    { 'Parámetro': 'Ubicación / Laboratorio', 'Valor': cohort.location || 'Laboratorio Técnico' },
+    { 'Parámetro': 'Cupo Máximo (Capacidad)', 'Valor': cohort.capacity || 20 },
+    { 'Parámetro': 'Participantes Matriculados', 'Valor': participants.length },
+    { 'Parámetro': 'Fecha de Emisión de Reporte', 'Valor': new Date().toISOString().slice(0, 10) }
+  ];
+  const wsSummary = XLSX.utils.json_to_sheet(summaryData);
+  wsSummary['!cols'] = [{ wch: 30 }, { wch: 40 }];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Participantes_Matriculados');
+  XLSX.utils.book_append_sheet(wb, wsSummary, 'Ficha_Cohorte');
+
+  const cleanCourse = (cohort.courseTitle || 'Academia_Tecnica').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 20);
+  const cleanDate = (cohort.startDate || new Date().toISOString().slice(0, 10)).replace(/[^0-9-]/g, '');
+  XLSX.writeFile(wb, `Participantes_${cleanCourse}_${cleanDate}.xlsx`);
+};
+
+/**
+ * Descarga una plantilla oficial para la carga masiva de participantes a una cohorte técnica
+ */
+export const downloadCohortParticipantsTemplateExcel = (): void => {
+  const sampleData = [
+    {
+      'Carnet': '2010',
+      'Cedula': '402-2196163-1',
+      'Email': 'luis.almazan@empresa.com',
+      'Nombre (Opcional)': 'LUIS ALBERTO ALMAZAN POOT'
+    },
+    {
+      'Carnet': '2012',
+      'Cedula': '001-0876543-2',
+      'Email': 'liliana.sosa@empresa.com',
+      'Nombre (Opcional)': 'LILIANA ESTHER SOSA PECH'
+    },
+    {
+      'Carnet': '1998',
+      'Cedula': '001-1234567-8',
+      'Email': 'fermin.chi@empresa.com',
+      'Nombre (Opcional)': 'FERMIN GABRIEL CHI PERERA'
+    }
+  ];
+
+  const ws = XLSX.utils.json_to_sheet(sampleData);
+  ws['!cols'] = [
+    { wch: 16 }, // Carnet
+    { wch: 18 }, // Cedula
+    { wch: 30 }, // Email
+    { wch: 35 }  // Nombre
+  ];
+
+  const instructions = [
+    { 'Paso / Regla': '1. Identificación', 'Detalle': 'El sistema puede vincular al técnico por su Carnet (Tarjeta), Cédula o Correo Electrónico institucional.' },
+    { 'Paso / Regla': '2. Flexibilidad', 'Detalle': 'Basta con completar al menos una de las columnas de identificación (Carnet, Cédula o Email) por cada fila.' },
+    { 'Paso / Regla': '3. Validación', 'Detalle': 'El colaborador debe estar previamente registrado en el padrón general de la plataforma.' },
+    { 'Paso / Regla': '4. Formatos admitidos', 'Detalle': 'Puede subir este archivo en formato .xlsx, .xls o guardar como .csv.' }
+  ];
+  const wsInstructions = XLSX.utils.json_to_sheet(instructions);
+  wsInstructions['!cols'] = [{ wch: 24 }, { wch: 70 }];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Participantes');
+  XLSX.utils.book_append_sheet(wb, wsInstructions, 'Instrucciones');
+
+  XLSX.writeFile(wb, 'Plantilla_Carga_Participantes_Academia_Tecnica.xlsx');
+};
+
+/**
+ * Procesa y valida un archivo Excel/CSV con la lista de participantes a enrolar
+ */
+export const parseCohortParticipantsExcel = async (
+  file: File,
+  allParticipants: Participant[]
+): Promise<{
+  matched: Array<{
+    card: string;
+    name: string;
+    email: string;
+    cedula?: string;
+    department?: string;
+    matchedBy: 'card' | 'cedula' | 'email';
+  }>;
+  unmatched: Array<{
+    rawValue: string;
+    reason: string;
+    rowNumber: number;
+  }>;
+  duplicatesInFile: number;
+}> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const rows: any[] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+        if (!rows || rows.length < 2) {
+          throw new Error('El archivo no contiene filas de datos para procesar.');
+        }
+
+        const header = (rows[0] || []).map((h: any) => String(h || '').toLowerCase().trim());
+        let cardIdx = header.findIndex((h: string) => h.includes('carnet') || h.includes('tarjeta') || h.includes('card') || h.includes('codigo') || h.includes('código'));
+        let cedulaIdx = header.findIndex((h: string) => h.includes('cedula') || h.includes('cédula'));
+        let emailIdx = header.findIndex((h: string) => h.includes('correo') || h.includes('email') || h.includes('mail'));
+
+        // Si la primera columna no tiene cabecera estándar pero es la primera
+        if (cardIdx === -1 && cedulaIdx === -1 && emailIdx === -1) {
+          cardIdx = 0;
+        }
+
+        // Mapeos rápidos para búsqueda O(1)
+        const byCard = new Map<string, Participant>();
+        const byCedula = new Map<string, Participant>();
+        const byEmail = new Map<string, Participant>();
+
+        allParticipants.forEach(p => {
+          if (p.card) byCard.set(p.card.trim().toLowerCase(), p);
+          if (p.cedula) {
+            const clean = p.cedula.replace(/[^0-9kK]/g, '').toLowerCase();
+            if (clean) byCedula.set(clean, p);
+          }
+          if (p.email) byEmail.set(p.email.trim().toLowerCase(), p);
+        });
+
+        const matched: Array<{
+          card: string;
+          name: string;
+          email: string;
+          cedula?: string;
+          department?: string;
+          matchedBy: 'card' | 'cedula' | 'email';
+        }> = [];
+        const unmatched: Array<{ rawValue: string; reason: string; rowNumber: number }> = [];
+        const seenCards = new Set<string>();
+        let duplicatesInFile = 0;
+
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i];
+          if (!row || row.length === 0) continue;
+
+          const rawCard = cardIdx !== -1 ? String(row[cardIdx] || '').trim() : '';
+          const rawCedula = cedulaIdx !== -1 ? String(row[cedulaIdx] || '').trim() : '';
+          const rawEmail = emailIdx !== -1 ? String(row[emailIdx] || '').trim() : '';
+
+          if (!rawCard && !rawCedula && !rawEmail) {
+            continue;
+          }
+
+          let found: Participant | undefined;
+          let matchedBy: 'card' | 'cedula' | 'email' = 'card';
+
+          // 1. Intentar por carnet
+          if (rawCard && byCard.has(rawCard.toLowerCase())) {
+            found = byCard.get(rawCard.toLowerCase());
+            matchedBy = 'card';
+          }
+          // 2. Intentar por cédula
+          if (!found && rawCedula) {
+            const cleanCedula = rawCedula.replace(/[^0-9kK]/g, '').toLowerCase();
+            if (byCedula.has(cleanCedula)) {
+              found = byCedula.get(cleanCedula);
+              matchedBy = 'cedula';
+            }
+          }
+          // 3. Intentar por email
+          if (!found && rawEmail) {
+            if (byEmail.has(rawEmail.toLowerCase())) {
+              found = byEmail.get(rawEmail.toLowerCase());
+              matchedBy = 'email';
+            }
+          }
+          // 4. Si rawCard contiene formato de email
+          if (!found && rawCard.includes('@') && byEmail.has(rawCard.toLowerCase())) {
+            found = byEmail.get(rawCard.toLowerCase());
+            matchedBy = 'email';
+          }
+
+          const identifierDisplay = rawCard || rawCedula || rawEmail;
+
+          if (found) {
+            if (seenCards.has(found.card)) {
+              duplicatesInFile++;
+            } else {
+              seenCards.add(found.card);
+              matched.push({
+                card: found.card,
+                name: found.name,
+                email: found.email,
+                cedula: found.cedula,
+                department: found.department,
+                matchedBy
+              });
+            }
+          } else {
+            unmatched.push({
+              rawValue: identifierDisplay,
+              reason: 'No se encontró colaborador en el padrón con este identificador.',
+              rowNumber: i + 1
+            });
+          }
+        }
+
+        resolve({ matched, unmatched, duplicatesInFile });
+      } catch (err: any) {
+        reject(err);
+      }
+    };
+    reader.onerror = () => reject(new Error('Error al leer el archivo.'));
+    reader.readAsArrayBuffer(file);
+  });
 };
 
