@@ -675,3 +675,43 @@ export interface TechnicalCohortParticipantsResponse {
   };
   participants: TechnicalCohortEnrolledParticipant[];
 }
+
+// ==========================================
+// TIPOS PARA RESPALDOS Y MIGRACIONES DE BD
+// ==========================================
+
+export interface DatabaseBackupRecord {
+  filename: string;
+  filepath?: string;
+  sizeBytes: number;
+  sizeFormatted: string;
+  sha256: string;
+  createdAt: string;
+  triggerType: 'automated_scheduled' | 'manual_admin' | 'pre_restore_safety';
+  tableCount?: number;
+  databaseName: string;
+}
+
+export interface DatabaseStats {
+  databaseName: string;
+  databaseSize: string;
+  databaseSizeBytes: number;
+  tableCount: number;
+  backupCount: number;
+  totalBackupSizeBytes: number;
+  totalBackupSizeFormatted: string;
+  lastBackupAt: string | null;
+  serverTime: string;
+}
+
+export interface MigrationStatusRecord {
+  id?: number;
+  version: string;
+  name: string;
+  checksum: string;
+  appliedAt?: string;
+  executionTimeMs?: number;
+  success?: boolean;
+  status: 'applied' | 'pending' | 'failed';
+}
+

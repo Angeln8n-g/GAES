@@ -16,6 +16,8 @@ import settingsRouter from './routes/settings.js';
 import ojtRouter from './routes/ojt.js';
 import { externalTrainingsRouter } from './routes/externalTrainings.js';
 import { technicalAcademyRouter } from './routes/technicalAcademy.js';
+import { adminBackupsRouter } from './routes/backups.js';
+import { initBackupScheduler } from './services/backupService.js';
 
 import { pool, initDbMigrations } from './db.js';
 
@@ -54,6 +56,7 @@ app.use('/api/groups', groupsRouter);
 app.use('/api/programs', programsRouter);
 app.use('/api/external-trainings', externalTrainingsRouter);
 app.use('/api/technical-academy', technicalAcademyRouter);
+app.use('/api/admin', adminBackupsRouter);
 
 import http from 'http';
 import { initWebSocketServer } from './websocket.js';
@@ -70,5 +73,6 @@ server.listen(PORT, async () => {
   console.log(`🌐 Health check: http://localhost:${PORT}/api/health`);
   console.log(`=========================================`);
   await initDbMigrations();
+  initBackupScheduler();
 });
 

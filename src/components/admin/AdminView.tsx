@@ -12,7 +12,8 @@ import {
   Activity,
   Settings,
   Award,
-  GraduationCap
+  GraduationCap,
+  Database
 } from 'lucide-react';
 import { TrainingEvent, Participant, UserAccount, ParticipantGroup, TrainingProgram, Company, SystemSettings, OjtChecklist, CalibrationSession, TechnicalAcademyHistoryRecord } from '../../types';
 import { EventsManager } from './EventsManager';
@@ -22,6 +23,7 @@ import { GroupsManager } from './GroupsManager';
 import { ProgramsManager } from './ProgramsManager';
 import { CompaniesManager } from './CompaniesManager';
 import { SettingsManager } from './SettingsManager';
+import { DatabaseBackupManager } from './DatabaseBackupManager';
 import { FormalLettersManager } from './FormalLettersManager';
 import { ExternalTrainingsManager } from './ExternalTrainingsManager';
 import { OjtManager } from '../ojt/OjtManager';
@@ -117,7 +119,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
   onMakeRecurrent,
   onShowToast
 }) => {
-  const [adminTab, setAdminTab] = useState<'events' | 'programs' | 'groups' | 'participants' | 'users' | 'companies' | 'ojt' | 'letters' | 'external-trainings' | 'settings'>('events');
+  const [adminTab, setAdminTab] = useState<'events' | 'programs' | 'groups' | 'participants' | 'users' | 'companies' | 'ojt' | 'letters' | 'external-trainings' | 'settings' | 'backups'>('events');
 
   // Modals state
   const [isEventFormOpen, setIsEventFormOpen] = useState(false);
@@ -442,6 +444,22 @@ export const AdminView: React.FC<AdminViewProps> = ({
                 <span>Configuración</span>
               </button>
             )}
+
+            {isSuperAdmin && (
+              <button
+                role="tab"
+                aria-selected={adminTab === 'backups'}
+                onClick={() => setAdminTab('backups')}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
+                  adminTab === 'backups'
+                    ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                }`}
+              >
+                <Database className={`w-4 h-4 shrink-0 ${adminTab === 'backups' ? 'text-white' : 'text-slate-500'}`} />
+                <span>Base de Datos & Respaldos</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -594,6 +612,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
         <SettingsManager
           settings={settings}
           onUpdateSettings={onUpdateSettings}
+          onShowToast={onShowToast}
+        />
+      )}
+
+      {adminTab === 'backups' && isSuperAdmin && (
+        <DatabaseBackupManager
+          currentUser={currentUser}
           onShowToast={onShowToast}
         />
       )}

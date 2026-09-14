@@ -4,9 +4,11 @@
   "description": "API REST Backend para Gestión de Reservas y Capacitaciones con PostgreSQL",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && mkdir -p dist/migrations && cp -r src/migrations/*.sql dist/migrations/ 2>/dev/null || true",
     "start": "node dist/index.js",
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "migrate": "node dist/migrator.js run",
+    "migrate:status": "node dist/migrator.js status"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

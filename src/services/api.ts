@@ -31,7 +31,10 @@ import {
   TechnicalCohortParticipant,
   TechnicalAcademyHistoryRecord,
   TechnicalCohortEnrolledParticipant,
-  TechnicalCohortParticipantsResponse
+  TechnicalCohortParticipantsResponse,
+  DatabaseBackupRecord,
+  DatabaseStats,
+  MigrationStatusRecord
 } from '../types';
 
 export const MOCK_COMPANIES: Company[] = [
@@ -2140,6 +2143,106 @@ export const apiService = {
       throw new Error(err.error || 'Error al consultar historial de academia técnica');
     }
     return await res.json();
+  },
+
+  // ==========================================
+  // RESPALDOS Y MIGRACIONES DE BASE DE DATOS
+  // ==========================================
+
+  getDatabaseBackups: async (): Promise<DatabaseBackupRecord[]> => {
+    const res = await fetch(`${API_BASE_URL}/admin/backups`, {
+      headers: getAuthHeaders(false)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al consultar lista de respaldos');
+    }
+    const data = await res.json();
+    return data.backups || [];
+  },
+
+  createDatabaseBackup: async (triggeredBy?: string): Promise<DatabaseBackupRecord> => {
+    const res = await fetch(`${API_BASE_URL}/admin/backups`, {
+      method: 'POST',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify({ triggeredBy })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al generar respaldo de la base de datos');
+    }
+    const data = await res.json();
+    return data.backup;
+  },
+
+  deleteDatabaseBackup: async (filename: string, triggeredBy?: string): Promise<{ success: boolean; message: string }> => {
+    const res = await fetch(`${API_BASE_URL}/admin/backups/${encodeURIComponent(filename)}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify({ triggeredBy })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al eliminar respaldo de la base de datos');
+    }
+    return await res.json();
+  },
+
+  restoreDatabaseBackup: async (
+    filename: string,
+    triggeredBy?: string
+  ): Promise<{ success: boolean; message: string; safetyBackup: string }> => {
+    const res = await fetch(`${API_BASE_URL}/admin/backups/${encodeURIComponent(filename)}/restore`, {
+      method: 'POST',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify({ confirm: true, triggeredBy })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al restaurar respaldo de la base de datos');
+    }
+    return await res.json();
+  },
+
+  getDatabaseStats: async (): Promise<DatabaseStats> => {
+    const res = await fetch(`${API_BASE_URL}/admin/backups/stats`, {
+      headers: getAuthHeaders(false)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al consultar estadísticas de la base de datos');
+    }
+    const data = await res.json();
+    return data.stats;
+  },
+
+  getMigrationStatus: async (): Promise<MigrationStatusRecord[]> => {
+    const res = await fetch(`${API_BASE_URL}/admin/migrations/status`, {
+      headers: getAuthHeaders(false)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al consultar estado de migraciones');
+    }
+    const data = await res.json();
+    return data.migrations || [];
+  },
+
+  runPendingMigrations: async (): Promise<{ success: boolean; appliedCount: number; results: MigrationStatusRecord[] }> => {
+    const res = await fetch(`${API_BASE_URL}/admin/migrations/run`, {
+      method: 'POST',
+      headers: getAuthHeaders(true)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al ejecutar migraciones pendientes');
+    }
+    return await res.json();
+  },
+
+  getBackupDownloadUrl: (filename: string): string => {
+    return `${API_BASE_URL}/admin/backups/${encodeURIComponent(filename)}/download`;
   }
 };
+
 

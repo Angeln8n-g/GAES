@@ -21,6 +21,8 @@ const settings_js_1 = __importDefault(require("./routes/settings.js"));
 const ojt_js_1 = __importDefault(require("./routes/ojt.js"));
 const externalTrainings_js_1 = require("./routes/externalTrainings.js");
 const technicalAcademy_js_1 = require("./routes/technicalAcademy.js");
+const backups_js_1 = require("./routes/backups.js");
+const backupService_js_1 = require("./services/backupService.js");
 const db_js_1 = require("./db.js");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -53,6 +55,7 @@ app.use('/api/groups', groups_js_1.groupsRouter);
 app.use('/api/programs', programs_js_1.programsRouter);
 app.use('/api/external-trainings', externalTrainings_js_1.externalTrainingsRouter);
 app.use('/api/technical-academy', technicalAcademy_js_1.technicalAcademyRouter);
+app.use('/api/admin', backups_js_1.adminBackupsRouter);
 const http_1 = __importDefault(require("http"));
 const websocket_js_1 = require("./websocket.js");
 // Iniciar Servidor HTTP + WebSocket
@@ -66,4 +69,5 @@ server.listen(PORT, async () => {
     console.log(`🌐 Health check: http://localhost:${PORT}/api/health`);
     console.log(`=========================================`);
     await (0, db_js_1.initDbMigrations)();
+    (0, backupService_js_1.initBackupScheduler)();
 });
