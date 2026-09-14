@@ -36,7 +36,7 @@ const COLOR_OPTIONS = [
   { id: 'amber', label: 'Ámbar', bg: 'bg-amber-500/20', text: 'text-amber-400', border: 'border-amber-500/30', dot: 'bg-amber-500' },
   { id: 'rose', label: 'Rosa / Rojo', bg: 'bg-rose-500/20', text: 'text-rose-400', border: 'border-rose-500/30', dot: 'bg-rose-500' },
   { id: 'sky', label: 'Cielo', bg: 'bg-sky-500/20', text: 'text-sky-400', border: 'border-sky-500/30', dot: 'bg-sky-500' },
-  { id: 'purple', label: 'Púrpura', bg: 'bg-purple-500/20', text: 'text-purple-400', border: 'border-purple-500/30', dot: 'bg-purple-500' },
+  { id: 'teal', label: 'Teal / Azul verdoso', bg: 'bg-teal-500/20', text: 'text-teal-400', border: 'border-teal-500/30', dot: 'bg-teal-500' },
   { id: 'cyan', label: 'Cian', bg: 'bg-cyan-500/20', text: 'text-cyan-400', border: 'border-cyan-500/30', dot: 'bg-cyan-500' }
 ];
 
@@ -352,7 +352,7 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
 
                   <button
                     onClick={() => handleDelete(group)}
-                    className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                    className="p-2 rounded-xl text-rose-600 hover:text-rose-800 hover:bg-rose-50 transition-colors cursor-pointer"
                     title="Eliminar grupo"
                   >
                     <Trash2 className="w-3.5 h-3.5" />

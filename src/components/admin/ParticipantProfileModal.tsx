@@ -27,8 +27,9 @@ import {
   MapPin,
   Phone
 } from "lucide-react";
-import { Participant, UserAccount, TrainingEvent, TrainingProgram, Company, ParticipantGrade } from "../../types";
+import { Participant, UserAccount, TrainingEvent, TrainingProgram, Company, ParticipantGrade, ExternalTraining } from "../../types";
 import { FormalLetterModal, TrainingHistoryRecord } from "../history/FormalLetterModal";
+import { getProgramShortName } from "../../constants/sustainabilityPrograms";
 
 interface ParticipantProfileModalProps {
   participant: Participant | null;
@@ -36,6 +37,7 @@ interface ParticipantProfileModalProps {
   events: TrainingEvent[];
   programs?: TrainingProgram[];
   companies?: Company[];
+  externalTrainings?: ExternalTraining[];
   isOpen: boolean;
   onClose: () => void;
   onOpenEdit?: (participant: Participant) => void;
@@ -48,6 +50,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
   events,
   programs = [],
   companies = [],
+  externalTrainings = [],
   isOpen,
   onClose,
   onOpenEdit,
@@ -65,7 +68,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
   const { 
     attendedEvents, 
     registeredEvents, 
-    totalHours,
+    internalHours,
     academicGrades,
     avgScore,
     passedCount,
@@ -128,7 +131,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
     return {
       attendedEvents: attended,
       registeredEvents: registered,
-      totalHours: attended.length * 2,
+      internalHours: attended.reduce((acc, a) => acc + (a.event.totalHours || 2), 0),
       academicGrades: gradesList,
       avgScore: avg,
       passedCount: passed,
@@ -137,6 +140,20 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
       hasRetrainingAlert: retraining || gapsSet.size > 0
     };
   }, [events, emailLower, cardStr]);
+
+  // Filtrar capacitaciones externas de este participante
+  const participantExternalTrainings = useMemo(() => {
+    return (externalTrainings || []).filter(t => 
+      t.participantCard === cardStr || 
+      (t.participantEmail && t.participantEmail.toLowerCase() === emailLower)
+    );
+  }, [externalTrainings, cardStr, emailLower]);
+
+  const externalHoursTotal = useMemo(() => {
+    return participantExternalTrainings.reduce((acc, t) => acc + (Number(t.totalHours) || 0), 0);
+  }, [participantExternalTrainings]);
+
+  const totalCalculatedHours = internalHours + externalHoursTotal;
 
   const [isFormalLetterOpen, setIsFormalLetterOpen] = useState(false);
 
@@ -152,7 +169,8 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
         date: att.date,
         time: att.time,
         hasAttended: true,
-        hours: 2
+        hours: att.event.totalHours || 2,
+        isExternal: false
       });
     });
     registeredEvents.forEach((reg, idx) => {
@@ -165,11 +183,33 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
         date: reg.date,
         time: reg.time,
         hasAttended: false,
-        hours: 2
+        hours: reg.event.totalHours || 2,
+        isExternal: false
       });
     });
+
+    // Añadir capacitaciones externas
+    participantExternalTrainings.forEach((ext, idx) => {
+      list.push({
+        id: `ext-${ext.id}-${idx}`,
+        title: ext.title,
+        category: ext.programCategory,
+        modality: ext.modality,
+        instructor: ext.supplier,
+        date: ext.endDate || ext.startDate,
+        time: 'Acreditado',
+        hasAttended: true,
+        hours: Number(ext.totalHours) || 1,
+        gradeScore: ext.score,
+        academicStatus: ext.academicStatus || 'passed',
+        isExternal: true,
+        supplier: ext.supplier,
+        credentialUrl: ext.credentialUrl
+      });
+    });
+
     return list;
-  }, [attendedEvents, registeredEvents]);
+  }, [attendedEvents, registeredEvents, participantExternalTrainings]);
 
   const empStatus = participant.employmentStatus || "contratado";
 
@@ -277,7 +317,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
             <p className="text-[10px] text-slate-500 font-semibold mt-0.5">Asistencias</p>
           </div>
           <div className="p-3">
-            <p className="text-lg font-black text-purple-700">{avgScore} <span className="text-[10px] text-slate-400 font-normal">pts</span></p>
+            <p className="text-lg font-black text-indigo-600">{avgScore} <span className="text-[10px] text-slate-400 font-normal">pts</span></p>
             <p className="text-[10px] text-slate-500 font-semibold mt-0.5">Promedio Notas</p>
           </div>
           <div className="p-3">
@@ -287,7 +327,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
             <p className="text-[10px] text-slate-500 font-semibold mt-0.5">Aprobados / Reprobados</p>
           </div>
           <div className="p-3">
-            <p className="text-lg font-black text-[#DA291C]">~{totalHours}h</p>
+            <p className="text-lg font-black text-[#DA291C]">~{totalCalculatedHours}h</p>
             <p className="text-[10px] text-slate-500 font-semibold mt-0.5">Horas Formativas</p>
           </div>
         </div>
@@ -399,11 +439,11 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                <GraduationCap className="w-3.5 h-3.5 text-purple-600" />
+                <GraduationCap className="w-3.5 h-3.5 text-indigo-600" />
                 <span>Libro de Calificaciones & Debilidades ({academicGrades.length})</span>
               </h3>
               {academicGrades.length > 0 && (
-                <span className="text-[10px] text-purple-700 font-bold bg-purple-50 px-2 py-0.5 rounded-lg border border-purple-200">
+                <span className="text-[10px] text-indigo-700 font-bold bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-200">
                   Promedio: {avgScore} pts
                 </span>
               )}
@@ -548,6 +588,67 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
             ) : (
               <p className="text-xs text-slate-500 italic p-3 bg-slate-50 rounded-xl border border-slate-200 text-center">
                 Aún no registra asistencias confirmadas por código QR.
+              </p>
+            )}
+          </div>
+
+          {/* Capacitaciones Externas Homologadas */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                <GraduationCap className="w-3.5 h-3.5 text-blue-600" />
+                <span>Capacitaciones Externas Homologadas ({participantExternalTrainings.length})</span>
+              </h3>
+              {externalHoursTotal > 0 && (
+                <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+                  +{externalHoursTotal} hrs acreditadas
+                </span>
+              )}
+            </div>
+
+            {participantExternalTrainings.length > 0 ? (
+              <div className="space-y-2">
+                {participantExternalTrainings.map((ext, idx) => (
+                  <div 
+                    key={idx} 
+                    className="p-3.5 rounded-2xl bg-blue-50/40 border border-blue-200/80 flex items-center justify-between gap-3"
+                  >
+                    <div className="space-y-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-blue-100 text-blue-800 border border-blue-200 uppercase tracking-wider">
+                          Externa
+                        </span>
+                        <p className="text-xs font-bold text-slate-900 truncate">{ext.title}</p>
+                      </div>
+                      <div className="flex items-center gap-2 text-[11px] text-slate-600 font-medium flex-wrap">
+                        <span>🏢 {ext.supplier}</span>
+                        <span>• 📅 {ext.startDate} → {ext.endDate}</span>
+                        <span>• 🌿 {getProgramShortName(ext.programCategory)}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="px-2.5 py-1 rounded-xl bg-white border border-slate-200 text-slate-900 text-xs font-black shadow-2xs">
+                        {ext.totalHours} hrs
+                      </span>
+                      {ext.credentialUrl && (
+                        <a
+                          href={ext.credentialUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 p-1"
+                          title="Ver certificado externo"
+                        >
+                          <FileText className="w-4 h-4" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-slate-500 italic p-3 bg-slate-50 rounded-xl border border-slate-200 text-center">
+                No tiene capacitaciones externas registradas aún.
               </p>
             )}
           </div>

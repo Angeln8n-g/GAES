@@ -33,6 +33,9 @@ export interface TrainingHistoryRecord {
   hours: number;
   gradeScore?: number | null;
   academicStatus?: string | null;
+  isExternal?: boolean;
+  supplier?: string;
+  credentialUrl?: string | null;
 }
 
 interface FormalLetterModalProps {
@@ -477,10 +480,18 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                             className="rounded text-[#DA291C] focus:ring-[#DA291C]"
                           />
                           <div className="min-w-0">
-                            <p className="font-bold text-slate-900 truncate text-[11px]">{rec.title}</p>
+                            <p className="font-bold text-slate-900 truncate text-[11px] flex items-center gap-1.5">
+                              <span>{rec.title}</span>
+                              {rec.isExternal && (
+                                <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-blue-100 text-blue-800 border border-blue-200">
+                                  Externa
+                                </span>
+                              )}
+                            </p>
                             <div className="flex items-center gap-2 text-[10px] text-slate-500">
                               <span>📅 {formatDateShort(rec.date)}</span>
                               <span>• {rec.modality}</span>
+                              {rec.supplier && <span>• {rec.supplier}</span>}
                               {rec.hasAttended && (
                                 <span className="text-emerald-700 font-bold">✓ Asistió</span>
                               )}
@@ -685,7 +696,12 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                             return (
                               <tr key={course.id} className="hover:bg-slate-50/50">
                                 <td className="py-2 px-3 text-center text-slate-400 font-bold">{idx + 1}</td>
-                                <td className="py-2 px-3 font-bold text-slate-900">{course.title}</td>
+                                <td className="py-2 px-3 font-bold text-slate-900">
+                                  {course.title}
+                                  {course.isExternal && (
+                                    <span className="ml-1 text-[10px] font-bold text-blue-700"> (Externa - {course.supplier || 'Suplidor'})</span>
+                                  )}
+                                </td>
                                 <td className="py-2 px-2 text-center text-slate-600 font-medium">{course.modality}</td>
                                 <td className="py-2 px-3 text-slate-600">{course.instructor}</td>
                                 <td className="py-2 px-2 text-center text-slate-600">{formatDateShort(course.date)}</td>

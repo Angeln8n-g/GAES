@@ -255,7 +255,7 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
                       onClick={() => handleDateChange(sch.date)}
                       className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
                         selectedDate === sch.date
-                          ? 'bg-red-50 border-[#DA291C] text-slate-900 shadow-sm'
+                          ? 'bg-red-50 border-[#DA291C] text-red-950 shadow-sm'
                           : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                       }`}
                     >
@@ -318,7 +318,7 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
                 onClick={() => setIsMandatory(true)}
                 className={`p-4 rounded-2xl border text-left transition-all relative cursor-pointer ${
                   isMandatory
-                    ? 'bg-rose-50 border-rose-400 text-slate-900 shadow-sm'
+                    ? 'bg-rose-50 border-rose-400 text-rose-950 shadow-sm'
                     : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                 }`}
               >
@@ -329,7 +329,7 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
                   </div>
                   {isMandatory && <Check className="w-4 h-4 text-rose-600 stroke-[3]" />}
                 </div>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
+                <p className={`text-[11px] leading-relaxed ${isMandatory ? 'text-rose-900/80' : 'text-slate-500'}`}>
                   El colaborador no podrá cancelar ni desasignarse desde su panel. Se exigirá asistencia.
                 </p>
               </button>
@@ -340,7 +340,7 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
                 onClick={() => setIsMandatory(false)}
                 className={`p-4 rounded-2xl border text-left transition-all relative cursor-pointer ${
                   !isMandatory
-                    ? 'bg-cyan-50 border-cyan-400 text-slate-900 shadow-sm'
+                    ? 'bg-cyan-50 border-cyan-400 text-cyan-950 shadow-sm'
                     : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                 }`}
               >
@@ -351,7 +351,7 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
                   </div>
                   {!isMandatory && <Check className="w-4 h-4 text-cyan-600 stroke-[3]" />}
                 </div>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
+                <p className={`text-[11px] leading-relaxed ${!isMandatory ? 'text-cyan-900/80' : 'text-slate-500'}`}>
                   Aparecerá recomendado por el líder, pero el colaborador podrá cancelar o ajustar su horario.
                 </p>
               </button>

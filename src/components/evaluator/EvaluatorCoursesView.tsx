@@ -398,7 +398,7 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
                   <button
                     onClick={() => handleExportGrades(event)}
                     title="Exportar calificaciones a Excel"
-                    className="p-2.5 rounded-xl text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5"
+                    className="p-2.5 rounded-xl text-slate-600 hover:text-emerald-800 hover:bg-slate-100 border border-slate-200 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5"
                   >
                     <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
                     <span className="hidden sm:inline">Excel</span>

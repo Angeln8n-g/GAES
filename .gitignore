@@ -3,3 +3,10 @@ server/node_modules/
 *.log
 .DS_Store
 .env
+
+# Skills and AI tool configuration
+.agent/
+.gemini/
+.opencode/
+skills/
+.skills/

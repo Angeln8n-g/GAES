@@ -11,9 +11,24 @@ import {
   ParticipantGrade,
   OjtChecklist,
   CalibrationSession,
-  Company
+  Company,
+  ExternalTraining,
+  CreateExternalTrainingPayload
 } from '../types';
-import { formatDateLong, formatCedula, isValidCedula } from './formatters';
+import { formatDateLong, formatCedula, isValidCedula, formatDateShort } from './formatters';
+import {
+  SUSTAINABILITY_PROGRAMS,
+  SESSION_TYPES,
+  TRAINING_TYPES,
+  TRAINING_FORMATS,
+  EVENT_MODALITIES,
+  getProgramLabel,
+  getProgramShortName,
+  getSubprogramsForProgram,
+  SessionType,
+  TrainingType,
+  TrainingFormat
+} from '../constants/sustainabilityPrograms';
 
 /**
  * Exporta la lista de asistentes de un horario/evento a un archivo Excel (.xlsx)
@@ -1854,3 +1869,606 @@ export const exportSustainabilityAndTrainingReportToExcel = (
   const fileName = `Reporte_Sustentabilidad_Capacitaciones_Claro_${dateToday}.xlsx`;
   XLSX.writeFile(wb, fileName);
 };
+
+// =========================================================================
+// UTILIDADES PARA CAPACITACIONES EXTERNAS (HISTÓRICO & CARGA MASIVA)
+// =========================================================================
+
+export const formatExcelDate = (val: any): string => {
+  if (!val && val !== 0) return '';
+  if (typeof val === 'number') {
+    try {
+      const parsed = XLSX.SSF.parse_date_code(val);
+      if (parsed && parsed.y && parsed.m && parsed.d) {
+        const y = parsed.y;
+        const m = String(parsed.m).padStart(2, '0');
+        const d = String(parsed.d).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+      }
+    } catch {}
+  }
+  const s = String(val).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const ddmmyyyy = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if (ddmmyyyy) {
+    const d = ddmmyyyy[1].padStart(2, '0');
+    const m = ddmmyyyy[2].padStart(2, '0');
+    const y = ddmmyyyy[3];
+    return `${y}-${m}-${d}`;
+  }
+  const dateObj = new Date(s);
+  if (!isNaN(dateObj.getTime())) {
+    return dateObj.toISOString().split('T')[0];
+  }
+  return s;
+};
+
+export const normalizeProgramCategory = (raw: string): string => {
+  if (!raw) return 'Capacitacion_tecnologica_digital';
+  const clean = raw.trim().toLowerCase();
+  if (clean.includes('comerc') || clean.includes('client') || clean.includes('market')) {
+    return 'Capacitacion_comercial_atencion_clientes_marketing';
+  }
+  if (clean.includes('tecnol') || clean.includes('digit') || clean.includes('soft') || clean.includes('base de datos') || clean.includes('ciber') || clean.includes('seguridad inform') || clean.includes('sistema oper')) {
+    return 'Capacitacion_tecnologica_digital';
+  }
+  if (clean.includes('corp') || clean.includes('finanz') || clean.includes('calidad') || clean.includes('agil') || clean.includes('normat')) {
+    return 'Capacitacion_corporativa';
+  }
+  if (clean.includes('talento') || clean.includes('lider') || clean.includes('aprendiz') || clean.includes('estrateg')) {
+    return 'Capacitacion_gestion_desarrollo_del_talento';
+  }
+  if (clean.includes('humano') || clean.includes('asume') || clean.includes('bienestar')) {
+    return 'Capacitacion_desarrollo_humano';
+  }
+  if (clean.includes('salud') || clean.includes('higiene') || clean.includes('riesgo') || clean.includes('sustent') || clean.includes('sst') || clean.includes('proteccion civil')) {
+    return 'Capacitacion_seguridad_salud_en_el_trabajo_y_sustentabilidad';
+  }
+  const exact = SUSTAINABILITY_PROGRAMS.find(p => p.id.toLowerCase() === clean);
+  if (exact) return exact.id;
+  return 'Capacitacion_tecnologica_digital';
+};
+
+export const normalizeSubprogram = (programId: string, rawSub: string): string => {
+  const subs = getSubprogramsForProgram(programId);
+  if (!rawSub || !rawSub.trim()) return subs[0] || 'General';
+  const clean = rawSub.trim().toLowerCase();
+  const found = subs.find(s => s.toLowerCase() === clean || clean.includes(s.toLowerCase()) || s.toLowerCase().includes(clean));
+  return found || rawSub.trim();
+};
+
+export const normalizeSessionType = (raw: string): string => {
+  if (!raw) return 'Asincrónica';
+  const clean = raw.trim().toLowerCase();
+  if (clean.includes('sincr') || clean.includes('vivo') || clean.includes('directo')) return 'Sincrónica';
+  if (clean.includes('hibr') || clean.includes('mixt')) return 'Híbrido';
+  return 'Asincrónica';
+};
+
+export const normalizeTrainingType = (raw: string): string => {
+  if (!raw) return 'Técnico';
+  const clean = raw.trim().toLowerCase();
+  if (clean.includes('conduct') || clean.includes('blanda') || clean.includes('human')) return 'Conductual';
+  return 'Técnico';
+};
+
+export const normalizeTrainingFormat = (raw: string): string => {
+  if (!raw) return 'Curso';
+  const clean = raw.trim().toLowerCase();
+  if (clean.includes('diplom')) return 'Diplomado';
+  if (clean.includes('certif')) return 'Certificación';
+  if (clean.includes('taller')) return 'Taller';
+  if (clean.includes('webinar')) return 'Webinar';
+  if (clean.includes('charla')) return 'Charla';
+  if (clean.includes('workshop')) return 'Workshop';
+  if (clean.includes('seminar')) return 'Seminario';
+  if (clean.includes('cine')) return 'Cinefórum';
+  return 'Curso';
+};
+
+export const normalizeModality = (raw: string): string => {
+  if (!raw) return 'Virtual';
+  const clean = raw.trim().toLowerCase();
+  if (clean.includes('presenc')) return 'Presencial';
+  if (clean.includes('mixt') || clean.includes('hibr')) return 'Mixta';
+  return 'Virtual';
+};
+
+export const normalizeAcademicStatus = (raw: string): string => {
+  if (!raw) return 'passed';
+  const clean = raw.trim().toLowerCase();
+  if (clean.includes('aprob') || clean.includes('pass') || clean.includes('certif')) return 'passed';
+  if (clean.includes('complet') || clean.includes('asist')) return 'completed';
+  if (clean.includes('reprob') || clean.includes('no aprob') || clean.includes('fail')) return 'failed';
+  if (clean.includes('curso') || clean.includes('progress')) return 'in_progress';
+  return 'passed';
+};
+
+/**
+ * Descarga la plantilla oficial en Excel (.xlsx) para la carga masiva de capacitaciones externas
+ */
+export const downloadExternalTrainingsTemplateExcel = (participants: Participant[] = []): void => {
+  const wb = XLSX.utils.book_new();
+
+  const sampleData = [
+    {
+      'Identificación del Colaborador (Cédula o Tarjeta o Correo) *': '402-2194060-0',
+      'Nombre del Colaborador (Informativo)': 'Angel Santana',
+      'Título de la Capacitación Externa *': 'Certificación AWS Solutions Architect Associate',
+      'Suplidor / Entidad Emisora *': 'Amazon Web Services / Pearson VUE',
+      'Programa de Sustentabilidad *': 'Tecnología & Digital',
+      'Subprograma': 'Desarrollo de software',
+      'Formato de Capacitación': 'Certificación',
+      'Tipo de Sesión': 'Asincrónica',
+      'Tipo de Entrenamiento': 'Técnico',
+      'Modalidad': 'Virtual',
+      'Fecha Inicio (AAAA-MM-DD) *': '2026-08-01',
+      'Fecha Fin (AAAA-MM-DD) *': '2026-08-25',
+      'Horas Acreditadas *': 48,
+      'Estatus Académico (Aprobado / Completado / Reprobado)': 'Aprobado',
+      'Calificación Obtenida (0-100)': 92,
+      'Folio / No. Certificado': 'AWS-SAA-89152026',
+      'URL Credencial Digital': 'https://aws.amazon.com/verification/AWS-CERT-8915',
+      'Descripción / Temario': 'Diseño y despliegue de arquitecturas en la nube escalables, seguras y de alta disponibilidad.'
+    },
+    {
+      'Identificación del Colaborador (Cédula o Tarjeta o Correo) *': '001-0876543-2',
+      'Nombre del Colaborador (Informativo)': 'Carlos Gómez Herrera',
+      'Título de la Capacitación Externa *': 'Diplomado en Gestión Integral de Ciberseguridad',
+      'Suplidor / Entidad Emisora *': 'INFOTEP',
+      'Programa de Sustentabilidad *': 'Tecnología & Digital',
+      'Subprograma': 'Seguridad informática',
+      'Formato de Capacitación': 'Diplomado',
+      'Tipo de Sesión': 'Sincrónica',
+      'Tipo de Entrenamiento': 'Técnico',
+      'Modalidad': 'Presencial',
+      'Fecha Inicio (AAAA-MM-DD) *': '2026-06-10',
+      'Fecha Fin (AAAA-MM-DD) *': '2026-07-28',
+      'Horas Acreditadas *': 60,
+      'Estatus Académico (Aprobado / Completado / Reprobado)': 'Aprobado',
+      'Calificación Obtenida (0-100)': 96,
+      'Folio / No. Certificado': 'INF-DIP-2026-0412',
+      'URL Credencial Digital': '',
+      'Descripción / Temario': 'Fundamentos y gestión de incidentes, análisis forense y normativas ISO 27001.'
+    },
+    {
+      'Identificación del Colaborador (Cédula o Tarjeta o Correo) *': '031-0456789-4',
+      'Nombre del Colaborador (Informativo)': 'Laura Patricia Gómez',
+      'Título de la Capacitación Externa *': 'Taller Práctico de Liderazgo y Equipos Ágiles',
+      'Suplidor / Entidad Emisora *': 'INTEC Consultores',
+      'Programa de Sustentabilidad *': 'Gestión del Talento',
+      'Subprograma': 'Liderazgo',
+      'Formato de Capacitación': 'Taller',
+      'Tipo de Sesión': 'Sincrónica',
+      'Tipo de Entrenamiento': 'Conductual',
+      'Modalidad': 'Mixta',
+      'Fecha Inicio (AAAA-MM-DD) *': '2026-07-05',
+      'Fecha Fin (AAAA-MM-DD) *': '2026-07-15',
+      'Horas Acreditadas *': 24,
+      'Estatus Académico (Aprobado / Completado / Reprobado)': 'Completado',
+      'Calificación Obtenida (0-100)': 88,
+      'Folio / No. Certificado': 'INTEC-LID-2026-88',
+      'URL Credencial Digital': '',
+      'Descripción / Temario': 'Dinámicas de comunicación asertiva, resolución de conflictos y facilitación ágil.'
+    }
+  ];
+
+  const ws1 = XLSX.utils.json_to_sheet(sampleData);
+  ws1['!cols'] = [
+    { wch: 32 }, // Identificación
+    { wch: 28 }, // Nombre
+    { wch: 45 }, // Título
+    { wch: 32 }, // Suplidor
+    { wch: 25 }, // Programa
+    { wch: 25 }, // Subprograma
+    { wch: 20 }, // Formato
+    { wch: 18 }, // Tipo Sesión
+    { wch: 20 }, // Tipo Entren
+    { wch: 15 }, // Modalidad
+    { wch: 18 }, // Fecha Inicio
+    { wch: 18 }, // Fecha Fin
+    { wch: 16 }, // Horas
+    { wch: 20 }, // Estatus
+    { wch: 20 }, // Calificación
+    { wch: 22 }, // Folio
+    { wch: 35 }, // URL
+    { wch: 45 }  // Descripción
+  ];
+  XLSX.utils.book_append_sheet(wb, ws1, 'Plantilla_Capacitaciones_Ext');
+
+  const guideRows = [
+    { Campo: 'Identificación del Colaborador *', Requerido: 'OBLIGATORIO', Formato: 'Cédula (000-0000000-0), No. Tarjeta (ej. 8915) o Correo corporativo', Explicación: 'Permite asociar el registro al colaborador en el padrón oficial.' },
+    { Campo: 'Título de la Capacitación *', Requerido: 'OBLIGATORIO', Formato: 'Texto libre', Explicación: 'Nombre del curso, diplomado o certificación acreditada.' },
+    { Campo: 'Suplidor / Entidad Emisora *', Requerido: 'OBLIGATORIO', Formato: 'Texto libre (ej. INFOTEP, Microsoft, Platzi)', Explicación: 'Institución o empresa que impartió o emitió la credencial.' },
+    { Campo: 'Programa de Sustentabilidad *', Requerido: 'OBLIGATORIO', Formato: 'Comercial & Clientes | Tecnología & Digital | Corporativa | Gestión del Talento | Desarrollo Humano | SST & Sustentabilidad', Explicación: 'Eje del programa oficial Claro al que tributa la formación.' },
+    { Campo: 'Subprograma', Requerido: 'RECOMENDADO', Formato: 'Según el programa (ej. Desarrollo de software, Ciberseguridad, Liderazgo, etc.)', Explicación: 'Subcategoría temática del programa de sustentabilidad.' },
+    { Campo: 'Formato de Capacitación', Requerido: 'OPCIONAL (Defecto: Curso)', Formato: 'Curso | Taller | Diplomado | Certificación | Webinar | Charla | Workshop | Seminario', Explicación: 'Estructura pedagógica del evento formativo.' },
+    { Campo: 'Tipo de Sesión', Requerido: 'OPCIONAL (Defecto: Asincrónica)', Formato: 'Asincrónica | Sincrónica | Híbrido', Explicación: 'Modalidad de interacción temporal con el facilitador.' },
+    { Campo: 'Tipo de Entrenamiento', Requerido: 'OPCIONAL (Defecto: Técnico)', Formato: 'Técnico | Conductual', Explicación: 'Tipo de competencia desarrollada.' },
+    { Campo: 'Modalidad', Requerido: 'OPCIONAL (Defecto: Virtual)', Formato: 'Virtual | Presencial | Mixta', Explicación: 'Entorno de impartición de las clases.' },
+    { Campo: 'Fecha Inicio y Fin *', Requerido: 'OBLIGATORIO', Formato: 'AAAA-MM-DD o DD/MM/AAAA (ej. 2026-08-01)', Explicación: 'Periodo de ejecución de la capacitación externa.' },
+    { Campo: 'Horas Acreditadas *', Requerido: 'OBLIGATORIO', Formato: 'Número mayor a 0 (ej. 40, 20.5)', Explicación: 'Cantidad de horas que se sumarán al histórico formativo.' },
+    { Campo: 'Estatus Académico', Requerido: 'OPCIONAL (Defecto: Aprobado)', Formato: 'Aprobado | Completado | Reprobado', Explicación: 'Resultado final obtenido por el colaborador.' },
+    { Campo: 'Calificación Obtenida', Requerido: 'OPCIONAL', Formato: 'Número entre 0 y 100 (ej. 95.5)', Explicación: 'Nota numérica si aplica.' },
+    { Campo: 'Folio / Certificado', Requerido: 'OPCIONAL', Formato: 'Texto / Código alfanumérico', Explicación: 'Código de certificado o número de folio oficial.' },
+    { Campo: 'URL Credencial', Requerido: 'OPCIONAL', Formato: 'Enlace web https://...', Explicación: 'Link para verificar el certificado o insignia digital.' }
+  ];
+  const ws2 = XLSX.utils.json_to_sheet(guideRows);
+  ws2['!cols'] = [
+    { wch: 30 },
+    { wch: 18 },
+    { wch: 40 },
+    { wch: 55 }
+  ];
+  XLSX.utils.book_append_sheet(wb, ws2, 'Catalogo_y_Reglas');
+
+  if (participants && participants.length > 0) {
+    const dirData = participants.map((p, i) => ({
+      'No.': i + 1,
+      'Cédula': p.cedula || 'N/A',
+      'No. Tarjeta': p.card,
+      'Nombre Completo': p.name,
+      'Correo Corporativo': p.email,
+      'Departamento': p.department || 'General'
+    }));
+    const ws3 = XLSX.utils.json_to_sheet(dirData);
+    ws3['!cols'] = [
+      { wch: 6 },
+      { wch: 18 },
+      { wch: 14 },
+      { wch: 32 },
+      { wch: 32 },
+      { wch: 25 }
+    ];
+    XLSX.utils.book_append_sheet(wb, ws3, 'Directorio_Colaboradores');
+  }
+
+  XLSX.writeFile(wb, 'Plantilla_Carga_Masiva_Capacitaciones_Externas.xlsx');
+};
+
+/**
+ * Parsea un archivo Excel (.xlsx / .xls) de capacitaciones externas
+ */
+export const parseExternalTrainingsExcelFile = async (
+  file: File,
+  participants: Participant[]
+): Promise<{ validTrainings: CreateExternalTrainingPayload[]; invalidRows: Array<{ row: number; data: any; reason: string }> }> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const rows: any[] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+        if (rows.length < 2) {
+          throw new Error('El archivo está vacío o no contiene filas de datos.');
+        }
+
+        // Crear mapas de resolución rápida de colaboradores
+        const pByCard = new Map<string, Participant>();
+        const pByCedula = new Map<string, Participant>();
+        const pByEmail = new Map<string, Participant>();
+
+        participants.forEach(p => {
+          if (p.card) pByCard.set(p.card.trim().toLowerCase(), p);
+          if (p.cedula) {
+            pByCedula.set(p.cedula.replace(/\D/g, ''), p);
+            pByCedula.set(p.cedula.trim(), p);
+          }
+          if (p.email) pByEmail.set(p.email.trim().toLowerCase(), p);
+        });
+
+        // Detectar columnas
+        const header = rows[0].map((h: any) => String(h || '').toLowerCase().trim());
+
+        const idIdx = header.findIndex((h: string) => h.includes('identifica') || h.includes('cedula') || h.includes('cédula') || h.includes('tarjeta') || h.includes('correo') || h.includes('email') || h.includes('colaborador'));
+        const titleIdx = header.findIndex((h: string) => h.includes('título') || h.includes('titulo') || h.includes('capacitacion') || h.includes('capacitación') || h.includes('curso') || h.includes('nombre de la'));
+        const supplierIdx = header.findIndex((h: string) => h.includes('suplidor') || h.includes('proveedor') || h.includes('entidad') || h.includes('instituc') || h.includes('emisor'));
+        const progIdx = header.findIndex((h: string) => h.includes('programa') && !h.includes('sub'));
+        const subProgIdx = header.findIndex((h: string) => h.includes('subprograma'));
+        const formatIdx = header.findIndex((h: string) => h.includes('formato'));
+        const sessionIdx = header.findIndex((h: string) => h.includes('sesion') || h.includes('sesión'));
+        const typeIdx = header.findIndex((h: string) => (h.includes('tipo') && h.includes('entren')) || h.includes('conductual') || h.includes('técnico'));
+        const modalityIdx = header.findIndex((h: string) => h.includes('modalidad'));
+        const startIdx = header.findIndex((h: string) => h.includes('inicio') || h.includes('desde') || h.includes('start'));
+        const endIdx = header.findIndex((h: string) => h.includes('fin') || h.includes('hasta') || h.includes('culmina') || h.includes('end'));
+        const hoursIdx = header.findIndex((h: string) => h.includes('hora') || h.includes('duracion') || h.includes('duración'));
+        const statusIdx = header.findIndex((h: string) => h.includes('estatus') || h.includes('estado') || h.includes('culminacion') || h.includes('aprobado'));
+        const scoreIdx = header.findIndex((h: string) => h.includes('calific') || h.includes('nota') || h.includes('score') || h.includes('puntos'));
+        const certIdx = header.findIndex((h: string) => h.includes('folio') || h.includes('certif') || h.includes('codigo') || h.includes('código'));
+        const urlIdx = header.findIndex((h: string) => h.includes('url') || h.includes('link') || h.includes('enlace') || h.includes('credencial'));
+        const descIdx = header.findIndex((h: string) => h.includes('descrip') || h.includes('temario') || h.includes('alcance') || h.includes('detalle'));
+
+        const validTrainings: CreateExternalTrainingPayload[] = [];
+        const invalidRows: Array<{ row: number; data: any; reason: string }> = [];
+
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i];
+          if (!row || row.length === 0) continue;
+
+          const rawId = idIdx !== -1 ? String(row[idIdx] || '').trim() : '';
+          const rawTitle = titleIdx !== -1 ? String(row[titleIdx] || '').trim() : '';
+          const rawSupplier = supplierIdx !== -1 ? String(row[supplierIdx] || '').trim() : '';
+          const rawProg = progIdx !== -1 ? String(row[progIdx] || '').trim() : '';
+          const rawSubProg = subProgIdx !== -1 ? String(row[subProgIdx] || '').trim() : '';
+          const rawFormat = formatIdx !== -1 ? String(row[formatIdx] || '').trim() : '';
+          const rawSession = sessionIdx !== -1 ? String(row[sessionIdx] || '').trim() : '';
+          const rawType = typeIdx !== -1 ? String(row[typeIdx] || '').trim() : '';
+          const rawModality = modalityIdx !== -1 ? String(row[modalityIdx] || '').trim() : '';
+          const rawStart = startIdx !== -1 ? formatExcelDate(row[startIdx]) : '';
+          const rawEnd = endIdx !== -1 ? formatExcelDate(row[endIdx]) : rawStart;
+          const rawHours = hoursIdx !== -1 ? Number(row[hoursIdx]) : 0;
+          const rawStatus = statusIdx !== -1 ? String(row[statusIdx] || '').trim() : '';
+          const rawScore = scoreIdx !== -1 && row[scoreIdx] !== undefined && row[scoreIdx] !== '' ? Number(row[scoreIdx]) : null;
+          const rawCert = certIdx !== -1 ? String(row[certIdx] || '').trim() : '';
+          const rawUrl = urlIdx !== -1 ? String(row[urlIdx] || '').trim() : '';
+          const rawDesc = descIdx !== -1 ? String(row[descIdx] || '').trim() : '';
+
+          // 1. Validar Identificación del colaborador
+          if (!rawId) {
+            invalidRows.push({ row: i + 1, data: row, reason: 'Falta la identificación del colaborador (Cédula, Tarjeta o Correo).' });
+            continue;
+          }
+
+          // Resolver participante
+          let matchedPart: Participant | undefined = undefined;
+          matchedPart = pByCard.get(rawId.toLowerCase());
+          if (!matchedPart) {
+            matchedPart = pByCedula.get(rawId.replace(/\D/g, '')) || pByCedula.get(rawId);
+          }
+          if (!matchedPart) {
+            matchedPart = pByEmail.get(rawId.toLowerCase());
+          }
+
+          if (!matchedPart) {
+            invalidRows.push({
+              row: i + 1,
+              data: row,
+              reason: `No se encontró en el padrón ningún colaborador con la identificación "${rawId}".`
+            });
+            continue;
+          }
+
+          // 2. Validar Título
+          if (!rawTitle) {
+            invalidRows.push({ row: i + 1, data: row, reason: 'El título o nombre de la capacitación externa es obligatorio.' });
+            continue;
+          }
+
+          // 3. Validar Suplidor
+          const supplier = rawSupplier || 'Externo';
+
+          // 4. Validar Fechas
+          const startDate = rawStart || new Date().toISOString().split('T')[0];
+          const endDate = rawEnd || startDate;
+          if (new Date(startDate) > new Date(endDate)) {
+            invalidRows.push({ row: i + 1, data: row, reason: `La fecha de inicio (${startDate}) no puede ser posterior a la fecha de fin (${endDate}).` });
+            continue;
+          }
+
+          // 5. Validar Horas
+          const totalHours = !isNaN(rawHours) && rawHours > 0 ? rawHours : 1;
+
+          // 6. Normalizaciones
+          const programCategory = normalizeProgramCategory(rawProg);
+          const subprogram = normalizeSubprogram(programCategory, rawSubProg);
+          const sessionType = normalizeSessionType(rawSession);
+          const trainingType = normalizeTrainingType(rawType);
+          const trainingFormat = normalizeTrainingFormat(rawFormat);
+          const modality = normalizeModality(rawModality);
+          const academicStatus = normalizeAcademicStatus(rawStatus);
+
+          validTrainings.push({
+            participantCard: matchedPart.card,
+            participantName: matchedPart.name,
+            participantCedula: matchedPart.cedula,
+            participantEmail: matchedPart.email,
+            companyId: matchedPart.companyId || 'emp_kasino',
+            title: rawTitle,
+            supplier,
+            programCategory,
+            subprogram,
+            sessionType,
+            trainingType,
+            trainingFormat,
+            modality,
+            startDate,
+            endDate,
+            totalHours,
+            academicStatus,
+            score: rawScore !== null && !isNaN(rawScore) ? rawScore : null,
+            certificateNumber: rawCert || null,
+            credentialUrl: rawUrl || null,
+            description: rawDesc || '',
+            registeredBy: 'Carga Masiva Excel'
+          });
+        }
+
+        resolve({ validTrainings, invalidRows });
+      } catch (err: any) {
+        reject(err);
+      }
+    };
+    reader.onerror = () => reject(new Error('Error al leer el archivo Excel.'));
+    reader.readAsArrayBuffer(file);
+  });
+};
+
+/**
+ * Parsea texto tabulado / copiado desde portapapeles
+ */
+export const parseExternalTrainingsFromText = (
+  rawText: string,
+  participants: Participant[]
+): { validTrainings: CreateExternalTrainingPayload[]; invalidRows: Array<{ line: number; reason: string }> } => {
+  const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+  if (lines.length === 0) return { validTrainings: [], invalidRows: [] };
+
+  const pByCard = new Map<string, Participant>();
+  const pByCedula = new Map<string, Participant>();
+  const pByEmail = new Map<string, Participant>();
+
+  participants.forEach(p => {
+    if (p.card) pByCard.set(p.card.trim().toLowerCase(), p);
+    if (p.cedula) {
+      pByCedula.set(p.cedula.replace(/\D/g, ''), p);
+      pByCedula.set(p.cedula.trim(), p);
+    }
+    if (p.email) pByEmail.set(p.email.trim().toLowerCase(), p);
+  });
+
+  const validTrainings: CreateExternalTrainingPayload[] = [];
+  const invalidRows: Array<{ line: number; reason: string }> = [];
+
+  const startIndex = lines[0].toLowerCase().includes('titulo') || lines[0].toLowerCase().includes('ident') || lines[0].toLowerCase().includes('cedula') ? 1 : 0;
+
+  for (let i = startIndex; i < lines.length; i++) {
+    const line = lines[i];
+    const parts = line.split('\t').map(p => p.trim());
+    if (parts.length < 2) {
+      invalidRows.push({ line: i + 1, reason: 'Formato insuficiente. Se espera al menos: Identificación y Título de capacitación separados por tabulación.' });
+      continue;
+    }
+
+    const rawId = parts[0] || '';
+    const rawTitle = parts[1] || '';
+    const rawSupplier = parts[2] || 'Externo';
+    const rawProg = parts[3] || 'Tecnología & Digital';
+    const rawSubProg = parts[4] || '';
+    const rawFormat = parts[5] || 'Curso';
+    const rawStart = formatExcelDate(parts[6]);
+    const rawEnd = formatExcelDate(parts[7]) || rawStart;
+    const rawHours = parts[8] ? Number(parts[8]) : 1;
+    const rawStatus = parts[9] || 'Aprobado';
+    const rawScore = parts[10] ? Number(parts[10]) : null;
+    const rawCert = parts[11] || '';
+    const rawUrl = parts[12] || '';
+
+    let matchedPart = pByCard.get(rawId.toLowerCase());
+    if (!matchedPart) matchedPart = pByCedula.get(rawId.replace(/\D/g, '')) || pByCedula.get(rawId);
+    if (!matchedPart) matchedPart = pByEmail.get(rawId.toLowerCase());
+
+    if (!matchedPart) {
+      invalidRows.push({ line: i + 1, reason: `No se encontró colaborador para "${rawId}".` });
+      continue;
+    }
+
+    if (!rawTitle) {
+      invalidRows.push({ line: i + 1, reason: 'El título de la capacitación es obligatorio.' });
+      continue;
+    }
+
+    const startDate = rawStart || new Date().toISOString().split('T')[0];
+    const endDate = rawEnd || startDate;
+    const programCategory = normalizeProgramCategory(rawProg);
+    const subprogram = normalizeSubprogram(programCategory, rawSubProg);
+
+    validTrainings.push({
+      participantCard: matchedPart.card,
+      participantName: matchedPart.name,
+      participantCedula: matchedPart.cedula,
+      participantEmail: matchedPart.email,
+      companyId: matchedPart.companyId || 'emp_kasino',
+      title: rawTitle,
+      supplier: rawSupplier || 'Externo',
+      programCategory,
+      subprogram,
+      sessionType: 'Asincrónica',
+      trainingType: 'Técnico',
+      trainingFormat: normalizeTrainingFormat(rawFormat),
+      modality: 'Virtual',
+      startDate,
+      endDate,
+      totalHours: !isNaN(rawHours) && rawHours > 0 ? rawHours : 1,
+      academicStatus: normalizeAcademicStatus(rawStatus),
+      score: rawScore !== null && !isNaN(rawScore) ? rawScore : null,
+      certificateNumber: rawCert || null,
+      credentialUrl: rawUrl || null,
+      description: '',
+      registeredBy: 'Carga Masiva Portapapeles'
+    });
+  }
+
+  return { validTrainings, invalidRows };
+};
+
+/**
+ * Exporta el listado completo o filtrado de capacitaciones externas a Excel
+ */
+export const exportExternalTrainingsToExcel = (
+  trainings: ExternalTraining[],
+  participants: Participant[] = []
+): void => {
+  const pMap = new Map<string, Participant>();
+  participants.forEach(p => pMap.set(p.card, p));
+
+  const data = trainings.map((t, idx) => {
+    const p = pMap.get(t.participantCard);
+    const pName = p?.name || t.participantName || 'Colaborador';
+    const pCedula = p?.cedula || t.participantCedula || 'N/A';
+    const pDept = p?.department || t.participantDepartment || 'General';
+
+    return {
+      'No.': idx + 1,
+      'Cédula': pCedula,
+      'No. Tarjeta': t.participantCard,
+      'Nombre del Colaborador': pName,
+      'Departamento': pDept,
+      'Título de la Capacitación': t.title,
+      'Suplidor / Emisor': t.supplier,
+      'Programa de Sustentabilidad': getProgramShortName(t.programCategory),
+      'Programa Completo': getProgramLabel(t.programCategory),
+      'Subprograma': t.subprogram,
+      'Formato': t.trainingFormat,
+      'Tipo de Sesión': t.sessionType,
+      'Tipo de Entrenamiento': t.trainingType,
+      'Modalidad': t.modality,
+      'Fecha Inicio': formatDateShort(t.startDate),
+      'Fecha Fin': formatDateShort(t.endDate),
+      'Horas Acreditadas': Number(t.totalHours) || 0,
+      'Estatus Académico': t.academicStatus === 'passed' ? 'Aprobado' : (t.academicStatus || 'Completado'),
+      'Calificación': t.score !== null && t.score !== undefined ? t.score : 'N/A',
+      'Folio / Certificado': t.certificateNumber || 'N/A',
+      'URL Credencial': t.credentialUrl || 'N/A',
+      'Registrado Por': t.registeredBy || 'Administrador',
+      'Fecha Registro': t.createdAt ? formatDateShort(t.createdAt) : 'N/A'
+    };
+  });
+
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Capacitaciones_Externas');
+
+  ws['!cols'] = [
+    { wch: 6 },
+    { wch: 18 },
+    { wch: 14 },
+    { wch: 30 },
+    { wch: 22 },
+    { wch: 38 },
+    { wch: 28 },
+    { wch: 25 },
+    { wch: 40 },
+    { wch: 25 },
+    { wch: 18 },
+    { wch: 16 },
+    { wch: 18 },
+    { wch: 14 },
+    { wch: 14 },
+    { wch: 14 },
+    { wch: 16 },
+    { wch: 18 },
+    { wch: 14 },
+    { wch: 22 },
+    { wch: 35 },
+    { wch: 22 },
+    { wch: 16 }
+  ];
+
+  const today = new Date().toISOString().split('T')[0];
+  XLSX.writeFile(wb, `Historico_Capacitaciones_Externas_${today}.xlsx`);
+};
+

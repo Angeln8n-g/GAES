@@ -204,6 +204,60 @@ export interface TrainingEvent {
   supplier?: string;
 }
 
+export interface ExternalTraining {
+  id: string;
+  participantCard: string;
+  participantName?: string;
+  participantEmail?: string;
+  participantDepartment?: string;
+  participantCedula?: string;
+  title: string;
+  sessionType: 'Asincrónica' | 'Sincrónica' | 'Híbrido' | string;
+  trainingType: 'Conductual' | 'Técnico' | string;
+  trainingFormat: 'Taller' | 'Webinar' | 'Curso' | 'Cinefórum' | 'Charla' | 'Workshop' | 'Diplomado' | 'Certificación' | 'Seminario' | string;
+  modality: 'Virtual' | 'Presencial' | 'Mixta' | string;
+  programCategory: string;
+  subprogram: string;
+  startDate: string;
+  endDate: string;
+  totalHours: number;
+  supplier: string;
+  description: string;
+  credentialUrl?: string | null;
+  certificateNumber?: string | null;
+  score?: number | null;
+  academicStatus?: 'passed' | 'failed' | 'completed' | string;
+  companyId?: string;
+  registeredBy?: string;
+  createdAt?: string;
+}
+
+export interface CreateExternalTrainingPayload {
+  participantCards?: string[];
+  participantCard?: string;
+  participantCedula?: string;
+  participantEmail?: string;
+  participantName?: string;
+  title: string;
+  sessionType: string;
+  trainingType: string;
+  trainingFormat: string;
+  modality: string;
+  programCategory: string;
+  subprogram: string;
+  startDate: string;
+  endDate: string;
+  totalHours: number;
+  supplier: string;
+  description?: string;
+  credentialUrl?: string | null;
+  certificateNumber?: string | null;
+  score?: number | null;
+  academicStatus?: string;
+  companyId?: string;
+  registeredBy?: string;
+}
+
 export type EmploymentStatus = 'contratado' | 'en_proceso' | 'inactivo';
 
 export type EducationLevel = 

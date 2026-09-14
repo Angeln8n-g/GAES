@@ -21,7 +21,7 @@ import {
   BarChart3,
   Calendar
 } from 'lucide-react';
-import { Participant, UserAccount, TrainingEvent, TrainingProgram, Company, ParticipantGrade } from '../../types';
+import { Participant, UserAccount, TrainingEvent, TrainingProgram, Company, ParticipantGrade, ExternalTraining } from '../../types';
 import { FormalLetterModal, TrainingHistoryRecord } from '../history/FormalLetterModal';
 import { formatDateShort, formatCedula } from '../../utils/formatters';
 
@@ -31,6 +31,7 @@ interface FormalLettersManagerProps {
   events: TrainingEvent[];
   programs?: TrainingProgram[];
   companies?: Company[];
+  externalTrainings?: ExternalTraining[];
   currentUser: UserAccount | null;
   onShowToast?: (title: string, message: string, type: 'success' | 'error' | 'info') => void;
 }
@@ -41,6 +42,7 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
   events,
   programs = [],
   companies = [],
+  externalTrainings = [],
   currentUser,
   onShowToast
 }) => {
@@ -128,17 +130,40 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
       const sum = validScores.reduce((acc, curr) => acc + Number(curr.score), 0);
       const avg = validScores.length > 0 ? (sum / validScores.length).toFixed(1) : '0.0';
 
+      const extList: TrainingHistoryRecord[] = (externalTrainings || [])
+        .filter(t => t.participantCard === cardStr || (t.participantEmail && t.participantEmail.toLowerCase() === emailLower))
+        .map((ext, idx) => ({
+          id: `ext-${ext.id}-${idx}`,
+          title: ext.title,
+          category: ext.programCategory,
+          modality: ext.modality,
+          instructor: ext.supplier,
+          date: ext.endDate || ext.startDate,
+          time: 'Acreditado',
+          hasAttended: true,
+          hours: Number(ext.totalHours) || 1,
+          gradeScore: ext.score,
+          academicStatus: ext.academicStatus || 'passed',
+          isExternal: true,
+          supplier: ext.supplier,
+          credentialUrl: ext.credentialUrl
+        }));
+
+      const allRecords = [...attended, ...registered, ...extList];
+      const extHours = extList.reduce((acc, e) => acc + (e.hours || 0), 0);
+      const totalHours = attended.reduce((acc, a) => acc + (a.hours || 2), 0) + extHours;
+
       map.set(p.card, {
-        attendedCount: attended.length,
+        attendedCount: attended.length + extList.length,
         registeredCount: registered.length,
-        totalHours: attended.length * 2,
-        records: [...attended, ...registered],
+        totalHours,
+        records: allRecords,
         avgScore: avg
       });
     });
 
     return map;
-  }, [participants, events]);
+  }, [participants, events, externalTrainings]);
 
   // Filtrado de participantes según búsqueda, empresa y asistencia
   const filteredParticipants = useMemo(() => {
@@ -557,7 +582,7 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                     <p className="text-[10px] font-bold text-slate-500 uppercase mt-0.5">Horas Formativas</p>
                   </div>
                   <div className="bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
-                    <p className="text-lg font-black text-purple-700">{activeStats.avgScore} <span className="text-[10px] font-normal text-slate-400">pts</span></p>
+                    <p className="text-lg font-black text-indigo-600">{activeStats.avgScore} <span className="text-[10px] font-normal text-slate-400">pts</span></p>
                     <p className="text-[10px] font-bold text-slate-500 uppercase mt-0.5">Promedio Notas</p>
                   </div>
                   <div className="bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
@@ -635,12 +660,22 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
 
                             <div className="min-w-0">
                               <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                                {rec.isExternal && (
+                                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-blue-100 text-blue-800 border border-blue-200 uppercase tracking-wider">
+                                    Externa
+                                  </span>
+                                )}
                                 <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-red-50 text-[#DA291C] border border-red-200">
                                   {rec.category}
                                 </span>
                                 <span className="text-[10px] font-bold text-slate-500">
                                   {rec.modality}
                                 </span>
+                                {rec.supplier && (
+                                  <span className="text-[10px] font-bold text-slate-600">
+                                    • {rec.supplier}
+                                  </span>
+                                )}
                               </div>
                               <p className="text-xs font-black text-slate-900 truncate">
                                 {rec.title}
@@ -678,7 +713,7 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                                 e.stopPropagation();
                                 handleGenerateSingleCourse(rec);
                               }}
-                              className="p-2 rounded-xl bg-slate-100 hover:bg-red-50 hover:text-[#DA291C] text-slate-600 text-xs font-bold transition-colors cursor-pointer"
+                              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-bold transition-colors cursor-pointer"
                               title="Emitir constancia solo para este curso"
                             >
                               <Printer className="w-4 h-4" />

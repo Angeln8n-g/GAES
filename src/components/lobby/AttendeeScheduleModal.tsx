@@ -80,7 +80,7 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/20 backdrop-blur-md">
               Lobby de Recepción Presencial
             </span>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-400 text-slate-950 font-bold">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-400 text-amber-950">
               Consulta de Cédula
             </span>
           </div>
@@ -299,7 +299,7 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
                               Asistió
                             </span>
                           ) : isToday ? (
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-slate-950 uppercase tracking-wider animate-pulse">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-amber-950 uppercase tracking-wider animate-pulse">
                               ¡Es Hoy!
                             </span>
                           ) : (

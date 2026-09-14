@@ -578,10 +578,10 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
                     <button
                       type="button"
                       onClick={selectMatchingInterestEmails}
-                      className="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-xs font-black text-purple-700 whitespace-nowrap cursor-pointer flex items-center gap-1.5 transition-colors active:scale-95 shadow-2xs"
+                      className="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-xs font-black text-indigo-700 whitespace-nowrap cursor-pointer flex items-center gap-1.5 transition-colors active:scale-95 shadow-2xs"
                       title="Seleccionar colaboradores cuya ficha formativa coincide con este curso"
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                      <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
                       <span>⚡ Interesados en este Tema ({matchingInterestEmails.length})</span>
                     </button>
                     <span className="text-[11px] text-slate-500 font-medium">
@@ -708,7 +708,7 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
                     type="file"
                     accept=".xlsx,.xls,.csv"
                     onChange={handleFileUpload}
-                    className="text-xs text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#DA291C] file:text-white hover:file:bg-red-700 cursor-pointer"
+                    className="text-xs text-slate-700 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#DA291C] file:text-white hover:file:opacity-90 cursor-pointer"
                   />
                 </div>
               </div>

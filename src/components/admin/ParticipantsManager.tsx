@@ -25,6 +25,7 @@ import { exportParticipantsToExcel, parseParticipantsExcelFile } from "../../uti
 import { generateEmailFromName, formatCedula, isValidCedula } from "../../utils/formatters";
 import { EditParticipantModal } from "./EditParticipantModal";
 import { ParticipantProfileModal } from "./ParticipantProfileModal";
+import { ExternalTraining } from "../../types";
 
 interface ParticipantsManagerProps {
   participants: Participant[];
@@ -32,6 +33,7 @@ interface ParticipantsManagerProps {
   events?: TrainingEvent[];
   programs?: TrainingProgram[];
   companies?: Company[];
+  externalTrainings?: ExternalTraining[];
   currentUser?: UserAccount | null;
   isSuperAdmin?: boolean;
   onSaveParticipants: (participants: Participant[]) => Promise<void>;
@@ -45,6 +47,7 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
   events = [],
   programs = [],
   companies = [],
+  externalTrainings = [],
   currentUser,
   isSuperAdmin = true,
   onSaveParticipants,
@@ -542,16 +545,16 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
           onClick={() => setSelectedSuperFilter("unassigned")}
           className={`p-4 rounded-3xl border cursor-pointer transition-all ${
             selectedSuperFilter === "unassigned"
-              ? "bg-purple-50 border-purple-500 shadow-sm"
+              ? "bg-amber-50 border-amber-500 shadow-sm"
               : "bg-white border-slate-200 hover:border-slate-300 shadow-xs"
           }`}
         >
-          <div className="flex items-center justify-between text-xs text-purple-700 font-bold">
+          <div className="flex items-center justify-between text-xs text-amber-800 font-bold">
             <span>Sin Supervisor</span>
-            <AlertTriangle className="w-4 h-4 text-purple-600" />
+            <AlertTriangle className="w-4 h-4 text-amber-600" />
           </div>
-          <p className="text-2xl font-black text-purple-700 mt-1.5">{stats.sinSupervisor}</p>
-          <p className="text-[10px] text-purple-600 mt-0.5">Pendientes de vincular</p>
+          <p className="text-2xl font-black text-amber-900 mt-1.5">{stats.sinSupervisor}</p>
+          <p className="text-[10px] text-amber-700 mt-0.5">Pendientes de vincular</p>
         </div>
 
         <div 
@@ -1101,7 +1104,7 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => setViewingProfileParticipant(p)}
-                            className="p-1.5 text-slate-500 hover:text-[#DA291C] hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-slate-600 hover:text-red-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
                             title="Ver Ficha 360°"
                           >
                             <Eye className="w-3.5 h-3.5" />
@@ -1109,7 +1112,7 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
 
                           <button
                             onClick={() => setEditingParticipant(p)}
-                            className="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-slate-600 hover:text-amber-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
                             title="Editar Datos"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
@@ -1117,7 +1120,7 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
 
                           <button
                             onClick={() => handleDelete(p.card, p.name)}
-                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                             title="Eliminar del padrón"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -1166,6 +1169,7 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
           events={events}
           programs={programs}
           companies={companies}
+          externalTrainings={externalTrainings}
           currentUser={currentUser}
           isOpen={Boolean(viewingProfileParticipant)}
           onClose={() => setViewingProfileParticipant(null)}

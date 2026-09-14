@@ -16,7 +16,8 @@ import {
   UserPlus,
   Building2,
   FileSpreadsheet,
-  UserCheck
+  UserCheck,
+  BookOpen
 } from 'lucide-react';
 import { TrainingEvent, Company, Participant } from '../../types';
 import { formatDateShort } from '../../utils/formatters';
@@ -133,105 +134,138 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
       </div>
 
       {/* Events Table / Cards */}
-      <div className="space-y-4">
-        {filteredEvents.map(event => {
-          let totalCap = 0;
-          let totalReg = 0;
-          let totalAtt = 0;
-
-          event.schedule.forEach(sch => {
-            sch.slots.forEach(slot => {
-              totalCap += slot.capacity;
-              totalReg += slot.registered;
-              totalAtt += (slot.attendedList || []).length;
-            });
-          });
-
-          const comp = companies.find(c => c.id === (event.companyId || 'emp_kasino'));
-
-          return (
-            <div
-              key={event.id}
-              className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm hover:border-slate-300 hover:shadow transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-6"
+      {filteredEvents.length === 0 ? (
+        <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center shadow-sm">
+          <div className="w-12 h-12 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center mx-auto text-[#DA291C] mb-3">
+            <BookOpen className="w-6 h-6" />
+          </div>
+          <h3 className="text-base font-black text-slate-900">
+            {searchQuery ? 'No se encontraron capacitaciones' : 'No hay capacitaciones creadas'}
+          </h3>
+          <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
+            {searchQuery 
+              ? `No hay resultados para "${searchQuery}". Intenta ajustar el término de búsqueda o el filtro de empresa.` 
+              : 'Comienza creando la primera capacitación institucional con sus fechas, horarios y cupos disponibles.'}
+          </p>
+          <div className="flex items-center justify-center gap-3 mt-4">
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer"
+              >
+                Limpiar Búsqueda
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onOpenCreateModal}
+              className="px-4 py-2 bg-[#DA291C] hover:bg-red-700 text-white text-xs font-extrabold rounded-xl transition-all inline-flex items-center gap-2 cursor-pointer shadow-md shadow-red-500/25"
             >
-              
-              {/* Event Info */}
-              <div className="flex items-start gap-4">
-                <img
-                  src={event.imageUrl || "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80"}
-                  alt={event.title}
-                  className="w-20 h-20 rounded-2xl object-cover shrink-0 border border-slate-200 hidden sm:block shadow-xs"
-                />
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-50 text-[#DA291C] border border-red-200">
-                      {event.category}
-                    </span>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 ${
-                      event.modality === 'Virtual' ? 'bg-cyan-50 text-cyan-700 border border-cyan-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                    }`}>
-                      {event.modality === 'Virtual' ? <Video className="w-2.5 h-2.5" /> : <MapPin className="w-2.5 h-2.5" />}
-                      {event.modality}
-                    </span>
-                    {event.companyId === 'all' || !event.companyId ? (
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1">
-                        <Building2 className="w-3 h-3 text-indigo-600" />
-                        Todas las Empresas
-                      </span>
-                    ) : comp ? (
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1">
-                        <Building2 className="w-3 h-3 text-[#DA291C]" />
-                        {comp.name}
-                      </span>
-                    ) : null}
-                    {event.ojtEvaluatorName && (
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200 flex items-center gap-1" title="Tutor / Evaluador OJT Asignado">
-                        <UserCheck className="w-3 h-3 text-purple-600" />
-                        <span>Tutor OJT: {event.ojtEvaluatorName}</span>
-                      </span>
-                    )}
-                  </div>
+              <Plus className="w-4 h-4" /> Crear Nueva Capacitación
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {filteredEvents.map(event => {
+            let totalCap = 0;
+            let totalReg = 0;
+            let totalAtt = 0;
 
-                  <h3 className="text-sm font-bold text-slate-900 leading-snug">{event.title}</h3>
-                  <p className="text-xs text-slate-500">Facilitador: <strong className="text-slate-700">{event.instructor}</strong></p>
+            event.schedule.forEach(sch => {
+              sch.slots.forEach(slot => {
+                totalCap += slot.capacity;
+                totalReg += slot.registered;
+                totalAtt += (slot.attendedList || []).length;
+              });
+            });
 
-                  <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 pt-1 font-medium">
-                    <span className="flex items-center gap-1">
-                      <CalendarIcon className="w-3.5 h-3.5 text-[#DA291C]" />
-                      {event.schedule.length} fecha(s)
-                    </span>
-                    <span>•</span>
-                    <span className="text-cyan-700 font-bold">{totalReg} / {totalCap} inscritos</span>
-                    <span>•</span>
-                    <span className="text-emerald-700 font-bold">{totalAtt} confirmados</span>
+            const comp = companies.find(c => c.id === (event.companyId || 'emp_kasino'));
+
+            return (
+              <div
+                key={event.id}
+                className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm hover:border-slate-300 hover:shadow transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-6"
+              >
+                
+                {/* Event Info */}
+                <div className="flex items-start gap-4">
+                  <img
+                    src={event.imageUrl || "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80"}
+                    alt={event.title}
+                    className="w-20 h-20 rounded-2xl object-cover shrink-0 border border-slate-200 hidden sm:block shadow-xs"
+                  />
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-50 text-[#DA291C] border border-red-200">
+                        {event.category}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 ${
+                        event.modality === 'Virtual' ? 'bg-cyan-50 text-cyan-700 border border-cyan-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                      }`}>
+                        {event.modality === 'Virtual' ? <Video className="w-2.5 h-2.5" /> : <MapPin className="w-2.5 h-2.5" />}
+                        {event.modality}
+                      </span>
+                      {event.companyId === 'all' || !event.companyId ? (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1">
+                          <Building2 className="w-3 h-3 text-indigo-600" />
+                          Todas las Empresas
+                        </span>
+                      ) : comp ? (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1">
+                          <Building2 className="w-3 h-3 text-[#DA291C]" />
+                          {comp.name}
+                        </span>
+                      ) : null}
+                      {event.ojtEvaluatorName && (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1" title="Tutor / Evaluador OJT Asignado">
+                          <UserCheck className="w-3 h-3 text-indigo-600" />
+                          <span>Tutor OJT: {event.ojtEvaluatorName}</span>
+                        </span>
+                      )}
+                    </div>
+
+                    <h3 className="text-sm font-bold text-slate-900 leading-snug">{event.title}</h3>
+                    <p className="text-xs text-slate-500">Facilitador: <strong className="text-slate-700">{event.instructor}</strong></p>
+
+                    <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 pt-1 font-medium">
+                      <span className="flex items-center gap-1">
+                        <CalendarIcon className="w-3.5 h-3.5 text-[#DA291C]" />
+                        {event.schedule.length} fecha(s)
+                      </span>
+                      <span>•</span>
+                      <span className="text-cyan-700 font-bold">{totalReg} / {totalCap} inscritos</span>
+                      <span>•</span>
+                      <span className="text-emerald-700 font-bold">{totalAtt} confirmados</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Action Buttons Toolbar */}
-              <div className="flex flex-wrap items-center gap-2 border-t lg:border-t-0 pt-4 lg:pt-0 border-slate-100">
-                <button
-                  onClick={() => exportSessionGradesForOjtAndCalibration(event, participants, companies)}
-                  title="Exportar calificaciones e insumos para Bitácoras OJT, Mesas de Calibración y Estadísticas en Excel"
-                  className="px-3 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-800 text-xs font-bold flex items-center gap-1.5 border border-purple-200 transition-colors cursor-pointer shadow-xs"
-                >
-                  <FileSpreadsheet className="w-3.5 h-3.5 text-purple-700" />
-                  <span className="hidden sm:inline">Exportar OJT & Calibración</span>
-                </button>
+                {/* Action Buttons Toolbar */}
+                <div className="flex flex-wrap items-center gap-2 border-t lg:border-t-0 pt-4 lg:pt-0 border-slate-100">
+                  <button
+                    onClick={() => exportSessionGradesForOjtAndCalibration(event, participants, companies)}
+                    title="Exportar calificaciones e insumos para Bitácoras OJT, Mesas de Calibración y Estadísticas en Excel"
+                    className="px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-indigo-700 text-xs font-bold flex items-center gap-1.5 border border-slate-200 hover:border-indigo-200 transition-colors cursor-pointer shadow-xs"
+                  >
+                    <FileSpreadsheet className="w-3.5 h-3.5 text-indigo-600" />
+                    <span className="hidden sm:inline">Exportar OJT & Calibración</span>
+                  </button>
 
-                <button
-                  onClick={() => onOpenAttendeesModal(event)}
-                  title="Ver Asistentes"
-                  className="px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1.5 border border-slate-200 transition-colors cursor-pointer"
-                >
-                  <Users className="w-3.5 h-3.5 text-[#DA291C]" />
-                  <span>Asistentes ({totalReg})</span>
-                </button>
+                  <button
+                    onClick={() => onOpenAttendeesModal(event)}
+                    title="Ver Asistentes"
+                    className="px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1.5 border border-slate-200 transition-colors cursor-pointer"
+                  >
+                    <Users className="w-3.5 h-3.5 text-[#DA291C]" />
+                    <span>Asistentes ({totalReg})</span>
+                  </button>
 
                 <button
                   onClick={() => onOpenNotificationModal(event)}
                   title="Enviar Recordatorio"
-                  className="p-2 rounded-xl bg-slate-50 hover:bg-cyan-50 text-slate-600 hover:text-cyan-700 border border-slate-200 transition-colors cursor-pointer"
+                  className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-cyan-700 border border-slate-200 transition-colors cursor-pointer"
                 >
                   <Bell className="w-4 h-4" />
                 </button>
@@ -239,7 +273,7 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
                 <button
                   onClick={() => onOpenQrModal(event)}
                   title="Generar e Imprimir QR"
-                  className="p-2 rounded-xl bg-slate-50 hover:bg-purple-50 text-slate-600 hover:text-purple-700 border border-slate-200 transition-colors cursor-pointer"
+                  className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-blue-700 border border-slate-200 transition-colors cursor-pointer"
                 >
                   <QrCode className="w-4 h-4" />
                 </button>
@@ -247,7 +281,7 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
                 <button
                   onClick={() => onOpenEditModal(event)}
                   title="Editar Capacitación"
-                  className="p-2 rounded-xl bg-slate-50 hover:bg-amber-50 text-slate-600 hover:text-amber-700 border border-slate-200 transition-colors cursor-pointer"
+                  className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-amber-700 border border-slate-200 transition-colors cursor-pointer"
                 >
                   <Edit3 className="w-4 h-4" />
                 </button>
@@ -255,7 +289,7 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
                 <button
                   onClick={() => setDeletingId(event.id)}
                   title="Eliminar Capacitación"
-                  className="p-2 rounded-xl bg-slate-50 hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-slate-200 transition-colors cursor-pointer"
+                  className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-rose-700 border border-slate-200 transition-colors cursor-pointer"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -265,6 +299,7 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
           );
         })}
       </div>
+      )}
 
       {/* Delete Confirmation Dialog */}
       {deletingId && (

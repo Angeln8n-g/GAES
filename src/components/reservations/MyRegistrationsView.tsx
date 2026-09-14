@@ -30,7 +30,7 @@ import {
   Layers
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import { TrainingEvent, UserAccount, Slot, Schedule, TrainingProgram, ParticipantGroup, Participant, Company } from '../../types';
+import { TrainingEvent, UserAccount, Slot, Schedule, TrainingProgram, ParticipantGroup, Participant, Company, ExternalTraining } from '../../types';
 import { formatDateLong, formatDateShort, formatCedula, getEventDurationMetrics } from '../../utils/formatters';
 import { downloadIcsFile, getGoogleCalendarUrl } from '../../utils/icsUtils';
 import { FormalLetterModal, TrainingHistoryRecord } from '../history/FormalLetterModal';
@@ -55,6 +55,7 @@ interface MyRegistrationsViewProps {
   programs?: TrainingProgram[];
   groups?: ParticipantGroup[];
   participants?: Participant[];
+  externalTrainings?: ExternalTraining[];
   onCancelRegistration: (eventId: string, date: string, time: string, email: string) => Promise<void>;
   onExploreCatalog: () => void;
   onOpenReservationModal?: (event: TrainingEvent) => void;
@@ -70,6 +71,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
   programs = [],
   groups = [],
   participants = [],
+  externalTrainings = [],
   onCancelRegistration,
   onExploreCatalog,
   onOpenReservationModal,
@@ -162,9 +164,9 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
     return isTargetGroup || isTargetDirect;
   });
 
-  // Generar lista de registros históricos
+  // Generar lista de registros históricos (Internos + Externos)
   const trainingHistoryRecords: TrainingHistoryRecord[] = useMemo(() => {
-    return userRegistrations.map((item, idx) => {
+    const internalRecords: TrainingHistoryRecord[] = userRegistrations.map((item, idx) => {
       const isPast = item.schedule.date < todayStr;
       const gradeObj = (item.event.grades || []).find(g => 
         (userCard && g.participantCard === userCard) || 
@@ -180,12 +182,34 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
         date: item.schedule.date,
         time: item.slot.time,
         hasAttended: item.hasAttended,
-        hours: 2,
+        hours: item.event.totalHours || 2,
         gradeScore: gradeObj ? gradeObj.score : null,
-        academicStatus: gradeObj ? gradeObj.academicStatus : (item.hasAttended ? 'passed' : isPast ? 'failed' : 'pending')
+        academicStatus: gradeObj ? gradeObj.academicStatus : (item.hasAttended ? 'passed' : isPast ? 'failed' : 'pending'),
+        isExternal: false
       };
     });
-  }, [userRegistrations, todayStr, userCard, userEmail]);
+
+    const externalRecords: TrainingHistoryRecord[] = (externalTrainings || [])
+      .filter(t => (userCard && t.participantCard === userCard) || (t.participantEmail && t.participantEmail.toLowerCase() === userEmail))
+      .map(t => ({
+        id: `ext-${t.id}`,
+        title: t.title,
+        category: t.programCategory,
+        modality: t.modality,
+        instructor: t.supplier,
+        date: t.endDate || t.startDate,
+        time: 'Acreditado',
+        hasAttended: true,
+        hours: Number(t.totalHours) || 1,
+        gradeScore: t.score,
+        academicStatus: t.academicStatus || 'passed',
+        isExternal: true,
+        supplier: t.supplier,
+        credentialUrl: t.credentialUrl
+      }));
+
+    return [...internalRecords, ...externalRecords].sort((a, b) => b.date.localeCompare(a.date));
+  }, [userRegistrations, todayStr, userCard, userEmail, externalTrainings]);
 
   // Métricas del Histórico
   const historyMetrics = useMemo(() => {
@@ -193,7 +217,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
     const attendedCount = trainingHistoryRecords.filter(r => r.hasAttended).length;
     const upcomingCount = trainingHistoryRecords.filter(r => !r.hasAttended && r.date >= todayStr).length;
     const missedCount = trainingHistoryRecords.filter(r => !r.hasAttended && r.date < todayStr).length;
-    const totalHours = attendedCount * 2;
+    const totalHours = trainingHistoryRecords.filter(r => r.hasAttended).reduce((acc, r) => acc + (Number(r.hours) || 2), 0);
     const rate = totalCount > 0 ? Math.round((attendedCount / totalCount) * 100) : 0;
 
     return {
@@ -386,7 +410,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
-                <span className="p-1.5 rounded-xl bg-amber-400 text-slate-950 shadow-inner">
+                <span className="p-1.5 rounded-xl bg-amber-400 text-amber-950 shadow-inner">
                   <Sparkles className="w-4 h-4" />
                 </span>
                 <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
@@ -438,7 +462,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                     </span>
                     <button
                       onClick={() => onOpenReservationModal ? onOpenReservationModal(event) : onExploreCatalog()}
-                      className="px-3 py-1.5 rounded-xl bg-white text-slate-900 hover:bg-amber-300 text-xs font-black transition-colors cursor-pointer active:scale-95 flex items-center gap-1 shadow-sm"
+                      className="px-3 py-1.5 rounded-xl bg-white text-slate-900 hover:bg-slate-100 text-xs font-black transition-colors cursor-pointer active:scale-95 flex items-center gap-1 shadow-sm"
                     >
                       <span>Reservar Cupo</span>
                       <ChevronRight className="w-3.5 h-3.5" />
@@ -844,7 +868,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                       ) : !hasAttended && !item.isCheckedIn ? (
                         <button
                           onClick={() => setCancelingItem(item)}
-                          className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                          className="p-2 rounded-xl text-rose-600 hover:text-rose-800 hover:bg-rose-50 transition-colors"
                           title="Cancelar inscripción y liberar cupo"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -1065,7 +1089,12 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                       return (
                         <tr key={rec.id} className="hover:bg-slate-50/75 transition-colors">
                           <td className="py-4 px-4 font-bold text-slate-900 max-w-xs">
-                            <div className="flex items-center gap-2 mb-1">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              {rec.isExternal && (
+                                <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-wider">
+                                  Externa
+                                </span>
+                              )}
                               <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-red-50 text-[#DA291C] border border-red-200">
                                 {rec.category}
                               </span>
@@ -1077,7 +1106,20 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                                 </span>
                               )}
                             </div>
-                            <p className="line-clamp-1 text-slate-900 font-extrabold text-xs">{rec.title}</p>
+                            <div className="flex items-center justify-between gap-1">
+                              <p className="line-clamp-1 text-slate-900 font-extrabold text-xs">{rec.title}</p>
+                              {rec.credentialUrl && (
+                                <a
+                                  href={rec.credentialUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:text-blue-800 text-[10px] font-bold shrink-0 inline-flex items-center gap-0.5"
+                                  title="Ver certificado oficial externo"
+                                >
+                                  <ExternalLink className="w-3 h-3" /> Certificado
+                                </a>
+                              )}
+                            </div>
                           </td>
                           <td className="py-4 px-4 text-slate-600">
                             <span className="font-semibold block text-slate-800">{rec.modality}</span>
@@ -1114,7 +1156,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                                   setSelectedRecordsForLetter([rec]);
                                   setIsFormalLetterModalOpen(true);
                                 }}
-                                className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-red-50 hover:text-[#DA291C] text-slate-700 text-[11px] font-bold transition-all cursor-pointer inline-flex items-center gap-1.5"
+                                className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold transition-all cursor-pointer inline-flex items-center gap-1.5"
                                 title="Elaborar constancia formal para esta capacitación (Exclusivo Super Administrador)"
                               >
                                 <FileText className="w-3.5 h-3.5 text-[#DA291C]" />

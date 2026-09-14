@@ -285,7 +285,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 border-b border-slate-100 pb-4">
             <div>
               <div className="flex items-center gap-2">
-                <Flame className="w-5 h-5 text-[#DA291C] animate-bounce" />
+                <Flame className="w-5 h-5 text-[#DA291C] animate-pulse" />
                 <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                   Cursos <span className="text-[#DA291C]">Recomendados & Tendencias</span>
                 </h3>

@@ -21,7 +21,9 @@ import {
   OjtChecklist,
   CalibrationSession,
   OjtMetrics,
-  OjtPlanSettings
+  OjtPlanSettings,
+  ExternalTraining,
+  CreateExternalTrainingPayload
 } from '../types';
 
 export const MOCK_COMPANIES: Company[] = [
@@ -1711,6 +1713,82 @@ export const apiService = {
       avgFieldScore: 0,
       topFieldWeaknesses: []
     };
+  },
+
+  // ==========================================
+  // CAPACITACIONES EXTERNAS (SUSTENTABILIDAD)
+  // ==========================================
+  getExternalTrainings: async (companyId?: string, participantCard?: string, search?: string): Promise<ExternalTraining[]> => {
+    try {
+      const params = new URLSearchParams();
+      if (companyId && companyId !== 'all') params.append('companyId', companyId);
+      if (participantCard) params.append('participantCard', participantCard);
+      if (search) params.append('search', search);
+
+      const qs = params.toString();
+      const url = qs ? `${API_BASE_URL}/external-trainings?${qs}` : `${API_BASE_URL}/external-trainings`;
+      const response = await fetch(url);
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (e) {
+      console.warn('Fallo al obtener capacitaciones externas de API:', e);
+    }
+    return [];
+  },
+
+  createExternalTraining: async (payload: CreateExternalTrainingPayload): Promise<ExternalTraining[]> => {
+    const response = await fetch(`${API_BASE_URL}/external-trainings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || 'Error al registrar capacitación externa');
+    }
+    const data = await response.json();
+    return data.records || [];
+  },
+
+  updateExternalTraining: async (id: string, payload: Partial<ExternalTraining>): Promise<ExternalTraining> => {
+    const response = await fetch(`${API_BASE_URL}/external-trainings/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || 'Error al actualizar capacitación externa');
+    }
+    return await response.json();
+  },
+
+  deleteExternalTraining: async (id: string): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/external-trainings/${encodeURIComponent(id)}`, {
+      method: 'DELETE'
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || 'Error al eliminar capacitación externa');
+    }
+  },
+
+  bulkCreateExternalTrainings: async (
+    trainings: CreateExternalTrainingPayload[],
+    defaultCompanyId = 'emp_kasino',
+    registeredBy = 'Super Administrador'
+  ): Promise<{ count: number; skippedCount: number; records: ExternalTraining[]; skipped: Array<{ row: number; item: any; reason: string }> }> => {
+    const response = await fetch(`${API_BASE_URL}/external-trainings/bulk`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ trainings, defaultCompanyId, registeredBy })
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || 'Error al procesar la carga masiva de capacitaciones externas');
+    }
+    return await response.json();
   }
 };
 

@@ -1445,16 +1445,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="space-y-6 animate-in fade-in duration-300">
           
           {/* Header Banner */}
-          <div className="bg-purple-50 border border-purple-200 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-purple-100 border border-purple-200 flex items-center justify-center text-purple-700 shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-[#DA291C] shrink-0">
                 <Target className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-base font-extrabold text-purple-950">
+                <h3 className="text-base font-extrabold text-slate-900">
                   Diagnóstico Estratégico de Brechas de Habilidades (Skills Gap)
                 </h3>
-                <p className="text-xs text-purple-800 mt-0.5">
+                <p className="text-xs text-slate-600 mt-0.5">
                   Identifica las debilidades académicas y operativas detectadas por instructores para enfocar planes de re-capacitación y refuerzo técnico.
                 </p>
               </div>
@@ -1465,7 +1465,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 exportSkillsGapReportToExcel(events, participants, skillsGapGlobalMetrics.allGrades);
                 handleToast('Reporte generado', 'Matriz de Skills Gap y Debilidades descargada.', 'success');
               }}
-              className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl shadow-md shadow-purple-600/25 flex items-center gap-2 transition-all shrink-0 cursor-pointer"
+              className="px-4 py-2.5 bg-[#DA291C] hover:bg-red-700 text-white text-xs font-bold rounded-xl shadow-md shadow-red-500/20 flex items-center gap-2 transition-all shrink-0 cursor-pointer"
             >
               <Download className="w-4 h-4" />
               <span>Exportar Diagnóstico (.xlsx)</span>
@@ -1477,7 +1477,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
               <span className="text-xs font-bold text-slate-500">Promedio General Institucional</span>
               <div className="flex items-baseline justify-between mt-2">
-                <span className="text-2xl font-black text-purple-700">{skillsGapGlobalMetrics.overallAvg}</span>
+                <span className="text-2xl font-black text-blue-700">{skillsGapGlobalMetrics.overallAvg}</span>
                 <span className="text-xs font-bold text-slate-500">Escala 0 - 100</span>
               </div>
               <p className="text-[11px] text-slate-500 mt-1">Calculado en cursos con evaluación formal</p>

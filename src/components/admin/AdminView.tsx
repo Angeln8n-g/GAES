@@ -11,7 +11,8 @@ import {
   Building2,
   Activity,
   Settings,
-  Award
+  Award,
+  GraduationCap
 } from 'lucide-react';
 import { TrainingEvent, Participant, UserAccount, ParticipantGroup, TrainingProgram, Company, SystemSettings, OjtChecklist, CalibrationSession } from '../../types';
 import { EventsManager } from './EventsManager';
@@ -22,12 +23,14 @@ import { ProgramsManager } from './ProgramsManager';
 import { CompaniesManager } from './CompaniesManager';
 import { SettingsManager } from './SettingsManager';
 import { FormalLettersManager } from './FormalLettersManager';
+import { ExternalTrainingsManager } from './ExternalTrainingsManager';
 import { OjtManager } from '../ojt/OjtManager';
 import { EventFormModal } from './EventFormModal';
 import { AttendeesModal } from './AttendeesModal';
 import { NotificationModal } from './NotificationModal';
 import { QrModal } from './QrModal';
 import { BulkEnrollmentModal } from './BulkEnrollmentModal';
+import { ExternalTraining, CreateExternalTrainingPayload } from '../../types';
 
 interface AdminViewProps {
   events: TrainingEvent[];
@@ -39,6 +42,7 @@ interface AdminViewProps {
   settings?: SystemSettings;
   checklists?: OjtChecklist[];
   calibrations?: CalibrationSession[];
+  externalTrainings?: ExternalTraining[];
   selectedCompanyId?: string;
   currentUser: UserAccount | null;
   onSelectCompanyScope?: (companyId: string) => void;
@@ -50,6 +54,9 @@ interface AdminViewProps {
   onSaveCalibration?: (session: Partial<CalibrationSession>) => Promise<void>;
   onSaveEvent: (event: TrainingEvent) => Promise<void>;
   onDeleteEvent: (eventId: string) => Promise<void>;
+  onSaveExternalTraining?: (payload: CreateExternalTrainingPayload, isEdit?: boolean, editId?: string) => Promise<void>;
+  onBulkSaveExternalTrainings?: (trainings: CreateExternalTrainingPayload[]) => Promise<{ count: number; skippedCount: number; records: ExternalTraining[]; skipped: Array<{ row: number; item: any; reason: string }> }>;
+  onDeleteExternalTraining?: (id: string) => Promise<void>;
   onSaveParticipants: (participants: Participant[]) => Promise<void>;
   onSaveUsers: (users: UserAccount[]) => Promise<void>;
   onSaveGroup: (group: ParticipantGroup) => Promise<void>;
@@ -79,6 +86,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
   settings = { ojt_plan_90d: { enabled: true, enable_702010: true, enable_calibration: true, target_ttp_days: 30 } },
   checklists = [],
   calibrations = [],
+  externalTrainings = [],
   selectedCompanyId = 'all',
   currentUser,
   onSelectCompanyScope,
@@ -90,6 +98,9 @@ export const AdminView: React.FC<AdminViewProps> = ({
   onSaveCalibration,
   onSaveEvent,
   onDeleteEvent,
+  onSaveExternalTraining,
+  onBulkSaveExternalTrainings,
+  onDeleteExternalTraining,
   onSaveParticipants,
   onSaveUsers,
   onSaveGroup,
@@ -102,7 +113,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
   onBulkRegisterUsers,
   onShowToast
 }) => {
-  const [adminTab, setAdminTab] = useState<'events' | 'programs' | 'groups' | 'participants' | 'users' | 'companies' | 'ojt' | 'letters' | 'settings'>('events');
+  const [adminTab, setAdminTab] = useState<'events' | 'programs' | 'groups' | 'participants' | 'users' | 'companies' | 'ojt' | 'letters' | 'external-trainings' | 'settings'>('events');
 
   // Modals state
   const [isEventFormOpen, setIsEventFormOpen] = useState(false);
@@ -125,6 +136,11 @@ export const AdminView: React.FC<AdminViewProps> = ({
     if (isSuperAdmin && effectiveCompanyId === 'all') return events;
     return events.filter(e => (e.companyId || 'emp_kasino') === effectiveCompanyId);
   }, [events, isSuperAdmin, effectiveCompanyId]);
+
+  const scopedExternalTrainings = useMemo(() => {
+    if (isSuperAdmin && effectiveCompanyId === 'all') return externalTrainings;
+    return externalTrainings.filter(t => (t.companyId || 'emp_kasino') === effectiveCompanyId);
+  }, [externalTrainings, isSuperAdmin, effectiveCompanyId]);
 
   const scopedPrograms = useMemo(() => {
     if (isSuperAdmin && effectiveCompanyId === 'all') return programs;
@@ -186,7 +202,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
 
           {/* Company Scope Selector */}
           {companies.length > 0 && isSuperAdmin && onSelectCompanyScope && (
-            <div className="flex items-center gap-2 bg-slate-50 px-3.5 py-2 rounded-2xl border border-slate-200 text-xs shrink-0 self-start lg:self-auto">
+            <div className="flex items-center gap-2 bg-slate-50 px-3.5 py-2 rounded-2xl border border-slate-200 text-xs shrink-0 self-start lg:self-auto shadow-2xs">
               <Building2 className="w-4 h-4 text-[#DA291C] shrink-0" />
               <select
                 value={selectedCompanyId}
@@ -204,123 +220,221 @@ export const AdminView: React.FC<AdminViewProps> = ({
           )}
         </div>
 
+        {/* Executive Summary Metrics Ribbon */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-slate-100">
+          <div className="bg-slate-50/80 rounded-2xl p-3 border border-slate-200/70">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Capacitaciones</span>
+            <span className="text-xl font-black text-slate-900 mt-0.5 block">{scopedEvents.length}</span>
+          </div>
+          <div className="bg-slate-50/80 rounded-2xl p-3 border border-slate-200/70">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Colaboradores</span>
+            <span className="text-xl font-black text-slate-900 mt-0.5 block">{scopedParticipants.length}</span>
+          </div>
+          <div className="bg-slate-50/80 rounded-2xl p-3 border border-slate-200/70">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Cronogramas</span>
+            <span className="text-xl font-black text-slate-900 mt-0.5 block">{scopedPrograms.length}</span>
+          </div>
+          <div className="bg-slate-50/80 rounded-2xl p-3 border border-slate-200/70">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Áreas / Grupos</span>
+            <span className="text-xl font-black text-slate-900 mt-0.5 block">{scopedGroups.length}</span>
+          </div>
+        </div>
+
         {/* Sub-tabs Selector with Dedicated Responsive Scroll Bar */}
-        <div className="w-full overflow-x-auto pb-1 scrollbar-none">
-          <div className="flex items-center bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200 min-w-max gap-1">
+        <div className="w-full overflow-x-auto pb-1 scrollbar-none touch-pan-x">
+          <div 
+            role="tablist" 
+            aria-label="Secciones del Panel de Control" 
+            className="flex items-center bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200 min-w-max gap-1"
+          >
             <button
+              role="tab"
+              aria-selected={adminTab === 'events'}
               onClick={() => setAdminTab('events')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
                 adminTab === 'events'
                   ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white'
               }`}
             >
-              <BookOpen className="w-4 h-4" />
-              <span>Capacitaciones ({scopedEvents.length})</span>
+              <BookOpen className="w-4 h-4 shrink-0" />
+              <span>Capacitaciones</span>
+              <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-bold leading-none ${
+                adminTab === 'events' ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-600'
+              }`}>
+                {scopedEvents.length}
+              </span>
             </button>
 
             <button
+              role="tab"
+              aria-selected={adminTab === 'programs'}
               onClick={() => setAdminTab('programs')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
                 adminTab === 'programs'
                   ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white'
               }`}
             >
-              <Calendar className="w-4 h-4" />
-              <span>Cronogramas ({scopedPrograms.length})</span>
+              <Calendar className="w-4 h-4 shrink-0" />
+              <span>Cronogramas</span>
+              <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-bold leading-none ${
+                adminTab === 'programs' ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-600'
+              }`}>
+                {scopedPrograms.length}
+              </span>
             </button>
 
             <button
+              role="tab"
+              aria-selected={adminTab === 'groups'}
               onClick={() => setAdminTab('groups')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
                 adminTab === 'groups'
                   ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white'
               }`}
             >
-              <Layers className="w-4 h-4" />
-              <span>Grupos & Áreas ({scopedGroups.length})</span>
+              <Layers className="w-4 h-4 shrink-0" />
+              <span>Grupos & Áreas</span>
+              <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-bold leading-none ${
+                adminTab === 'groups' ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-600'
+              }`}>
+                {scopedGroups.length}
+              </span>
             </button>
 
             <button
+              role="tab"
+              aria-selected={adminTab === 'participants'}
               onClick={() => setAdminTab('participants')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
                 adminTab === 'participants'
                   ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white'
               }`}
             >
-              <Users className="w-4 h-4" />
-              <span>Padrón ({scopedParticipants.length})</span>
+              <Users className="w-4 h-4 shrink-0" />
+              <span>Padrón</span>
+              <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-bold leading-none ${
+                adminTab === 'participants' ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-600'
+              }`}>
+                {scopedParticipants.length}
+              </span>
             </button>
 
             {(isSuperAdmin || currentUser?.role === 'Administrador / Editor') && (
               <button
+                role="tab"
+                aria-selected={adminTab === 'users'}
                 onClick={() => setAdminTab('users')}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
                   adminTab === 'users'
                     ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white'
                 }`}
               >
-                <ShieldCheck className="w-4 h-4" />
-                <span>Usuarios ({scopedUsers.length})</span>
+                <ShieldCheck className="w-4 h-4 shrink-0" />
+                <span>Usuarios</span>
+                <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-bold leading-none ${
+                  adminTab === 'users' ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-600'
+                }`}>
+                  {scopedUsers.length}
+                </span>
               </button>
             )}
 
             {settings?.ojt_plan_90d?.enabled !== false && (isSuperAdmin || currentUser?.role === 'Evaluador / Tutor OJT') && (
               <button
+                role="tab"
+                aria-selected={adminTab === 'ojt'}
                 onClick={() => setAdminTab('ojt')}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
                   adminTab === 'ojt'
                     ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white'
                 }`}
               >
-                <Activity className="w-4 h-4" />
-                <span>OJT & Campo ({scopedChecklists.length})</span>
+                <Activity className="w-4 h-4 shrink-0" />
+                <span>OJT & Campo</span>
+                <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-bold leading-none ${
+                  adminTab === 'ojt' ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-600'
+                }`}>
+                  {scopedChecklists.length}
+                </span>
               </button>
             )}
 
             {isSuperAdmin && (
               <button
+                role="tab"
+                aria-selected={adminTab === 'companies'}
                 onClick={() => setAdminTab('companies')}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
                   adminTab === 'companies'
                     ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white'
                 }`}
               >
-                <Building2 className="w-4 h-4" />
-                <span>Empresas ({companies.length})</span>
+                <Building2 className="w-4 h-4 shrink-0" />
+                <span>Empresas</span>
+                <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-bold leading-none ${
+                  adminTab === 'companies' ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-600'
+                }`}>
+                  {companies.length}
+                </span>
               </button>
             )}
 
             {isSuperAdmin && (
               <button
+                role="tab"
+                aria-selected={adminTab === 'letters'}
                 onClick={() => setAdminTab('letters')}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
                   adminTab === 'letters'
                     ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white'
                 }`}
               >
-                <Award className="w-4 h-4 text-amber-500" />
+                <Award className={`w-4 h-4 shrink-0 ${adminTab === 'letters' ? 'text-white' : 'text-slate-500'}`} />
                 <span>Cartas & Constancias</span>
+              </button>
+            )}
+
+            {(isSuperAdmin || currentUser?.role === 'Administrador / Editor') && (
+              <button
+                role="tab"
+                aria-selected={adminTab === 'external-trainings'}
+                onClick={() => setAdminTab('external-trainings')}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
+                  adminTab === 'external-trainings'
+                    ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                }`}
+              >
+                <GraduationCap className={`w-4 h-4 shrink-0 ${adminTab === 'external-trainings' ? 'text-white' : 'text-slate-500'}`} />
+                <span>Capacitaciones Externas</span>
+                <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-bold leading-none ${
+                  adminTab === 'external-trainings' ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-600'
+                }`}>
+                  {scopedExternalTrainings.length}
+                </span>
               </button>
             )}
 
             {isSuperAdmin && (
               <button
+                role="tab"
+                aria-selected={adminTab === 'settings'}
                 onClick={() => setAdminTab('settings')}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
                   adminTab === 'settings'
                     ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white'
                 }`}
               >
-                <Sliders className="w-4 h-4 text-amber-600" />
+                <Sliders className={`w-4 h-4 shrink-0 ${adminTab === 'settings' ? 'text-white' : 'text-slate-500'}`} />
                 <span>Configuración</span>
               </button>
             )}
@@ -390,6 +504,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
           events={scopedEvents}
           programs={scopedPrograms}
           companies={companies}
+          externalTrainings={scopedExternalTrainings}
           currentUser={currentUser}
           isSuperAdmin={isSuperAdmin}
           onSaveParticipants={onSaveParticipants}
@@ -448,7 +563,21 @@ export const AdminView: React.FC<AdminViewProps> = ({
           events={scopedEvents}
           programs={scopedPrograms}
           companies={companies}
+          externalTrainings={scopedExternalTrainings}
           currentUser={currentUser}
+          onShowToast={onShowToast}
+        />
+      )}
+
+      {adminTab === 'external-trainings' && onSaveExternalTraining && onDeleteExternalTraining && (
+        <ExternalTrainingsManager
+          trainings={scopedExternalTrainings}
+          participants={scopedParticipants}
+          companies={companies}
+          currentUser={currentUser}
+          onSaveTraining={onSaveExternalTraining}
+          onBulkSaveTrainings={onBulkSaveExternalTrainings}
+          onDeleteTraining={onDeleteExternalTraining}
           onShowToast={onShowToast}
         />
       )}

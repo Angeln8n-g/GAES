@@ -29,7 +29,7 @@ export const OfflineBanner: React.FC = () => {
 
   if (isOffline) {
     return (
-      <div className="bg-amber-500 text-slate-950 font-bold text-xs py-1.5 px-4 flex items-center justify-center gap-2 shadow-md animate-in slide-in-from-top duration-300">
+      <div className="bg-amber-500 text-amber-950 font-black text-xs py-1.5 px-4 flex items-center justify-center gap-2 shadow-md animate-in slide-in-from-top duration-300">
         <WifiOff className="w-4 h-4 animate-pulse" />
         <span>Modo sin conexión activo — Visualizando datos en caché local</span>
       </div>

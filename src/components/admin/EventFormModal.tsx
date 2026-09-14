@@ -946,13 +946,13 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
             </div>
 
             {/* Asignación de Tutor / Evaluador OJT */}
-            <div className="bg-purple-50/50 border border-purple-200/80 p-4 rounded-2xl space-y-2">
+            <div className="bg-indigo-50/50 border border-indigo-200/80 p-4 rounded-2xl space-y-2">
               <div className="flex items-center justify-between">
                 <label className="block text-xs font-black text-slate-800 flex items-center gap-1.5">
-                  <UserCheck className="w-4 h-4 text-purple-700" />
+                  <UserCheck className="w-4 h-4 text-indigo-700" />
                   <span>Tutor / Evaluador OJT Responsable (Acompañamiento en Campo)</span>
                 </label>
-                <span className="text-[10px] text-purple-700 bg-purple-100/70 font-bold px-2 py-0.5 rounded-full border border-purple-300">
+                <span className="text-[10px] text-indigo-700 bg-indigo-100/70 font-bold px-2 py-0.5 rounded-full border border-indigo-300">
                   Bitácoras & Calibración
                 </span>
               </div>

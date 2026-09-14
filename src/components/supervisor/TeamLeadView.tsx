@@ -1040,7 +1040,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                             <div className="flex items-center justify-end gap-1.5">
                               <a
                                 href={`mailto:${p.participantEmail}?subject=Recordatorio%20de%20Capacitaci%C3%B3n%20-%20${encodeURIComponent(activeProgram?.title || 'CapacitaHub')}&body=Hola%20${encodeURIComponent(p.participantName)},%20te%20recordamos%20que%20tienes%20capacitaciones%20pendientes%20en%20el%20cronograma%20institucional.`}
-                                className="p-1.5 text-slate-500 hover:text-[#DA291C] hover:bg-red-50 rounded-lg transition-colors"
+                                className="p-1.5 text-slate-600 hover:text-red-700 hover:bg-slate-100 rounded-lg transition-colors"
                                 title="Enviar correo individual"
                               >
                                 <Mail className="w-3.5 h-3.5" />
@@ -1050,7 +1050,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                                 href={`https://wa.me/?text=${encodeURIComponent(`Hola ${p.participantName}, te escribo para recordarte que tienes capacitaciones pendientes en el cronograma "${activeProgram?.title || 'CapacitaHub'}". Por favor revisa tu avance en la plataforma.`)}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="p-1.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                className="p-1.5 text-slate-600 hover:text-emerald-700 hover:bg-slate-100 rounded-lg transition-colors"
                                 title="Enviar WhatsApp"
                               >
                                 <MessageSquare className="w-3.5 h-3.5" />
@@ -1191,7 +1191,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                         <div className="flex items-center justify-end gap-1.5">
                           <a
                             href={`mailto:${item.email}?subject=Capacitaciones%20Corporativas`}
-                            className="p-1.5 text-slate-500 hover:text-[#DA291C] hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-1.5 text-slate-600 hover:text-red-700 hover:bg-slate-100 rounded-lg transition-colors"
                           >
                             <Mail className="w-3.5 h-3.5" />
                           </a>
@@ -1199,7 +1199,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                             href={`https://wa.me/?text=${encodeURIComponent(`Hola ${item.name}, te contacto desde la supervisión de capacitaciones de tu área.`)}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-1.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                            className="p-1.5 text-slate-600 hover:text-emerald-700 hover:bg-slate-100 rounded-lg transition-colors"
                           >
                             <MessageSquare className="w-3.5 h-3.5" />
                           </a>
@@ -1453,7 +1453,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                               item.participant.email,
                               item.participant.name
                             )}
-                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors inline-flex items-center gap-1 cursor-pointer"
+                            className="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors inline-flex items-center gap-1 cursor-pointer"
                             title="Desasignar a este colaborador"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -1506,7 +1506,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
             <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
               <span className="text-xs font-bold text-slate-500">Promedio General del Equipo</span>
               <div className="flex items-baseline justify-between mt-2">
-                <span className="text-2xl font-black text-purple-700">{teamGradesAnalysis.overallTeamAvg}</span>
+                <span className="text-2xl font-black text-blue-700">{teamGradesAnalysis.overallTeamAvg}</span>
                 <span className="text-xs font-bold text-slate-400">Escala 0 - 100</span>
               </div>
               <p className="text-[11px] text-slate-500 mt-1">Calculado sobre cursos con evaluación formal</p>
@@ -1548,15 +1548,15 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
 
           {/* Radar / Diagnostic Panel of Weaknesses */}
           {teamGradesAnalysis.topGaps.length > 0 && (
-            <div className="p-6 rounded-3xl bg-purple-50/60 border border-purple-200 shadow-sm space-y-3">
+            <div className="p-6 rounded-3xl bg-slate-50 border border-slate-200 shadow-sm space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Target className="w-5 h-5 text-purple-700" />
-                  <h3 className="text-sm font-black text-purple-950">
+                  <Target className="w-5 h-5 text-[#DA291C]" />
+                  <h3 className="text-sm font-black text-slate-900">
                     Matriz de Detección de Debilidades en el Equipo (Skills Gap Analysis)
                   </h3>
                 </div>
-                <span className="text-[11px] text-purple-800 font-bold bg-white px-3 py-1 rounded-xl border border-purple-200 shadow-xs">
+                <span className="text-[11px] text-blue-800 font-bold bg-blue-50 px-3 py-1 rounded-xl border border-blue-200 shadow-xs">
                   {teamGradesAnalysis.topGaps.length} áreas identificadas
                 </span>
               </div>

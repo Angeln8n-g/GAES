@@ -144,7 +144,7 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/20 backdrop-blur-md">
               Encuesta de Satisfacción Oficial
             </span>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-400 text-slate-950">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-400 text-amber-950">
               TEC - Calidad Educativa
             </span>
             {isReadOnly && (
@@ -347,7 +347,7 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
                                 isReadOnly ? 'cursor-default' : 'cursor-pointer'
                               } ${
                                 isSelected
-                                  ? 'bg-amber-500 text-slate-950 border-amber-500 shadow-md shadow-amber-500/25 scale-[1.02]'
+                                  ? 'bg-amber-500 text-amber-950 border-amber-500 shadow-md shadow-amber-500/25 scale-[1.02]'
                                   : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
                               }`}
                             >

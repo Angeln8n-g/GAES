@@ -99,7 +99,7 @@ export const ReceptionLobbySection: React.FC<ReceptionLobbySectionProps> = ({
           </div>
 
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white leading-tight">
-            Consulta de Asistencia & <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-rose-300 to-amber-300">Cursos por Cédula</span>
+            Consulta de Asistencia & <span className="text-red-400">Cursos por Cédula</span>
           </h2>
 
           <p className="mt-2 text-xs sm:text-sm text-slate-300 font-medium max-w-2xl leading-relaxed">

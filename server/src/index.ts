@@ -14,6 +14,7 @@ import { companiesRouter } from './routes/companies.js';
 import { gradesRouter } from './routes/grades.js';
 import settingsRouter from './routes/settings.js';
 import ojtRouter from './routes/ojt.js';
+import { externalTrainingsRouter } from './routes/externalTrainings.js';
 
 import { pool, initDbMigrations } from './db.js';
 
@@ -49,6 +50,7 @@ app.use('/api/feedback', feedbackRouter);
 app.use('/api/notifications', notificationsRouter);
 app.use('/api/groups', groupsRouter);
 app.use('/api/programs', programsRouter);
+app.use('/api/external-trainings', externalTrainingsRouter);
 
 import http from 'http';
 import { initWebSocketServer } from './websocket.js';

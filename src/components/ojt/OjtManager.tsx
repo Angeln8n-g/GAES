@@ -457,7 +457,7 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
                                     onShowToast('Bitácora eliminada', 'El registro ha sido removido.', 'info');
                                   }
                                 }}
-                                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                className="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                                 title="Eliminar"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />

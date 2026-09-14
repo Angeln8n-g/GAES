@@ -12,20 +12,24 @@ import {
   Company,
   SystemSettings,
   OjtChecklist,
-  CalibrationSession
+  CalibrationSession,
+  ExternalTraining,
+  CreateExternalTrainingPayload
 } from './types';
 import { Navbar } from './components/layout/Navbar';
 import { SuperAdminSidebar } from './components/layout/SuperAdminSidebar';
 import { LoginModal } from './components/auth/LoginModal';
-import { CatalogView } from './components/catalog/CatalogView';
-import { MyRegistrationsView } from './components/reservations/MyRegistrationsView';
 import { ReservationModal } from './components/reservations/ReservationModal';
-import { AttendanceView } from './components/attendance/AttendanceView';
-import { DashboardView } from './components/dashboard/DashboardView';
-import { AdminView } from './components/admin/AdminView';
-import { TeamLeadView } from './components/supervisor/TeamLeadView';
-import { OjtManager } from './components/ojt/OjtManager';
-import { EvaluatorCoursesView } from './components/evaluator/EvaluatorCoursesView';
+
+// Code-splitting y carga diferida de módulos pesados (Vite bundle optimization)
+const CatalogView = React.lazy(() => import('./components/catalog/CatalogView').then(m => ({ default: m.CatalogView })));
+const MyRegistrationsView = React.lazy(() => import('./components/reservations/MyRegistrationsView').then(m => ({ default: m.MyRegistrationsView })));
+const AttendanceView = React.lazy(() => import('./components/attendance/AttendanceView').then(m => ({ default: m.AttendanceView })));
+const DashboardView = React.lazy(() => import('./components/dashboard/DashboardView').then(m => ({ default: m.DashboardView })));
+const AdminView = React.lazy(() => import('./components/admin/AdminView').then(m => ({ default: m.AdminView })));
+const TeamLeadView = React.lazy(() => import('./components/supervisor/TeamLeadView').then(m => ({ default: m.TeamLeadView })));
+const OjtManager = React.lazy(() => import('./components/ojt/OjtManager').then(m => ({ default: m.OjtManager })));
+const EvaluatorCoursesView = React.lazy(() => import('./components/evaluator/EvaluatorCoursesView').then(m => ({ default: m.EvaluatorCoursesView })));
 import { Toast } from './components/common/Toast';
 import { Footer } from './components/common/Footer';
 import { PwaInstallPrompt } from './components/common/PwaInstallPrompt';
@@ -61,6 +65,14 @@ const getSafeStoredUser = (): UserAccount | null => {
   }
 };
 
+// Componente visual de carga para vistas con code-splitting
+const ViewLoadingFallback: React.FC = () => (
+  <div className="flex flex-col items-center justify-center py-28 space-y-3.5 animate-in fade-in duration-200">
+    <div className="w-9 h-9 border-3 border-slate-200 border-t-[#DA291C] rounded-full animate-spin shadow-xs"></div>
+    <p className="text-xs font-bold text-slate-600">Cargando módulo...</p>
+  </div>
+);
+
 export function App() {
   const [companies, setCompanies] = useState<Company[]>(MOCK_COMPANIES);
   const [settings, setSettings] = useState<SystemSettings>({
@@ -68,6 +80,7 @@ export function App() {
   });
   const [checklists, setChecklists] = useState<OjtChecklist[]>([]);
   const [calibrations, setCalibrations] = useState<CalibrationSession[]>([]);
+  const [externalTrainings, setExternalTrainings] = useState<ExternalTraining[]>([]);
 
   // Estado del panel lateral (exclusivo para SuperAdmin)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
@@ -153,7 +166,8 @@ export function App() {
           loadedPrograms,
           loadedSettings,
           loadedChecklists,
-          loadedCalibrations
+          loadedCalibrations,
+          loadedExternalTrainings
         ] = await Promise.all([
           apiService.getCompanies(),
           apiService.getEvents(),
@@ -163,7 +177,8 @@ export function App() {
           apiService.getPrograms(),
           apiService.getSettings(),
           apiService.getOjtChecklists(),
-          apiService.getCalibrationSessions()
+          apiService.getCalibrationSessions(),
+          apiService.getExternalTrainings()
         ]);
         setCompanies(loadedCompanies);
         setEvents(loadedEvents);
@@ -174,6 +189,7 @@ export function App() {
         if (loadedSettings) setSettings(loadedSettings);
         if (loadedChecklists) setChecklists(loadedChecklists);
         if (loadedCalibrations) setCalibrations(loadedCalibrations);
+        if (loadedExternalTrainings) setExternalTrainings(loadedExternalTrainings);
 
         // Auto-consulta si la URL contiene ?cedula=
         const urlParams = new URLSearchParams(window.location.search);
@@ -469,6 +485,36 @@ export function App() {
     setCompanies(updated);
   };
 
+  const handleSaveExternalTraining = async (payload: CreateExternalTrainingPayload, isEdit?: boolean, editId?: string) => {
+    if (isEdit && editId) {
+      await apiService.updateExternalTraining(editId, payload);
+      showToast('Capacitación Actualizada', 'La capacitación externa ha sido actualizada correctamente.', 'success');
+    } else {
+      await apiService.createExternalTraining(payload);
+      showToast('Capacitación Registrada', 'La capacitación externa ha sido registrada con éxito.', 'success');
+    }
+    const freshTrainings = await apiService.getExternalTrainings();
+    setExternalTrainings(freshTrainings);
+  };
+
+  const handleDeleteExternalTraining = async (id: string) => {
+    await apiService.deleteExternalTraining(id);
+    const freshTrainings = await apiService.getExternalTrainings();
+    setExternalTrainings(freshTrainings);
+    showToast('Capacitación Eliminada', 'El registro externo fue eliminado con éxito.', 'info');
+  };
+
+  const handleBulkSaveExternalTrainings = async (trainingsToImport: CreateExternalTrainingPayload[]) => {
+    const res = await apiService.bulkCreateExternalTrainings(
+      trainingsToImport,
+      currentUser?.companyId || 'emp_kasino',
+      currentUser?.name || 'Super Administrador'
+    );
+    const freshTrainings = await apiService.getExternalTrainings();
+    setExternalTrainings(freshTrainings);
+    return res;
+  };
+
   const handleBulkRegisterUsers = async (
     eventId: string,
     date: string,
@@ -671,6 +717,7 @@ export function App() {
 
         {/* Main Content Area */}
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+          <React.Suspense fallback={<ViewLoadingFallback />}>
           
           {/* Tab 1: Catálogo Principal */}
           {currentTab === 'landing' && (
@@ -695,6 +742,7 @@ export function App() {
             programs={programs}
             groups={groups}
             participants={participants}
+            externalTrainings={externalTrainings}
             onCancelRegistration={handleCancelRegistration}
             onExploreCatalog={() => setCurrentTab('landing')}
             onOpenReservationModal={(event) => setSelectedEventForModal(event)}
@@ -739,10 +787,14 @@ export function App() {
             settings={settings}
             checklists={checklists}
             calibrations={calibrations}
+            externalTrainings={externalTrainings}
             selectedCompanyId={selectedCompanyId}
             onSelectCompanyScope={(cId) => setSelectedCompanyId(cId)}
             onSaveCompany={handleSaveCompany}
             onDeleteCompany={handleDeleteCompany}
+            onSaveExternalTraining={handleSaveExternalTraining}
+            onBulkSaveExternalTrainings={handleBulkSaveExternalTrainings}
+            onDeleteExternalTraining={handleDeleteExternalTraining}
             onUpdateSettings={handleUpdateSettings}
             onSaveChecklist={handleSaveOjtChecklist}
             onDeleteChecklist={handleDeleteOjtChecklist}
@@ -845,7 +897,8 @@ export function App() {
           />
         )}
 
-      </main>
+          </React.Suspense>
+        </main>
 
       {/* Corporate Claro Training Footer */}
       <Footer />
@@ -918,6 +971,7 @@ export function App() {
           }}
           currentUser={currentUser}
           participant={participants.find(p => p.email.toLowerCase() === currentUser.email.toLowerCase()) || null}
+          externalTrainings={externalTrainings}
           isMandatory={isProfileMandatory}
           onSaveProfile={handleSaveProfile}
           onShowToast={showToast}

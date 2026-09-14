@@ -390,16 +390,16 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
           onClick={() => setSelectedRoleFilter("Líder de Área / Supervisor")}
           className={`p-4 rounded-3xl border cursor-pointer transition-all ${
             selectedRoleFilter === "Líder de Área / Supervisor"
-              ? "bg-purple-50 border-purple-500 shadow-sm"
+              ? "bg-blue-50 border-blue-500 shadow-sm"
               : "bg-white border-slate-200 hover:border-slate-300 shadow-xs"
           }`}
         >
-          <div className="flex items-center justify-between text-xs text-purple-700 font-bold">
+          <div className="flex items-center justify-between text-xs text-blue-700 font-bold">
             <span>Líderes / Sup.</span>
-            <ShieldCheck className="w-4 h-4 text-purple-600" />
+            <ShieldCheck className="w-4 h-4 text-blue-600" />
           </div>
-          <p className="text-2xl font-black text-purple-700 mt-1.5">{stats.supervisores}</p>
-          <p className="text-[10px] text-purple-600 mt-0.5">Mandos con equipo</p>
+          <p className="text-2xl font-black text-blue-700 mt-1.5">{stats.supervisores}</p>
+          <p className="text-[10px] text-blue-600 mt-0.5">Mandos con equipo</p>
         </div>
 
         <div 
@@ -749,7 +749,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                               : u.role === "Administrador / Editor"
                               ? "text-[#DA291C]"
                               : u.role === "Evaluador / Tutor OJT"
-                              ? "text-purple-700"
+                              ? "text-indigo-700"
                               : u.role === "Líder de Área / Supervisor"
                               ? "text-emerald-700"
                               : "text-slate-700"
@@ -770,7 +770,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => handleOpenUserProfile(u)}
-                            className="p-1.5 text-slate-500 hover:text-[#DA291C] hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-slate-600 hover:text-red-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
                             title="Ver Ficha 360°"
                           >
                             <Eye className="w-3.5 h-3.5" />
@@ -789,7 +789,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
 
                           <button
                             onClick={() => setSelectedUserForEdit(u)}
-                            className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-slate-600 hover:text-blue-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
                             title="Editar usuario"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
@@ -800,7 +800,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                               setSelectedUserForPassword(u);
                               setNewPasswordInput("");
                             }}
-                            className="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-slate-600 hover:text-amber-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
                             title="Cambiar contraseña"
                           >
                             <KeyRound className="w-3.5 h-3.5" />
@@ -809,7 +809,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                           {u.id !== currentUser?.id && (
                             <button
                               onClick={() => handleDeleteUser(u.id)}
-                              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                              className="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                               title="Eliminar usuario"
                             >
                               <Trash2 className="w-3.5 h-3.5" />

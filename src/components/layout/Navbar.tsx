@@ -388,7 +388,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 onClick={onOpenUserProfile}
                 title="Mi Perfil & Ficha Académica"
-                className="hidden sm:flex p-2 rounded-2xl text-slate-500 hover:text-[#DA291C] hover:bg-red-50 border border-slate-200 hover:border-red-200 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
+                className="hidden sm:flex p-2 rounded-2xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
               >
                 <User className="w-4 h-4" />
               </button>
@@ -411,7 +411,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 onClick={onOpenChangePassword}
                 title="Cambiar Mi Contraseña"
-                className="hidden sm:flex p-2 rounded-2xl text-slate-500 hover:text-[#DA291C] hover:bg-red-50 border border-slate-200 hover:border-red-200 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
+                className="hidden sm:flex p-2 rounded-2xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
               >
                 <KeyRound className="w-4 h-4" />
               </button>
@@ -421,7 +421,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               onClick={onLogout}
               title="Cerrar Sesión"
-              className="hidden sm:flex p-2 rounded-2xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
+              className="hidden sm:flex p-2 rounded-2xl text-slate-600 hover:text-rose-700 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
             >
               <LogOut className="w-4 h-4" />
             </button>

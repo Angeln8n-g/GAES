@@ -19,6 +19,7 @@ const companies_js_1 = require("./routes/companies.js");
 const grades_js_1 = require("./routes/grades.js");
 const settings_js_1 = __importDefault(require("./routes/settings.js"));
 const ojt_js_1 = __importDefault(require("./routes/ojt.js"));
+const externalTrainings_js_1 = require("./routes/externalTrainings.js");
 const db_js_1 = require("./db.js");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -48,6 +49,7 @@ app.use('/api/feedback', feedback_js_1.feedbackRouter);
 app.use('/api/notifications', notifications_js_1.notificationsRouter);
 app.use('/api/groups', groups_js_1.groupsRouter);
 app.use('/api/programs', programs_js_1.programsRouter);
+app.use('/api/external-trainings', externalTrainings_js_1.externalTrainingsRouter);
 const http_1 = __importDefault(require("http"));
 const websocket_js_1 = require("./websocket.js");
 // Iniciar Servidor HTTP + WebSocket

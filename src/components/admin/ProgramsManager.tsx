@@ -302,7 +302,7 @@ export const ProgramsManager: React.FC<ProgramsManagerProps> = ({
 
                     <button
                       onClick={() => handleDelete(prog)}
-                      className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                      className="p-2 rounded-xl text-rose-600 hover:text-rose-800 hover:bg-rose-50 transition-colors cursor-pointer"
                       title="Eliminar cronograma"
                     >
                       <Trash2 className="w-4 h-4" />

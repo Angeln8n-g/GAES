@@ -238,7 +238,7 @@ export const CedulaScannerModal: React.FC<CedulaScannerModalProps> = ({
               <CreditCard className="w-3 h-3" />
               Lobby de Recepción
             </span>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-400 text-slate-950">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-400 text-emerald-950">
               Lector Activo
             </span>
           </div>

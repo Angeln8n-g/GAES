@@ -90,7 +90,7 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
             className={`py-2.5 px-4 rounded-2xl text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${
               activeMode === 'checkin'
                 ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25'
-                : 'bg-white text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 border border-slate-200'
+                : 'bg-white text-slate-700 hover:bg-slate-100 hover:text-emerald-800 border border-slate-200'
             }`}
           >
             <LogIn className="w-4 h-4" />
@@ -103,7 +103,7 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
             className={`py-2.5 px-4 rounded-2xl text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${
               activeMode === 'checkout'
                 ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                : 'bg-white text-slate-600 hover:bg-red-50 hover:text-[#DA291C] border border-slate-200'
+                : 'bg-white text-slate-700 hover:bg-slate-100 hover:text-red-800 border border-slate-200'
             }`}
           >
             <LogOut className="w-4 h-4" />

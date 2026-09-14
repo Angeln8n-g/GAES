@@ -209,19 +209,19 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
 
           {/* Ficha Académica del Tutorado (Sinergia OJT) */}
           {selectedParticipant && (selectedParticipant.educationLevel || selectedParticipant.isCurrentlyStudying) && (
-            <div className="p-3.5 bg-gradient-to-r from-indigo-50/90 to-blue-50/90 border border-indigo-200/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-2xs">
+            <div className="p-3.5 bg-blue-50/80 border border-blue-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-2xs">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
                   <GraduationCap className="w-4 h-4" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-black text-indigo-950">Perfil Formativo del Tutorado:</span>
-                    <span className="px-2 py-0.2 rounded-md bg-white border border-indigo-200 text-indigo-800 font-bold text-[10px]">
+                    <span className="font-black text-blue-950">Perfil Formativo del Tutorado:</span>
+                    <span className="px-2 py-0.5 rounded-md bg-white border border-blue-200 text-blue-800 font-bold text-[10px]">
                       {selectedParticipant.educationLevel || 'Bachiller'}
                     </span>
                   </div>
-                  <p className="text-[11px] text-indigo-700 mt-0.5">
+                  <p className="text-[11px] text-blue-700 mt-0.5">
                     {selectedParticipant.isCurrentlyStudying ? (
                       <span>
                         🎓 Cursa: <strong>{selectedParticipant.currentStudyField || 'Carrera'}</strong> en {selectedParticipant.institutionName || 'Institución'}

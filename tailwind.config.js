@@ -5,7 +5,18 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        claro: {
+          DEFAULT: '#DA291C',
+          red: '#DA291C',
+          darkred: '#B31E12',
+          lightred: '#FFF1F0',
+          dark: '#0F172A',
+          navy: '#0B1329',
+        },
+      },
+    },
   },
   plugins: [],
 }

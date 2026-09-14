@@ -141,7 +141,7 @@ export const ComplianceReminderModal: React.FC<ComplianceReminderModalProps> = (
               onClick={() => setRecipientFilter('all_incomplete')}
               className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
                 recipientFilter === 'all_incomplete'
-                  ? 'bg-red-50 border-[#DA291C] text-slate-900 shadow-xs'
+                  ? 'bg-red-50 border-[#DA291C] text-red-950 shadow-xs'
                   : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
               }`}
             >
@@ -151,8 +151,8 @@ export const ComplianceReminderModal: React.FC<ComplianceReminderModalProps> = (
                   {complianceSummary.participants.filter(p => p.percentage < 100).length}
                 </span>
               </div>
-              <p className="text-xs font-bold text-slate-900">Todos los Incompletos</p>
-              <p className="text-[10px] text-slate-500 mt-0.5">Avance menor al 100%</p>
+              <p className={`text-xs font-bold ${recipientFilter === 'all_incomplete' ? 'text-red-950' : 'text-slate-900'}`}>Todos los Incompletos</p>
+              <p className={`text-[10px] mt-0.5 ${recipientFilter === 'all_incomplete' ? 'text-red-900/80' : 'text-slate-500'}`}>Avance menor al 100%</p>
             </button>
 
             <button

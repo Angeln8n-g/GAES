@@ -179,7 +179,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                 onClick={() => { setEmploymentStatus('contratado'); setIsActive(true); }}
                 className={`p-3 rounded-2xl border text-left flex items-start gap-2.5 transition-all cursor-pointer ${
                   employmentStatus === 'contratado'
-                    ? 'bg-emerald-50 border-emerald-500 text-slate-900 shadow-xs'
+                    ? 'bg-emerald-50 border-emerald-500 text-emerald-950 shadow-xs'
                     : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                 }`}
               >
@@ -187,8 +187,8 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                   <CheckCircle2 className="w-3.5 h-3.5" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-emerald-800">Contratado</p>
-                  <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">Colaborador formal y activo</p>
+                  <p className="text-xs font-bold text-emerald-900">Contratado</p>
+                  <p className={`text-[10px] mt-0.5 leading-tight ${employmentStatus === 'contratado' ? 'text-emerald-800/80' : 'text-slate-500'}`}>Colaborador formal y activo</p>
                 </div>
               </button>
 
@@ -198,7 +198,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                 onClick={() => { setEmploymentStatus('en_proceso'); setIsActive(true); }}
                 className={`p-3 rounded-2xl border text-left flex items-start gap-2.5 transition-all cursor-pointer ${
                   employmentStatus === 'en_proceso'
-                    ? 'bg-amber-50 border-amber-500 text-slate-900 shadow-xs'
+                    ? 'bg-amber-50 border-amber-500 text-amber-950 shadow-xs'
                     : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                 }`}
               >
@@ -206,8 +206,8 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                   <Clock className="w-3.5 h-3.5" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-amber-800">En Proceso</p>
-                  <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">En inducción o contratación</p>
+                  <p className="text-xs font-bold text-amber-900">En Proceso</p>
+                  <p className={`text-[10px] mt-0.5 leading-tight ${employmentStatus === 'en_proceso' ? 'text-amber-800/80' : 'text-slate-500'}`}>En inducción o contratación</p>
                 </div>
               </button>
 
@@ -217,7 +217,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                 onClick={() => { setEmploymentStatus('inactivo'); setIsActive(false); }}
                 className={`p-3 rounded-2xl border text-left flex items-start gap-2.5 transition-all cursor-pointer ${
                   employmentStatus === 'inactivo'
-                    ? 'bg-rose-50 border-rose-500 text-slate-900 shadow-xs'
+                    ? 'bg-rose-50 border-rose-500 text-rose-950 shadow-xs'
                     : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                 }`}
               >
@@ -225,8 +225,8 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                   <UserX className="w-3.5 h-3.5" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-rose-800">Inactivo / Baja</p>
-                  <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">Desvinculado o pausado</p>
+                  <p className="text-xs font-bold text-rose-900">Inactivo / Baja</p>
+                  <p className={`text-[10px] mt-0.5 leading-tight ${employmentStatus === 'inactivo' ? 'text-rose-800/80' : 'text-slate-500'}`}>Desvinculado o pausado</p>
                 </div>
               </button>
             </div>

@@ -337,7 +337,7 @@ export const CompaniesManager: React.FC<CompaniesManagerProps> = ({
                     <button
                       type="button"
                       onClick={() => handleDelete(comp)}
-                      className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
+                      className="p-2 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
                       title="Eliminar Empresa"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
