@@ -15,6 +15,7 @@ import { gradesRouter } from './routes/grades.js';
 import settingsRouter from './routes/settings.js';
 import ojtRouter from './routes/ojt.js';
 import { externalTrainingsRouter } from './routes/externalTrainings.js';
+import { technicalAcademyRouter } from './routes/technicalAcademy.js';
 
 import { pool, initDbMigrations } from './db.js';
 
@@ -51,6 +52,7 @@ app.use('/api/notifications', notificationsRouter);
 app.use('/api/groups', groupsRouter);
 app.use('/api/programs', programsRouter);
 app.use('/api/external-trainings', externalTrainingsRouter);
+app.use('/api/technical-academy', technicalAcademyRouter);
 
 import http from 'http';
 import { initWebSocketServer } from './websocket.js';

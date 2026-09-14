@@ -329,7 +329,7 @@ export interface ToastNotification {
   type: 'success' | 'error' | 'info' | 'warning';
 }
 
-export type TabView = 'landing' | 'my-registrations' | 'dashboard' | 'admin' | 'attendance' | 'team' | 'ojt' | 'evaluator-courses' | 'kiosk';
+export type TabView = 'landing' | 'my-registrations' | 'dashboard' | 'admin' | 'attendance' | 'team' | 'ojt' | 'evaluator-courses' | 'kiosk' | 'technical-academy';
 
 // ==========================================
 // MÓDULO DE GRUPOS, CRONOGRAMAS Y CUMPLIMIENTO
@@ -495,4 +495,85 @@ export interface ProgramComplianceSummary {
     completedMembers: number;
   }[];
   participants: ParticipantComplianceDetail[];
+}
+
+// ==========================================
+// MÓDULO DE ACADEMIA TÉCNICA (CAPACITACIONES RECURRENTES)
+// ==========================================
+
+export interface TechnicalAcademyCourse {
+  id: string;
+  title: string;
+  code?: string;
+  description?: string;
+  category: string;
+  dailyHours: number;
+  durationDays: number;
+  modality: string;
+  location: string;
+  companyId: string;
+  isActive: boolean;
+  createdAt?: string;
+}
+
+export interface TechnicalAcademyCohort {
+  id: string;
+  courseId: string;
+  courseTitle?: string;
+  courseCategory?: string;
+  dailyHours?: number;
+  durationDays?: number;
+  groupId?: string | null;
+  groupName?: string;
+  facilitatorId?: string | null;
+  facilitatorName?: string;
+  facilitatorEmail?: string;
+  startDate: string; // YYYY-MM-DD
+  endDate: string;   // YYYY-MM-DD
+  weekNumber?: number;
+  year?: number;
+  dailyTime: string;
+  location: string;
+  capacity: number;
+  enrolledCount?: number;
+  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+  notes?: string;
+  dailyPin: string;
+  companyId: string;
+  createdAt?: string;
+}
+
+export interface TechnicalDailyAttendance {
+  status: 'present' | 'late' | 'absent' | 'excused';
+  method?: 'manual' | 'qr_scan' | 'pin';
+  markedBy?: string;
+  markedAt?: string;
+  notes?: string;
+}
+
+export interface TechnicalCohortParticipant {
+  card: string;
+  name: string;
+  email: string;
+  cedula?: string;
+  department?: string;
+  enrollmentStatus: string;
+  attendanceByDate: Record<string, TechnicalDailyAttendance>;
+  attendedDays: number;
+  totalDays: number;
+  attendancePercentage: number;
+  totalHoursEarned: number;
+}
+
+export interface TechnicalCohortAttendanceMatrix {
+  cohortId: string;
+  courseTitle: string;
+  groupName?: string;
+  facilitatorName?: string;
+  dailyHours: number;
+  startDate: string;
+  endDate: string;
+  sessionDates: string[];
+  dailyPin: string;
+  participants: TechnicalCohortParticipant[];
 }

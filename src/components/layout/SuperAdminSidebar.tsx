@@ -14,7 +14,8 @@ import {
   ChevronRight,
   X,
   KeyRound,
-  GraduationCap
+  GraduationCap,
+  Wrench
 } from 'lucide-react';
 import { UserAccount, TabView, Company } from '../../types';
 
@@ -60,7 +61,8 @@ export const SuperAdminSidebar: React.FC<SuperAdminSidebarProps> = ({
       items: [
         { id: 'landing' as TabView, label: "Catálogo de Cursos", icon: Grid, badge: null },
         { id: 'my-registrations' as TabView, label: "Mis Cursos & Rutas", icon: CalendarCheck2, badge: myRegistrationsCount > 0 ? myRegistrationsCount : null },
-        { id: 'team' as TabView, label: "Mi Equipo de Trabajo", icon: UserCheck, badge: null }
+        { id: 'team' as TabView, label: "Mi Equipo de Trabajo", icon: UserCheck, badge: null },
+        { id: 'technical-academy' as TabView, label: "Academia Técnica", icon: Wrench, badge: null }
       ]
     },
     {

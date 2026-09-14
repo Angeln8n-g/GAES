@@ -23,7 +23,12 @@ import {
   OjtMetrics,
   OjtPlanSettings,
   ExternalTraining,
-  CreateExternalTrainingPayload
+  CreateExternalTrainingPayload,
+  TechnicalAcademyCourse,
+  TechnicalAcademyCohort,
+  TechnicalDailyAttendance,
+  TechnicalCohortAttendanceMatrix,
+  TechnicalCohortParticipant
 } from '../types';
 
 export const MOCK_COMPANIES: Company[] = [
@@ -1789,6 +1794,190 @@ export const apiService = {
       throw new Error(err.error || 'Error al procesar la carga masiva de capacitaciones externas');
     }
     return await response.json();
+  },
+
+  // ==========================================
+  // ACADEMIA TÉCNICA (CAPACITACIONES RECURRENTES)
+  // ==========================================
+
+  getTechnicalCourses: async (companyId?: string): Promise<TechnicalAcademyCourse[]> => {
+    const qs = companyId ? `?companyId=${encodeURIComponent(companyId)}` : '';
+    const res = await fetch(`${API_BASE_URL}/technical-academy/courses${qs}`);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al obtener cursos técnicos');
+    }
+    return await res.json();
+  },
+
+  saveTechnicalCourse: async (course: Partial<TechnicalAcademyCourse>): Promise<{ message: string; courseId: string }> => {
+    const res = await fetch(`${API_BASE_URL}/technical-academy/courses`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(course)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al guardar curso técnico');
+    }
+    return await res.json();
+  },
+
+  deleteTechnicalCourse: async (id: string): Promise<void> => {
+    const res = await fetch(`${API_BASE_URL}/technical-academy/courses/${encodeURIComponent(id)}`, {
+      method: 'DELETE'
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al eliminar curso técnico');
+    }
+  },
+
+  getTechnicalCohorts: async (companyId?: string): Promise<TechnicalAcademyCohort[]> => {
+    const qs = companyId ? `?companyId=${encodeURIComponent(companyId)}` : '';
+    const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts${qs}`);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al obtener cohortes técnicas');
+    }
+    return await res.json();
+  },
+
+  saveTechnicalCohort: async (cohort: Partial<TechnicalAcademyCohort> & { autoEnrollGroupMembers?: boolean }): Promise<{ message: string; cohortId: string }> => {
+    const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(cohort)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al guardar cohorte técnica');
+    }
+    return await res.json();
+  },
+
+  reassignTechnicalCohort: async (
+    id: string,
+    payload: {
+      facilitatorId?: string | null;
+      facilitatorName?: string;
+      facilitatorEmail?: string;
+      groupId?: string | null;
+      groupName?: string;
+      rotateGroupMembers?: boolean;
+      notes?: string;
+    }
+  ): Promise<{ message: string; enrolledCount?: number }> => {
+    const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(id)}/reassign`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al reasignar cohorte');
+    }
+    return await res.json();
+  },
+
+  updateTechnicalCohortStatus: async (id: string, status: string): Promise<{ message: string; status: string }> => {
+    const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(id)}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al actualizar estado');
+    }
+    return await res.json();
+  },
+
+  deleteTechnicalCohort: async (id: string): Promise<void> => {
+    const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(id)}`, {
+      method: 'DELETE'
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al eliminar cohorte técnica');
+    }
+  },
+
+  duplicateTechnicalCohort: async (
+    id: string,
+    payload?: {
+      newGroupId?: string | null;
+      newGroupName?: string;
+      newFacilitatorId?: string | null;
+      newFacilitatorName?: string;
+      newFacilitatorEmail?: string;
+    }
+  ): Promise<{ message: string; newCohortId: string; startDate: string; endDate: string }> => {
+    const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(id)}/duplicate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload || {})
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al duplicar cohorte técnica');
+    }
+    return await res.json();
+  },
+
+  getCohortDailyAttendance: async (cohortId: string): Promise<TechnicalCohortAttendanceMatrix> => {
+    const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/attendance`);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al consultar asistencia de la cohorte');
+    }
+    return await res.json();
+  },
+
+  markCohortDailyAttendance: async (
+    cohortId: string,
+    payload: {
+      sessionDate: string;
+      records: Array<{
+        participantCard: string;
+        status: 'present' | 'late' | 'absent' | 'excused';
+        method?: string;
+        notes?: string;
+      }>;
+      markedBy?: string;
+    }
+  ): Promise<{ message: string; updatedCount: number }> => {
+    const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/attendance`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al guardar asistencia de la cohorte');
+    }
+    return await res.json();
+  },
+
+  checkInTechnicalQr: async (
+    cohortId: string,
+    payload: { identifier: string; pin?: string; sessionDate?: string }
+  ): Promise<{
+    success: boolean;
+    message: string;
+    participant: { card: string; name: string; email: string };
+    sessionDate: string;
+  }> => {
+    const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/qr-checkin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al procesar asistencia por QR o PIN');
+    }
+    return await res.json();
   }
 };
 

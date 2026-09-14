@@ -30,6 +30,7 @@ const AdminView = React.lazy(() => import('./components/admin/AdminView').then(m
 const TeamLeadView = React.lazy(() => import('./components/supervisor/TeamLeadView').then(m => ({ default: m.TeamLeadView })));
 const OjtManager = React.lazy(() => import('./components/ojt/OjtManager').then(m => ({ default: m.OjtManager })));
 const EvaluatorCoursesView = React.lazy(() => import('./components/evaluator/EvaluatorCoursesView').then(m => ({ default: m.EvaluatorCoursesView })));
+const TechnicalAcademyView = React.lazy(() => import('./components/technical-academy/TechnicalAcademyView').then(m => ({ default: m.TechnicalAcademyView })));
 import { Toast } from './components/common/Toast';
 import { Footer } from './components/common/Footer';
 import { PwaInstallPrompt } from './components/common/PwaInstallPrompt';
@@ -876,6 +877,18 @@ export function App() {
             onConfirmAttendance={handleConfirmAttendance}
             onRevertAttendance={handleRevertAttendance}
             onSaveEvent={handleSaveEvent}
+            onShowToast={showToast}
+          />
+        )}
+
+        {/* Tab Academia Técnica: Capacitaciones Recurrentes, Rotación Semanal y Matriz Diaria */}
+        {currentTab === 'technical-academy' && (
+          <TechnicalAcademyView
+            currentUser={currentUser}
+            companies={companies}
+            groups={groups}
+            users={users}
+            participants={scopedParticipants}
             onShowToast={showToast}
           />
         )}

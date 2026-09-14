@@ -13,7 +13,8 @@ import {
   CalibrationSession,
   Company,
   ExternalTraining,
-  CreateExternalTrainingPayload
+  CreateExternalTrainingPayload,
+  TechnicalCohortAttendanceMatrix
 } from '../types';
 import { formatDateLong, formatCedula, isValidCedula, formatDateShort } from './formatters';
 import {
@@ -2470,5 +2471,75 @@ export const exportExternalTrainingsToExcel = (
 
   const today = new Date().toISOString().split('T')[0];
   XLSX.writeFile(wb, `Historico_Capacitaciones_Externas_${today}.xlsx`);
+};
+
+/**
+ * Exporta la matriz de asistencia diaria de una cohorte de la Academia Técnica a Excel (.xlsx)
+ */
+export const exportTechnicalAcademyAttendanceToExcel = (matrix: TechnicalCohortAttendanceMatrix): void => {
+  const formatStatus = (status?: string) => {
+    switch (status) {
+      case 'present': return 'PRESENTE';
+      case 'late': return 'TARDANZA';
+      case 'absent': return 'AUSENTE';
+      case 'excused': return 'EXCUSADO';
+      default: return 'NO REGISTRADO';
+    }
+  };
+
+  const rows = matrix.participants.map((p, idx) => {
+    const rowObj: Record<string, any> = {
+      'No.': idx + 1,
+      'Carnet / Código': p.card,
+      'Cédula': p.cedula ? formatCedula(p.cedula) : 'N/A',
+      'Colaborador': p.name,
+      'Correo Electrónico': p.email,
+      'Departamento': p.department || 'N/A'
+    };
+
+    // Añadir columnas por cada día hábil
+    matrix.sessionDates.forEach((date, dIdx) => {
+      const att = p.attendanceByDate[date];
+      rowObj[`Día ${dIdx + 1} (${date})`] = formatStatus(att?.status);
+    });
+
+    rowObj['Días Asistidos'] = p.attendedDays;
+    rowObj['Total Días'] = p.totalDays;
+    rowObj['% Asistencia'] = `${p.attendancePercentage}%`;
+    rowObj['Horas Acreditadas'] = p.totalHoursEarned;
+    rowObj['Condición Académica'] = p.attendancePercentage >= 80 ? 'APROBADO' : (p.attendancePercentage >= 60 ? 'EN RIESGO' : 'REPROBADO');
+
+    return rowObj;
+  });
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+
+  // Ficha de cohorte (resumen)
+  const avgAttendance = matrix.participants.length > 0
+    ? Math.round(matrix.participants.reduce((acc, p) => acc + p.attendancePercentage, 0) / matrix.participants.length)
+    : 0;
+
+  const summaryData = [
+    { 'Parámetro': 'Curso Técnico', 'Valor': matrix.courseTitle },
+    { 'Parámetro': 'Grupo Técnico Asignado', 'Valor': matrix.groupName || 'Sin Grupo Específico' },
+    { 'Parámetro': 'Facilitador / Instructor', 'Valor': matrix.facilitatorName || 'No Asignado' },
+    { 'Parámetro': 'Fecha de Inicio', 'Valor': matrix.startDate },
+    { 'Parámetro': 'Fecha de Finalización', 'Valor': matrix.endDate },
+    { 'Parámetro': 'Horas Diarias', 'Valor': `${matrix.dailyHours} hrs` },
+    { 'Parámetro': 'Total de Días de Taller', 'Valor': matrix.sessionDates.length },
+    { 'Parámetro': 'Total Técnicos Matriculados', 'Valor': matrix.participants.length },
+    { 'Parámetro': 'Promedio General de Asistencia', 'Valor': `${avgAttendance}%` },
+    { 'Parámetro': 'PIN de Auto-marcado Diario', 'Valor': matrix.dailyPin }
+  ];
+
+  const wsSummary = XLSX.utils.json_to_sheet(summaryData);
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Matriz_Asistencia');
+  XLSX.utils.book_append_sheet(wb, wsSummary, 'Ficha_Cohorte');
+
+  const cleanCourse = (matrix.courseTitle || 'Curso_Tecnico').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 20);
+  const cleanGroup = (matrix.groupName || 'Grupo').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 15);
+  XLSX.writeFile(wb, `Academia_Tecnica_${cleanCourse}_${cleanGroup}_${matrix.startDate}.xlsx`);
 };
 

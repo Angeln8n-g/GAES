@@ -19,7 +19,8 @@ import {
   Sparkles,
   KeyRound,
   GraduationCap,
-  Camera
+  Camera,
+  Wrench
 } from 'lucide-react';
 import { UserAccount, TabView, Company } from '../../types';
 
@@ -66,6 +67,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const isLeaderOrAdmin = isAdminOrSuper || currentUser.role === 'Líder de Área / Supervisor';
   const canAccessOjt = isSuperAdmin || isOjtUser;
   const canAccessEvaluatorCourses = isSuperAdmin || isOjtUser;
+  const canAccessTechnicalAcademy = isAdminOrSuper || currentUser.role === 'Líder de Área / Supervisor' || isOjtUser;
 
   const handleNavClick = (tab: TabView) => {
     setCurrentTab(tab);
@@ -115,6 +117,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       case 'team': return 'Mi Equipo de Trabajo';
       case 'ojt': return 'Bitácoras & Mesas de Calibración';
       case 'evaluator-courses': return 'Cursos Asignados (Evaluación OJT)';
+      case 'technical-academy': return 'Academia Técnica (Capacitaciones Recurrentes)';
       case 'dashboard': return 'Dashboard & Métricas';
       case 'admin': return 'Panel de Administración';
       default: return 'Portal de Formación';
@@ -300,6 +303,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                       {evaluatorCoursesCount}
                     </span>
                   )}
+                </button>
+              )}
+
+              {canAccessTechnicalAcademy && (
+                <button
+                  onClick={() => handleNavClick('technical-academy')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all whitespace-nowrap shrink-0 ${
+                    currentTab === 'technical-academy'
+                      ? 'bg-gradient-to-r from-[#DA291C] to-[#E02418] text-white shadow-md shadow-red-500/25 font-bold scale-[1.02]'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white font-semibold'
+                  }`}
+                >
+                  <Wrench className="w-4 h-4" />
+                  <span>Academia Técnica</span>
                 </button>
               )}
 
@@ -632,6 +649,23 @@ export const Navbar: React.FC<NavbarProps> = ({
                   )}
                   <ChevronRight className="w-4 h-4 opacity-70" />
                 </div>
+              </button>
+            )}
+
+            {canAccessTechnicalAcademy && (
+              <button
+                onClick={() => handleNavClick('technical-academy')}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
+                  currentTab === 'technical-academy'
+                    ? 'bg-gradient-to-r from-[#DA291C] to-red-600 text-white shadow-md shadow-red-500/25'
+                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200/60'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Wrench className="w-4 h-4" />
+                  <span>Academia Técnica (Talleres Diarios)</span>
+                </div>
+                <ChevronRight className="w-4 h-4 opacity-70" />
               </button>
             )}
 
