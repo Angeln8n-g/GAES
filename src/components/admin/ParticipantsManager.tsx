@@ -25,7 +25,7 @@ import { exportParticipantsToExcel, parseParticipantsExcelFile } from "../../uti
 import { generateEmailFromName, formatCedula, isValidCedula } from "../../utils/formatters";
 import { EditParticipantModal } from "./EditParticipantModal";
 import { ParticipantProfileModal } from "./ParticipantProfileModal";
-import { ExternalTraining } from "../../types";
+import { ExternalTraining, TechnicalAcademyHistoryRecord } from "../../types";
 
 interface ParticipantsManagerProps {
   participants: Participant[];
@@ -34,6 +34,7 @@ interface ParticipantsManagerProps {
   programs?: TrainingProgram[];
   companies?: Company[];
   externalTrainings?: ExternalTraining[];
+  technicalHistory?: TechnicalAcademyHistoryRecord[];
   currentUser?: UserAccount | null;
   isSuperAdmin?: boolean;
   onSaveParticipants: (participants: Participant[]) => Promise<void>;
@@ -48,6 +49,7 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
   programs = [],
   companies = [],
   externalTrainings = [],
+  technicalHistory = [],
   currentUser,
   isSuperAdmin = true,
   onSaveParticipants,
@@ -1170,6 +1172,7 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
           programs={programs}
           companies={companies}
           externalTrainings={externalTrainings}
+          technicalHistory={technicalHistory}
           currentUser={currentUser}
           isOpen={Boolean(viewingProfileParticipant)}
           onClose={() => setViewingProfileParticipant(null)}

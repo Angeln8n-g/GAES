@@ -14,7 +14,8 @@ import {
   OjtChecklist,
   CalibrationSession,
   ExternalTraining,
-  CreateExternalTrainingPayload
+  CreateExternalTrainingPayload,
+  TechnicalAcademyHistoryRecord
 } from './types';
 import { Navbar } from './components/layout/Navbar';
 import { SuperAdminSidebar } from './components/layout/SuperAdminSidebar';
@@ -82,6 +83,8 @@ export function App() {
   const [checklists, setChecklists] = useState<OjtChecklist[]>([]);
   const [calibrations, setCalibrations] = useState<CalibrationSession[]>([]);
   const [externalTrainings, setExternalTrainings] = useState<ExternalTraining[]>([]);
+  const [technicalHistory, setTechnicalHistory] = useState<TechnicalAcademyHistoryRecord[]>([]);
+  const [eventToMakeRecurrent, setEventToMakeRecurrent] = useState<TrainingEvent | null>(null);
 
   // Estado del panel lateral (exclusivo para SuperAdmin)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
@@ -168,7 +171,8 @@ export function App() {
           loadedSettings,
           loadedChecklists,
           loadedCalibrations,
-          loadedExternalTrainings
+          loadedExternalTrainings,
+          loadedTechnicalHistory
         ] = await Promise.all([
           apiService.getCompanies(),
           apiService.getEvents(),
@@ -179,7 +183,8 @@ export function App() {
           apiService.getSettings(),
           apiService.getOjtChecklists(),
           apiService.getCalibrationSessions(),
-          apiService.getExternalTrainings()
+          apiService.getExternalTrainings(),
+          apiService.getTechnicalAcademyHistory()
         ]);
         setCompanies(loadedCompanies);
         setEvents(loadedEvents);
@@ -191,12 +196,13 @@ export function App() {
         if (loadedChecklists) setChecklists(loadedChecklists);
         if (loadedCalibrations) setCalibrations(loadedCalibrations);
         if (loadedExternalTrainings) setExternalTrainings(loadedExternalTrainings);
+        if (loadedTechnicalHistory) setTechnicalHistory(loadedTechnicalHistory);
 
         // Auto-consulta si la URL contiene ?cedula=
         const urlParams = new URLSearchParams(window.location.search);
         const cedulaFromUrl = urlParams.get('cedula');
         if (cedulaFromUrl) {
-          const res = findAttendeeByCedula(cedulaFromUrl, loadedParticipants, loadedUsers, loadedEvents);
+          const res = findAttendeeByCedula(cedulaFromUrl, loadedParticipants, loadedUsers, loadedEvents, loadedTechnicalHistory || []);
           setAttendeeLookupResult(res);
           setIsAttendeeScheduleModalOpen(true);
           setLastSearchedCedula(cedulaFromUrl);
@@ -386,7 +392,7 @@ export function App() {
     setIsSearchingCedula(true);
     setLastSearchedCedula(query.trim());
     try {
-      const result = findAttendeeByCedula(query, participants, users, events);
+      const result = findAttendeeByCedula(query, participants, users, events, technicalHistory);
       setAttendeeLookupResult(result);
       setIsAttendeeScheduleModalOpen(true);
       if (!result.found) {
@@ -419,7 +425,7 @@ export function App() {
     const updated = await apiService.confirmAttendance(eventId, date, time, email, type);
     setEvents(updated);
     if (lastSearchedCedula) {
-      const refreshed = findAttendeeByCedula(lastSearchedCedula, participants, users, updated);
+      const refreshed = findAttendeeByCedula(lastSearchedCedula, participants, users, updated, technicalHistory);
       setAttendeeLookupResult(refreshed);
     }
     showToast('Asistencia Confirmada', `Tu ${type === 'checkout' ? 'salida' : 'entrada'} presencial ha sido validada exitosamente.`, 'success');
@@ -744,6 +750,7 @@ export function App() {
             groups={groups}
             participants={participants}
             externalTrainings={externalTrainings}
+            technicalHistory={technicalHistory}
             onCancelRegistration={handleCancelRegistration}
             onExploreCatalog={() => setCurrentTab('landing')}
             onOpenReservationModal={(event) => setSelectedEventForModal(event)}
@@ -789,6 +796,7 @@ export function App() {
             checklists={checklists}
             calibrations={calibrations}
             externalTrainings={externalTrainings}
+            technicalHistory={technicalHistory}
             selectedCompanyId={selectedCompanyId}
             onSelectCompanyScope={(cId) => setSelectedCompanyId(cId)}
             onSaveCompany={handleSaveCompany}
@@ -813,6 +821,10 @@ export function App() {
             onRevertAttendance={handleRevertAttendance}
             onSendNotification={handleSendNotification}
             onBulkRegisterUsers={handleBulkRegisterUsers}
+            onMakeRecurrent={(evt) => {
+              setEventToMakeRecurrent(evt);
+              setCurrentTab('technical-academy');
+            }}
             onShowToast={showToast}
           />
         )}
@@ -827,6 +839,7 @@ export function App() {
             groups={groups}
             programs={programs}
             companies={companies}
+            technicalHistory={technicalHistory}
             onAssignTeamMembers={handleAssignTeamMembers}
             onCancelRegistration={handleCancelRegistration}
             onSendNotification={handleSendNotification}
@@ -889,6 +902,9 @@ export function App() {
             groups={groups}
             users={users}
             participants={scopedParticipants}
+            events={events}
+            initialEventToMakeRecurrent={eventToMakeRecurrent}
+            onClearEventToMakeRecurrent={() => setEventToMakeRecurrent(null)}
             onShowToast={showToast}
           />
         )}

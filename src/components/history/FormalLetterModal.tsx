@@ -36,6 +36,11 @@ export interface TrainingHistoryRecord {
   isExternal?: boolean;
   supplier?: string;
   credentialUrl?: string | null;
+  isRecurrent?: boolean;
+  cohortId?: string;
+  attendancePercentage?: number;
+  facilitatorName?: string;
+  groupName?: string;
 }
 
 interface FormalLetterModalProps {
@@ -487,6 +492,11 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                                   Externa
                                 </span>
                               )}
+                              {rec.isRecurrent && (
+                                <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-purple-100 text-purple-800 border border-purple-200">
+                                  Academia
+                                </span>
+                              )}
                             </p>
                             <div className="flex items-center gap-2 text-[10px] text-slate-500">
                               <span>📅 {formatDateShort(rec.date)}</span>
@@ -700,6 +710,9 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                                   {course.title}
                                   {course.isExternal && (
                                     <span className="ml-1 text-[10px] font-bold text-blue-700"> (Externa - {course.supplier || 'Suplidor'})</span>
+                                  )}
+                                  {course.isRecurrent && (
+                                    <span className="ml-1 text-[10px] font-bold text-purple-700"> (Academia Técnica - {course.groupName || 'Taller Práctico'})</span>
                                   )}
                                 </td>
                                 <td className="py-2 px-2 text-center text-slate-600 font-medium">{course.modality}</td>

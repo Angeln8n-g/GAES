@@ -1,4 +1,4 @@
-import { TrainingEvent, Schedule, Slot, Participant, UserAccount } from '../types';
+import { TrainingEvent, Schedule, Slot, Participant, UserAccount, TechnicalAcademyHistoryRecord } from '../types';
 import { formatCedula } from './formatters';
 
 export interface ScheduledSessionItem {
@@ -11,6 +11,12 @@ export interface ScheduledSessionItem {
   isPast: boolean;
   assignedBy?: string | null;
   assignmentNotes?: string | null;
+  isRecurrent?: boolean;
+  cohortId?: string;
+  facilitatorName?: string;
+  location?: string;
+  dailyTime?: string;
+  dailyPin?: string;
 }
 
 export interface AttendeeLookupResult {
@@ -29,13 +35,14 @@ export interface AttendeeLookupResult {
 
 /**
  * Busca un colaborador por cédula, número de tarjeta o correo,
- * y extrae todos los eventos y cursos en los que está agendado.
+ * y extrae todos los eventos y cursos en los que está agendado (regulares y recurrentes).
  */
 export function findAttendeeByCedula(
   query: string,
   participants: Participant[],
   users: UserAccount[],
-  events: TrainingEvent[]
+  events: TrainingEvent[],
+  technicalHistory?: TechnicalAcademyHistoryRecord[]
 ): AttendeeLookupResult {
   if (!query || !query.trim()) {
     return {
@@ -126,6 +133,7 @@ export function findAttendeeByCedula(
   // Extraer todas las sesiones en las que está agendado
   const sessions: ScheduledSessionItem[] = [];
 
+  // 1. Sesiones de Eventos Regulares
   events.forEach(evt => {
     (evt.schedule || []).forEach(sch => {
       const isToday = sch.date === todayStr;
@@ -158,6 +166,65 @@ export function findAttendeeByCedula(
       });
     });
   });
+
+  // 2. Sesiones de Capacitaciones Recurrentes (Academia Técnica)
+  if (technicalHistory && technicalHistory.length > 0) {
+    const matchingRecurrent = technicalHistory.filter(h => 
+      (matchedParticipant?.card && h.participantCard === matchedParticipant.card) ||
+      Array.from(emailsToMatch).some(e => h.participantEmail && h.participantEmail.toLowerCase() === e)
+    );
+
+    matchingRecurrent.forEach(h => {
+      const isToday = todayStr >= h.startDate && todayStr <= h.endDate;
+      const isPast = h.endDate < todayStr;
+      const sessionDate = isToday ? todayStr : (isPast ? h.endDate : h.startDate);
+
+      const syntheticEvent: TrainingEvent = {
+        id: `tac_evt_${h.cohortId}`,
+        title: h.title,
+        description: `Capacitación Técnica Recurrente • Cuadrilla / Grupo: ${h.groupName || 'Técnicos'}.`,
+        category: h.category || 'Academia Técnica',
+        instructor: h.facilitatorName || 'Facilitador Asignado',
+        modality: (h.modality as any) || 'Presencial',
+        location: h.location || 'Laboratorio Técnico',
+        imageUrl: '',
+        status: 'active',
+        schedule: [],
+        totalHours: h.totalHours || (h.dailyHours * h.durationDays),
+        companyId: 'emp_kasino'
+      };
+
+      const syntheticSchedule: Schedule = {
+        date: sessionDate,
+        slots: []
+      };
+
+      const syntheticSlot: Slot = {
+        time: h.time || '08:00 AM - 12:00 PM',
+        capacity: 20,
+        registered: 1,
+        attendees: [h.participantEmail],
+        attendedList: h.hasAttended ? [h.participantEmail] : []
+      };
+
+      sessions.push({
+        event: syntheticEvent,
+        schedule: syntheticSchedule,
+        slot: syntheticSlot,
+        hasAttended: h.hasAttended,
+        isMandatory: true,
+        isToday,
+        isPast,
+        isRecurrent: true,
+        cohortId: h.cohortId,
+        facilitatorName: h.facilitatorName,
+        location: h.location,
+        dailyTime: h.time,
+        assignedBy: 'Academia Técnica',
+        assignmentNotes: `Grupo: ${h.groupName || 'Técnicos'} • Facilitador: ${h.facilitatorName}`
+      });
+    });
+  }
 
   // Ordenar sesiones:
   // 1. Sesiones de HOY primero

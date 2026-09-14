@@ -17,7 +17,8 @@ import {
   Building2,
   FileSpreadsheet,
   UserCheck,
-  BookOpen
+  BookOpen,
+  RotateCw
 } from 'lucide-react';
 import { TrainingEvent, Company, Participant } from '../../types';
 import { formatDateShort } from '../../utils/formatters';
@@ -34,6 +35,7 @@ interface EventsManagerProps {
   onOpenNotificationModal: (event: TrainingEvent) => void;
   onOpenQrModal: (event: TrainingEvent) => void;
   onOpenBulkEnrollment?: (eventId?: string) => void;
+  onMakeRecurrent?: (event: TrainingEvent) => void;
   onDeleteEvent: (eventId: string) => Promise<void>;
 }
 
@@ -48,6 +50,7 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
   onOpenNotificationModal,
   onOpenQrModal,
   onOpenBulkEnrollment,
+  onMakeRecurrent,
   onDeleteEvent
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -261,6 +264,17 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
                     <Users className="w-3.5 h-3.5 text-[#DA291C]" />
                     <span>Asistentes ({totalReg})</span>
                   </button>
+
+                  {onMakeRecurrent && isSuperAdmin && (
+                    <button
+                      onClick={() => onMakeRecurrent(event)}
+                      title="Volver Recurrente / Programar en Academia Técnica"
+                      className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                    >
+                      <RotateCw className="w-3.5 h-3.5 text-amber-400" />
+                      <span className="hidden sm:inline">Volver Recurrente</span>
+                    </button>
+                  )}
 
                 <button
                   onClick={() => onOpenNotificationModal(event)}

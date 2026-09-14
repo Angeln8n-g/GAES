@@ -28,7 +28,8 @@ import {
   TechnicalAcademyCohort,
   TechnicalDailyAttendance,
   TechnicalCohortAttendanceMatrix,
-  TechnicalCohortParticipant
+  TechnicalCohortParticipant,
+  TechnicalAcademyHistoryRecord
 } from '../types';
 
 export const MOCK_COMPANIES: Company[] = [
@@ -2055,6 +2056,20 @@ export const apiService = {
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error || 'Error al procesar asistencia por QR o PIN');
+    }
+    return await res.json();
+  },
+
+  getTechnicalAcademyHistory: async (participantCard?: string, email?: string, companyId?: string): Promise<TechnicalAcademyHistoryRecord[]> => {
+    const params = new URLSearchParams();
+    if (participantCard) params.append('participantCard', participantCard);
+    if (email) params.append('email', email);
+    if (companyId && companyId !== 'all') params.append('companyId', companyId);
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    const res = await fetch(`${API_BASE_URL}/technical-academy/history${qs}`);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al consultar historial de academia técnica');
     }
     return await res.json();
   }

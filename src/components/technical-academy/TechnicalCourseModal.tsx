@@ -10,7 +10,7 @@ import {
   RotateCw,
   Sparkles
 } from 'lucide-react';
-import { TechnicalAcademyCourse, Company } from '../../types';
+import { TechnicalAcademyCourse, Company, TrainingEvent } from '../../types';
 import { apiService } from '../../services/api';
 
 interface TechnicalCourseModalProps {
@@ -18,6 +18,8 @@ interface TechnicalCourseModalProps {
   onClose: () => void;
   courseToEdit?: TechnicalAcademyCourse | null;
   companies?: Company[];
+  events?: TrainingEvent[];
+  initialEvent?: TrainingEvent | null;
   isAdminOrSuper?: boolean;
   onSuccess: () => void;
 }
@@ -38,6 +40,8 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
   onClose,
   courseToEdit = null,
   companies = [],
+  events = [],
+  initialEvent = null,
   isAdminOrSuper = false,
   onSuccess
 }) => {
@@ -45,20 +49,22 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
 
   const isEdit = Boolean(courseToEdit);
 
-  const [title, setTitle] = useState<string>(courseToEdit?.title || '');
+  const [selectedEventId, setSelectedEventId] = useState<string>(courseToEdit?.eventId || initialEvent?.id || '');
+  const [title, setTitle] = useState<string>(courseToEdit?.title || initialEvent?.title || '');
   const [code, setCode] = useState<string>(courseToEdit?.code || '');
-  const [description, setDescription] = useState<string>(courseToEdit?.description || '');
-  const [category, setCategory] = useState<string>(courseToEdit?.category || 'Planta Externa');
+  const [description, setDescription] = useState<string>(courseToEdit?.description || initialEvent?.description || '');
+  const [category, setCategory] = useState<string>(courseToEdit?.category || initialEvent?.category || 'Planta Externa');
   const [dailyHours, setDailyHours] = useState<number>(courseToEdit?.dailyHours || 4);
   const [durationDays, setDurationDays] = useState<number>(courseToEdit?.durationDays || 5);
-  const [modality, setModality] = useState<string>(courseToEdit?.modality || 'Presencial (Taller Técnico)');
-  const [location, setLocation] = useState<string>(courseToEdit?.location || 'Laboratorio Técnico Nave 4');
-  const [companyId, setCompanyId] = useState<string>(courseToEdit?.companyId || 'emp_kasino');
+  const [modality, setModality] = useState<string>(courseToEdit?.modality || initialEvent?.modality || 'Presencial (Taller Técnico)');
+  const [location, setLocation] = useState<string>(courseToEdit?.location || initialEvent?.location || 'Laboratorio Técnico Nave 4');
+  const [companyId, setCompanyId] = useState<string>(courseToEdit?.companyId || initialEvent?.companyId || 'emp_kasino');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (courseToEdit) {
+      setSelectedEventId(courseToEdit.eventId || '');
       setTitle(courseToEdit.title);
       setCode(courseToEdit.code || '');
       setDescription(courseToEdit.description || '');
@@ -68,8 +74,16 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
       setModality(courseToEdit.modality || 'Presencial (Taller Técnico)');
       setLocation(courseToEdit.location || '');
       setCompanyId(courseToEdit.companyId || 'emp_kasino');
+    } else if (initialEvent) {
+      setSelectedEventId(initialEvent.id);
+      setTitle(initialEvent.title);
+      setDescription(initialEvent.description || '');
+      if (initialEvent.category) setCategory(initialEvent.category);
+      if (initialEvent.location) setLocation(initialEvent.location);
+      if (initialEvent.modality) setModality(initialEvent.modality);
+      if (initialEvent.companyId) setCompanyId(initialEvent.companyId);
     }
-  }, [courseToEdit]);
+  }, [courseToEdit, initialEvent]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,6 +97,7 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
 
       await apiService.saveTechnicalCourse({
         id: courseToEdit?.id,
+        eventId: selectedEventId || courseToEdit?.eventId || null,
         title: title.trim(),
         code: code.trim(),
         description: description.trim(),
@@ -137,6 +152,59 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
             <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{errorMsg}</span>
+            </div>
+          )}
+
+          {/* VINCULACIÓN CON CAPACITACIÓN EXISTENTE */}
+          {!isEdit && events && events.length > 0 && (
+            <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Tomar de Capacitación Creada (Opcional):</span>
+                </label>
+                {selectedEventId && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedEventId('');
+                      setTitle('');
+                      setDescription('');
+                    }}
+                    className="text-[11px] font-bold text-slate-500 hover:text-slate-800 underline cursor-pointer"
+                  >
+                    Limpiar selección
+                  </button>
+                )}
+              </div>
+
+              <select
+                value={selectedEventId}
+                onChange={(e) => {
+                  const evtId = e.target.value;
+                  setSelectedEventId(evtId);
+                  const foundEvt = events.find(ev => ev.id === evtId);
+                  if (foundEvt) {
+                    setTitle(foundEvt.title);
+                    setDescription(foundEvt.description || '');
+                    if (foundEvt.category) setCategory(foundEvt.category);
+                    if (foundEvt.location) setLocation(foundEvt.location);
+                    if (foundEvt.modality) setModality(foundEvt.modality);
+                    if (foundEvt.companyId) setCompanyId(foundEvt.companyId);
+                  }
+                }}
+                className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500"
+              >
+                <option value="">-- Seleccionar capacitación del catálogo general --</option>
+                {events.map(ev => (
+                  <option key={ev.id} value={ev.id}>
+                    {ev.title} ({ev.category} • {ev.modality})
+                  </option>
+                ))}
+              </select>
+              <p className="text-[10px] text-slate-500">
+                Al seleccionar una capacitación existente, se vincularán sus datos para crear el curso recurrente de impartición diaria.
+              </p>
             </div>
           )}
 

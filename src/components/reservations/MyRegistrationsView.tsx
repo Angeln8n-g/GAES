@@ -30,7 +30,7 @@ import {
   Layers
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import { TrainingEvent, UserAccount, Slot, Schedule, TrainingProgram, ParticipantGroup, Participant, Company, ExternalTraining } from '../../types';
+import { TrainingEvent, UserAccount, Slot, Schedule, TrainingProgram, ParticipantGroup, Participant, Company, ExternalTraining, TechnicalAcademyHistoryRecord } from '../../types';
 import { formatDateLong, formatDateShort, formatCedula, getEventDurationMetrics } from '../../utils/formatters';
 import { downloadIcsFile, getGoogleCalendarUrl } from '../../utils/icsUtils';
 import { FormalLetterModal, TrainingHistoryRecord } from '../history/FormalLetterModal';
@@ -56,6 +56,7 @@ interface MyRegistrationsViewProps {
   groups?: ParticipantGroup[];
   participants?: Participant[];
   externalTrainings?: ExternalTraining[];
+  technicalHistory?: TechnicalAcademyHistoryRecord[];
   onCancelRegistration: (eventId: string, date: string, time: string, email: string) => Promise<void>;
   onExploreCatalog: () => void;
   onOpenReservationModal?: (event: TrainingEvent) => void;
@@ -72,6 +73,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
   groups = [],
   participants = [],
   externalTrainings = [],
+  technicalHistory = [],
   onCancelRegistration,
   onExploreCatalog,
   onOpenReservationModal,
@@ -208,8 +210,29 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
         credentialUrl: t.credentialUrl
       }));
 
-    return [...internalRecords, ...externalRecords].sort((a, b) => b.date.localeCompare(a.date));
-  }, [userRegistrations, todayStr, userCard, userEmail, externalTrainings]);
+    const recurrentRecords: TrainingHistoryRecord[] = (technicalHistory || [])
+      .filter(t => (userCard && t.participantCard === userCard) || (t.participantEmail && t.participantEmail.toLowerCase() === userEmail))
+      .map(t => ({
+        id: `rec-${t.cohortId}-${t.courseId}`,
+        title: t.title,
+        category: t.category || 'Academia Técnica',
+        modality: t.modality || 'Presencial / Práctico',
+        instructor: t.facilitatorName || 'Facilitador Técnico',
+        date: t.endDate || t.startDate,
+        time: `${t.attendedDays || 0}/${t.durationDays || 0} sesiones`,
+        hasAttended: (t.attendedDays || 0) > 0,
+        hours: Number(t.hoursEarned || t.totalHours) || 0,
+        gradeScore: null,
+        academicStatus: t.academicStatus,
+        isRecurrent: true,
+        cohortId: t.cohortId,
+        attendancePercentage: t.attendancePercentage,
+        facilitatorName: t.facilitatorName,
+        groupName: t.groupName
+      }));
+
+    return [...internalRecords, ...externalRecords, ...recurrentRecords].sort((a, b) => b.date.localeCompare(a.date));
+  }, [userRegistrations, todayStr, userCard, userEmail, externalTrainings, technicalHistory]);
 
   // Métricas del Histórico
   const historyMetrics = useMemo(() => {
@@ -1095,6 +1118,11 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                                   Externa
                                 </span>
                               )}
+                              {rec.isRecurrent && (
+                                <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-purple-50 text-purple-700 border border-purple-200 uppercase tracking-wider">
+                                  Recurrente • Academia
+                                </span>
+                              )}
                               <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-red-50 text-[#DA291C] border border-red-200">
                                 {rec.category}
                               </span>
@@ -1135,7 +1163,21 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                             {rec.hours} hrs
                           </td>
                           <td className="py-4 px-4 text-center whitespace-nowrap">
-                            {rec.hasAttended ? (
+                            {rec.isRecurrent ? (
+                              rec.academicStatus === 'passed' ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
+                                  <CheckCircle2 className="w-3.5 h-3.5" /> Acreditado ({rec.attendancePercentage || 0}%)
+                                </span>
+                              ) : rec.academicStatus === 'in_progress' ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                  <Clock className="w-3.5 h-3.5" /> En Curso ({rec.attendancePercentage || 0}%)
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                  <AlertTriangle className="w-3.5 h-3.5" /> No Acreditado ({rec.attendancePercentage || 0}%)
+                                </span>
+                              )
+                            ) : rec.hasAttended ? (
                               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
                                 <CheckCircle2 className="w-3.5 h-3.5" /> Asistió
                               </span>

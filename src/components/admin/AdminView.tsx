@@ -14,7 +14,7 @@ import {
   Award,
   GraduationCap
 } from 'lucide-react';
-import { TrainingEvent, Participant, UserAccount, ParticipantGroup, TrainingProgram, Company, SystemSettings, OjtChecklist, CalibrationSession } from '../../types';
+import { TrainingEvent, Participant, UserAccount, ParticipantGroup, TrainingProgram, Company, SystemSettings, OjtChecklist, CalibrationSession, TechnicalAcademyHistoryRecord } from '../../types';
 import { EventsManager } from './EventsManager';
 import { ParticipantsManager } from './ParticipantsManager';
 import { UsersManager } from './UsersManager';
@@ -73,6 +73,8 @@ interface AdminViewProps {
     emails: string[], 
     autoExpandCapacity?: boolean
   ) => Promise<{ events: TrainingEvent[]; enrolledCount: number; skippedAlreadyEnrolled: string[] }>;
+  onMakeRecurrent?: (event: TrainingEvent) => void;
+  technicalHistory?: TechnicalAcademyHistoryRecord[];
   onShowToast: (title: string, message: string, type: 'success' | 'error' | 'info') => void;
 }
 
@@ -87,6 +89,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
   checklists = [],
   calibrations = [],
   externalTrainings = [],
+  technicalHistory = [],
   selectedCompanyId = 'all',
   currentUser,
   onSelectCompanyScope,
@@ -111,6 +114,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
   onRevertAttendance,
   onSendNotification,
   onBulkRegisterUsers,
+  onMakeRecurrent,
   onShowToast
 }) => {
   const [adminTab, setAdminTab] = useState<'events' | 'programs' | 'groups' | 'participants' | 'users' | 'companies' | 'ojt' | 'letters' | 'external-trainings' | 'settings'>('events');
@@ -461,6 +465,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
           onOpenNotificationModal={(evt) => setNotificationEvent(evt)}
           onOpenQrModal={(evt) => setQrEvent(evt)}
           onOpenBulkEnrollment={(evtId) => handleOpenBulkEnrollment(evtId)}
+          onMakeRecurrent={onMakeRecurrent}
           onDeleteEvent={async (id) => {
             await onDeleteEvent(id);
             onShowToast('Capacitación eliminada', 'El evento ha sido removido del sistema.', 'info');
@@ -505,6 +510,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
           programs={scopedPrograms}
           companies={companies}
           externalTrainings={scopedExternalTrainings}
+          technicalHistory={technicalHistory}
           currentUser={currentUser}
           isSuperAdmin={isSuperAdmin}
           onSaveParticipants={onSaveParticipants}
@@ -520,6 +526,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
           events={scopedEvents}
           programs={scopedPrograms}
           companies={companies}
+          technicalHistory={technicalHistory}
           currentUser={currentUser}
           onSaveUsers={onSaveUsers}
           onSaveParticipants={onSaveParticipants}
@@ -564,6 +571,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
           programs={scopedPrograms}
           companies={companies}
           externalTrainings={scopedExternalTrainings}
+          technicalHistory={technicalHistory}
           currentUser={currentUser}
           onShowToast={onShowToast}
         />

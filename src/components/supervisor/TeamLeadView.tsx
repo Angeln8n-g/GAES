@@ -41,14 +41,15 @@ import {
   ComplianceStatus,
   Schedule,
   Slot,
-  ParticipantGrade
+  ParticipantGrade,
+  Company,
+  TechnicalAcademyHistoryRecord
 } from '../../types';
 import { apiService } from '../../services/api';
 import { exportComplianceReportToExcel, exportSkillsGapReportToExcel } from '../../utils/excelUtils';
 import { ComplianceReminderModal } from '../admin/ComplianceReminderModal';
 import { TeamAssignmentModal } from './TeamAssignmentModal';
 import { ParticipantProfileModal } from '../admin/ParticipantProfileModal';
-import { Company } from '../../types';
 
 interface TeamLeadViewProps {
   currentUser: UserAccount;
@@ -58,6 +59,7 @@ interface TeamLeadViewProps {
   groups: ParticipantGroup[];
   programs: TrainingProgram[];
   companies?: Company[];
+  technicalHistory?: TechnicalAcademyHistoryRecord[];
   onAssignTeamMembers?: (payload: any) => Promise<any>;
   onCancelRegistration?: (eventId: string, date: string, time: string, email: string, isSupervisorOrAdmin?: boolean, force?: boolean) => Promise<void>;
   onSendNotification: (eventId: string, channel: 'Email' | 'Teams' | 'WhatsApp', message: string, recipients: number) => Promise<void>;
@@ -72,6 +74,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
   groups,
   programs,
   companies = [],
+  technicalHistory = [],
   onAssignTeamMembers,
   onCancelRegistration,
   onSendNotification,
@@ -421,6 +424,25 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
         }
       });
 
+      // Sumar capacitaciones recurrentes de la Academia Técnica
+      const recurrents = (technicalHistory || []).filter(th => 
+        (th.participantCard && th.participantCard === p.card) ||
+        (th.participantEmail && th.participantEmail.toLowerCase() === pEmail)
+      );
+
+      recurrents.forEach(th => {
+        const hrs = Number(th.hoursEarned || th.totalHours) || 0;
+        if ((th.attendedDays || 0) > 0) {
+          attendedCount++;
+          totalHours += hrs;
+          attendedEventsList.push({
+            title: `${th.title} (${th.groupName || 'Taller Práctico'})`,
+            date: th.endDate || th.startDate,
+            hours: hrs
+          });
+        }
+      });
+
       // Determinar badge de tipo de vinculación con el supervisor
       const isDirect = directlyAssignedCards.has(card);
       const isDept = deptAssignedCards.has(card);
@@ -444,7 +466,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
         attendedEventsList
       };
     }).filter(Boolean);
-  }, [activeScopeCards, participants, events, directlyAssignedCards, deptAssignedCards, effectiveSupervisor]);
+  }, [activeScopeCards, participants, events, directlyAssignedCards, deptAssignedCards, effectiveSupervisor, technicalHistory]);
 
   // Lista efectiva de participantes en el alcance activo
   const effectiveTeamParticipants = useMemo(() => {
@@ -1845,6 +1867,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
           events={events}
           programs={programs}
           companies={companies}
+          technicalHistory={technicalHistory}
           currentUser={currentUser}
           isOpen={Boolean(viewingProfileParticipant)}
           onClose={() => setViewingProfileParticipant(null)}

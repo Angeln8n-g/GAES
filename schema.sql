@@ -213,6 +213,7 @@ CREATE INDEX IF NOT EXISTS idx_ext_trainings_company ON external_trainings(compa
 -- 17. Academia Técnica: Cursos Técnicos Recurrentes
 CREATE TABLE IF NOT EXISTS technical_academy_courses (
     id VARCHAR(100) PRIMARY KEY,
+    event_id VARCHAR(100) REFERENCES events(id) ON DELETE SET NULL,
     title VARCHAR(255) NOT NULL,
     code VARCHAR(50),
     description TEXT,
@@ -226,10 +227,12 @@ CREATE TABLE IF NOT EXISTS technical_academy_courses (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_tac_courses_company ON technical_academy_courses(company_id);
+CREATE INDEX IF NOT EXISTS idx_tac_courses_event ON technical_academy_courses(event_id);
 
 -- 18. Academia Técnica: Cohortes / Semanas de Capacitación
 CREATE TABLE IF NOT EXISTS technical_academy_cohorts (
     id VARCHAR(100) PRIMARY KEY,
+    event_id VARCHAR(100) REFERENCES events(id) ON DELETE SET NULL,
     course_id VARCHAR(100) NOT NULL REFERENCES technical_academy_courses(id) ON DELETE CASCADE,
     group_id VARCHAR(100) REFERENCES participant_groups(id) ON DELETE SET NULL,
     group_name VARCHAR(255),
@@ -252,6 +255,7 @@ CREATE TABLE IF NOT EXISTS technical_academy_cohorts (
 CREATE INDEX IF NOT EXISTS idx_tac_cohorts_course ON technical_academy_cohorts(course_id);
 CREATE INDEX IF NOT EXISTS idx_tac_cohorts_group ON technical_academy_cohorts(group_id);
 CREATE INDEX IF NOT EXISTS idx_tac_cohorts_dates ON technical_academy_cohorts(start_date, end_date);
+CREATE INDEX IF NOT EXISTS idx_tac_cohorts_event ON technical_academy_cohorts(event_id);
 
 -- 19. Academia Técnica: Participantes Enrolados por Cohorte
 CREATE TABLE IF NOT EXISTS technical_academy_enrollments (

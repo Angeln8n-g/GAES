@@ -20,7 +20,7 @@ import {
   Building2,
   FileSpreadsheet
 } from "lucide-react";
-import { UserAccount, UserRole, Participant, EmploymentStatus, TrainingEvent, TrainingProgram, Company } from "../../types";
+import { UserAccount, UserRole, Participant, EmploymentStatus, TrainingEvent, TrainingProgram, Company, TechnicalAcademyHistoryRecord } from "../../types";
 import { exportUsersToExcel, downloadUsersTemplateExcel } from "../../utils/excelUtils";
 import { formatCedula, isValidCedula } from "../../utils/formatters";
 import { BulkUsersModal } from "./BulkUsersModal";
@@ -34,6 +34,7 @@ interface UsersManagerProps {
   events?: TrainingEvent[];
   programs?: TrainingProgram[];
   companies?: Company[];
+  technicalHistory?: TechnicalAcademyHistoryRecord[];
   currentUser: UserAccount | null;
   onSaveUsers: (users: UserAccount[]) => Promise<void>;
   onSaveParticipants?: (participants: Participant[]) => Promise<void>;
@@ -46,6 +47,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
   events = [],
   programs = [],
   companies = [],
+  technicalHistory = [],
   currentUser,
   onSaveUsers,
   onSaveParticipants,
@@ -923,6 +925,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
           events={events}
           programs={programs}
           companies={companies}
+          technicalHistory={technicalHistory}
           currentUser={currentUser}
           isOpen={Boolean(viewingProfileParticipant)}
           onClose={() => setViewingProfileParticipant(null)}

@@ -284,6 +284,11 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
                             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-[#DA291C] border border-red-200">
                               {event.category}
                             </span>
+                            {session.isRecurrent && (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-900 text-white">
+                                Recurrente • Taller
+                              </span>
+                            )}
                             {isMandatory && (
                               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-100 text-red-800 border border-red-300 flex items-center gap-1">
                                 <Lock className="w-2.5 h-2.5 text-red-600" />

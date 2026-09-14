@@ -33,6 +33,7 @@ exports.technicalAcademyRouter.get('/courses', async (req, res) => {
         const result = await db_js_1.pool.query(query, params);
         const courses = result.rows.map(r => ({
             id: r.id,
+            eventId: r.event_id || null,
             title: r.title,
             code: r.code || '',
             description: r.description || '',
@@ -57,7 +58,7 @@ exports.technicalAcademyRouter.post('/courses', async (req, res) => {
     if (!checkAdminPermission(req, res))
         return;
     try {
-        const { id, title, code, description, category, dailyHours, durationDays, modality, location, companyId } = req.body;
+        const { id, eventId, title, code, description, category, dailyHours, durationDays, modality, location, companyId } = req.body;
         if (!title || !title.trim()) {
             return res.status(400).json({ error: 'El título del curso técnico es obligatorio.' });
         }
@@ -67,9 +68,10 @@ exports.technicalAcademyRouter.post('/courses', async (req, res) => {
         const numDurationDays = Number(durationDays) || 5;
         await db_js_1.pool.query(`
       INSERT INTO technical_academy_courses (
-        id, title, code, description, category, daily_hours, duration_days, modality, location, company_id, is_active
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, true)
+        id, event_id, title, code, description, category, daily_hours, duration_days, modality, location, company_id, is_active
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, true)
       ON CONFLICT (id) DO UPDATE SET
+        event_id = COALESCE(EXCLUDED.event_id, technical_academy_courses.event_id),
         title = EXCLUDED.title,
         code = EXCLUDED.code,
         description = EXCLUDED.description,
@@ -82,6 +84,7 @@ exports.technicalAcademyRouter.post('/courses', async (req, res) => {
         is_active = true
     `, [
             courseId,
+            eventId || null,
             title.trim(),
             code || '',
             description || '',
@@ -124,6 +127,8 @@ async function fetchTechnicalCohorts(companyId) {
     let query = `
     SELECT 
       c.*,
+      c.event_id as cohort_event_id,
+      cr.event_id as course_event_id,
       cr.title as course_title,
       cr.category as course_category,
       cr.daily_hours as course_daily_hours,
@@ -139,12 +144,13 @@ async function fetchTechnicalCohorts(companyId) {
         params.push(companyId);
     }
     query += `
-    GROUP BY c.id, cr.title, cr.category, cr.daily_hours, cr.duration_days
+    GROUP BY c.id, c.event_id, cr.event_id, cr.title, cr.category, cr.daily_hours, cr.duration_days
     ORDER BY c.start_date DESC
   `;
     const result = await db_js_1.pool.query(query, params);
     return result.rows.map(r => ({
         id: r.id,
+        eventId: r.cohort_event_id || r.course_event_id || null,
         courseId: r.course_id,
         courseTitle: r.course_title,
         courseCategory: r.course_category,
@@ -189,7 +195,7 @@ exports.technicalAcademyRouter.post('/cohorts', async (req, res) => {
     const client = await db_js_1.pool.connect();
     try {
         await client.query('BEGIN');
-        const { id, courseId, groupId, groupName, facilitatorId, facilitatorName, facilitatorEmail, startDate, endDate, weekNumber, year, dailyTime, location, capacity, notes, dailyPin, companyId, autoEnrollGroupMembers = true } = req.body;
+        const { id, eventId, courseId, groupId, groupName, facilitatorId, facilitatorName, facilitatorEmail, startDate, endDate, weekNumber, year, dailyTime, location, capacity, notes, dailyPin, companyId, autoEnrollGroupMembers = true } = req.body;
         if (!courseId || !startDate || !endDate) {
             await client.query('ROLLBACK');
             return res.status(400).json({ error: 'Curso, fecha de inicio y fecha de fin son obligatorios.' });
@@ -198,15 +204,17 @@ exports.technicalAcademyRouter.post('/cohorts', async (req, res) => {
         const targetCompanyId = companyId || 'emp_kasino';
         const pin = dailyPin || Math.floor(1000 + Math.random() * 9000).toString();
         // Obtener info del curso para defaults si faltan
-        const courseRes = await client.query('SELECT location, duration_days FROM technical_academy_courses WHERE id = $1', [courseId]);
+        const courseRes = await client.query('SELECT location, duration_days, event_id FROM technical_academy_courses WHERE id = $1', [courseId]);
         const courseInfo = courseRes.rows[0];
         const finalLocation = location || (courseInfo ? courseInfo.location : 'Laboratorio Técnico');
+        const finalEventId = eventId || (courseInfo ? courseInfo.event_id : null);
         await client.query(`
       INSERT INTO technical_academy_cohorts (
-        id, course_id, group_id, group_name, facilitator_id, facilitator_name, facilitator_email,
+        id, event_id, course_id, group_id, group_name, facilitator_id, facilitator_name, facilitator_email,
         start_date, end_date, week_number, year, daily_time, location, capacity, status, notes, daily_pin, company_id
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
       ON CONFLICT (id) DO UPDATE SET
+        event_id = COALESCE(EXCLUDED.event_id, technical_academy_cohorts.event_id),
         course_id = EXCLUDED.course_id,
         group_id = EXCLUDED.group_id,
         group_name = EXCLUDED.group_name,
@@ -225,6 +233,7 @@ exports.technicalAcademyRouter.post('/cohorts', async (req, res) => {
         company_id = EXCLUDED.company_id
     `, [
             cohortId,
+            finalEventId || null,
             courseId,
             groupId || null,
             groupName || '',
@@ -699,5 +708,130 @@ exports.technicalAcademyRouter.post('/cohorts/:id/qr-checkin', async (req, res) 
     catch (err) {
         console.error('Error en check-in QR de Academia Técnica:', err);
         res.status(500).json({ error: 'Error al registrar asistencia por QR', details: err.message });
+    }
+});
+// ==========================================
+// 6. HISTORIAL CONSOLIDADO DE CAPACITACIONES RECURRENTES
+// ==========================================
+// GET /api/technical-academy/history
+exports.technicalAcademyRouter.get('/history', async (req, res) => {
+    try {
+        const { participantCard, email, companyId } = req.query;
+        let query = `
+      SELECT 
+        e.participant_card as "participantCard",
+        p.name as "participantName",
+        p.email as "participantEmail",
+        c.id as "cohortId",
+        c.course_id as "courseId",
+        COALESCE(c.event_id, tc.event_id) as "eventId",
+        tc.title as "courseTitle",
+        tc.code as "courseCode",
+        tc.category as "courseCategory",
+        tc.daily_hours as "dailyHours",
+        tc.duration_days as "durationDays",
+        tc.modality as "modality",
+        c.location as "location",
+        c.facilitator_id as "facilitatorId",
+        c.facilitator_name as "facilitatorName",
+        c.facilitator_email as "facilitatorEmail",
+        c.group_name as "groupName",
+        to_char(c.start_date, 'YYYY-MM-DD') as "startDate",
+        to_char(c.end_date, 'YYYY-MM-DD') as "endDate",
+        c.daily_time as "dailyTime",
+        c.status as "cohortStatus",
+        e.status as "enrollmentStatus",
+        COUNT(CASE WHEN a.status IN ('present', 'late') THEN 1 END) as "attendedDays",
+        COUNT(DISTINCT a.session_date) as "markedDays",
+        COALESCE(
+          ROUND(
+            (COUNT(CASE WHEN a.status IN ('present', 'late') THEN 1 END)::numeric / NULLIF(tc.duration_days, 0)::numeric) * 100, 
+            1
+          ), 
+          0
+        ) as "attendancePercentage",
+        ROUND(
+          COUNT(CASE WHEN a.status IN ('present', 'late') THEN 1 END)::numeric * tc.daily_hours::numeric, 
+          1
+        ) as "hoursEarned",
+        ROUND(tc.duration_days::numeric * tc.daily_hours::numeric, 1) as "totalHours"
+      FROM technical_academy_enrollments e
+      JOIN technical_academy_cohorts c ON e.cohort_id = c.id
+      JOIN technical_academy_courses tc ON c.course_id = tc.id
+      JOIN participants p ON e.participant_card = p.card
+      LEFT JOIN technical_academy_attendance a ON a.cohort_id = c.id AND a.participant_card = e.participant_card
+    `;
+        const conditions = [];
+        const params = [];
+        if (participantCard && typeof participantCard === 'string') {
+            params.push(participantCard.trim());
+            conditions.push(`e.participant_card = $${params.length}`);
+        }
+        if (email && typeof email === 'string') {
+            params.push(email.trim().toLowerCase());
+            conditions.push(`LOWER(p.email) = $${params.length}`);
+        }
+        if (companyId && typeof companyId === 'string' && companyId !== 'all') {
+            params.push(companyId);
+            conditions.push(`(c.company_id = $${params.length} OR c.company_id = 'all')`);
+        }
+        if (conditions.length > 0) {
+            query += ' WHERE ' + conditions.join(' AND ');
+        }
+        query += `
+      GROUP BY e.participant_card, p.name, p.email, c.id, c.course_id, c.event_id, tc.event_id, 
+               tc.title, tc.code, tc.category, tc.daily_hours, tc.duration_days, tc.modality, 
+               c.location, c.facilitator_id, c.facilitator_name, c.facilitator_email, c.group_name, 
+               c.start_date, c.end_date, c.daily_time, c.status, e.status
+      ORDER BY c.end_date DESC, c.start_date DESC
+    `;
+        const result = await db_js_1.pool.query(query, params);
+        const history = result.rows.map(r => {
+            const attendedDays = parseInt(r.attendedDays, 10) || 0;
+            const totalDays = parseInt(r.durationDays, 10) || 5;
+            const attendancePercentage = parseFloat(r.attendancePercentage) || 0;
+            const hoursEarned = parseFloat(r.hoursEarned) || 0;
+            const totalHours = parseFloat(r.totalHours) || 20;
+            const isPassed = attendancePercentage >= 80;
+            return {
+                id: `tac_hist_${r.cohortId}_${r.participantCard}`,
+                cohortId: r.cohortId,
+                courseId: r.courseId,
+                eventId: r.eventId || null,
+                participantCard: r.participantCard,
+                participantName: r.participantName,
+                participantEmail: r.participantEmail,
+                title: r.courseTitle,
+                code: r.courseCode || '',
+                category: r.courseCategory,
+                modality: r.modality,
+                location: r.location,
+                instructor: r.facilitatorName,
+                facilitatorName: r.facilitatorName,
+                facilitatorEmail: r.facilitatorEmail,
+                groupName: r.groupName,
+                startDate: r.startDate,
+                endDate: r.endDate,
+                date: r.endDate || r.startDate,
+                time: r.dailyTime,
+                dailyHours: parseFloat(r.dailyHours) || 4,
+                durationDays: totalDays,
+                attendedDays,
+                markedDays: parseInt(r.markedDays, 10) || 0,
+                totalHours,
+                hoursEarned: isPassed ? totalHours : hoursEarned,
+                hours: isPassed ? totalHours : hoursEarned,
+                attendancePercentage,
+                hasAttended: attendedDays > 0,
+                academicStatus: isPassed ? 'passed' : (r.cohortStatus === 'in_progress' ? 'in_progress' : 'failed'),
+                isRecurrent: true,
+                status: r.cohortStatus
+            };
+        });
+        res.json(history);
+    }
+    catch (err) {
+        console.error('Error al consultar historial de Academia Técnica:', err);
+        res.status(500).json({ error: 'Error al consultar historial técnico', details: err.message });
     }
 });

@@ -35,7 +35,8 @@ import {
   ParticipantGroup, 
   UserAccount, 
   Participant, 
-  Company 
+  Company,
+  TrainingEvent
 } from '../../types';
 import { apiService } from '../../services/api';
 import { exportTechnicalAcademyAttendanceToExcel } from '../../utils/excelUtils';
@@ -50,6 +51,9 @@ interface TechnicalAcademyViewProps {
   groups?: ParticipantGroup[];
   users?: UserAccount[];
   participants?: Participant[];
+  events?: TrainingEvent[];
+  initialEventToMakeRecurrent?: TrainingEvent | null;
+  onClearEventToMakeRecurrent?: () => void;
   onShowToast?: (title: string, message: string, type?: 'success' | 'error' | 'info' | 'warning') => void;
 }
 
@@ -59,6 +63,9 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
   groups = [],
   users = [],
   participants = [],
+  events = [],
+  initialEventToMakeRecurrent = null,
+  onClearEventToMakeRecurrent,
   onShowToast
 }) => {
   // Roles y permisos
@@ -143,6 +150,14 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (initialEventToMakeRecurrent) {
+      setCourseToEdit(null);
+      setActiveTab('courses');
+      setIsCourseModalOpen(true);
+    }
+  }, [initialEventToMakeRecurrent]);
 
   // 2. Cargar Matriz de Asistencia cuando cambia la cohorte seleccionada
   const fetchAttendance = async (cohortId: string) => {
@@ -1364,6 +1379,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
         groups={groups}
         users={users}
         companies={companies}
+        events={events}
         cohortToEdit={cohortToEdit}
         onSuccess={async () => {
           if (onShowToast) onShowToast('Éxito', 'Cohorte guardada correctamente', 'success');
@@ -1390,11 +1406,17 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
       <TechnicalCourseModal
         isOpen={isCourseModalOpen}
         isAdminOrSuper={isAdminOrSuper}
-        onClose={() => setIsCourseModalOpen(false)}
+        onClose={() => {
+          setIsCourseModalOpen(false);
+          if (onClearEventToMakeRecurrent) onClearEventToMakeRecurrent();
+        }}
         courseToEdit={courseToEdit}
         companies={companies}
+        events={events}
+        initialEvent={initialEventToMakeRecurrent}
         onSuccess={async () => {
           if (onShowToast) onShowToast('Éxito', 'Curso técnico guardado en el catálogo', 'success');
+          if (onClearEventToMakeRecurrent) onClearEventToMakeRecurrent();
           await fetchData();
         }}
       />

@@ -503,6 +503,7 @@ export interface ProgramComplianceSummary {
 
 export interface TechnicalAcademyCourse {
   id: string;
+  eventId?: string | null;
   title: string;
   code?: string;
   description?: string;
@@ -518,6 +519,7 @@ export interface TechnicalAcademyCourse {
 
 export interface TechnicalAcademyCohort {
   id: string;
+  eventId?: string | null;
   courseId: string;
   courseTitle?: string;
   courseCategory?: string;
@@ -541,6 +543,41 @@ export interface TechnicalAcademyCohort {
   dailyPin: string;
   companyId: string;
   createdAt?: string;
+}
+
+export interface TechnicalAcademyHistoryRecord {
+  id: string;
+  cohortId: string;
+  courseId: string;
+  eventId?: string | null;
+  participantCard: string;
+  participantName: string;
+  participantEmail: string;
+  title: string;
+  code?: string;
+  category: string;
+  modality: string;
+  location: string;
+  instructor?: string;
+  facilitatorName: string;
+  facilitatorEmail?: string;
+  groupName?: string;
+  startDate: string;
+  endDate: string;
+  date: string;
+  time: string;
+  dailyHours: number;
+  durationDays: number;
+  attendedDays: number;
+  markedDays: number;
+  totalHours: number;
+  hoursEarned: number;
+  hours: number;
+  attendancePercentage: number;
+  hasAttended: boolean;
+  academicStatus: 'passed' | 'in_progress' | 'failed';
+  isRecurrent: true;
+  status: string;
 }
 
 export interface TechnicalDailyAttendance {

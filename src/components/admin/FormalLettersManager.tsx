@@ -21,7 +21,7 @@ import {
   BarChart3,
   Calendar
 } from 'lucide-react';
-import { Participant, UserAccount, TrainingEvent, TrainingProgram, Company, ParticipantGrade, ExternalTraining } from '../../types';
+import { Participant, UserAccount, TrainingEvent, TrainingProgram, Company, ParticipantGrade, ExternalTraining, TechnicalAcademyHistoryRecord } from '../../types';
 import { FormalLetterModal, TrainingHistoryRecord } from '../history/FormalLetterModal';
 import { formatDateShort, formatCedula } from '../../utils/formatters';
 
@@ -32,6 +32,7 @@ interface FormalLettersManagerProps {
   programs?: TrainingProgram[];
   companies?: Company[];
   externalTrainings?: ExternalTraining[];
+  technicalHistory?: TechnicalAcademyHistoryRecord[];
   currentUser: UserAccount | null;
   onShowToast?: (title: string, message: string, type: 'success' | 'error' | 'info') => void;
 }
@@ -43,6 +44,7 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
   programs = [],
   companies = [],
   externalTrainings = [],
+  technicalHistory = [],
   currentUser,
   onShowToast
 }) => {
@@ -149,12 +151,34 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
           credentialUrl: ext.credentialUrl
         }));
 
-      const allRecords = [...attended, ...registered, ...extList];
+      const recurrentList: TrainingHistoryRecord[] = (technicalHistory || [])
+        .filter(t => (t.participantCard && t.participantCard === cardStr) || (t.participantEmail && t.participantEmail.toLowerCase() === emailLower))
+        .map((rec, idx) => ({
+          id: `rec-${rec.cohortId}-${rec.courseId}-${idx}`,
+          title: rec.title,
+          category: rec.category || 'Academia Técnica',
+          modality: rec.modality || 'Presencial / Práctico',
+          instructor: rec.facilitatorName || 'Facilitador Técnico',
+          date: rec.endDate || rec.startDate,
+          time: `${rec.attendedDays || 0}/${rec.durationDays || 0} sesiones`,
+          hasAttended: (rec.attendedDays || 0) > 0,
+          hours: Number(rec.hoursEarned || rec.totalHours || 0),
+          gradeScore: null,
+          academicStatus: rec.academicStatus,
+          isRecurrent: true,
+          cohortId: rec.cohortId,
+          attendancePercentage: rec.attendancePercentage,
+          facilitatorName: rec.facilitatorName,
+          groupName: rec.groupName
+        }));
+
+      const allRecords = [...attended, ...registered, ...extList, ...recurrentList];
       const extHours = extList.reduce((acc, e) => acc + (e.hours || 0), 0);
-      const totalHours = attended.reduce((acc, a) => acc + (a.hours || 2), 0) + extHours;
+      const recurrentHours = recurrentList.reduce((acc, r) => acc + (r.hours || 0), 0);
+      const totalHours = attended.reduce((acc, a) => acc + (a.hours || 2), 0) + extHours + recurrentHours;
 
       map.set(p.card, {
-        attendedCount: attended.length + extList.length,
+        attendedCount: attended.length + extList.length + recurrentList.filter(r => r.hasAttended).length,
         registeredCount: registered.length,
         totalHours,
         records: allRecords,
@@ -163,7 +187,7 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
     });
 
     return map;
-  }, [participants, events, externalTrainings]);
+  }, [participants, events, externalTrainings, technicalHistory]);
 
   // Filtrado de participantes según búsqueda, empresa y asistencia
   const filteredParticipants = useMemo(() => {
@@ -665,6 +689,11 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                                     Externa
                                   </span>
                                 )}
+                                {rec.isRecurrent && (
+                                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-purple-100 text-purple-800 border border-purple-200 uppercase tracking-wider">
+                                    Academia
+                                  </span>
+                                )}
                                 <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-red-50 text-[#DA291C] border border-red-200">
                                   {rec.category}
                                 </span>
@@ -696,7 +725,17 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                               <span className="text-xs font-black text-slate-900 block">
                                 {rec.hours} hrs
                               </span>
-                              {rec.hasAttended ? (
+                              {rec.isRecurrent ? (
+                                rec.academicStatus === 'passed' ? (
+                                  <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                    <CheckCircle2 className="w-3 h-3" /> Acreditado ({rec.attendancePercentage || 0}%)
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
+                                    <Clock className="w-3 h-3" /> {rec.attendancePercentage || 0}% Asist.
+                                  </span>
+                                )
+                              ) : rec.hasAttended ? (
                                 <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                                   <CheckCircle2 className="w-3 h-3" /> Asistió
                                 </span>

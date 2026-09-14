@@ -18,7 +18,8 @@ import {
   TechnicalAcademyCourse, 
   ParticipantGroup, 
   UserAccount,
-  Company 
+  Company,
+  TrainingEvent
 } from '../../types';
 import { apiService } from '../../services/api';
 
@@ -29,6 +30,7 @@ interface CohortFormModalProps {
   groups: ParticipantGroup[];
   users: UserAccount[];
   companies?: Company[];
+  events?: TrainingEvent[];
   cohortToEdit?: TechnicalAcademyCohort | null;
   isAdminOrSuper?: boolean;
   onSuccess: () => void;
@@ -41,6 +43,7 @@ export const CohortFormModal: React.FC<CohortFormModalProps> = ({
   groups,
   users,
   companies = [],
+  events = [],
   cohortToEdit = null,
   isAdminOrSuper = false,
   onSuccess
@@ -177,10 +180,12 @@ export const CohortFormModal: React.FC<CohortFormModalProps> = ({
 
       const weekNumber = getWeekNumber(startDate);
       const year = new Date(startDate).getFullYear();
+      const selectedCourse = courses.find(c => c.id === courseId);
 
       await apiService.saveTechnicalCohort({
         id: cohortToEdit?.id,
         courseId,
+        eventId: cohortToEdit?.eventId || selectedCourse?.eventId || null,
         groupId: groupId || null,
         groupName: groupName || '',
         facilitatorId: facilitatorId === 'custom' ? null : (facilitatorId || null),
@@ -267,6 +272,19 @@ export const CohortFormModal: React.FC<CohortFormModalProps> = ({
                 ))
               )}
             </select>
+            {(() => {
+              const selectedCourse = courses.find(c => c.id === courseId);
+              const linkedEvent = events?.find(e => e.id === selectedCourse?.eventId || e.id === cohortToEdit?.eventId);
+              if (linkedEvent) {
+                return (
+                  <div className="p-2.5 bg-slate-50 border border-slate-200/90 rounded-xl text-xs text-slate-700 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                    <span>Vinculado a Capacitación Creada: <strong className="text-slate-900">{linkedEvent.title}</strong></span>
+                  </div>
+                );
+              }
+              return null;
+            })()}
           </div>
 
           {/* 2. Grupo Técnico & Facilitador */}
