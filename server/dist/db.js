@@ -537,8 +537,18 @@ const initDbMigrations = async () => {
         enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         status VARCHAR(50) DEFAULT 'enrolled' CHECK (status IN ('enrolled', 'completed', 'dropped')),
         attendance_percentage NUMERIC(5, 2) DEFAULT 0,
+        score NUMERIC(5, 2) DEFAULT NULL,
+        academic_status VARCHAR(50) DEFAULT 'pending',
+        feedback TEXT DEFAULT NULL,
+        graded_by VARCHAR(150) DEFAULT NULL,
+        graded_at TIMESTAMP DEFAULT NULL,
         UNIQUE (cohort_id, participant_card)
       );
+      ALTER TABLE technical_academy_enrollments ADD COLUMN IF NOT EXISTS score NUMERIC(5, 2) DEFAULT NULL;
+      ALTER TABLE technical_academy_enrollments ADD COLUMN IF NOT EXISTS academic_status VARCHAR(50) DEFAULT 'pending';
+      ALTER TABLE technical_academy_enrollments ADD COLUMN IF NOT EXISTS feedback TEXT DEFAULT NULL;
+      ALTER TABLE technical_academy_enrollments ADD COLUMN IF NOT EXISTS graded_by VARCHAR(150) DEFAULT NULL;
+      ALTER TABLE technical_academy_enrollments ADD COLUMN IF NOT EXISTS graded_at TIMESTAMP DEFAULT NULL;
       CREATE INDEX IF NOT EXISTS idx_tac_enrollments_cohort ON technical_academy_enrollments(cohort_id);
       CREATE INDEX IF NOT EXISTS idx_tac_enrollments_card ON technical_academy_enrollments(participant_card);
 

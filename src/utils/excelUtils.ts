@@ -2508,7 +2508,10 @@ export const exportTechnicalAcademyAttendanceToExcel = (matrix: TechnicalCohortA
     rowObj['Total Días'] = p.totalDays;
     rowObj['% Asistencia'] = `${p.attendancePercentage}%`;
     rowObj['Horas Acreditadas'] = p.totalHoursEarned;
-    rowObj['Condición Académica'] = p.attendancePercentage >= 80 ? 'APROBADO' : (p.attendancePercentage >= 60 ? 'EN RIESGO' : 'REPROBADO');
+    rowObj['Calificación (0-100)'] = p.score !== null && p.score !== undefined ? `${p.score} pts` : 'Pendiente';
+    rowObj['Estado Académico'] = p.academicStatus === 'passed' ? 'APROBADO' : (p.academicStatus === 'failed' ? 'REPROBADO' : (p.score !== null && p.score !== undefined ? (p.score >= 70 ? 'APROBADO' : 'REPROBADO') : (p.attendancePercentage >= 80 ? 'APROBADO' : 'PENDIENTE')));
+    rowObj['Condición Académica'] = rowObj['Estado Académico'];
+    rowObj['Observaciones'] = p.feedback || '';
 
     return rowObj;
   });
@@ -2575,7 +2578,12 @@ export const exportCohortParticipantsToExcel = (
     'Total Días Taller': p.totalDays ?? 0,
     '% Asistencia': `${p.attendancePercentage ?? 0}%`,
     'Horas Acreditadas': p.totalHoursEarned ?? 0,
-    'Condición Académica': p.academicCondition || ((p.attendancePercentage ?? 0) >= 80 ? 'APROBADO' : (p.attendancePercentage ?? 0) >= 50 ? 'EN RIESGO' : 'REPROBADO')
+    'Calificación (0-100)': p.score !== null && p.score !== undefined ? `${p.score} pts` : 'Pendiente',
+    'Estado Académico': p.academicStatus === 'passed' ? 'APROBADO' : (p.academicStatus === 'failed' ? 'REPROBADO' : (p.score !== null && p.score !== undefined ? (p.score >= 70 ? 'APROBADO' : 'REPROBADO') : 'PENDIENTE')),
+    'Condición Académica': p.academicCondition || ((p.score !== null && p.score !== undefined ? (p.score >= 70 ? 'APROBADO' : 'REPROBADO') : (p.attendancePercentage ?? 0) >= 80 ? 'APROBADO' : (p.attendancePercentage ?? 0) >= 50 ? 'EN RIESGO' : 'REPROBADO')),
+    'Retroalimentación': p.feedback || '',
+    'Evaluado Por': p.gradedBy || '',
+    'Fecha Calificación': p.gradedAt ? formatDateShort(p.gradedAt) : ''
   }));
 
   const ws = XLSX.utils.json_to_sheet(rows);
@@ -2593,7 +2601,12 @@ export const exportCohortParticipantsToExcel = (
     { wch: 16 }, // Total Días
     { wch: 14 }, // % Asistencia
     { wch: 18 }, // Horas Acreditadas
-    { wch: 20 }  // Condición
+    { wch: 20 }, // Calificación
+    { wch: 18 }, // Estado Académico
+    { wch: 20 }, // Condición Académica
+    { wch: 30 }, // Retroalimentación
+    { wch: 22 }, // Evaluado Por
+    { wch: 18 }  // Fecha Calificación
   ];
 
   // Ficha de cohorte
@@ -2630,19 +2643,22 @@ export const downloadCohortParticipantsTemplateExcel = (): void => {
       'Carnet': '2010',
       'Cedula': '402-2196163-1',
       'Email': 'luis.almazan@empresa.com',
-      'Nombre (Opcional)': 'LUIS ALBERTO ALMAZAN POOT'
+      'Nombre (Opcional)': 'LUIS ALBERTO ALMAZAN POOT',
+      'Calificacion (0-100 Opcional)': 95
     },
     {
       'Carnet': '2012',
       'Cedula': '001-0876543-2',
       'Email': 'liliana.sosa@empresa.com',
-      'Nombre (Opcional)': 'LILIANA ESTHER SOSA PECH'
+      'Nombre (Opcional)': 'LILIANA ESTHER SOSA PECH',
+      'Calificacion (0-100 Opcional)': 88
     },
     {
       'Carnet': '1998',
       'Cedula': '001-1234567-8',
       'Email': 'fermin.chi@empresa.com',
-      'Nombre (Opcional)': 'FERMIN GABRIEL CHI PERERA'
+      'Nombre (Opcional)': 'FERMIN GABRIEL CHI PERERA',
+      'Calificacion (0-100 Opcional)': ''
     }
   ];
 
@@ -2651,14 +2667,16 @@ export const downloadCohortParticipantsTemplateExcel = (): void => {
     { wch: 16 }, // Carnet
     { wch: 18 }, // Cedula
     { wch: 30 }, // Email
-    { wch: 35 }  // Nombre
+    { wch: 35 }, // Nombre
+    { wch: 28 }  // Calificacion
   ];
 
   const instructions = [
     { 'Paso / Regla': '1. Identificación', 'Detalle': 'El sistema puede vincular al técnico por su Carnet (Tarjeta), Cédula o Correo Electrónico institucional.' },
     { 'Paso / Regla': '2. Flexibilidad', 'Detalle': 'Basta con completar al menos una de las columnas de identificación (Carnet, Cédula o Email) por cada fila.' },
-    { 'Paso / Regla': '3. Validación', 'Detalle': 'El colaborador debe estar previamente registrado en el padrón general de la plataforma.' },
-    { 'Paso / Regla': '4. Formatos admitidos', 'Detalle': 'Puede subir este archivo en formato .xlsx, .xls o guardar como .csv.' }
+    { 'Paso / Regla': '3. Calificación (Opcional)', 'Detalle': 'Puede incluir la columna "Calificación" o "Nota" con un valor numérico entre 0 y 100.' },
+    { 'Paso / Regla': '4. Validación', 'Detalle': 'El colaborador debe estar previamente registrado en el padrón general de la plataforma.' },
+    { 'Paso / Regla': '5. Formatos admitidos', 'Detalle': 'Puede subir este archivo en formato .xlsx, .xls o guardar como .csv.' }
   ];
   const wsInstructions = XLSX.utils.json_to_sheet(instructions);
   wsInstructions['!cols'] = [{ wch: 24 }, { wch: 70 }];
@@ -2683,6 +2701,7 @@ export const parseCohortParticipantsExcel = async (
     email: string;
     cedula?: string;
     department?: string;
+    score?: number;
     matchedBy: 'card' | 'cedula' | 'email';
   }>;
   unmatched: Array<{
@@ -2710,6 +2729,7 @@ export const parseCohortParticipantsExcel = async (
         let cardIdx = header.findIndex((h: string) => h.includes('carnet') || h.includes('tarjeta') || h.includes('card') || h.includes('codigo') || h.includes('código'));
         let cedulaIdx = header.findIndex((h: string) => h.includes('cedula') || h.includes('cédula'));
         let emailIdx = header.findIndex((h: string) => h.includes('correo') || h.includes('email') || h.includes('mail'));
+        let scoreIdx = header.findIndex((h: string) => h.includes('nota') || h.includes('calificacion') || h.includes('calificación') || h.includes('score') || h.includes('puntos'));
 
         // Si la primera columna no tiene cabecera estándar pero es la primera
         if (cardIdx === -1 && cedulaIdx === -1 && emailIdx === -1) {
@@ -2736,6 +2756,7 @@ export const parseCohortParticipantsExcel = async (
           email: string;
           cedula?: string;
           department?: string;
+          score?: number;
           matchedBy: 'card' | 'cedula' | 'email';
         }> = [];
         const unmatched: Array<{ rawValue: string; reason: string; rowNumber: number }> = [];
@@ -2785,6 +2806,15 @@ export const parseCohortParticipantsExcel = async (
 
           const identifierDisplay = rawCard || rawCedula || rawEmail;
 
+          // Extraer nota si vino en el archivo
+          let rowScore: number | undefined = undefined;
+          if (scoreIdx !== -1 && row[scoreIdx] !== undefined && row[scoreIdx] !== null && String(row[scoreIdx]).trim() !== '') {
+            const parsedNum = parseFloat(String(row[scoreIdx]).replace(',', '.').trim());
+            if (!isNaN(parsedNum) && parsedNum >= 0 && parsedNum <= 100) {
+              rowScore = Math.round(parsedNum * 100) / 100;
+            }
+          }
+
           if (found) {
             if (seenCards.has(found.card)) {
               duplicatesInFile++;
@@ -2796,6 +2826,7 @@ export const parseCohortParticipantsExcel = async (
                 email: found.email,
                 cedula: found.cedula,
                 department: found.department,
+                score: rowScore,
                 matchedBy
               });
             }

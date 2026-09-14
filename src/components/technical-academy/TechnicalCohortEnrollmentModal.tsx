@@ -19,7 +19,8 @@ import {
   Clock,
   MapPin,
   HelpCircle,
-  Filter
+  Filter,
+  Award
 } from 'lucide-react';
 import {
   TechnicalAcademyCohort,
@@ -40,6 +41,7 @@ interface TechnicalCohortEnrollmentModalProps {
   cohort: TechnicalAcademyCohort | null;
   allParticipants: Participant[];
   isAdminOrSuper?: boolean;
+  canGrade?: boolean;
   onSuccess: () => void;
 }
 
@@ -51,15 +53,25 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
   cohort,
   allParticipants,
   isAdminOrSuper = false,
+  canGrade = false,
   onSuccess
 }) => {
   if (!isOpen || !cohort) return null;
+
+  const hasGradingPermission = isAdminOrSuper || canGrade;
 
   const [activeTab, setActiveTab] = useState<TabType>('enrolled');
   const [loading, setLoading] = useState<boolean>(true);
   const [enrolledParticipants, setEnrolledParticipants] = useState<TechnicalCohortEnrolledParticipant[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // Calificación rápida individual (Tab 1)
+  const [gradingParticipant, setGradingParticipant] = useState<TechnicalCohortEnrolledParticipant | null>(null);
+  const [gradingScore, setGradingScore] = useState<string>('');
+  const [gradingStatus, setGradingStatus] = useState<'passed' | 'failed' | 'pending'>('pending');
+  const [gradingFeedback, setGradingFeedback] = useState<string>('');
+  const [isSubmittingGrade, setIsSubmittingGrade] = useState<boolean>(false);
 
   // Tab 1: Lista de Matriculados
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -73,7 +85,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const [isParsingExcel, setIsParsingExcel] = useState<boolean>(false);
   const [excelPreview, setExcelPreview] = useState<{
-    matched: Array<{ card: string; name: string; email: string; cedula?: string; department?: string; matchedBy: 'card' | 'cedula' | 'email' }>;
+    matched: Array<{ card: string; name: string; email: string; cedula?: string; department?: string; score?: number; matchedBy: 'card' | 'cedula' | 'email' }>;
     unmatched: Array<{ rawValue: string; reason: string; rowNumber: number }>;
     duplicatesInFile: number;
   } | null>(null);
@@ -105,6 +117,48 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
       setErrorMsg(err.message || 'Error al cargar la lista de participantes');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const openGradingModal = (p: TechnicalCohortEnrolledParticipant) => {
+    setGradingParticipant(p);
+    setGradingScore(p.score !== undefined && p.score !== null ? String(p.score) : '');
+    setGradingStatus(
+      p.academicStatus ||
+      (p.score !== undefined && p.score !== null ? (p.score >= 70 ? 'passed' : 'failed') : 'pending')
+    );
+    setGradingFeedback(p.feedback || '');
+  };
+
+  const handleSaveSingleGrade = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!gradingParticipant || gradingScore === '') return;
+
+    setIsSubmittingGrade(true);
+    setErrorMsg(null);
+    setSuccessMsg(null);
+
+    try {
+      const numScore = parseFloat(gradingScore);
+      await apiService.saveCohortGrades(cohort.id, {
+        grades: [
+          {
+            participantCard: gradingParticipant.card,
+            score: isNaN(numScore) ? null : numScore,
+            academicStatus: gradingStatus,
+            feedback: gradingFeedback.trim() || undefined
+          }
+        ]
+      });
+
+      setSuccessMsg(`Calificación guardada exitosamente para ${gradingParticipant.name}.`);
+      setGradingParticipant(null);
+      await fetchEnrolledList();
+      onSuccess();
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Error al registrar la calificación.');
+    } finally {
+      setIsSubmittingGrade(false);
     }
   };
 
@@ -256,7 +310,28 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
         participantCards: newCardsToEnroll
       });
 
-      setSuccessMsg(`¡Éxito! Se han matriculado ${res.newlyEnrolled} participantes a la cohorte.`);
+      // Si el archivo contenía calificaciones, guardarlas
+      const gradesToSave = excelPreview.matched
+        .filter(m => m.score !== undefined && m.score !== null)
+        .map(m => ({
+          participantCard: m.card,
+          score: m.score,
+          academicStatus: (m.score! >= 70 ? 'passed' : 'failed') as 'passed' | 'failed'
+        }));
+
+      if (gradesToSave.length > 0) {
+        try {
+          await apiService.saveCohortGrades(cohort.id, { grades: gradesToSave });
+        } catch (gradeErr) {
+          console.error('Error guardando notas desde excel:', gradeErr);
+        }
+      }
+
+      setSuccessMsg(
+        `¡Éxito! Se han matriculado ${res.newlyEnrolled} participantes a la cohorte.${
+          gradesToSave.length > 0 ? ` Se registraron ${gradesToSave.length} calificaciones.` : ''
+        }`
+      );
       setExcelPreview(null);
       setSelectedFileName(null);
       await fetchEnrolledList();
@@ -716,8 +791,9 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                           <th className="py-3 px-4">Cédula</th>
                           <th className="py-3 px-4">Departamento</th>
                           <th className="py-3 px-4 text-center">Asistencia Diaria</th>
+                          <th className="py-3 px-4 text-center">Calificación</th>
                           <th className="py-3 px-4 text-center">Condición</th>
-                          {isAdminOrSuper && <th className="py-3 px-4 text-right">Acciones</th>}
+                          {(isAdminOrSuper || hasGradingPermission) && <th className="py-3 px-4 text-right">Acciones</th>}
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 font-medium">
@@ -750,6 +826,37 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                               </div>
                             </td>
                             <td className="py-3 px-4 text-center">
+                              {p.score !== undefined && p.score !== null ? (
+                                <div className="inline-flex flex-col items-center">
+                                  <span className="font-black text-slate-900 text-xs">
+                                    {p.score} / 100
+                                  </span>
+                                  <span
+                                    className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold border mt-0.5 ${
+                                      p.academicStatus === 'passed' || (!p.academicStatus && p.score >= 70)
+                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                        : p.academicStatus === 'failed' || (!p.academicStatus && p.score < 70)
+                                        ? 'bg-rose-50 text-rose-700 border-rose-200'
+                                        : 'bg-amber-50 text-amber-700 border-amber-200'
+                                    }`}
+                                  >
+                                    {p.academicStatus === 'passed' || (!p.academicStatus && p.score >= 70)
+                                      ? 'Aprobado'
+                                      : p.academicStatus === 'failed' || (!p.academicStatus && p.score < 70)
+                                      ? 'Reprobado'
+                                      : 'Pendiente'}
+                                  </span>
+                                  {p.feedback && (
+                                    <span className="text-[10px] text-slate-500 truncate max-w-[130px] mt-0.5" title={p.feedback}>
+                                      💬 {p.feedback}
+                                    </span>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-slate-400 italic text-[11px]">Sin calificar</span>
+                              )}
+                            </td>
+                            <td className="py-3 px-4 text-center">
                               <span
                                 className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-black tracking-wider uppercase border ${
                                   p.academicCondition === 'APROBADO'
@@ -762,21 +869,36 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                                 {p.academicCondition}
                               </span>
                             </td>
-                            {isAdminOrSuper && (
+                            {(isAdminOrSuper || hasGradingPermission) && (
                               <td className="py-3 px-4 text-right">
-                                <button
-                                  type="button"
-                                  onClick={() => handleRemoveParticipant(p)}
-                                  disabled={isRemovingCard === p.card}
-                                  className="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors"
-                                  title={`Desmatricular a ${p.name}`}
-                                >
-                                  {isRemovingCard === p.card ? (
-                                    <RefreshCw className="w-4 h-4 animate-spin text-rose-600" />
-                                  ) : (
-                                    <Trash2 className="w-4 h-4" />
+                                <div className="flex items-center justify-end gap-1.5">
+                                  {hasGradingPermission && (
+                                    <button
+                                      type="button"
+                                      onClick={() => openGradingModal(p)}
+                                      className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-1 text-xs font-semibold"
+                                      title={`Calificar o editar notas de ${p.name}`}
+                                    >
+                                      <Award className="w-4 h-4" />
+                                      <span className="hidden xl:inline">Calificar</span>
+                                    </button>
                                   )}
-                                </button>
+                                  {isAdminOrSuper && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleRemoveParticipant(p)}
+                                      disabled={isRemovingCard === p.card}
+                                      className="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors"
+                                      title={`Desmatricular a ${p.name}`}
+                                    >
+                                      {isRemovingCard === p.card ? (
+                                        <RefreshCw className="w-4 h-4 animate-spin text-rose-600" />
+                                      ) : (
+                                        <Trash2 className="w-4 h-4" />
+                                      )}
+                                    </button>
+                                  )}
+                                </div>
                               </td>
                             )}
                           </tr>
@@ -1264,6 +1386,113 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
             Cerrar
           </button>
         </div>
+
+        {/* Sub-modal: Calificación Rápida Individual */}
+        {gradingParticipant && (
+          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+            <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-md w-full p-6 space-y-4 animate-scale-up">
+              <div className="flex items-start justify-between">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#DA291C] bg-red-50 px-2.5 py-0.5 rounded-full border border-red-100">
+                    Academia Técnica • Calificación
+                  </span>
+                  <h3 className="text-base font-black text-slate-900 mt-1">
+                    {gradingParticipant.name}
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Carnet: <span className="font-mono font-bold text-slate-700">{gradingParticipant.card}</span> • {gradingParticipant.department || 'Sin Depto'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setGradingParticipant(null)}
+                  className="p-1.5 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveSingleGrade} className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-slate-700">
+                      Calificación / Nota (0 a 100 pts)
+                    </label>
+                    <span className="text-[10px] font-semibold text-slate-500">
+                      Aprobación: &gt;= 70 pts
+                    </span>
+                  </div>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    required
+                    value={gradingScore}
+                    onChange={e => {
+                      const val = e.target.value;
+                      setGradingScore(val);
+                      if (val !== '') {
+                        const num = parseFloat(val);
+                        if (!isNaN(num)) {
+                          setGradingStatus(num >= 70 ? 'passed' : 'failed');
+                        }
+                      }
+                    }}
+                    placeholder="Ej: 90"
+                    className="w-full px-3.5 py-2.5 text-base font-black bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white text-slate-900"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Estado Académico
+                  </label>
+                  <select
+                    value={gradingStatus}
+                    onChange={e => setGradingStatus(e.target.value as any)}
+                    className="w-full px-3 py-2 text-xs font-bold bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] text-slate-800"
+                  >
+                    <option value="passed">Aprobado (Cumple competencias)</option>
+                    <option value="failed">Reprobado (No alcanza nota mínima)</option>
+                    <option value="pending">Pendiente de evaluación</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Retroalimentación / Observaciones Técnicas (Opcional)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={gradingFeedback}
+                    onChange={e => setGradingFeedback(e.target.value)}
+                    placeholder="Observaciones sobre desempeño práctico, destrezas técnicas, etc..."
+                    className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white text-slate-800"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => setGradingParticipant(null)}
+                    className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmittingGrade || gradingScore === ''}
+                    className="px-4 py-2 text-xs font-bold text-white bg-[#DA291C] hover:bg-[#b82216] rounded-xl transition-colors shadow-xs flex items-center gap-1.5 disabled:opacity-50"
+                  >
+                    {isSubmittingGrade ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                    Guardar Calificación
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

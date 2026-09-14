@@ -600,6 +600,11 @@ technicalAcademyRouter.get('/cohorts/:id/participants', async (req: Request, res
         e.enrolled_at,
         e.status as enrollment_status,
         e.attendance_percentage,
+        e.score,
+        e.academic_status,
+        e.feedback,
+        e.graded_by,
+        e.graded_at,
         p.name as participant_name,
         p.email as participant_email,
         p.cedula as participant_cedula,
@@ -628,7 +633,14 @@ technicalAcademyRouter.get('/cohorts/:id/participants', async (req: Request, res
       const attendedDays = attendanceMap.get(e.participant_card) || 0;
       const attendancePercentage = Math.round((attendedDays / totalDays) * 100);
       const totalHoursEarned = attendedDays * dailyHours;
-      const academicCondition = attendancePercentage >= 80 ? 'APROBADO' : (attendancePercentage >= 50 ? 'EN RIESGO' : 'REPROBADO');
+
+      // Determinación de condición académica (prioriza nota si existe, o asistencia si no)
+      let academicCondition: 'APROBADO' | 'EN RIESGO' | 'REPROBADO' = 'REPROBADO';
+      if (e.score !== null && e.score !== undefined) {
+        academicCondition = parseFloat(e.score) >= 70 ? 'APROBADO' : 'REPROBADO';
+      } else {
+        academicCondition = attendancePercentage >= 80 ? 'APROBADO' : (attendancePercentage >= 50 ? 'EN RIESGO' : 'REPROBADO');
+      }
 
       return {
         card: e.participant_card,
@@ -643,7 +655,12 @@ technicalAcademyRouter.get('/cohorts/:id/participants', async (req: Request, res
         totalDays,
         attendancePercentage,
         totalHoursEarned,
-        academicCondition
+        academicCondition,
+        score: e.score !== null && e.score !== undefined ? parseFloat(e.score) : null,
+        academicStatus: e.academic_status || (e.score !== null && e.score !== undefined ? (parseFloat(e.score) >= 70 ? 'passed' : 'failed') : 'pending'),
+        feedback: e.feedback || null,
+        gradedBy: e.graded_by || null,
+        gradedAt: e.graded_at || null
       };
     });
 
@@ -815,6 +832,11 @@ technicalAcademyRouter.get('/cohorts/:id/attendance', async (req: Request, res: 
         e.enrolled_at,
         e.status as enrollment_status,
         e.attendance_percentage,
+        e.score,
+        e.academic_status,
+        e.feedback,
+        e.graded_by,
+        e.graded_at,
         p.name as participant_name,
         p.email as participant_email,
         p.cedula as participant_cedula,
@@ -890,7 +912,12 @@ technicalAcademyRouter.get('/cohorts/:id/attendance', async (req: Request, res: 
         attendedDays,
         totalDays: dates.length,
         attendancePercentage: attendancePercent,
-        totalHoursEarned
+        totalHoursEarned,
+        score: e.score !== null && e.score !== undefined ? parseFloat(e.score) : null,
+        academicStatus: e.academic_status || (e.score !== null && e.score !== undefined ? (parseFloat(e.score) >= 70 ? 'passed' : 'failed') : (attendancePercent >= 80 ? 'passed' : 'pending')),
+        feedback: e.feedback || null,
+        gradedBy: e.graded_by || null,
+        gradedAt: e.graded_at || null
       };
     });
 
@@ -1053,6 +1080,107 @@ technicalAcademyRouter.post('/cohorts/:id/qr-checkin', async (req: Request, res:
 });
 
 // ==========================================
+// 4. CALIFICACIONES Y EVALUACIÓN DE COMPETENCIAS
+// ==========================================
+
+// PUT & POST /api/technical-academy/cohorts/:id/grades
+// Asienta o actualiza calificaciones y retroalimentación de los técnicos en la cohorte
+const handleSaveGrades = async (req: Request, res: Response) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { id } = req.params;
+    const { grades, gradedBy } = req.body;
+
+    if (!Array.isArray(grades) || grades.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ error: 'grades (array) es obligatorio y debe contener al menos un registro.' });
+    }
+
+    // Verificar existencia de la cohorte
+    const cohortRes = await client.query('SELECT * FROM technical_academy_cohorts WHERE id = $1', [id]);
+    if (cohortRes.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'Cohorte no encontrada' });
+    }
+
+    const cohort = cohortRes.rows[0];
+    const role = (req.headers['x-user-role'] || req.body?.userRole) as string | undefined;
+    const userEmail = ((req.headers['x-user-email'] || req.body?.userEmail) as string || '').toLowerCase().trim();
+    const userName = ((req.headers['x-user-name'] || req.body?.userName) as string || '').toLowerCase().trim();
+
+    // Permisos: Administrador O facilitador asignado
+    const isAdmin = !role || role === 'Super Administrador' || role === 'Administrador / Editor';
+    const isCohortFacilitator =
+      (cohort.facilitator_email && cohort.facilitator_email.toLowerCase().trim() === userEmail) ||
+      (cohort.facilitator_name && cohort.facilitator_name.toLowerCase().trim() === userName);
+
+    if (!isAdmin && !isCohortFacilitator) {
+      await client.query('ROLLBACK');
+      return res.status(403).json({ error: 'Acceso denegado: solo el facilitador asignado o un administrador pueden asentar calificaciones.' });
+    }
+
+    const evaluator = gradedBy || (req.headers['x-user-name'] as string) || cohort.facilitator_name || 'Facilitador Técnico';
+    let updatedCount = 0;
+
+    for (const g of grades) {
+      const { participantCard, score, academicStatus, feedback } = g;
+      if (!participantCard) continue;
+
+      let finalScore: number | null = null;
+      if (score !== null && score !== undefined && score !== '') {
+        const num = parseFloat(score);
+        if (!isNaN(num)) {
+          finalScore = Math.max(0, Math.min(100, num));
+        }
+      }
+
+      let finalAcademicStatus: string = academicStatus || 'pending';
+      if (finalScore !== null) {
+        if (!academicStatus || academicStatus === 'pending') {
+          finalAcademicStatus = finalScore >= 70 ? 'passed' : 'failed';
+        }
+      }
+
+      await client.query(`
+        UPDATE technical_academy_enrollments SET
+          score = $1,
+          academic_status = $2::varchar,
+          feedback = COALESCE($3, feedback),
+          graded_by = $4,
+          graded_at = CURRENT_TIMESTAMP,
+          status = CASE WHEN $2::varchar = 'passed' THEN 'completed' ELSE status END
+        WHERE cohort_id = $5 AND participant_card = $6
+      `, [
+        finalScore,
+        finalAcademicStatus,
+        feedback !== undefined ? feedback : null,
+        evaluator,
+        id,
+        participantCard
+      ]);
+      updatedCount++;
+    }
+
+    await client.query('COMMIT');
+    res.json({
+      message: `${updatedCount} calificación(es) registrada(s) exitosamente.`,
+      cohortId: id,
+      updatedCount
+    });
+  } catch (err: any) {
+    await client.query('ROLLBACK');
+    console.error('Error al guardar calificaciones de cohorte técnica:', err);
+    res.status(500).json({ error: 'Error al registrar calificaciones', details: err.message });
+  } finally {
+    client.release();
+  }
+};
+
+technicalAcademyRouter.put('/cohorts/:id/grades', handleSaveGrades);
+technicalAcademyRouter.post('/cohorts/:id/grades', handleSaveGrades);
+
+// ==========================================
 // 6. HISTORIAL CONSOLIDADO DE CAPACITACIONES RECURRENTES
 // ==========================================
 
@@ -1084,6 +1212,11 @@ technicalAcademyRouter.get('/history', async (req: Request, res: Response) => {
         c.daily_time as "dailyTime",
         c.status as "cohortStatus",
         e.status as "enrollmentStatus",
+        e.score as "score",
+        e.academic_status as "enrollmentAcademicStatus",
+        e.feedback as "feedback",
+        e.graded_by as "gradedBy",
+        e.graded_at as "gradedAt",
         COUNT(CASE WHEN a.status IN ('present', 'late') THEN 1 END) as "attendedDays",
         COUNT(DISTINCT a.session_date) as "markedDays",
         COALESCE(
@@ -1131,7 +1264,8 @@ technicalAcademyRouter.get('/history', async (req: Request, res: Response) => {
       GROUP BY e.participant_card, p.name, p.email, c.id, c.course_id, c.event_id, tc.event_id, 
                tc.title, tc.code, tc.category, tc.daily_hours, tc.duration_days, tc.modality, 
                c.location, c.facilitator_id, c.facilitator_name, c.facilitator_email, c.group_name, 
-               c.start_date, c.end_date, c.daily_time, c.status, e.status
+               c.start_date, c.end_date, c.daily_time, c.status, e.status, e.score, e.academic_status,
+               e.feedback, e.graded_by, e.graded_at
       ORDER BY c.end_date DESC, c.start_date DESC
     `;
 
@@ -1143,7 +1277,8 @@ technicalAcademyRouter.get('/history', async (req: Request, res: Response) => {
       const attendancePercentage = parseFloat(r.attendancePercentage) || 0;
       const hoursEarned = parseFloat(r.hoursEarned) || 0;
       const totalHours = parseFloat(r.totalHours) || 20;
-      const isPassed = attendancePercentage >= 80;
+      const score = r.score !== null && r.score !== undefined ? parseFloat(r.score) : null;
+      const isPassed = r.enrollmentAcademicStatus === 'passed' || (r.enrollmentAcademicStatus !== 'failed' && (score !== null ? score >= 70 : attendancePercentage >= 80));
 
       return {
         id: `tac_hist_${r.cohortId}_${r.participantCard}`,
@@ -1160,24 +1295,28 @@ technicalAcademyRouter.get('/history', async (req: Request, res: Response) => {
         location: r.location,
         instructor: r.facilitatorName,
         facilitatorName: r.facilitatorName,
-        facilitatorEmail: r.facilitatorEmail,
-        groupName: r.groupName,
+        facilitatorEmail: r.facilitatorEmail || '',
+        groupName: r.groupName || '',
         startDate: r.startDate,
         endDate: r.endDate,
-        date: r.endDate || r.startDate,
-        time: r.dailyTime,
+        date: r.startDate,
+        time: r.dailyTime || '08:00 AM - 12:00 PM',
         dailyHours: parseFloat(r.dailyHours) || 4,
         durationDays: totalDays,
         attendedDays,
         markedDays: parseInt(r.markedDays, 10) || 0,
         totalHours,
-        hoursEarned: isPassed ? totalHours : hoursEarned,
-        hours: isPassed ? totalHours : hoursEarned,
+        hoursEarned,
+        hours: hoursEarned,
         attendancePercentage,
         hasAttended: attendedDays > 0,
-        academicStatus: isPassed ? 'passed' : (r.cohortStatus === 'in_progress' ? 'in_progress' : 'failed'),
-        isRecurrent: true,
-        status: r.cohortStatus
+        academicStatus: isPassed ? 'passed' : (attendancePercentage > 0 ? 'in_progress' : 'failed'),
+        score,
+        feedback: r.feedback || null,
+        gradedBy: r.gradedBy || null,
+        gradedAt: r.gradedAt ? new Date(r.gradedAt).toISOString() : null,
+        isRecurrent: true as const,
+        status: r.cohortStatus || 'scheduled'
       };
     });
 

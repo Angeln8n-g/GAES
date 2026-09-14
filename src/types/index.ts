@@ -600,6 +600,11 @@ export interface TechnicalCohortParticipant {
   totalDays: number;
   attendancePercentage: number;
   totalHoursEarned: number;
+  score?: number | null;
+  academicStatus?: 'passed' | 'failed' | 'pending';
+  feedback?: string | null;
+  gradedBy?: string | null;
+  gradedAt?: string | null;
 }
 
 export interface TechnicalCohortAttendanceMatrix {
@@ -629,6 +634,11 @@ export interface TechnicalCohortEnrolledParticipant {
   attendancePercentage: number;
   totalHoursEarned: number;
   academicCondition: 'APROBADO' | 'EN RIESGO' | 'REPROBADO';
+  score?: number | null;
+  academicStatus?: 'passed' | 'failed' | 'pending';
+  feedback?: string | null;
+  gradedBy?: string | null;
+  gradedAt?: string | null;
 }
 
 export interface TechnicalCohortParticipantsResponse {

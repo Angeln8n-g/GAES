@@ -2127,6 +2127,43 @@ export const apiService = {
     return await res.json();
   },
 
+  saveCohortGrades: async (
+    cohortId: string,
+    payload: {
+      grades: Array<{
+        participantCard: string;
+        score?: number | null;
+        academicStatus?: 'passed' | 'failed' | 'pending';
+        feedback?: string | null;
+      }>;
+      gradedBy?: string;
+    }
+  ): Promise<{ message: string; cohortId: string; updatedCount: number }> => {
+    const roleHeader: Record<string, string> = {};
+    if (typeof window !== 'undefined') {
+      try {
+        const u = localStorage.getItem('capacitahub_user');
+        if (u) {
+          const parsed = JSON.parse(u);
+          if (parsed?.role) roleHeader['X-User-Role'] = parsed.role;
+          if (parsed?.email) roleHeader['X-User-Email'] = parsed.email;
+          if (parsed?.name) roleHeader['X-User-Name'] = parsed.name;
+        }
+      } catch (_) {}
+    }
+
+    const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/grades`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...roleHeader },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al guardar calificaciones de la cohorte');
+    }
+    return await res.json();
+  },
+
   getTechnicalAcademyHistory: async (participantCard?: string, email?: string, companyId?: string): Promise<TechnicalAcademyHistoryRecord[]> => {
     const params = new URLSearchParams();
     if (participantCard) params.append('participantCard', participantCard);

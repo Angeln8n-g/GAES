@@ -26,7 +26,8 @@ import {
   AlertCircle,
   RotateCw,
   Eye,
-  CheckCheck
+  CheckCheck,
+  Save
 } from 'lucide-react';
 import { 
   TechnicalAcademyCourse, 
@@ -118,6 +119,8 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
   const [courseToEdit, setCourseToEdit] = useState<TechnicalAcademyCourse | null>(null);
   const [isEnrollmentModalOpen, setIsEnrollmentModalOpen] = useState<boolean>(false);
   const [cohortForEnrollment, setCohortForEnrollment] = useState<TechnicalAcademyCohort | null>(null);
+  const [cohortGrades, setCohortGrades] = useState<Record<string, { score: string; academicStatus: 'passed' | 'failed' | 'pending'; feedback: string }>>({});
+  const [isSavingGrades, setIsSavingGrades] = useState<boolean>(false);
 
   // 1. Cargar Cursos y Cohortes
   const fetchData = async () => {
@@ -172,6 +175,17 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
       setIsLoadingAttendance(true);
       const matrix = await apiService.getCohortDailyAttendance(cohortId);
       setAttendanceMatrix(matrix);
+
+      // Inicializar calificaciones editables para la cohorte
+      const initialGrades: Record<string, { score: string; academicStatus: 'passed' | 'failed' | 'pending'; feedback: string }> = {};
+      matrix.participants.forEach(p => {
+        initialGrades[p.card] = {
+          score: p.score !== null && p.score !== undefined ? String(p.score) : '',
+          academicStatus: p.academicStatus || (p.score !== null && p.score !== undefined ? (p.score >= 70 ? 'passed' : 'failed') : (p.attendancePercentage >= 80 ? 'passed' : 'pending')),
+          feedback: p.feedback || ''
+        };
+      });
+      setCohortGrades(initialGrades);
 
       // Si la fecha seleccionada actual no está en los sessionDates de la cohorte, seleccionar la de hoy o la primera
       const todayStr = new Date().toISOString().slice(0, 10);
@@ -343,6 +357,69 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
     }
     exportTechnicalAcademyAttendanceToExcel(attendanceMatrix);
     if (onShowToast) onShowToast('Exportación Exitosa', 'El archivo Excel de asistencia técnica ha sido descargado', 'success');
+  };
+
+  // Permiso de calificación: Administradores O el facilitador asignado a la cohorte
+  const canGradeActiveCohort = useMemo(() => {
+    if (isAdminOrSuper) return true;
+    if (activeCohort && isUserFacilitatorOfCohort(activeCohort)) return true;
+    return false;
+  }, [isAdminOrSuper, activeCohort, currentUser]);
+
+  // Guardar calificaciones de la cohorte
+  const handleSaveAllGrades = async () => {
+    if (!selectedCohortId || !attendanceMatrix || !canGradeActiveCohort) return;
+    setIsSavingGrades(true);
+    try {
+      const gradesToSave = attendanceMatrix.participants.map(p => {
+        const g = cohortGrades[p.card] || { score: '', academicStatus: 'pending', feedback: '' };
+        const parsedScore = g.score !== '' ? parseFloat(g.score) : null;
+        return {
+          participantCard: p.card,
+          score: parsedScore,
+          academicStatus: g.academicStatus,
+          feedback: g.feedback || null
+        };
+      });
+
+      const res = await apiService.saveCohortGrades(selectedCohortId, {
+        grades: gradesToSave,
+        gradedBy: currentUser?.name || activeCohort?.facilitatorName || 'Facilitador Técnico'
+      });
+
+      if (onShowToast) {
+        onShowToast('Calificaciones Guardadas', `${res.updatedCount} calificaciones registradas exitosamente`, 'success');
+      }
+      await fetchAttendance(selectedCohortId);
+    } catch (err: any) {
+      console.error('Error al guardar calificaciones:', err);
+      if (onShowToast) {
+        onShowToast('Error', err.message || 'Error al guardar calificaciones', 'error');
+      }
+    } finally {
+      setIsSavingGrades(false);
+    }
+  };
+
+  // Asignar nota 100 y aprobado a técnicos con asistencia >= 80%
+  const handleAutoFillGrades100 = () => {
+    if (!attendanceMatrix) return;
+    setCohortGrades(prev => {
+      const next = { ...prev };
+      attendanceMatrix.participants.forEach(p => {
+        if (p.attendancePercentage >= 80) {
+          next[p.card] = {
+            score: prev[p.card]?.score || '100',
+            academicStatus: 'passed',
+            feedback: prev[p.card]?.feedback || 'Cumplimiento satisfactorio de competencias y asistencia'
+          };
+        }
+      });
+      return next;
+    });
+    if (onShowToast) {
+      onShowToast('Calificaciones Asignadas', 'Se asignó 100 pts a técnicos con asistencia >= 80%. Haz clic en "Guardar Calificaciones" para persistir.', 'info');
+    }
   };
 
   // Participantes filtrados en la matriz de asistencia
@@ -1302,80 +1379,223 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
       )}
 
       {/* ========================================================================= */}
-      {/* TAB 4: ACREDITACIÓN & REPORTES */}
+      {/* TAB 4: ACREDITACIÓN & CALIFICACIONES */}
       {/* ========================================================================= */}
       {activeTab === 'accreditation' && (
         <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div>
-              <h2 className="text-base font-bold text-slate-900">
-                Acreditación de Competencias Técnicas ({activeCohort?.courseTitle || 'Cohorte Actual'})
+              <div className="flex items-center gap-2 mb-1">
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-50 text-[#DA291C] border border-red-100 uppercase tracking-wider">
+                  Evaluación de Competencias
+                </span>
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                  {activeCohort?.groupName || 'Sin Grupo'}
+                </span>
+              </div>
+              <h2 className="text-base sm:text-lg font-black text-slate-900">
+                Acreditación y Calificaciones: {activeCohort?.courseTitle || 'Cohorte Actual'}
               </h2>
-              <p className="text-xs text-slate-500">
-                Criterio institucional de aprobación técnica: asistencia mínima requerida del 80%.
+              <p className="text-xs text-slate-500 mt-0.5">
+                Ingresa las calificaciones finales (0-100 pts), retroalimentación técnica y dictamen de acreditación institucional.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handleExportExcel}
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-2 shadow-sm self-start sm:self-auto"
-            >
-              <FileSpreadsheet className="w-4 h-4" />
-              <span>Exportar Reporte Oficial (.xlsx)</span>
-            </button>
+
+            <div className="flex flex-wrap items-center gap-2">
+              {canGradeActiveCohort && (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleAutoFillGrades100}
+                    className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-xs"
+                    title="Asignar 100 puntos automáticamente a todos los técnicos con asistencia completa (>= 80%)"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    <span>Auto-Calificar (≥ 80% Asistencia)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSaveAllGrades}
+                    disabled={isSavingGrades || !attendanceMatrix || attendanceMatrix.participants.length === 0}
+                    className="px-4 py-2 bg-[#DA291C] hover:bg-[#b82216] text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Guardar todas las calificaciones y notas de la cohorte"
+                  >
+                    {isSavingGrades ? <RotateCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                    <span>Guardar Calificaciones</span>
+                  </button>
+                </>
+              )}
+
+              <button
+                type="button"
+                onClick={handleExportExcel}
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-2 shadow-sm"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5" />
+                <span>Exportar Reporte (.xlsx)</span>
+              </button>
+            </div>
           </div>
 
           <div className="overflow-x-auto rounded-2xl border border-slate-200">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px] tracking-wider">
+                <tr className="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold uppercase text-[10px] tracking-wider">
                   <th className="py-3 px-3">No.</th>
                   <th className="py-3 px-3">Carnet</th>
                   <th className="py-3 px-4">Técnico / Colaborador</th>
-                  <th className="py-3 px-3">Departamento</th>
-                  <th className="py-3 px-3 text-center">Días Asistidos</th>
-                  <th className="py-3 px-3 text-center">% Cumplimiento</th>
-                  <th className="py-3 px-3 text-center">Horas Acreditadas</th>
+                  <th className="py-3 px-3 text-center">Asistencia</th>
+                  <th className="py-3 px-3 text-center">Horas</th>
+                  <th className="py-3 px-3 text-center">Calificación (0 - 100)</th>
+                  <th className="py-3 px-3 text-center">Estado Académico</th>
+                  <th className="py-3 px-4">Retroalimentación / Notas</th>
                   <th className="py-3 px-4 text-center">Dictamen Final</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {!attendanceMatrix || attendanceMatrix.participants.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="py-8 text-center text-slate-400">
+                    <td colSpan={9} className="py-12 text-center text-slate-400">
                       No hay registros de técnicos disponibles en esta cohorte.
                     </td>
                   </tr>
                 ) : (
                   attendanceMatrix.participants.map((p, idx) => {
-                    const isPassed = p.attendancePercentage >= 80;
+                    const gradeState = cohortGrades[p.card] || { score: '', academicStatus: 'pending', feedback: '' };
+                    const isPassed = gradeState.academicStatus === 'passed';
+                    const isFailed = gradeState.academicStatus === 'failed';
+
                     return (
                       <tr key={p.card} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="py-3 px-3 font-mono text-slate-400">{idx + 1}</td>
+                        <td className="py-3 px-3 font-mono text-slate-400 font-bold">{idx + 1}</td>
                         <td className="py-3 px-3 font-mono font-bold text-slate-800">#{p.card}</td>
-                        <td className="py-3 px-4 font-bold text-slate-900">{p.name}</td>
-                        <td className="py-3 px-3 text-slate-600">{p.department || 'Planta Externa'}</td>
-                        <td className="py-3 px-3 text-center font-mono">
-                          {p.attendedDays} / {p.totalDays}
+                        <td className="py-3 px-4">
+                          <div className="font-bold text-slate-900">{p.name}</div>
+                          <div className="text-[11px] text-slate-500">{p.department || 'Planta Externa'}</div>
                         </td>
-                        <td className="py-3 px-3 text-center font-mono font-bold">
-                          <span className={isPassed ? 'text-emerald-700' : 'text-red-600'}>
+                        <td className="py-3 px-3 text-center">
+                          <span className={`font-mono font-bold ${p.attendancePercentage >= 80 ? 'text-emerald-700' : 'text-slate-700'}`}>
                             {p.attendancePercentage}%
+                          </span>
+                          <span className="block text-[10px] text-slate-400">
+                            {p.attendedDays} / {p.totalDays} d
                           </span>
                         </td>
                         <td className="py-3 px-3 text-center font-mono font-bold text-slate-800">
-                          {p.totalHoursEarned} hrs
+                          {p.totalHoursEarned}h
+                        </td>
+                        <td className="py-3 px-3 text-center">
+                          {canGradeActiveCohort ? (
+                            <div className="inline-flex items-center gap-1">
+                              <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="1"
+                                placeholder="—"
+                                value={gradeState.score}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  const num = val === '' ? '' : String(Math.max(0, Math.min(100, Number(val))));
+                                  setCohortGrades(prev => ({
+                                    ...prev,
+                                    [p.card]: {
+                                      ...prev[p.card],
+                                      score: num,
+                                      academicStatus: num === '' ? 'pending' : (Number(num) >= 70 ? 'passed' : 'failed')
+                                    }
+                                  }));
+                                }}
+                                className="w-16 px-2 py-1 text-center font-mono font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white text-xs"
+                              />
+                              <span className="text-[10px] font-bold text-slate-400">pts</span>
+                            </div>
+                          ) : (
+                            <span className="font-mono font-bold text-slate-800">
+                              {p.score !== null && p.score !== undefined ? `${p.score} pts` : '—'}
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3 px-3 text-center">
+                          {canGradeActiveCohort ? (
+                            <select
+                              value={gradeState.academicStatus}
+                              onChange={(e) => {
+                                const st = e.target.value as 'passed' | 'failed' | 'pending';
+                                setCohortGrades(prev => ({
+                                  ...prev,
+                                  [p.card]: {
+                                    ...prev[p.card],
+                                    academicStatus: st
+                                  }
+                                }));
+                              }}
+                              className={`px-2 py-1 rounded-lg text-xs font-bold border focus:outline-none focus:ring-2 focus:ring-[#DA291C] ${
+                                isPassed
+                                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                  : isFailed
+                                  ? 'bg-rose-50 text-rose-800 border-rose-200'
+                                  : 'bg-amber-50 text-amber-800 border-amber-200'
+                              }`}
+                            >
+                              <option value="passed">Aprobado (≥ 70)</option>
+                              <option value="failed">Reprobado (&lt; 70)</option>
+                              <option value="pending">Pendiente</option>
+                            </select>
+                          ) : (
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                                isPassed
+                                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                  : isFailed
+                                  ? 'bg-rose-50 text-rose-800 border border-rose-200'
+                                  : 'bg-amber-50 text-amber-800 border border-amber-200'
+                              }`}
+                            >
+                              {isPassed ? 'Aprobado' : isFailed ? 'Reprobado' : 'Pendiente'}
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4">
+                          {canGradeActiveCohort ? (
+                            <input
+                              type="text"
+                              placeholder="Observaciones de evaluación..."
+                              value={gradeState.feedback}
+                              onChange={(e) => {
+                                const fb = e.target.value;
+                                setCohortGrades(prev => ({
+                                  ...prev,
+                                  [p.card]: {
+                                    ...prev[p.card],
+                                    feedback: fb
+                                  }
+                                }));
+                              }}
+                              className="w-full px-2.5 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white text-slate-700"
+                            />
+                          ) : (
+                            <span className="text-slate-500 text-xs italic">
+                              {p.feedback || '—'}
+                            </span>
+                          )}
                         </td>
                         <td className="py-3 px-4 text-center">
                           {isPassed ? (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
                               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                               ACREDITADO
                             </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-300">
-                              <XCircle className="w-3.5 h-3.5 text-red-600" />
+                          ) : isFailed ? (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-rose-50 text-rose-700 border border-rose-200">
+                              <XCircle className="w-3.5 h-3.5 text-rose-600" />
                               NO ACREDITADO
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-amber-50 text-amber-700 border border-amber-200">
+                              <Clock3 className="w-3.5 h-3.5 text-amber-600" />
+                              PENDIENTE
                             </span>
                           )}
                         </td>
@@ -1454,6 +1674,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
       <TechnicalCohortEnrollmentModal
         isOpen={isEnrollmentModalOpen}
         isAdminOrSuper={isAdminOrSuper}
+        canGrade={isAdminOrSuper || (cohortForEnrollment ? isUserFacilitatorOfCohort(cohortForEnrollment) : false)}
         onClose={() => {
           setIsEnrollmentModalOpen(false);
           setCohortForEnrollment(null);
