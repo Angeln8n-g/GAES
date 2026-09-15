@@ -379,6 +379,13 @@ usersRouter.put("/:id", async (req: Request, res: Response) => {
 
     await client.query("BEGIN");
 
+    // Consultar estado previo del usuario para capturar email y cédula anteriores
+    const previousUserRes = await client.query(
+      "SELECT email, cedula FROM users_simulated WHERE id = $1",
+      [id]
+    );
+    const oldEmail = previousUserRes.rows[0]?.email ? previousUserRes.rows[0].email.trim().toLowerCase() : null;
+
     let finalPasswordClause = "";
     let finalParams: any[] = [];
 
@@ -453,31 +460,36 @@ usersRouter.put("/:id", async (req: Request, res: Response) => {
 
     await client.query(updateQuery, finalParams);
 
-    // Sincronizar en participants
+    // Sincronizar en cascada en participants (por nuevo email, email previo, o cédula)
+    const unformattedCedula = cleanCedula ? cleanCedula.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() : null;
     await client.query(
       `UPDATE participants 
        SET name = $1, 
-           cedula = COALESCE($2, cedula), 
-           department = COALESCE($3, department),
-           employment_status = $4,
-           is_active = $5,
-           company_id = $6,
-           birth_date = COALESCE($7, birth_date),
-           education_level = COALESCE($8, education_level),
-           is_currently_studying = $9,
-           current_study_field = COALESCE($10, current_study_field),
-           institution_name = COALESCE($11, institution_name),
-           profession_title = COALESCE($12, profession_title),
-           current_address = COALESCE($13, current_address),
-           phone = COALESCE($14, phone),
-           gender = COALESCE($15, gender),
-           training_interest_areas = $16,
-           profile_completed = $17
-       WHERE LOWER(email) = $18`,
+           email = $2,
+           cedula = COALESCE($3, cedula), 
+           department = COALESCE($4, department),
+           employment_status = $5,
+           is_active = $6,
+           company_id = $7,
+           birth_date = COALESCE($8, birth_date),
+           education_level = COALESCE($9, education_level),
+           is_currently_studying = $10,
+           current_study_field = COALESCE($11, current_study_field),
+           institution_name = COALESCE($12, institution_name),
+           profession_title = COALESCE($13, profession_title),
+           current_address = COALESCE($14, current_address),
+           phone = COALESCE($15, phone),
+           gender = COALESCE($16, gender),
+           training_interest_areas = $17,
+           profile_completed = $18
+       WHERE LOWER(email) = LOWER($2)
+          OR (CAST($19 AS VARCHAR) IS NOT NULL AND LOWER(email) = LOWER($19))
+          OR (CAST($3 AS VARCHAR) IS NOT NULL AND (cedula = $3 OR REPLACE(REPLACE(LOWER(cedula), '-', ''), ' ', '') = $20))`,
       [
-        cleanName, cleanCedula, cleanDept, cleanEmpStatus, cleanIsActive, cleanCompanyId, 
+        cleanName, cleanEmail, cleanCedula, cleanDept, cleanEmpStatus, cleanIsActive, cleanCompanyId, 
         cleanBirthDate, cleanEduLevel, cleanStudying, cleanStudyField, cleanInstName, 
-        cleanProfTitle, cleanAddress, cleanPhone, cleanGender, cleanInterests, cleanCompleted, cleanEmail
+        cleanProfTitle, cleanAddress, cleanPhone, cleanGender, cleanInterests, cleanCompleted,
+        oldEmail, unformattedCedula
       ]
     );
 
@@ -594,7 +606,9 @@ usersRouter.put("/:id/profile", async (req: Request, res: Response) => {
 
     const updatedUser = updatedUserRes.rows[0];
 
-    // Sincronizar en participants
+    // Sincronizar en participants (por email o cédula)
+    const profileCedula = updatedUser.cedula ? updatedUser.cedula.trim() : null;
+    const profileCedulaClean = profileCedula ? profileCedula.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() : null;
     await client.query(
       `UPDATE participants 
        SET birth_date = $1,
@@ -608,10 +622,12 @@ usersRouter.put("/:id/profile", async (req: Request, res: Response) => {
            gender = $9,
            training_interest_areas = $10,
            profile_completed = $11
-       WHERE LOWER(email) = $12`,
+       WHERE LOWER(email) = $12
+          OR (CAST($13 AS VARCHAR) IS NOT NULL AND (cedula = $13 OR REPLACE(REPLACE(LOWER(cedula), '-', ''), ' ', '') = $14))`,
       [
         cleanBirthDate, cleanEduLevel, cleanStudying, cleanStudyField, cleanInstName, 
-        cleanProfTitle, cleanAddress, cleanPhone, cleanGender, cleanInterests, isComplete, updatedUser.email.toLowerCase()
+        cleanProfTitle, cleanAddress, cleanPhone, cleanGender, cleanInterests, isComplete, 
+        updatedUser.email.toLowerCase(), profileCedula, profileCedulaClean
       ]
     );
 

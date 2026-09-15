@@ -104,35 +104,65 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }, []);
 
-  // Extraer todas las inscripciones del usuario actual
-  const userRegistrations: UserRegistrationItem[] = [];
+  // Identificar tarjeta y datos de participante del usuario actual (por email o por cédula)
+  const userEmail = currentUser.email.toLowerCase();
+  const userCedulaClean = currentUser.cedula ? currentUser.cedula.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() : null;
 
-  events.forEach(evt => {
-    evt.schedule.forEach(sch => {
-      sch.slots.forEach(slot => {
-        const isEnrolled = slot.attendees.map(a => a.toLowerCase()).includes(currentUser.email.toLowerCase());
-        if (isEnrolled) {
-          const cleanEmail = currentUser.email.toLowerCase();
-          const isCheckedIn = (slot.checkInList || slot.attendedList || []).map(a => a.toLowerCase()).includes(cleanEmail);
-          const isCheckedOut = (slot.checkOutList || []).map(a => a.toLowerCase()).includes(cleanEmail);
-          const hasAttended = (slot.completedAttendanceList || []).map(a => a.toLowerCase()).includes(cleanEmail) || (isCheckedIn && isCheckedOut);
-          const detail = (slot.attendeesDetails || []).find(d => d.email.toLowerCase() === cleanEmail);
-          userRegistrations.push({
-            event: evt,
-            schedule: sch,
-            slot: slot,
-            hasAttended,
-            isCheckedIn,
-            isCheckedOut,
-            isMandatory: detail ? Boolean(detail.isMandatory) : false,
-            assignedBy: detail?.assignedBy || null,
-            assignmentType: detail?.assignmentType || (detail?.isMandatory ? 'mandatory' : 'self'),
-            assignmentNotes: detail?.assignmentNotes || null
-          });
-        }
+  const currentParticipant = useMemo(() => {
+    return participants.find(p => {
+      if (p.email && p.email.toLowerCase() === userEmail) return true;
+      if (userCedulaClean && p.cedula) {
+        const pCed = p.cedula.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        if (pCed === userCedulaClean) return true;
+      }
+      return false;
+    });
+  }, [participants, userEmail, userCedulaClean]);
+
+  const userCard = currentParticipant?.card;
+
+  // Conjunto de correos asociados al usuario (login actual + expediente en padrón si difieren)
+  const userAssociatedEmails = useMemo(() => {
+    const set = new Set<string>();
+    set.add(userEmail);
+    if (currentParticipant?.email) {
+      set.add(currentParticipant.email.toLowerCase());
+    }
+    return set;
+  }, [userEmail, currentParticipant]);
+
+  // Extraer todas las inscripciones del usuario actual
+  const userRegistrations: UserRegistrationItem[] = useMemo(() => {
+    const list: UserRegistrationItem[] = [];
+
+    events.forEach(evt => {
+      evt.schedule.forEach(sch => {
+        sch.slots.forEach(slot => {
+          const isEnrolled = slot.attendees.some(a => userAssociatedEmails.has(a.toLowerCase()));
+          if (isEnrolled) {
+            const isCheckedIn = (slot.checkInList || slot.attendedList || []).some(a => userAssociatedEmails.has(a.toLowerCase()));
+            const isCheckedOut = (slot.checkOutList || []).some(a => userAssociatedEmails.has(a.toLowerCase()));
+            const hasAttended = (slot.completedAttendanceList || []).some(a => userAssociatedEmails.has(a.toLowerCase())) || (isCheckedIn && isCheckedOut);
+            const detail = (slot.attendeesDetails || []).find(d => userAssociatedEmails.has(d.email.toLowerCase()));
+            list.push({
+              event: evt,
+              schedule: sch,
+              slot: slot,
+              hasAttended,
+              isCheckedIn,
+              isCheckedOut,
+              isMandatory: detail ? Boolean(detail.isMandatory) : false,
+              assignedBy: detail?.assignedBy || null,
+              assignmentType: detail?.assignmentType || (detail?.isMandatory ? 'mandatory' : 'self'),
+              assignmentNotes: detail?.assignmentNotes || null
+            });
+          }
+        });
       });
     });
-  });
+
+    return list;
+  }, [events, userAssociatedEmails]);
 
   const handleConfirmCancel = async () => {
     if (!cancelingItem) return;
@@ -152,11 +182,6 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
     }
   };
 
-  // Identificar tarjeta y datos de participante del usuario actual
-  const userEmail = currentUser.email.toLowerCase();
-  const currentParticipant = participants.find(p => p.email.toLowerCase() === userEmail);
-  const userCard = currentParticipant?.card;
-
   // Programas activos asignados al usuario
   const assignedPrograms = programs.filter(prog => {
     if (prog.status !== 'active') return false;
@@ -166,13 +191,13 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
     return isTargetGroup || isTargetDirect;
   });
 
-  // Generar lista de registros históricos (Internos + Externos)
+  // Generar lista de registros históricos (Internos + Externos + Recurrentes)
   const trainingHistoryRecords: TrainingHistoryRecord[] = useMemo(() => {
     const internalRecords: TrainingHistoryRecord[] = userRegistrations.map((item, idx) => {
       const isPast = item.schedule.date < todayStr;
       const gradeObj = (item.event.grades || []).find(g => 
         (userCard && g.participantCard === userCard) || 
-        (g.participantEmail && g.participantEmail.toLowerCase() === userEmail)
+        (g.participantEmail && userAssociatedEmails.has(g.participantEmail.toLowerCase()))
       );
 
       return {
@@ -192,7 +217,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
     });
 
     const externalRecords: TrainingHistoryRecord[] = (externalTrainings || [])
-      .filter(t => (userCard && t.participantCard === userCard) || (t.participantEmail && t.participantEmail.toLowerCase() === userEmail))
+      .filter(t => (userCard && t.participantCard === userCard) || (t.participantEmail && userAssociatedEmails.has(t.participantEmail.toLowerCase())))
       .map(t => ({
         id: `ext-${t.id}`,
         title: t.title,
@@ -211,7 +236,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
       }));
 
     const recurrentRecords: TrainingHistoryRecord[] = (technicalHistory || [])
-      .filter(t => (userCard && t.participantCard === userCard) || (t.participantEmail && t.participantEmail.toLowerCase() === userEmail))
+      .filter(t => (userCard && t.participantCard === userCard) || (t.participantEmail && userAssociatedEmails.has(t.participantEmail.toLowerCase())))
       .map(t => ({
         id: `rec-${t.cohortId}-${t.courseId}`,
         title: t.title,
@@ -232,7 +257,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
       }));
 
     return [...internalRecords, ...externalRecords, ...recurrentRecords].sort((a, b) => b.date.localeCompare(a.date));
-  }, [userRegistrations, todayStr, userCard, userEmail, externalTrainings, technicalHistory]);
+  }, [userRegistrations, todayStr, userCard, userAssociatedEmails, externalTrainings, technicalHistory]);
 
   // Métricas del Histórico
   const historyMetrics = useMemo(() => {
