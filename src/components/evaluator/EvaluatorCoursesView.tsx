@@ -16,7 +16,9 @@ import {
   Award,
   Video,
   BookOpen,
-  Filter
+  Filter,
+  Trash2,
+  UserMinus
 } from 'lucide-react';
 import { TrainingEvent, Participant, UserAccount } from '../../types';
 import { AttendeesModal } from '../admin/AttendeesModal';
@@ -30,6 +32,8 @@ interface EvaluatorCoursesViewProps {
   onConfirmAttendance: (eventId: string, date: string, time: string, email: string, type?: 'checkin' | 'checkout') => Promise<void>;
   onRevertAttendance?: (eventId: string, date: string, time: string, email: string, type?: 'checkout' | 'all') => Promise<void>;
   onSaveEvent?: (event: TrainingEvent) => Promise<void>;
+  onDeleteEvent?: (eventId: string) => Promise<void>;
+  onCancelRegistration?: (eventId: string, date: string, time: string, email: string, isSupervisorOrAdmin?: boolean, force?: boolean) => Promise<void>;
   onShowToast: (title: string, message: string, type: 'success' | 'error' | 'info' | 'warning') => void;
 }
 
@@ -41,12 +45,17 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
   onConfirmAttendance,
   onRevertAttendance,
   onSaveEvent,
+  onDeleteEvent,
+  onCancelRegistration,
   onShowToast
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'modular' | 'standard'>('all');
   const [selectedModalEvent, setSelectedModalEvent] = useState<TrainingEvent | null>(null);
   const [isDirectProjector, setIsDirectProjector] = useState(false);
+  const [courseToDeleteAssignment, setCourseToDeleteAssignment] = useState<TrainingEvent | null>(null);
+  const [deleteAssignmentMode, setDeleteAssignmentMode] = useState<'unassign_evaluator' | 'delete_event'>('unassign_evaluator');
+  const [isProcessingDeleteAssignment, setIsProcessingDeleteAssignment] = useState<boolean>(false);
 
   // Filtrar eventos asignados al evaluador actual (o todos si es SuperAdmin)
   const assignedEvents = useMemo(() => {
@@ -283,6 +292,12 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
             const attendancePercent = courseEnrolled > 0 ? Math.round((courseAttended / courseEnrolled) * 100) : 0;
             const gradesCount = (event.grades || []).length;
 
+            const todayStr = new Date().toISOString().slice(0, 10);
+            const eventDate = event.schedule?.[0]?.date || event.startDate || '';
+            const isFuture = Boolean(eventDate && eventDate > todayStr);
+            const isToday = Boolean(eventDate && eventDate === todayStr);
+            const isPast = Boolean(eventDate && eventDate < todayStr);
+
             return (
               <div 
                 key={event.id}
@@ -299,6 +314,18 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
                         {event.modality === 'Presencial' ? <MapPin className="w-3 h-3 text-slate-500" /> : <Video className="w-3 h-3 text-slate-500" />}
                         {event.modality}
                       </span>
+                      {eventDate && (
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black flex items-center gap-1 border ${
+                          isFuture
+                            ? 'bg-blue-50 text-blue-700 border-blue-200'
+                            : isToday
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                              : 'bg-amber-50 text-amber-800 border-amber-200'
+                        }`}>
+                          <Calendar className="w-3 h-3" />
+                          <span>{isFuture ? 'Por Impartir' : isToday ? 'En Curso Hoy' : 'Fecha Pasada'}</span>
+                        </span>
+                      )}
                       {hasModules ? (
                         <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-purple-50 text-purple-700 border border-purple-200 flex items-center gap-1">
                           <Layers className="w-3 h-3 text-purple-600" />
@@ -395,14 +422,32 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
 
                 {/* Acciones principales de la tarjeta */}
                 <div className="mt-5 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
-                  <button
-                    onClick={() => handleExportGrades(event)}
-                    title="Exportar calificaciones a Excel"
-                    className="p-2.5 rounded-xl text-slate-600 hover:text-emerald-800 hover:bg-slate-100 border border-slate-200 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5"
-                  >
-                    <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-                    <span className="hidden sm:inline">Excel</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleExportGrades(event)}
+                      title="Exportar calificaciones a Excel"
+                      className="p-2.5 rounded-xl text-slate-600 hover:text-emerald-800 hover:bg-slate-100 border border-slate-200 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5"
+                    >
+                      <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+                      <span className="hidden sm:inline">Excel</span>
+                    </button>
+
+                    {/* Botón Eliminar Asignación (Super Admin) */}
+                    {isSuperAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCourseToDeleteAssignment(event);
+                          setDeleteAssignmentMode('unassign_evaluator');
+                        }}
+                        title="Eliminar asignación de curso (Super Admin - Antes o después de la fecha)"
+                        className="p-2.5 rounded-xl text-rose-600 hover:text-rose-700 hover:bg-rose-50 border border-rose-200 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5"
+                      >
+                        <Trash2 className="w-4 h-4 text-rose-600" />
+                        <span className="hidden sm:inline">Eliminar Asignación</span>
+                      </button>
+                    )}
+                  </div>
 
                   <div className="flex items-center gap-2">
                     {/* Botón Proyectar QR en Sala */}
@@ -475,7 +520,215 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
             }
             onShowToast('Calificaciones guardadas', `Se actualizaron las notas para "${updatedEvt.title}".`, 'success');
           }}
+          onCancelRegistration={onCancelRegistration ? async (evtId, date, time, email, isSupervisorOrAdmin, force) => {
+            await onCancelRegistration(evtId, date, time, email, isSupervisorOrAdmin, force);
+            onShowToast('Asignación eliminada', `Se ha retirado la asignación de ${email} para este horario.`, 'info');
+          } : undefined}
         />
+      )}
+
+      {/* Modal de Eliminación de Asignación de Curso para Super Admin */}
+      {courseToDeleteAssignment && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-5 animate-in fade-in zoom-in-95">
+            <div className="flex items-start gap-4">
+              <div className="p-3 rounded-2xl bg-rose-50 text-rose-600 shrink-0">
+                <Trash2 className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-black text-slate-900">
+                    Eliminar Asignación de Curso
+                  </h3>
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
+                    Super Admin
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500">
+                  Control exclusivo para gestionar o retirar este curso asignado antes o después de la fecha en que se debe impartir.
+                </p>
+              </div>
+            </div>
+
+            {/* Ficha Resumen del Evento */}
+            {(() => {
+              const todayStr = new Date().toISOString().slice(0, 10);
+              const eventDate = courseToDeleteAssignment.schedule?.[0]?.date || courseToDeleteAssignment.startDate || '';
+              const isFuture = Boolean(eventDate && eventDate > todayStr);
+              const isToday = Boolean(eventDate && eventDate === todayStr);
+              const isPast = Boolean(eventDate && eventDate < todayStr);
+
+              let totalEnrolled = 0;
+              (courseToDeleteAssignment.schedule || []).forEach(sch => {
+                (sch.slots || []).forEach(slot => {
+                  totalEnrolled += (slot.attendees || []).length;
+                });
+              });
+
+              return (
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500 font-semibold">Curso:</span>
+                    <span className="font-black text-slate-900 truncate max-w-[240px]">
+                      {courseToDeleteAssignment.title}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500 font-semibold">Tutor OJT / Facilitador:</span>
+                    <span className="font-bold text-slate-800">
+                      {courseToDeleteAssignment.ojtEvaluatorName || courseToDeleteAssignment.instructor || 'Por Asignar'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500 font-semibold">Fecha Programada:</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-slate-700 font-bold">{eventDate || 'Sin fecha fija'}</span>
+                      {eventDate && (
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          isFuture
+                            ? 'bg-blue-100 text-blue-800'
+                            : isToday
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : 'bg-amber-100 text-amber-800'
+                        }`}>
+                          {isFuture ? '📅 Por Impartir' : isToday ? '🟢 Hoy' : '⏱️ Fecha Pasada'}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500 font-semibold">Colaboradores Inscritos:</span>
+                    <span className="font-bold text-slate-900">{totalEnrolled} participantes</span>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Opciones de Acción */}
+            <div className="space-y-3">
+              <label className="block text-xs font-bold text-slate-700">
+                Selecciona cómo deseas proceder con la eliminación:
+              </label>
+
+              {/* Opción 1: Desasignar Tutor OJT */}
+              <div
+                onClick={() => setDeleteAssignmentMode('unassign_evaluator')}
+                className={`p-3.5 rounded-2xl border transition-all cursor-pointer space-y-1 ${
+                  deleteAssignmentMode === 'unassign_evaluator'
+                    ? 'border-amber-500 bg-amber-50/40 ring-1 ring-amber-500'
+                    : 'border-slate-200 bg-white hover:border-slate-300'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 font-bold text-xs text-slate-900">
+                    <CheckCircle2 className={`w-4 h-4 ${deleteAssignmentMode === 'unassign_evaluator' ? 'text-amber-600' : 'text-slate-400'}`} />
+                    <span>Desasignar Tutor / Evaluador OJT</span>
+                  </div>
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                    Recomendado
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 pl-6">
+                  Quita la asignación de tutoría de este curso. El evento permanece en el catálogo general y no se borran inscripciones ni asistencias, pero deja de figurar como curso asignado a este tutor OJT.
+                </p>
+              </div>
+
+              {/* Opción 2: Eliminar Curso Completo */}
+              <div
+                onClick={() => setDeleteAssignmentMode('delete_event')}
+                className={`p-3.5 rounded-2xl border transition-all cursor-pointer space-y-1 ${
+                  deleteAssignmentMode === 'delete_event'
+                    ? 'border-rose-500 bg-rose-50/40 ring-1 ring-rose-500'
+                    : 'border-slate-200 bg-white hover:border-slate-300'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 font-bold text-xs text-slate-900">
+                    <Trash2 className={`w-4 h-4 ${deleteAssignmentMode === 'delete_event' ? 'text-rose-600' : 'text-slate-400'}`} />
+                    <span>Eliminar Curso / Evento Definitivamente</span>
+                  </div>
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
+                    Purga Total
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 pl-6">
+                  Elimina permanentemente el evento, sus horarios, inscripciones y calificaciones de la base de datos.
+                </p>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setCourseToDeleteAssignment(null)}
+                disabled={isProcessingDeleteAssignment}
+                className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!courseToDeleteAssignment) return;
+                  try {
+                    setIsProcessingDeleteAssignment(true);
+                    if (deleteAssignmentMode === 'unassign_evaluator') {
+                      const updatedEvent: TrainingEvent = {
+                        ...courseToDeleteAssignment,
+                        ojtEvaluatorId: undefined,
+                        ojtEvaluatorName: undefined,
+                        ojtEvaluatorEmail: undefined
+                      };
+                      if (onSaveEvent) {
+                        await onSaveEvent(updatedEvent);
+                      }
+                      onShowToast(
+                        'Asignación Eliminada',
+                        `Se ha retirado la tutoría OJT del curso "${courseToDeleteAssignment.title}".`,
+                        'success'
+                      );
+                    } else {
+                      if (onDeleteEvent) {
+                        await onDeleteEvent(courseToDeleteAssignment.id);
+                      }
+                      onShowToast(
+                        'Curso Eliminado',
+                        `El curso "${courseToDeleteAssignment.title}" ha sido eliminado definitivamente.`,
+                        'success'
+                      );
+                    }
+                    setCourseToDeleteAssignment(null);
+                  } catch (err: any) {
+                    console.error('Error al procesar eliminación:', err);
+                    onShowToast(
+                      'Error',
+                      err.message || 'No se pudo procesar la eliminación de la asignación.',
+                      'error'
+                    );
+                  } finally {
+                    setIsProcessingDeleteAssignment(false);
+                  }
+                }}
+                disabled={isProcessingDeleteAssignment}
+                className={`px-5 py-2.5 rounded-xl text-xs font-bold text-white flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50 ${
+                  deleteAssignmentMode === 'unassign_evaluator'
+                    ? 'bg-amber-600 hover:bg-amber-700 shadow-md shadow-amber-600/20'
+                    : 'bg-rose-600 hover:bg-rose-700 shadow-md shadow-rose-600/20'
+                }`}
+              >
+                <Trash2 className={`w-3.5 h-3.5 ${isProcessingDeleteAssignment ? 'animate-spin' : ''}`} />
+                <span>
+                  {isProcessingDeleteAssignment
+                    ? 'Procesando...'
+                    : deleteAssignmentMode === 'unassign_evaluator'
+                      ? 'Confirmar Desasignación'
+                      : 'Eliminar Definitivamente'}
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
     </div>

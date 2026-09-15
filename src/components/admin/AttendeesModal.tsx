@@ -26,7 +26,8 @@ import {
   Layers,
   QrCode,
   LogIn,
-  LogOut
+  LogOut,
+  Trash2
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { TrainingEvent, Participant, ParticipantGrade, AcademicStatus, EventModule, ParticipantModuleGrade } from '../../types';
@@ -45,6 +46,7 @@ interface AttendeesModalProps {
   onRevertAttendance?: (eventId: string, date: string, time: string, email: string, type?: 'checkout' | 'all') => Promise<void>;
   onOpenBulkEnrollment?: (eventId: string, date: string, time: string) => void;
   onSaveGradesSuccess?: (updatedEvent: TrainingEvent) => void;
+  onCancelRegistration?: (eventId: string, date: string, time: string, email: string, isSupervisorOrAdmin?: boolean, force?: boolean) => Promise<void>;
 }
 
 export const AttendeesModal: React.FC<AttendeesModalProps> = ({
@@ -56,7 +58,8 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
   onConfirmAttendance,
   onRevertAttendance,
   onOpenBulkEnrollment,
-  onSaveGradesSuccess
+  onSaveGradesSuccess,
+  onCancelRegistration
 }) => {
   if (!event) return null;
 
@@ -76,6 +79,8 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
   const [isProjectorOpen, setIsProjectorOpen] = useState<boolean>(initialProjectorMode);
   const [projectorMode, setProjectorMode] = useState<'checkin' | 'checkout'>('checkin');
   const [liveToast, setLiveToast] = useState<string | null>(null);
+  const [participantToUnassign, setParticipantToUnassign] = useState<any | null>(null);
+  const [isUnassigning, setIsUnassigning] = useState<boolean>(false);
 
   // Escuchar eventos en vivo de WebSocket para asistencia
   useEffect(() => {
@@ -734,6 +739,19 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                           <span>Revertir {item.isCheckedOut ? 'Salida' : ''}</span>
                         </button>
                       )}
+
+                      {/* Super Admin Action: Eliminar Asignación del Participante */}
+                      {isSuperAdmin && onCancelRegistration && (
+                        <button
+                          type="button"
+                          onClick={() => setParticipantToUnassign(item)}
+                          className="px-2 py-1 rounded-xl text-rose-600 hover:text-rose-700 hover:bg-rose-50 border border-rose-200 text-[10px] font-bold transition-colors cursor-pointer flex items-center gap-1"
+                          title="Eliminar asignación del participante (Super Admin - Antes o después de impartirse)"
+                        >
+                          <Trash2 className="w-3 h-3 text-rose-600" />
+                          <span>Desasignar</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -1372,6 +1390,64 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
             <p className="text-xs text-slate-500 max-w-md">
               Abre la cámara de tu smartphone y enfoca el código QR o digita el PIN de 4 dígitos para registrar tu {projectorMode === 'checkin' ? 'entrada' : 'salida'}.
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Confirmación para Desasignar Participante */}
+      {participantToUnassign && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-2xl bg-rose-50 text-rose-600">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-black text-slate-900">Eliminar Asignación de Curso</h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
+                  Super Admin
+                </span>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed">
+              ¿Estás seguro de que deseas eliminar la asignación de <strong className="text-slate-900">{participantToUnassign.name}</strong> para el curso <strong className="text-slate-900">{event.title}</strong> en fecha <strong className="text-slate-900">{selectedDate} ({selectedTime})</strong>?
+            </p>
+            <p className="text-[11px] text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-100">
+              Esta acción liberará el cupo y cancelará el registro del participante en este horario, independientemente de si el curso ya se impartió o está por impartirse.
+            </p>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setParticipantToUnassign(null)}
+                disabled={isUnassigning}
+                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    setIsUnassigning(true);
+                    if (onCancelRegistration) {
+                      await onCancelRegistration(event.id, selectedDate, selectedTime, participantToUnassign.email, true, true);
+                    }
+                    setParticipantToUnassign(null);
+                  } catch (err: any) {
+                    console.error('Error al desasignar participante:', err);
+                  } finally {
+                    setIsUnassigning(false);
+                  }
+                }}
+                disabled={isUnassigning}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+              >
+                <Trash2 className={`w-3.5 h-3.5 ${isUnassigning ? 'animate-spin' : ''}`} />
+                <span>{isUnassigning ? 'Eliminando...' : 'Eliminar Asignación'}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

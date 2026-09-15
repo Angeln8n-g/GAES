@@ -891,6 +891,8 @@ export function App() {
             onConfirmAttendance={handleConfirmAttendance}
             onRevertAttendance={handleRevertAttendance}
             onSaveEvent={handleSaveEvent}
+            onDeleteEvent={handleDeleteEvent}
+            onCancelRegistration={handleCancelRegistration}
             onShowToast={showToast}
           />
         )}
