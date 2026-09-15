@@ -4,12 +4,12 @@ import { broadcastAttendanceEvent } from '../websocket.js';
 
 export const technicalAcademyRouter = Router();
 
-// Validador de permisos: sólo administradores pueden crear, modificar o eliminar cursos y cohortes
+// Validador de permisos: sólo el Super Administrador puede crear, modificar o eliminar cursos y cohortes
 function checkAdminPermission(req: Request, res: Response): boolean {
   const role = (req.headers['x-user-role'] || req.body?.userRole) as string | undefined;
-  if (role && role !== 'Super Administrador' && role !== 'Administrador / Editor') {
+  if (role && role !== 'Super Administrador') {
     res.status(403).json({
-      error: 'Acceso denegado: sólo los administradores tienen permiso para crear, modificar o eliminar cursos y cohortes.'
+      error: 'Acceso denegado: sólo el Super Administrador tiene permiso para gestionar la Academia Técnica.'
     });
     return false;
   }
@@ -1108,8 +1108,8 @@ technicalAcademyRouter.post('/cohorts/:id/qr-checkin', async (req: Request, res:
     }
 
     const cohort = cohortRes.rows[0];
-    if (pin && cohort.daily_pin && pin.trim() !== cohort.daily_pin.trim()) {
-      return res.status(400).json({ error: 'PIN diario incorrecto.' });
+    if (cohort.daily_pin && (!pin || pin.trim() !== cohort.daily_pin.trim())) {
+      return res.status(400).json({ error: 'El código o PIN diario proyectado es incorrecto o está vacío.' });
     }
 
     // 2. Buscar al participante por carnet o cédula
@@ -1210,18 +1210,20 @@ const handleSaveGrades = async (req: Request, res: Response) => {
 
     const cohort = cohortRes.rows[0];
     const role = (req.headers['x-user-role'] || req.body?.userRole) as string | undefined;
+    const userId = ((req.headers['x-user-id'] || req.body?.userId) as string || '').trim();
     const userEmail = ((req.headers['x-user-email'] || req.body?.userEmail) as string || '').toLowerCase().trim();
     const userName = ((req.headers['x-user-name'] || req.body?.userName) as string || '').toLowerCase().trim();
 
-    // Permisos: Administrador O facilitador asignado
-    const isAdmin = !role || role === 'Super Administrador' || role === 'Administrador / Editor';
+    // Permisos: Super Administrador O facilitador asignado a la cohorte
+    const isSuperAdmin = role === 'Super Administrador' || !role;
     const isCohortFacilitator =
+      (cohort.facilitator_id && cohort.facilitator_id === userId) ||
       (cohort.facilitator_email && cohort.facilitator_email.toLowerCase().trim() === userEmail) ||
       (cohort.facilitator_name && cohort.facilitator_name.toLowerCase().trim() === userName);
 
-    if (!isAdmin && !isCohortFacilitator) {
+    if (!isSuperAdmin && !isCohortFacilitator) {
       await client.query('ROLLBACK');
-      return res.status(403).json({ error: 'Acceso denegado: solo el facilitador asignado o un administrador pueden asentar calificaciones.' });
+      return res.status(403).json({ error: 'Acceso denegado: solo el facilitador asignado o el Super Administrador pueden asentar calificaciones.' });
     }
 
     const evaluator = gradedBy || (req.headers['x-user-name'] as string) || cohort.facilitator_name || 'Facilitador Técnico';
@@ -1330,6 +1332,7 @@ technicalAcademyRouter.get('/history', async (req: Request, res: Response) => {
         e.graded_by as "gradedBy",
         e.graded_at as "gradedAt",
         COUNT(CASE WHEN a.status IN ('present', 'late') THEN 1 END) as "attendedDays",
+        COUNT(CASE WHEN a.session_date = CURRENT_DATE AND a.status IN ('present', 'late') THEN 1 END) as "attendedToday",
         COUNT(DISTINCT a.session_date) as "markedDays",
         COALESCE(
           ROUND(
@@ -1416,6 +1419,7 @@ technicalAcademyRouter.get('/history', async (req: Request, res: Response) => {
         dailyHours: parseFloat(r.dailyHours) || 4,
         durationDays: totalDays,
         attendedDays,
+        attendedToday: (parseInt(r.attendedToday, 10) || 0) > 0,
         markedDays: parseInt(r.markedDays, 10) || 0,
         totalHours,
         hoursEarned,
@@ -1428,6 +1432,8 @@ technicalAcademyRouter.get('/history', async (req: Request, res: Response) => {
         gradedBy: r.gradedBy || null,
         gradedAt: r.gradedAt ? new Date(r.gradedAt).toISOString() : null,
         isRecurrent: true as const,
+        cohortStatus: r.cohortStatus || 'scheduled',
+        enrollmentStatus: r.enrollmentStatus || 'enrolled',
         status: r.cohortStatus || 'scheduled'
       };
     });

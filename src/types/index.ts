@@ -583,6 +583,7 @@ export interface TechnicalAcademyHistoryRecord {
   dailyHours: number;
   durationDays: number;
   attendedDays: number;
+  attendedToday?: boolean;
   markedDays: number;
   totalHours: number;
   hoursEarned: number;
@@ -591,6 +592,8 @@ export interface TechnicalAcademyHistoryRecord {
   hasAttended: boolean;
   academicStatus: 'passed' | 'in_progress' | 'failed';
   isRecurrent: true;
+  cohortStatus?: string;
+  enrollmentStatus?: string;
   status: string;
 }
 

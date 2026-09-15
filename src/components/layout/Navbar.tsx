@@ -34,6 +34,7 @@ interface NavbarProps {
   onLogout: () => void;
   myRegistrationsCount?: number;
   evaluatorCoursesCount?: number;
+  isFacilitator?: boolean;
   onOpenMobileSidebar?: () => void;
   isSidebarCollapsed?: boolean;
   onOpenChangePassword?: () => void;
@@ -51,6 +52,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onLogout,
   myRegistrationsCount = 0,
   evaluatorCoursesCount = 0,
+  isFacilitator = false,
   onOpenMobileSidebar,
   isSidebarCollapsed = false,
   onOpenChangePassword,
@@ -66,8 +68,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   const isAdminOrSuper = isSuperAdmin || currentUser.role === 'Administrador / Editor';
   const isLeaderOrAdmin = isAdminOrSuper || currentUser.role === 'Líder de Área / Supervisor';
   const canAccessOjt = isSuperAdmin || isOjtUser;
-  const canAccessEvaluatorCourses = isSuperAdmin || isOjtUser;
-  const canAccessTechnicalAcademy = isAdminOrSuper || currentUser.role === 'Líder de Área / Supervisor' || isOjtUser;
+  const canAccessEvaluatorCourses = isSuperAdmin || isOjtUser || Boolean(isFacilitator);
+  const canAccessTechnicalAcademy = isSuperAdmin;
 
   const handleNavClick = (tab: TabView) => {
     setCurrentTab(tab);
@@ -116,7 +118,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       case 'my-registrations': return 'Mis Cursos & Rutas';
       case 'team': return 'Mi Equipo de Trabajo';
       case 'ojt': return 'Bitácoras & Mesas de Calibración';
-      case 'evaluator-courses': return 'Cursos Asignados (Evaluación OJT)';
+      case 'evaluator-courses': return 'Cursos Asignados';
       case 'technical-academy': return 'Academia Técnica (Capacitaciones Recurrentes)';
       case 'dashboard': return 'Dashboard & Métricas';
       case 'admin': return 'Panel de Administración';
@@ -639,7 +641,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <div className="flex items-center gap-3">
                   <GraduationCap className="w-4 h-4" />
-                  <span>Cursos Asignados (Evaluación OJT)</span>
+                  <span>Cursos Asignados</span>
                 </div>
                 <div className="flex items-center gap-2">
                   {evaluatorCoursesCount > 0 && (

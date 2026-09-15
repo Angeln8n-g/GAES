@@ -27,13 +27,15 @@ import {
   Search,
   Filter,
   TrendingUp,
-  Layers
+  Layers,
+  KeyRound
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { TrainingEvent, UserAccount, Slot, Schedule, TrainingProgram, ParticipantGroup, Participant, Company, ExternalTraining, TechnicalAcademyHistoryRecord } from '../../types';
 import { formatDateLong, formatDateShort, formatCedula, getEventDurationMetrics } from '../../utils/formatters';
 import { downloadIcsFile, getGoogleCalendarUrl } from '../../utils/icsUtils';
 import { FormalLetterModal, TrainingHistoryRecord } from '../history/FormalLetterModal';
+import { TechnicalPinCheckinModal } from './TechnicalPinCheckinModal';
 
 interface UserRegistrationItem {
   event: TrainingEvent;
@@ -57,12 +59,14 @@ interface MyRegistrationsViewProps {
   participants?: Participant[];
   externalTrainings?: ExternalTraining[];
   technicalHistory?: TechnicalAcademyHistoryRecord[];
+  onRefreshTechnicalHistory?: () => Promise<void>;
   onCancelRegistration: (eventId: string, date: string, time: string, email: string) => Promise<void>;
   onExploreCatalog: () => void;
   onOpenReservationModal?: (event: TrainingEvent) => void;
   onOpenQrScanner?: () => void;
   onOpenTecEvaluation?: (event: TrainingEvent) => void;
   onOpenUserProfile?: () => void;
+  onShowToast?: (title: string, message?: string, type?: 'success' | 'error' | 'warning' | 'info') => void;
 }
 
 export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
@@ -74,15 +78,18 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
   participants = [],
   externalTrainings = [],
   technicalHistory = [],
+  onRefreshTechnicalHistory,
   onCancelRegistration,
   onExploreCatalog,
   onOpenReservationModal,
   onOpenQrScanner,
   onOpenTecEvaluation,
-  onOpenUserProfile
+  onOpenUserProfile,
+  onShowToast
 }) => {
   const [cancelingItem, setCancelingItem] = useState<UserRegistrationItem | null>(null);
   const [selectedPassItem, setSelectedPassItem] = useState<UserRegistrationItem | null>(null);
+  const [selectedPinTraining, setSelectedPinTraining] = useState<TechnicalAcademyHistoryRecord | null>(null);
   const [isProcessingCancel, setIsProcessingCancel] = useState(false);
 
   // Sub-Pestañas: Sesiones Activas vs Histórico
@@ -190,6 +197,24 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
     const isTargetDirect = (prog.targetParticipantCards || []).includes(userCard);
     return isTargetGroup || isTargetDirect;
   });
+
+  // Entrenamientos técnicos asignados al colaborador (Academia Técnica)
+  const userTechnicalTrainings = useMemo(() => {
+    if (!technicalHistory || technicalHistory.length === 0) return [];
+    return technicalHistory.filter(t => 
+      (userCard && t.participantCard === userCard) || 
+      (t.participantEmail && userAssociatedEmails.has(t.participantEmail.toLowerCase()))
+    );
+  }, [technicalHistory, userCard, userAssociatedEmails]);
+
+  // Cohortes técnicas activas / vigentes del colaborador
+  const activeTechnicalTrainings = useMemo(() => {
+    return userTechnicalTrainings.filter(t => {
+      const isConcluded = t.status === 'completed' || t.academicStatus === 'passed';
+      const isDateValid = t.endDate >= todayStr;
+      return !isConcluded || isDateValid;
+    });
+  }, [userTechnicalTrainings, todayStr]);
 
   // Generar lista de registros históricos (Internos + Externos + Recurrentes)
   const trainingHistoryRecords: TrainingHistoryRecord[] = useMemo(() => {
@@ -575,6 +600,143 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
       {/* VISTA 1: SESIONES ACTIVAS & RUTAS FORMATIVAS */}
       {currentSubTab === 'active' && (
         <div className="space-y-8 animate-in fade-in duration-150">
+
+      {/* SECCIÓN: ENTRENAMIENTOS TÉCNICOS ASIGNADOS (ACADEMIA TÉCNICA) */}
+      {activeTechnicalTrainings.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs font-bold text-[#DA291C] uppercase tracking-wider">
+              <Sparkles className="w-4 h-4 text-[#DA291C]" />
+              <span>Mis Entrenamientos Técnicos Asignados (Academia Técnica)</span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-red-100 text-[#DA291C]">
+                {activeTechnicalTrainings.length}
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {activeTechnicalTrainings.map(t => {
+              const attendedDays = t.attendedDays || 0;
+              const totalDays = t.durationDays || 5;
+              const percentage = t.attendancePercentage || 0;
+              const attendedToday = Boolean(t.attendedToday);
+
+              return (
+                <div 
+                  key={`user-tac-${t.id || t.cohortId}`}
+                  className="bg-white border border-amber-200/90 rounded-3xl p-6 shadow-sm hover:border-amber-400/80 transition-all flex flex-col justify-between group"
+                >
+                  <div>
+                    {/* Header Badges */}
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-50 text-amber-800 border border-amber-300 flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-amber-600" />
+                        {t.category || 'Academia Técnica'}
+                      </span>
+
+                      {attendedToday ? (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-300 flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          Asististe Hoy
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-amber-500" />
+                          En Curso
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Título y Grupo */}
+                    <h3 className="text-sm font-black text-slate-900 group-hover:text-[#DA291C] transition-colors line-clamp-2 mb-1">
+                      {t.title}
+                    </h3>
+                    <p className="text-[11px] font-bold text-slate-500 line-clamp-1 mb-3">
+                      Cohorte: <span className="text-slate-800">{t.groupName || 'Cohorte General'}</span>
+                    </p>
+
+                    {/* Info de Facilitador, Fechas, Horario y Aula */}
+                    <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/70 text-xs text-slate-600 space-y-2 mb-4">
+                      {t.facilitatorName && (
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className="text-slate-500">Facilitador:</span>
+                          <span className="font-bold text-slate-800">{t.facilitatorName}</span>
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className="text-slate-500">Fechas:</span>
+                        <span className="font-bold text-slate-800">
+                          {formatDateShort(t.startDate)} - {formatDateShort(t.endDate)}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className="text-slate-500">Horario:</span>
+                        <span className="font-bold text-slate-800">{t.time}</span>
+                      </div>
+
+                      {t.location && (
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className="text-slate-500">Ubicación:</span>
+                          <span className="font-bold text-slate-800 truncate max-w-[170px]">{t.location}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Progreso de Asistencia Diaria */}
+                    <div className="space-y-1.5 mb-4">
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className="font-medium text-slate-500">Asistencia Acumulada:</span>
+                        <span className="font-bold text-slate-900">
+                          {attendedDays} de {totalDays} sesiones ({percentage}%)
+                        </span>
+                      </div>
+
+                      <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200/60">
+                        <div 
+                          className={`h-2 rounded-full transition-all duration-500 ${
+                            percentage >= 80 ? 'bg-emerald-500' : percentage > 0 ? 'bg-amber-500' : 'bg-slate-300'
+                          }`}
+                          style={{ width: `${Math.min(percentage, 100)}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Acción de Registro de Asistencia */}
+                  <div className="pt-3 border-t border-slate-100">
+                    {attendedToday ? (
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 text-xs text-emerald-700 font-bold">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                          <span>Asistencia asentada para hoy</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPinTraining(t)}
+                          className="text-[11px] text-slate-500 hover:text-slate-800 underline font-medium cursor-pointer"
+                        >
+                          Revalidar
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedPinTraining(t)}
+                        className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#DA291C] to-red-600 hover:from-[#c22418] hover:to-red-700 text-white text-xs font-bold transition-all shadow-md shadow-red-500/20 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                      >
+                        <KeyRound className="w-4 h-4 text-amber-300" />
+                        <span>Registrar Asistencia con Código</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* SECCIÓN: RUTAS Y CRONOGRAMAS ASIGNADOS */}
       {assignedPrograms.length > 0 && (
@@ -1352,6 +1514,23 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
           participant={currentParticipant}
           companies={companies}
           trainingRecords={selectedRecordsForLetter || trainingHistoryRecords}
+        />
+      )}
+
+      {/* Modal de Registro de Asistencia Diaria por PIN proyectado (Academia Técnica) */}
+      {selectedPinTraining && (
+        <TechnicalPinCheckinModal
+          isOpen={Boolean(selectedPinTraining)}
+          onClose={() => setSelectedPinTraining(null)}
+          training={selectedPinTraining}
+          currentUser={currentUser}
+          currentParticipant={currentParticipant}
+          onSuccess={() => {
+            if (onRefreshTechnicalHistory) {
+              onRefreshTechnicalHistory();
+            }
+          }}
+          onShowToast={onShowToast || (() => {})}
         />
       )}
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { apiService, MOCK_USERS, MOCK_GROUPS, MOCK_PROGRAMS, MOCK_COMPANIES } from './services/api';
 import { 
   TrainingEvent, 
@@ -15,7 +15,8 @@ import {
   CalibrationSession,
   ExternalTraining,
   CreateExternalTrainingPayload,
-  TechnicalAcademyHistoryRecord
+  TechnicalAcademyHistoryRecord,
+  TechnicalAcademyCohort
 } from './types';
 import { Navbar } from './components/layout/Navbar';
 import { SuperAdminSidebar } from './components/layout/SuperAdminSidebar';
@@ -84,6 +85,7 @@ export function App() {
   const [calibrations, setCalibrations] = useState<CalibrationSession[]>([]);
   const [externalTrainings, setExternalTrainings] = useState<ExternalTraining[]>([]);
   const [technicalHistory, setTechnicalHistory] = useState<TechnicalAcademyHistoryRecord[]>([]);
+  const [technicalCohorts, setTechnicalCohorts] = useState<TechnicalAcademyCohort[]>([]);
   const [eventToMakeRecurrent, setEventToMakeRecurrent] = useState<TrainingEvent | null>(null);
 
   // Estado del panel lateral (exclusivo para SuperAdmin)
@@ -172,7 +174,8 @@ export function App() {
           loadedChecklists,
           loadedCalibrations,
           loadedExternalTrainings,
-          loadedTechnicalHistory
+          loadedTechnicalHistory,
+          loadedTechnicalCohorts
         ] = await Promise.all([
           apiService.getCompanies(),
           apiService.getEvents(),
@@ -184,7 +187,8 @@ export function App() {
           apiService.getOjtChecklists(),
           apiService.getCalibrationSessions(),
           apiService.getExternalTrainings(),
-          apiService.getTechnicalAcademyHistory()
+          apiService.getTechnicalAcademyHistory(),
+          apiService.getTechnicalCohorts()
         ]);
         setCompanies(loadedCompanies);
         setEvents(loadedEvents);
@@ -197,6 +201,7 @@ export function App() {
         if (loadedCalibrations) setCalibrations(loadedCalibrations);
         if (loadedExternalTrainings) setExternalTrainings(loadedExternalTrainings);
         if (loadedTechnicalHistory) setTechnicalHistory(loadedTechnicalHistory);
+        if (loadedTechnicalCohorts) setTechnicalCohorts(loadedTechnicalCohorts);
 
         // Auto-consulta si la URL contiene ?cedula=
         const urlParams = new URLSearchParams(window.location.search);
@@ -257,13 +262,21 @@ export function App() {
         console.error('Error al sincronizar eventos en tiempo real:', err);
       });
 
+      // Refrescar también el módulo técnico si es evento de Academia Técnica
+      if (eventData.type === 'TECHNICAL_QR_CHECKIN' || eventData.type === 'TECHNICAL_ATTENDANCE_MARKED') {
+        apiService.getTechnicalAcademyHistory().then(setTechnicalHistory).catch(console.error);
+        apiService.getTechnicalCohorts().then(setTechnicalCohorts).catch(console.error);
+      }
+
       // Si el usuario actual es Super Administrador o Administrador, mostrar un toast discreto
       if (currentUser && (currentUser.role === 'Super Administrador' || currentUser.role === 'Administrador / Editor')) {
         const action = eventData.type === 'ATTENDANCE_CHECK_IN'
           ? 'Entrada registrada'
           : eventData.type === 'ATTENDANCE_CHECK_OUT'
             ? 'Salida registrada'
-            : 'Asistencia actualizada';
+            : eventData.type === 'TECHNICAL_QR_CHECKIN'
+              ? 'Check-in PIN de Academia'
+              : 'Asistencia actualizada';
         const label = eventData.participantName || eventData.email || 'Colaborador';
         showToast(`⚡ En vivo: ${action}`, `${label} ha marcado asistencia en tiempo real.`, 'info');
       }
@@ -273,6 +286,62 @@ export function App() {
       unsubscribe();
     };
   }, [currentUser]);
+
+  // Handlers para refrescar estado técnico
+  const handleRefreshTechnicalCohorts = async () => {
+    try {
+      const fresh = await apiService.getTechnicalCohorts();
+      setTechnicalCohorts(fresh);
+    } catch (err) {
+      console.error('Error al refrescar cohortes técnicas:', err);
+    }
+  };
+
+  const handleRefreshTechnicalHistory = async () => {
+    try {
+      const fresh = await apiService.getTechnicalAcademyHistory();
+      setTechnicalHistory(fresh);
+    } catch (err) {
+      console.error('Error al refrescar historial técnico:', err);
+    }
+  };
+
+  // Determinar si el usuario logueado es facilitador de alguna cohorte o instructor de evento
+  const isFacilitatorOfAnyCohort = useMemo(() => {
+    if (!currentUser) return false;
+    const uid = currentUser.id;
+    const uemail = (currentUser.email || '').toLowerCase().trim();
+    const uname = (currentUser.name || '').toLowerCase().trim();
+    return technicalCohorts.some(c =>
+      (c.facilitatorId && c.facilitatorId === uid) ||
+      (c.facilitatorEmail && c.facilitatorEmail.toLowerCase().trim() === uemail) ||
+      (c.facilitatorName && c.facilitatorName.toLowerCase().trim() === uname)
+    );
+  }, [currentUser, technicalCohorts]);
+
+  const isInstructorOfAnyEvent = useMemo(() => {
+    if (!currentUser) return false;
+    const uname = (currentUser.name || '').toLowerCase().trim();
+    const uemail = (currentUser.email || '').toLowerCase().trim();
+    return events.some(e =>
+      (e.instructor && e.instructor.toLowerCase().trim() === uname) ||
+      (e.ojtEvaluatorEmail && e.ojtEvaluatorEmail.toLowerCase().trim() === uemail)
+    );
+  }, [currentUser, events]);
+
+  const canAccessEvaluatorCourses = Boolean(
+    currentUser?.role === 'Super Administrador' || 
+    currentUser?.role === 'Evaluador / Tutor OJT' ||
+    isFacilitatorOfAnyCohort ||
+    isInstructorOfAnyEvent
+  );
+
+  // Redirigir si un usuario no Super Admin intenta ingresar a technical-academy
+  useEffect(() => {
+    if (currentTab === 'technical-academy' && currentUser && currentUser.role !== 'Super Administrador') {
+      setCurrentTab('my-registrations');
+    }
+  }, [currentTab, currentUser]);
 
   // Handlers de Sesión
   const handleLoginSuccess = (user: UserAccount) => {
@@ -605,6 +674,16 @@ export function App() {
         evaluatorCoursesCount++;
       }
     });
+
+    technicalCohorts.forEach(c => {
+      const isCohortFacilitator =
+        (c.facilitatorId && c.facilitatorId === userId) ||
+        (c.facilitatorEmail && c.facilitatorEmail.toLowerCase() === userEmail) ||
+        (c.facilitatorName && c.facilitatorName.toLowerCase() === userName);
+      if (isCohortFacilitator) {
+        evaluatorCoursesCount++;
+      }
+    });
   }
 
   // Si no está logueado, mostrar pantalla de inicio de sesión y recepción
@@ -713,6 +792,7 @@ export function App() {
           onLogout={handleLogout}
           myRegistrationsCount={myRegistrationsCount}
           evaluatorCoursesCount={evaluatorCoursesCount}
+          isFacilitator={isFacilitatorOfAnyCohort || isInstructorOfAnyEvent}
           onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
           isSidebarCollapsed={isSidebarCollapsed}
           onOpenChangePassword={() => setIsChangePasswordModalOpen(true)}
@@ -752,6 +832,7 @@ export function App() {
             participants={participants}
             externalTrainings={externalTrainings}
             technicalHistory={technicalHistory}
+            onRefreshTechnicalHistory={handleRefreshTechnicalHistory}
             onCancelRegistration={handleCancelRegistration}
             onExploreCatalog={() => setCurrentTab('landing')}
             onOpenReservationModal={(event) => setSelectedEventForModal(event)}
@@ -761,6 +842,7 @@ export function App() {
               setIsProfileMandatory(false);
               setIsProfileModalOpen(true);
             }}
+            onShowToast={showToast}
           />
         )}
 
@@ -881,13 +963,15 @@ export function App() {
           </div>
         )}
 
-        {/* Tab Evaluator: Cursos Asignados & Calificación Modular (SuperAdmin y Evaluador OJT) */}
-        {currentTab === 'evaluator-courses' && (currentUser.role === 'Super Administrador' || currentUser.role === 'Evaluador / Tutor OJT') && (
+        {/* Tab Evaluator: Cursos Asignados & Calificación Modular (SuperAdmin, Evaluador OJT o Facilitador asignado) */}
+        {currentTab === 'evaluator-courses' && canAccessEvaluatorCourses && (
           <EvaluatorCoursesView
             events={events}
             participants={participants}
             currentUser={currentUser}
             isSuperAdmin={currentUser.role === 'Super Administrador'}
+            technicalCohorts={technicalCohorts}
+            onRefreshTechnicalCohorts={handleRefreshTechnicalCohorts}
             onConfirmAttendance={handleConfirmAttendance}
             onRevertAttendance={handleRevertAttendance}
             onSaveEvent={handleSaveEvent}
@@ -897,8 +981,8 @@ export function App() {
           />
         )}
 
-        {/* Tab Academia Técnica: Capacitaciones Recurrentes, Rotación Semanal y Matriz Diaria */}
-        {currentTab === 'technical-academy' && (
+        {/* Tab Academia Técnica: Capacitaciones Recurrentes, Rotación Semanal y Matriz Diaria (Exclusivo SuperAdmin) */}
+        {currentTab === 'technical-academy' && currentUser.role === 'Super Administrador' && (
           <TechnicalAcademyView
             currentUser={currentUser}
             companies={companies}

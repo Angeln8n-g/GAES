@@ -20,15 +20,19 @@ import {
   Trash2,
   UserMinus
 } from 'lucide-react';
-import { TrainingEvent, Participant, UserAccount } from '../../types';
+import { TrainingEvent, Participant, UserAccount, TechnicalAcademyCohort } from '../../types';
 import { AttendeesModal } from '../admin/AttendeesModal';
 import { exportEventGradesToExcel } from '../../utils/excelUtils';
+import { TechnicalCohortManagerModal } from './TechnicalCohortManagerModal';
+import { TechnicalQrModal } from '../technical-academy/TechnicalQrModal';
 
 interface EvaluatorCoursesViewProps {
   events: TrainingEvent[];
   participants: Participant[];
   currentUser: UserAccount | null;
   isSuperAdmin?: boolean;
+  technicalCohorts?: TechnicalAcademyCohort[];
+  onRefreshTechnicalCohorts?: () => Promise<void>;
   onConfirmAttendance: (eventId: string, date: string, time: string, email: string, type?: 'checkin' | 'checkout') => Promise<void>;
   onRevertAttendance?: (eventId: string, date: string, time: string, email: string, type?: 'checkout' | 'all') => Promise<void>;
   onSaveEvent?: (event: TrainingEvent) => Promise<void>;
@@ -42,6 +46,8 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
   participants,
   currentUser,
   isSuperAdmin = false,
+  technicalCohorts = [],
+  onRefreshTechnicalCohorts,
   onConfirmAttendance,
   onRevertAttendance,
   onSaveEvent,
@@ -50,9 +56,11 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
   onShowToast
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState<'all' | 'modular' | 'standard'>('all');
+  const [filterType, setFilterType] = useState<'all' | 'modular' | 'standard' | 'technical'>('all');
   const [selectedModalEvent, setSelectedModalEvent] = useState<TrainingEvent | null>(null);
   const [isDirectProjector, setIsDirectProjector] = useState(false);
+  const [selectedTechnicalCohort, setSelectedTechnicalCohort] = useState<TechnicalAcademyCohort | null>(null);
+  const [isDirectProjectorCohort, setIsDirectProjectorCohort] = useState<TechnicalAcademyCohort | null>(null);
   const [courseToDeleteAssignment, setCourseToDeleteAssignment] = useState<TrainingEvent | null>(null);
   const [deleteAssignmentMode, setDeleteAssignmentMode] = useState<'unassign_evaluator' | 'delete_event'>('unassign_evaluator');
   const [isProcessingDeleteAssignment, setIsProcessingDeleteAssignment] = useState<boolean>(false);
@@ -79,8 +87,30 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
     });
   }, [events, currentUser, isSuperAdmin]);
 
-  // Aplicar búsqueda y filtros
+  // Filtrar cohortes de Academia Técnica asignadas al facilitador actual (o todas si es SuperAdmin)
+  const assignedTechnicalCohorts = useMemo(() => {
+    if (!currentUser || !technicalCohorts) return [];
+
+    return technicalCohorts.filter(cohort => {
+      if (isSuperAdmin) return true;
+
+      const userEmail = (currentUser.email || '').toLowerCase().trim();
+      const userName = (currentUser.name || '').toLowerCase().trim();
+      const userId = currentUser.id;
+
+      const isFacilitator =
+        (cohort.facilitatorId && cohort.facilitatorId === userId) ||
+        (cohort.facilitatorEmail && cohort.facilitatorEmail.toLowerCase().trim() === userEmail) ||
+        (cohort.facilitatorName && cohort.facilitatorName.toLowerCase().trim() === userName);
+
+      return isFacilitator;
+    });
+  }, [technicalCohorts, currentUser, isSuperAdmin]);
+
+  // Aplicar búsqueda y filtros a eventos
   const filteredEvents = useMemo(() => {
+    if (filterType === 'technical') return [];
+
     return assignedEvents.filter(event => {
       const q = searchQuery.toLowerCase().trim();
       const matchesQuery = 
@@ -100,6 +130,25 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
     });
   }, [assignedEvents, searchQuery, filterType]);
 
+  // Aplicar búsqueda y filtros a cohortes técnicas
+  const filteredTechnicalCohorts = useMemo(() => {
+    if (filterType === 'modular' || filterType === 'standard') return [];
+
+    return assignedTechnicalCohorts.filter(cohort => {
+      const q = searchQuery.toLowerCase().trim();
+      const matchesQuery = 
+        !q ||
+        cohort.courseTitle.toLowerCase().includes(q) ||
+        cohort.courseCategory.toLowerCase().includes(q) ||
+        (cohort.groupName || '').toLowerCase().includes(q) ||
+        (cohort.location || '').toLowerCase().includes(q) ||
+        (cohort.facilitatorName || '').toLowerCase().includes(q);
+
+      const matchesType = filterType === 'all' || filterType === 'technical';
+      return matchesQuery && matchesType;
+    });
+  }, [assignedTechnicalCohorts, searchQuery, filterType]);
+
   // Métricas rápidas
   const metrics = useMemo(() => {
     let totalEnrolled = 0;
@@ -116,16 +165,24 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
       });
     });
 
+    let technicalEnrolled = 0;
+    assignedTechnicalCohorts.forEach(coh => {
+      technicalEnrolled += (coh.enrolledCount || 0);
+    });
+
+    const totalCourses = assignedEvents.length + assignedTechnicalCohorts.length;
+    const allEnrolled = totalEnrolled + technicalEnrolled;
     const attendanceRate = totalEnrolled > 0 ? Math.round((totalAttended / totalEnrolled) * 100) : 0;
 
     return {
-      totalCourses: assignedEvents.length,
+      totalCourses,
       totalModular,
-      totalEnrolled,
+      totalEnrolled: allEnrolled,
       totalAttended,
-      attendanceRate
+      attendanceRate,
+      technicalCount: assignedTechnicalCohorts.length
     };
-  }, [assignedEvents]);
+  }, [assignedEvents, assignedTechnicalCohorts]);
 
   // Handler para abrir modal de gestión
   const handleOpenManager = (event: TrainingEvent, projectorMode = false) => {
@@ -237,20 +294,33 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
           />
         </div>
 
-        <div className="flex items-center gap-1.5 bg-slate-100/80 p-1 rounded-xl border border-slate-200/70 shrink-0">
+        <div className="flex items-center gap-1.5 bg-slate-100/80 p-1 rounded-xl border border-slate-200/70 shrink-0 overflow-x-auto">
           <button
             onClick={() => setFilterType('all')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
               filterType === 'all'
                 ? 'bg-white text-slate-900 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            Todos ({assignedEvents.length})
+            Todos ({metrics.totalCourses})
           </button>
+          {assignedTechnicalCohorts.length > 0 && (
+            <button
+              onClick={() => setFilterType('technical')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
+                filterType === 'technical'
+                  ? 'bg-white text-[#DA291C] shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Sparkles className="w-3 h-3 text-amber-500" />
+              <span>Academia Técnica ({assignedTechnicalCohorts.length})</span>
+            </button>
+          )}
           <button
             onClick={() => setFilterType('modular')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
               filterType === 'modular'
                 ? 'bg-white text-[#DA291C] shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
@@ -261,7 +331,7 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
           </button>
           <button
             onClick={() => setFilterType('standard')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
               filterType === 'standard'
                 ? 'bg-white text-slate-900 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
@@ -272,9 +342,120 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
         </div>
       </div>
 
-      {/* Listado de Cursos Asignados */}
-      {filteredEvents.length > 0 ? (
+      {/* Listado de Cursos Asignados (Academia Técnica + Eventos OJT) */}
+      {filteredEvents.length > 0 || filteredTechnicalCohorts.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          
+          {/* Tarjetas de Cohortes de Academia Técnica Asignadas al Facilitador */}
+          {filteredTechnicalCohorts.map(cohort => {
+            const todayStr = new Date().toISOString().slice(0, 10);
+            const isFuture = cohort.startDate > todayStr;
+            const isToday = cohort.startDate <= todayStr && cohort.endDate >= todayStr;
+
+            return (
+              <div 
+                key={`tech-${cohort.id}`}
+                className="bg-white rounded-3xl border border-amber-200/90 shadow-xs hover:shadow-md transition-all p-5 sm:p-6 flex flex-col justify-between group"
+              >
+                <div>
+                  {/* Badges superiores */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-50 text-amber-800 border border-amber-300 flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-amber-600" />
+                        Academia Técnica
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1">
+                        <MapPin className="w-3 h-3 text-slate-500" />
+                        {cohort.location || 'Taller Principal'}
+                      </span>
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black flex items-center gap-1 border ${
+                        isToday
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                          : isFuture
+                            ? 'bg-blue-50 text-blue-700 border-blue-200'
+                            : 'bg-slate-100 text-slate-600 border-slate-200'
+                      }`}>
+                        <Calendar className="w-3 h-3" />
+                        <span>{isToday ? 'En Curso Hoy' : isFuture ? 'Próxima Cohorte' : 'Concluida'}</span>
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                        {cohort.groupName || 'Grupo General'}
+                      </span>
+                    </div>
+
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                      PIN: {cohort.dailyPin || '2026'}
+                    </span>
+                  </div>
+
+                  {/* Título y Categoría */}
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-[#DA291C] transition-colors line-clamp-1">
+                    {cohort.courseTitle}
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                    Especialidad: <strong>{cohort.courseCategory}</strong> • Horario: <strong>{cohort.dailyTime}</strong> ({cohort.dailyHours}h/día, {cohort.durationDays} días)
+                  </p>
+
+                  {/* Detalles de fechas y participantes */}
+                  <div className="mt-4 p-3 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-2">
+                    <div className="flex items-center justify-between text-xs text-slate-600">
+                      <span className="flex items-center gap-1.5 font-medium">
+                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Fechas de Cohorte:</span>
+                      </span>
+                      <span className="font-bold text-slate-900">
+                        {cohort.startDate} al {cohort.endDate}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs text-slate-600">
+                      <span className="flex items-center gap-1.5 font-medium">
+                        <Users className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Técnicos Matriculados:</span>
+                      </span>
+                      <span className="font-bold text-slate-900">
+                        {cohort.enrolledCount || 0} de {cohort.capacity || 20} cupos
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Acciones principales de la tarjeta */}
+                <div className="mt-5 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] text-slate-500">
+                      Facilitador: <strong>{cohort.facilitatorName}</strong>
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {/* Botón Proyectar QR/PIN */}
+                    <button
+                      onClick={() => setIsDirectProjectorCohort(cohort)}
+                      title="Proyectar código QR y PIN en sala para que los técnicos marquen"
+                      className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs hover:shadow"
+                    >
+                      <QrCode className="w-4 h-4 text-amber-400" />
+                      <span>Proyectar PIN</span>
+                    </button>
+
+                    {/* Botón Gestionar Asistencia & Calificaciones */}
+                    <button
+                      onClick={() => setSelectedTechnicalCohort(cohort)}
+                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#DA291C] to-red-600 hover:from-[#c22418] hover:to-red-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-md shadow-red-500/20 active:scale-98"
+                    >
+                      <GraduationCap className="w-4 h-4" />
+                      <span>Gestionar Asistencia & Notas</span>
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            );
+          })}
+
+          {/* Tarjetas de Eventos Regulares / Modulares */}
           {filteredEvents.map(event => {
             const hasModules = Boolean(event.modules && event.modules.length > 0);
             const modulesCount = event.modules?.length || 0;
@@ -729,6 +910,27 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modal de Gestión de Cohorte Técnica para Facilitador */}
+      {selectedTechnicalCohort && (
+        <TechnicalCohortManagerModal
+          isOpen={Boolean(selectedTechnicalCohort)}
+          onClose={() => setSelectedTechnicalCohort(null)}
+          cohort={selectedTechnicalCohort}
+          currentUser={currentUser}
+          onShowToast={onShowToast}
+          onRefresh={onRefreshTechnicalCohorts}
+        />
+      )}
+
+      {/* Modal de Proyección Directa de QR / PIN para Cohorte Técnica */}
+      {isDirectProjectorCohort && (
+        <TechnicalQrModal
+          isOpen={Boolean(isDirectProjectorCohort)}
+          onClose={() => setIsDirectProjectorCohort(null)}
+          cohort={isDirectProjectorCohort}
+        />
       )}
 
     </div>
