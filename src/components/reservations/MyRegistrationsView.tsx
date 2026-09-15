@@ -717,7 +717,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                           onClick={() => setSelectedPinTraining(t)}
                           className="text-[11px] text-slate-500 hover:text-slate-800 underline font-medium cursor-pointer"
                         >
-                          Revalidar
+                          Revalidar (QR / PIN)
                         </button>
                       </div>
                     ) : (
@@ -726,8 +726,8 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                         onClick={() => setSelectedPinTraining(t)}
                         className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#DA291C] to-red-600 hover:from-[#c22418] hover:to-red-700 text-white text-xs font-bold transition-all shadow-md shadow-red-500/20 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
                       >
-                        <KeyRound className="w-4 h-4 text-amber-300" />
-                        <span>Registrar Asistencia con Código</span>
+                        <QrCode className="w-4 h-4 text-white" />
+                        <span>Registrar Asistencia (QR o PIN)</span>
                       </button>
                     )}
                   </div>
