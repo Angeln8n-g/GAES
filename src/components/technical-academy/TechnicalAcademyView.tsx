@@ -47,6 +47,7 @@ import { CohortFormModal } from './CohortFormModal';
 import { ReassignCohortModal } from './ReassignCohortModal';
 import { TechnicalCourseModal } from './TechnicalCourseModal';
 import { TechnicalCohortEnrollmentModal } from './TechnicalCohortEnrollmentModal';
+import { TechnicalCrmAssignmentsView } from './TechnicalCrmAssignmentsView';
 
 interface TechnicalAcademyViewProps {
   currentUser: UserAccount | null;
@@ -77,8 +78,8 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
   const isAdminOrSuper = isSuperAdmin || isAdmin;
   const isFacilitator = !isAdminOrSuper;
 
-  // Tabs: attendance (Marcado Diario), cohorts (Planificador), courses (Catálogo), accreditation (Acreditación)
-  const [activeTab, setActiveTab] = useState<'attendance' | 'cohorts' | 'courses' | 'accreditation'>('attendance');
+  // Tabs: attendance (Marcado Diario), cohorts (Planificador), courses (Catálogo), accreditation (Acreditación), crm (Control Asignaciones Super Admin)
+  const [activeTab, setActiveTab] = useState<'attendance' | 'cohorts' | 'courses' | 'accreditation' | 'crm'>('attendance');
 
   // Estado principal
   const [courses, setCourses] = useState<TechnicalAcademyCourse[]>([]);
@@ -172,6 +173,13 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
       setActiveTab('attendance');
     }
   }, [isAdminOrSuper, activeTab]);
+
+  // Proteger la pestaña Control de Asignaciones (CRM) para uso exclusivo del Super Administrador
+  useEffect(() => {
+    if (!isSuperAdmin && activeTab === 'crm') {
+      setActiveTab('attendance');
+    }
+  }, [isSuperAdmin, activeTab]);
 
   // 2. Cargar Matriz de Asistencia cuando cambia la cohorte seleccionada
   const fetchAttendance = async (cohortId: string) => {
@@ -655,6 +663,24 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
             >
               <Calendar className="w-4 h-4 text-slate-400" />
               <span>Planificador & Rotación ({cohorts.length})</span>
+            </button>
+          )}
+
+          {isSuperAdmin && (
+            <button
+              type="button"
+              onClick={() => setActiveTab('crm')}
+              className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
+                activeTab === 'crm'
+                  ? 'bg-slate-900 text-white shadow-sm ring-1 ring-red-500/50'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              <Users className="w-4 h-4 text-red-500" />
+              <span>Control de Asignaciones (CRM)</span>
+              <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-red-100 text-[#DA291C]">
+                Super Admin
+              </span>
             </button>
           )}
 
@@ -1646,6 +1672,24 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
             </table>
           </div>
         </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB 5: CONTROL DE ASIGNACIONES (CRM SUPER ADMIN)                          */}
+      {/* ========================================================================= */}
+      {activeTab === 'crm' && isSuperAdmin && (
+        <TechnicalCrmAssignmentsView
+          isSuperAdmin={isSuperAdmin}
+          participants={participants}
+          courses={courses}
+          cohorts={cohorts}
+          companies={companies}
+          onShowToast={onShowToast}
+          onRefreshData={async () => {
+            await fetchData();
+            if (selectedCohortId) await fetchAttendance(selectedCohortId);
+          }}
+        />
       )}
 
       {/* MODAL 1: QR & PIN PROJECTOR */}

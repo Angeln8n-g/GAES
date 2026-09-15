@@ -2091,10 +2091,11 @@ export const apiService = {
 
   unenrollCohortParticipant: async (
     cohortId: string,
-    participantCard: string
-  ): Promise<{ message: string; cohortId: string; participantCard: string }> => {
+    participantCard: string,
+    mode: 'archive' | 'hard_delete' = 'hard_delete'
+  ): Promise<{ message: string; cohortId: string; participantCard: string; status?: string }> => {
     const res = await fetch(
-      `${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/participants/${encodeURIComponent(participantCard)}`,
+      `${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/participants/${encodeURIComponent(participantCard)}?mode=${mode}`,
       {
         method: 'DELETE',
         headers: getAuthHeaders(false)
@@ -2103,6 +2104,24 @@ export const apiService = {
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error || 'Error al desmatricular participante de la cohorte');
+    }
+    return await res.json();
+  },
+
+  reassignTechnicalCourse: async (payload: {
+    participantCard: string;
+    prevCohortId?: string;
+    newCohortId: string;
+    archivePrevious?: boolean;
+  }): Promise<{ message: string; participantCard: string; prevCohortId?: string; newCohortId: string }> => {
+    const res = await fetch(`${API_BASE_URL}/technical-academy/assignments/reassign`, {
+      method: 'POST',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al reasignar curso técnico');
     }
     return await res.json();
   },

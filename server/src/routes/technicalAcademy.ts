@@ -768,7 +768,32 @@ technicalAcademyRouter.delete('/cohorts/:id/participants/:card', async (req: Req
   try {
     await client.query('BEGIN');
     const { id, card } = req.params;
+    const mode = (req.query.mode as string) || (req.body?.mode as string) || 'hard_delete';
 
+    if (mode === 'archive' || mode === 'conclude') {
+      // Modo Concluir / Archivar: preserva el historial de asistencias y notas pero marca la matrícula como concluida
+      const updRes = await client.query(`
+        UPDATE technical_academy_enrollments
+        SET status = 'completed'
+        WHERE cohort_id = $1 AND participant_card = $2
+        RETURNING participant_card
+      `, [id, card]);
+
+      if (updRes.rows.length === 0) {
+        await client.query('ROLLBACK');
+        return res.status(404).json({ error: 'El participante no estaba enrolado en esta cohorte.' });
+      }
+
+      await client.query('COMMIT');
+      return res.json({
+        message: 'Asignación concluida y archivada en el historial exitosamente.',
+        cohortId: id,
+        participantCard: card,
+        status: 'completed'
+      });
+    }
+
+    // Modo Eliminación Total (Hard Delete)
     // 1. Eliminar asistencias asociadas a esta cohorte y participante
     await client.query(`
       DELETE FROM technical_academy_attendance
@@ -797,6 +822,63 @@ technicalAcademyRouter.delete('/cohorts/:id/participants/:card', async (req: Req
     await client.query('ROLLBACK');
     console.error('Error al desmatricular participante:', err);
     res.status(500).json({ error: 'Error al desmatricular participante', details: err.message });
+  } finally {
+    client.release();
+  }
+});
+
+// POST /api/technical-academy/assignments/reassign
+// Permite desasignar o concluir una cohorte previa y enrolar en una nueva cohorte en una sola transacción
+technicalAcademyRouter.post('/assignments/reassign', async (req: Request, res: Response) => {
+  if (!checkAdminPermission(req, res)) return;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { participantCard, prevCohortId, newCohortId, archivePrevious = true } = req.body;
+
+    if (!participantCard || !newCohortId) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ error: 'Faltan parámetros obligatorios (participantCard, newCohortId).' });
+    }
+
+    // 1. Manejar cohorte previa si existe y es distinta de la nueva
+    if (prevCohortId && prevCohortId !== newCohortId) {
+      if (archivePrevious) {
+        await client.query(`
+          UPDATE technical_academy_enrollments
+          SET status = 'completed'
+          WHERE cohort_id = $1 AND participant_card = $2
+        `, [prevCohortId, participantCard]);
+      } else {
+        await client.query(`
+          DELETE FROM technical_academy_attendance
+          WHERE cohort_id = $1 AND participant_card = $2
+        `, [prevCohortId, participantCard]);
+        await client.query(`
+          DELETE FROM technical_academy_enrollments
+          WHERE cohort_id = $1 AND participant_card = $2
+        `, [prevCohortId, participantCard]);
+      }
+    }
+
+    // 2. Enrolar en nueva cohorte
+    await client.query(`
+      INSERT INTO technical_academy_enrollments (cohort_id, participant_card, status)
+      VALUES ($1, $2, 'enrolled')
+      ON CONFLICT (cohort_id, participant_card) DO UPDATE SET status = 'enrolled'
+    `, [newCohortId, participantCard]);
+
+    await client.query('COMMIT');
+    res.json({
+      message: 'Curso reasignado exitosamente.',
+      participantCard,
+      prevCohortId,
+      newCohortId
+    });
+  } catch (err: any) {
+    await client.query('ROLLBACK');
+    console.error('Error al reasignar curso técnico:', err);
+    res.status(500).json({ error: 'Error al reasignar curso técnico', details: err.message });
   } finally {
     client.release();
   }
