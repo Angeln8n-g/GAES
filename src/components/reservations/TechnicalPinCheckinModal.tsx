@@ -81,6 +81,18 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
     onClose();
   };
 
+  // Listener accesible de teclado (Escape)
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
   const switchTab = async (tab: 'qr' | 'pin') => {
     if (tab === activeTab) return;
     setErrorMessage(null);
@@ -313,7 +325,12 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-200">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-200"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="tech-checkin-modal-title"
+    >
       <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-200">
         
         {/* Cabecera del Modal */}
@@ -329,41 +346,46 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
                 <span className="text-white/40">•</span>
                 <span className="text-emerald-400">Check-In Presencial</span>
               </div>
-              <h3 className="text-base font-black tracking-tight text-white">
+              <h3 id="tech-checkin-modal-title" className="text-base font-black tracking-tight text-white">
                 Registro de Asistencia Diaria
               </h3>
             </div>
           </div>
 
           <button
+            type="button"
             onClick={handleClose}
-            className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer"
-            aria-label="Cerrar modal"
+            className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-white"
+            aria-label="Cerrar modal de asistencia"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Selector de Pestañas: QR vs PIN */}
+        {/* Selector de Pestañas: QR vs PIN (Áreas de toque mín. 44px) */}
         <div className="p-3 pb-0 bg-slate-50 border-b border-slate-200/80 shrink-0">
-          <div className="flex bg-slate-200/70 p-1 rounded-2xl gap-1">
+          <div className="flex bg-slate-200/70 p-1 rounded-2xl gap-1" role="tablist">
             <button
               type="button"
+              role="tab"
+              aria-selected={activeTab === 'qr'}
               onClick={() => switchTab('qr')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 min-h-[44px] rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'qr'
                   ? 'bg-white text-slate-900 shadow-sm border border-slate-200/80'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <QrCode className="w-4 h-4 text-[#DA291C]" />
+              <QrCode className="w-4 h-4 text-claro" />
               <span>Escanear QR</span>
             </button>
 
             <button
               type="button"
+              role="tab"
+              aria-selected={activeTab === 'pin'}
               onClick={() => switchTab('pin')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 min-h-[44px] rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'pin'
                   ? 'bg-white text-slate-900 shadow-sm border border-slate-200/80'
                   : 'text-slate-600 hover:text-slate-900'
@@ -389,36 +411,36 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
               </span>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 pt-1 border-t border-slate-200/60">
+            <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-600 pt-1 border-t border-slate-200/60 font-medium">
               <span className="flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-red-500" />
+                <Calendar className="w-3.5 h-3.5 text-claro" />
                 Hoy: {formatDateShort(todayStr)}
               </span>
               <span>•</span>
               <span className="flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-amber-500" />
+                <Clock className="w-3.5 h-3.5 text-amber-600" />
                 {training.time}
               </span>
               {training.facilitatorName && (
                 <>
                   <span>•</span>
-                  <span>Facilitador: <strong>{training.facilitatorName}</strong></span>
+                  <span>Facilitador: <strong className="text-slate-800">{training.facilitatorName}</strong></span>
                 </>
               )}
             </div>
           </div>
 
           {/* Tarjeta de Identificación del Participante */}
-          <div className="p-3 bg-red-50/50 border border-red-100 rounded-2xl flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-[#DA291C] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+          <div className="p-3 bg-red-50/60 border border-red-100 rounded-2xl flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-claro text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
               <User className="w-4 h-4" />
             </div>
             <div className="text-xs">
               <p className="font-bold text-slate-900">
                 {currentParticipant?.name || currentUser?.name}
               </p>
-              <p className="text-[11px] text-slate-500">
-                Carnet / Identificador: <strong className="font-mono text-slate-700">{participantCard || 'Sin carnet'}</strong>
+              <p className="text-[11px] text-slate-600 font-medium">
+                Carnet / Identificador: <strong className="font-mono text-slate-800">{participantCard || 'Sin carnet'}</strong>
               </p>
             </div>
           </div>
@@ -433,7 +455,7 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
                 <p className="text-xs font-bold text-emerald-700 uppercase tracking-wider">¡Asistencia Verificada!</p>
                 <p className="text-sm font-black text-slate-900 mt-1">{successMessage}</p>
               </div>
-              <p className="text-xs text-slate-500 font-medium">Cerrando ventana de confirmación...</p>
+              <p className="text-xs text-slate-600 font-medium">Cerrando ventana de confirmación...</p>
             </div>
           ) : (
             <>
@@ -446,7 +468,7 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
                     {/* Guía visual de enfoque */}
                     <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                       <div className="w-44 h-44 sm:w-48 sm:h-48 border-2 border-dashed border-red-500/80 rounded-2xl animate-pulse flex items-center justify-center">
-                        <span className="text-[10px] text-white/80 bg-black/60 px-2.5 py-0.5 rounded-full backdrop-blur-xs font-semibold">
+                        <span className="text-[10px] text-white/90 bg-black/70 px-2.5 py-0.5 rounded-full backdrop-blur-xs font-semibold">
                           Centra el código QR aquí
                         </span>
                       </div>
@@ -463,22 +485,22 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
                       <button
                         type="button"
                         onClick={() => switchTab('pin')}
-                        className="w-full py-1.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] transition-colors cursor-pointer"
+                        className="w-full py-2.5 px-3 min-h-[44px] rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition-colors cursor-pointer flex items-center justify-center"
                       >
                         Cambiar a Ingreso de PIN Manual
                       </button>
                     </div>
                   )}
 
-                  {/* Controles de Cámara y Subida de Archivo */}
+                  {/* Controles de Cámara y Subida de Archivo (Áreas de toque mín. 44px) */}
                   <div className="flex items-center gap-2 pt-1">
                     {cameras.length > 1 && (
                       <button
                         type="button"
                         onClick={handleSwitchCamera}
-                        className="flex-1 py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                        className="flex-1 py-2.5 px-3 min-h-[44px] rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                       >
-                        <RotateCw className="w-3.5 h-3.5 text-slate-600" />
+                        <RotateCw className="w-4 h-4 text-slate-600" />
                         <span>Cambiar Cámara</span>
                       </button>
                     )}
@@ -489,18 +511,19 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
                       accept="image/*"
                       onChange={handleFileScan}
                       className="hidden"
+                      id="technical-qr-file-upload"
                     />
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="flex-1 py-2 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-[#DA291C] border border-red-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                      className="flex-1 py-2.5 px-3 min-h-[44px] rounded-xl bg-red-50 hover:bg-red-100 text-claro border border-red-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                     >
-                      <Upload className="w-3.5 h-3.5 text-[#DA291C]" />
+                      <Upload className="w-4 h-4 text-claro" />
                       <span>Subir Foto de QR</span>
                     </button>
                   </div>
 
-                  <p className="text-[11px] text-center text-slate-400 font-medium pt-1">
+                  <p className="text-[11px] text-center text-slate-600 font-medium pt-1">
                     Apunta la cámara al código QR proyectado por el facilitador en sala.
                   </p>
                 </div>
@@ -510,15 +533,16 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
               {activeTab === 'pin' && (
                 <form onSubmit={handleSubmitManual} className="space-y-4 animate-in fade-in duration-200">
                   <div className="space-y-2 text-center">
-                    <label className="block text-xs font-black text-slate-700 uppercase tracking-wide">
+                    <label htmlFor="technical-pin-input" className="block text-xs font-black text-slate-700 uppercase tracking-wide">
                       Código / PIN Proyectado en Pantalla
                     </label>
-                    <p className="text-[11px] text-slate-500">
+                    <p className="text-[11px] text-slate-600 font-medium">
                       Ingresa el número de 4 dígitos que tu facilitador tiene proyectado en la sala.
                     </p>
 
                     <div className="pt-1">
                       <input
+                        id="technical-pin-input"
                         type="text"
                         autoFocus
                         maxLength={8}
@@ -528,7 +552,7 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
                           setErrorMessage(null);
                         }}
                         placeholder="••••"
-                        className="w-full text-center font-mono text-3xl font-black tracking-widest py-3 px-4 bg-slate-50 border-2 border-slate-200 rounded-2xl text-slate-900 placeholder-slate-300 focus:outline-none focus:border-[#DA291C] focus:ring-4 focus:ring-red-500/10 transition-all"
+                        className="w-full text-center font-mono text-3xl font-black tracking-widest py-3 px-4 bg-slate-50 border-2 border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-claro focus:ring-4 focus:ring-claro/10 transition-all"
                       />
                     </div>
                   </div>
@@ -541,12 +565,12 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
                     </div>
                   )}
 
-                  {/* Botones de Acción */}
+                  {/* Botones de Acción (min 44px de altura táctil) */}
                   <div className="flex items-center justify-end gap-3 pt-2">
                     <button
                       type="button"
                       onClick={handleClose}
-                      className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                      className="px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer flex items-center justify-center"
                     >
                       Cancelar
                     </button>
@@ -554,7 +578,7 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
                     <button
                       type="submit"
                       disabled={isSubmitting || !pin.trim()}
-                      className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#DA291C] to-red-600 hover:from-[#c22418] hover:to-red-700 text-white text-xs font-bold transition-all shadow-md shadow-red-500/25 cursor-pointer active:scale-95 disabled:opacity-50 flex items-center gap-2"
+                      className="px-6 py-2.5 min-h-[44px] rounded-xl bg-gradient-to-r from-claro to-claro-600 hover:from-claro-600 hover:to-claro-700 text-white text-xs font-bold transition-all shadow-md shadow-red-500/25 cursor-pointer active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                       {isSubmitting ? (
                         <>

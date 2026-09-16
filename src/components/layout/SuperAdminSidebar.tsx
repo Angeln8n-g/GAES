@@ -106,14 +106,14 @@ export const SuperAdminSidebar: React.FC<SuperAdminSidebarProps> = ({
               onClick={() => handleNavClick('landing')}
               className="flex items-center gap-3 cursor-pointer group select-none overflow-hidden"
             >
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#DA291C] via-[#EA382D] to-orange-500 p-0.5 shadow-lg shadow-red-500/30 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform ring-2 ring-red-500/20">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-claro via-red-500 to-orange-500 p-0.5 shadow-lg shadow-claro/30 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform ring-2 ring-claro/20">
                 <BookOpen className="w-5 h-5" />
               </div>
               {!isCollapsed && (
                 <div className="truncate">
                   <div className="flex items-center gap-1.5">
                     <span className="text-sm font-black text-white tracking-tight">
-                      GAES <span className="text-[#DA291C]">Portal</span>
+                      GAES <span className="text-claro">Portal</span>
                     </span>
                     <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/30">
                       ADMIN
@@ -128,8 +128,10 @@ export const SuperAdminSidebar: React.FC<SuperAdminSidebarProps> = ({
 
             {/* Mobile close button */}
             <button
+              type="button"
               onClick={() => setIsMobileOpen(false)}
-              className="lg:hidden p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              className="lg:hidden p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors focus-visible:ring-2 focus-visible:ring-claro cursor-pointer"
+              aria-label="Cerrar panel lateral"
             >
               <X className="w-5 h-5" />
             </button>

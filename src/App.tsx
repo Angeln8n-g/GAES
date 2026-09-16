@@ -39,10 +39,10 @@ import { PwaInstallPrompt } from './components/common/PwaInstallPrompt';
 import { OfflineBanner } from './components/common/OfflineBanner';
 import { ChangePasswordModal } from './components/auth/ChangePasswordModal';
 import { TecEvaluationModal } from './components/feedback/TecEvaluationModal';
-import { QrScannerModal } from './components/scanner/QrScannerModal';
+const QrScannerModal = React.lazy(() => import('./components/scanner/QrScannerModal').then(m => ({ default: m.QrScannerModal })));
+const CedulaScannerModal = React.lazy(() => import('./components/lobby/CedulaScannerModal').then(m => ({ default: m.CedulaScannerModal })));
+const AttendeeScheduleModal = React.lazy(() => import('./components/lobby/AttendeeScheduleModal').then(m => ({ default: m.AttendeeScheduleModal })));
 import { findAttendeeByCedula, AttendeeLookupResult } from './utils/attendeeLookup';
-import { CedulaScannerModal } from './components/lobby/CedulaScannerModal';
-import { AttendeeScheduleModal } from './components/lobby/AttendeeScheduleModal';
 import { UserProfileModal } from './components/profile/UserProfileModal';
 import { attendanceWs } from './services/websocket';
 
@@ -704,24 +704,28 @@ export function App() {
 
         {/* Cedula Scanner Modal (Solo disponible en Login / Recepción) */}
         {isCedulaScannerOpen && (
-          <CedulaScannerModal
-            isOpen={isCedulaScannerOpen}
-            onClose={() => setIsCedulaScannerOpen(false)}
-            onCedulaDetected={handleCedulaDetected}
-          />
+          <React.Suspense fallback={null}>
+            <CedulaScannerModal
+              isOpen={isCedulaScannerOpen}
+              onClose={() => setIsCedulaScannerOpen(false)}
+              onCedulaDetected={handleCedulaDetected}
+            />
+          </React.Suspense>
         )}
 
         {/* Attendee Schedule Modal (Solo disponible en Login / Recepción) */}
         {isAttendeeScheduleModalOpen && attendeeLookupResult && (
-          <AttendeeScheduleModal
-            isOpen={isAttendeeScheduleModalOpen}
-            onClose={() => setIsAttendeeScheduleModalOpen(false)}
-            lookupResult={attendeeLookupResult}
-            onConfirmAttendance={handleConfirmAttendanceLobby}
-            onOpenTecEvaluation={(event) => setSelectedEventForTecModal(event)}
-            onExploreCatalog={() => setIsAttendeeScheduleModalOpen(false)}
-            onShowToast={showToast}
-          />
+          <React.Suspense fallback={null}>
+            <AttendeeScheduleModal
+              isOpen={isAttendeeScheduleModalOpen}
+              onClose={() => setIsAttendeeScheduleModalOpen(false)}
+              lookupResult={attendeeLookupResult}
+              onConfirmAttendance={handleConfirmAttendanceLobby}
+              onOpenTecEvaluation={(event) => setSelectedEventForTecModal(event)}
+              onExploreCatalog={() => setIsAttendeeScheduleModalOpen(false)}
+              onShowToast={showToast}
+            />
+          </React.Suspense>
         )}
 
         <Toast toast={toast} onClose={() => setToast(null)} />
@@ -1067,15 +1071,17 @@ export function App() {
 
       {/* QR Attendance Scanner Modal */}
       {isQrScannerOpen && currentUser && (
-        <QrScannerModal
-          isOpen={isQrScannerOpen}
-          onClose={() => setIsQrScannerOpen(false)}
-          currentUser={currentUser}
-          events={events}
-          onConfirmAttendance={handleConfirmAttendance}
-          onOpenTecEvaluation={(event) => setSelectedEventForTecModal(event)}
-          onShowToast={showToast}
-        />
+        <React.Suspense fallback={null}>
+          <QrScannerModal
+            isOpen={isQrScannerOpen}
+            onClose={() => setIsQrScannerOpen(false)}
+            currentUser={currentUser}
+            events={events}
+            onConfirmAttendance={handleConfirmAttendance}
+            onOpenTecEvaluation={(event) => setSelectedEventForTecModal(event)}
+            onShowToast={showToast}
+          />
+        </React.Suspense>
       )}
 
       {/* Modal de Ficha y Perfil Sociodemográfico / Académico (Obligatorio en primer ingreso / Edición libre) */}

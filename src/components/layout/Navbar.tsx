@@ -172,11 +172,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex items-center gap-3">
             {isSuperAdmin && onOpenMobileSidebar && (
               <button
+                type="button"
                 onClick={onOpenMobileSidebar}
-                className="lg:hidden p-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 flex items-center justify-center cursor-pointer shadow-xs active:scale-95"
+                className="lg:hidden p-2.5 min-w-[44px] min-h-[44px] rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 flex items-center justify-center cursor-pointer shadow-xs active:scale-95 focus-visible:ring-2 focus-visible:ring-claro"
                 title="Abrir Panel Lateral"
+                aria-label="Abrir panel lateral de navegación"
               >
-                <Menu className="w-5 h-5 text-[#DA291C]" />
+                <Menu className="w-5 h-5 text-claro" />
               </button>
             )}
 
@@ -405,9 +407,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* User Profile Button (Desktop) */}
             {onOpenUserProfile && (
               <button
+                type="button"
                 onClick={onOpenUserProfile}
                 title="Mi Perfil & Ficha Académica"
-                className="hidden sm:flex p-2 rounded-2xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
+                aria-label="Mi Perfil & Ficha Académica"
+                className="hidden sm:flex p-2.5 min-w-[44px] min-h-[44px] items-center justify-center rounded-2xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0 focus-visible:ring-2 focus-visible:ring-claro"
               >
                 <User className="w-4 h-4" />
               </button>
@@ -416,9 +420,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Quick QR Scanner Button (Desktop) */}
             {onOpenQrScanner && (
               <button
+                type="button"
                 onClick={onOpenQrScanner}
                 title="Escanear QR de Asistencia"
-                className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-red-50 hover:bg-[#DA291C] text-[#DA291C] hover:text-white border border-red-200 hover:border-[#DA291C] text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
+                aria-label="Escanear QR de Asistencia"
+                className="hidden sm:flex items-center justify-center gap-1.5 px-3 py-2 min-h-[44px] rounded-2xl bg-red-50 hover:bg-claro text-claro hover:text-white border border-red-200 hover:border-claro text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95 shrink-0 focus-visible:ring-2 focus-visible:ring-claro"
               >
                 <Camera className="w-4 h-4" />
                 <span className="hidden xl:inline">Escanear QR</span>
@@ -428,9 +434,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Change Password Button (Desktop) */}
             {onOpenChangePassword && (
               <button
+                type="button"
                 onClick={onOpenChangePassword}
                 title="Cambiar Mi Contraseña"
-                className="hidden sm:flex p-2 rounded-2xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
+                aria-label="Cambiar Mi Contraseña"
+                className="hidden sm:flex p-2.5 min-w-[44px] min-h-[44px] items-center justify-center rounded-2xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0 focus-visible:ring-2 focus-visible:ring-claro"
               >
                 <KeyRound className="w-4 h-4" />
               </button>
@@ -438,9 +446,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* Logout Button (Desktop) */}
             <button
+              type="button"
               onClick={onLogout}
               title="Cerrar Sesión"
-              className="hidden sm:flex p-2 rounded-2xl text-slate-600 hover:text-rose-700 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
+              aria-label="Cerrar Sesión"
+              className="hidden sm:flex p-2.5 min-w-[44px] min-h-[44px] items-center justify-center rounded-2xl text-slate-600 hover:text-rose-700 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0 focus-visible:ring-2 focus-visible:ring-claro"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -448,11 +458,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Hamburger Button for Mobile / Tablet (< lg) (when not superadmin) */}
             {!isSuperAdmin && (
               <button
+                type="button"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                aria-label="Abrir menú de navegación"
-                className="lg:hidden p-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-all flex items-center justify-center cursor-pointer shadow-xs active:scale-95 shrink-0"
+                aria-label="Abrir menú de navegación móvil"
+                className="lg:hidden p-2.5 min-w-[44px] min-h-[44px] rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-all flex items-center justify-center cursor-pointer shadow-xs active:scale-95 shrink-0 focus-visible:ring-2 focus-visible:ring-claro"
               >
-                {isMobileMenuOpen ? <X className="w-6 h-6 text-[#DA291C]" /> : <Menu className="w-6 h-6" />}
+                {isMobileMenuOpen ? <X className="w-6 h-6 text-claro" /> : <Menu className="w-6 h-6" />}
               </button>
             )}
 

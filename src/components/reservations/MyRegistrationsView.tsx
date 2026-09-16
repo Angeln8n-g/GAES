@@ -715,7 +715,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                         <button
                           type="button"
                           onClick={() => setSelectedPinTraining(t)}
-                          className="text-[11px] text-slate-500 hover:text-slate-800 underline font-medium cursor-pointer"
+                          className="text-xs text-slate-600 hover:text-slate-900 underline font-semibold cursor-pointer min-h-[36px] flex items-center"
                         >
                           Revalidar (QR / PIN)
                         </button>
@@ -724,7 +724,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                       <button
                         type="button"
                         onClick={() => setSelectedPinTraining(t)}
-                        className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#DA291C] to-red-600 hover:from-[#c22418] hover:to-red-700 text-white text-xs font-bold transition-all shadow-md shadow-red-500/20 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                        className="w-full py-2.5 px-4 min-h-[44px] rounded-xl bg-gradient-to-r from-claro to-claro-600 hover:from-claro-600 hover:to-claro-700 text-white text-xs font-bold transition-all shadow-md shadow-claro/25 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
                       >
                         <QrCode className="w-4 h-4 text-white" />
                         <span>Registrar Asistencia (QR o PIN)</span>
@@ -1460,11 +1460,21 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
 
       {/* QR Pass Modal */}
       {selectedPassItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="qr-pass-title"
+        >
           <div className="bg-white border border-slate-200 rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <span className="text-xs font-extrabold text-[#DA291C] uppercase tracking-wider">Pase Digital de Asistencia</span>
-              <button onClick={() => setSelectedPassItem(null)} className="text-slate-400 hover:text-slate-700">
+              <span id="qr-pass-title" className="text-xs font-extrabold text-claro uppercase tracking-wider">Pase Digital de Asistencia</span>
+              <button 
+                type="button"
+                onClick={() => setSelectedPassItem(null)} 
+                className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-claro"
+                aria-label="Cerrar pase digital de asistencia"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
