@@ -594,6 +594,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
           </div>
           <button
             onClick={onClose}
+            aria-label="Cerrar modal de evento"
             className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -604,7 +605,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-6 flex-1">
           
           {error && (
-            <div className="p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+            <div role="alert" aria-live="assertive" className="p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
               <span>{error}</span>
             </div>
@@ -617,8 +618,9 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
             </h3>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Título de la Capacitación *</label>
+              <label htmlFor="event-form-title" className="block text-xs font-bold text-slate-700 mb-1">Título de la Capacitación *</label>
               <input
+                id="event-form-title"
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -629,8 +631,9 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Descripción y Objetivos</label>
+              <label htmlFor="event-form-description" className="block text-xs font-bold text-slate-700 mb-1">Descripción y Objetivos</label>
               <textarea
+                id="event-form-description"
                 rows={3}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -793,10 +796,11 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
               {/* Selectores Jerárquicos: Programa y Subprograma */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label htmlFor="event-form-program-category" className="block text-xs font-bold text-slate-700 mb-1">
                     Programa Corporativo *
                   </label>
                   <select
+                    id="event-form-program-category"
                     value={programCategory}
                     onChange={(e) => handleProgramCategoryChange(e.target.value)}
                     className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:border-emerald-600"
@@ -811,10 +815,11 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label htmlFor="event-form-subprogram" className="block text-xs font-bold text-slate-700 mb-1">
                     Subprograma (Dependiente) *
                   </label>
                   <select
+                    id="event-form-subprogram"
                     value={subprogram}
                     onChange={(e) => setSubprogram(e.target.value)}
                     className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:border-emerald-600"
@@ -832,10 +837,11 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
               {/* Fila 2: Tipo de Sesión, Tipo de Entrenamiento, Formato de Capacitación */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label htmlFor="event-form-session-type" className="block text-xs font-bold text-slate-700 mb-1">
                     Tipo de Sesión *
                   </label>
                   <select
+                    id="event-form-session-type"
                     value={sessionType}
                     onChange={(e) => setSessionType(e.target.value)}
                     className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-emerald-600"
@@ -847,10 +853,11 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label htmlFor="event-form-training-type" className="block text-xs font-bold text-slate-700 mb-1">
                     Tipo de Entrenamiento *
                   </label>
                   <select
+                    id="event-form-training-type"
                     value={trainingType}
                     onChange={(e) => setTrainingType(e.target.value)}
                     className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-emerald-600"
@@ -862,10 +869,11 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label htmlFor="event-form-training-format" className="block text-xs font-bold text-slate-700 mb-1">
                     Formato de Capacitación *
                   </label>
                   <select
+                    id="event-form-training-format"
                     value={trainingFormat}
                     onChange={(e) => {
                       setTrainingFormat(e.target.value);
@@ -883,8 +891,9 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
               {/* Fila 3: Modalidad, Suplidor, Fechas Desde / Hasta */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Modalidad *</label>
+                  <label htmlFor="event-form-modality" className="block text-xs font-bold text-slate-700 mb-1">Modalidad *</label>
                   <select
+                    id="event-form-modality"
                     value={modality === 'Híbrida' ? 'Mixta' : modality}
                     onChange={(e) => setModality(e.target.value as EventModality)}
                     className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-emerald-600"
@@ -896,8 +905,9 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Suplidor / Proveedor *</label>
+                  <label htmlFor="event-form-supplier" className="block text-xs font-bold text-slate-700 mb-1">Suplidor / Proveedor *</label>
                   <input
+                    id="event-form-supplier"
                     type="text"
                     list="supplier-options-list"
                     value={supplier}
@@ -914,8 +924,9 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Fecha Desde</label>
+                  <label htmlFor="event-form-start-date" className="block text-xs font-bold text-slate-700 mb-1">Fecha Desde</label>
                   <input
+                    id="event-form-start-date"
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
@@ -924,8 +935,9 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Fecha Hasta</label>
+                  <label htmlFor="event-form-end-date" className="block text-xs font-bold text-slate-700 mb-1">Fecha Hasta</label>
                   <input
+                    id="event-form-end-date"
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
@@ -938,8 +950,9 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
             {/* Instructor / Facilitador */}
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Instructor / Facilitador Principal *</label>
+                <label htmlFor="event-form-instructor" className="block text-xs font-bold text-slate-700 mb-1">Instructor / Facilitador Principal *</label>
                 <input
+                  id="event-form-instructor"
                   type="text"
                   value={instructor}
                   onChange={(e) => setInstructor(e.target.value)}
@@ -953,7 +966,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
             {/* Asignación de Tutor / Evaluador OJT */}
             <div className="bg-indigo-50/50 border border-indigo-200/80 p-4 rounded-2xl space-y-2">
               <div className="flex items-center justify-between">
-                <label className="block text-xs font-black text-slate-800 flex items-center gap-1.5">
+                <label htmlFor="event-form-ojt-evaluator" className="block text-xs font-black text-slate-800 flex items-center gap-1.5">
                   <UserCheck className="w-4 h-4 text-indigo-700" />
                   <span>Tutor / Evaluador OJT Responsable (Acompañamiento en Campo)</span>
                 </label>
@@ -965,6 +978,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 Selecciona al evaluador de campo encargado de auditar el puesto de trabajo, First-Time Fix y mesas de calibración para esta capacitación.
               </p>
               <select
+                id="event-form-ojt-evaluator"
                 value={ojtEvaluatorId}
                 onChange={(e) => setOjtEvaluatorId(e.target.value)}
                 className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#DA291C]"
@@ -993,8 +1007,9 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Ubicación o Enlace</label>
+                <label htmlFor="event-form-location" className="block text-xs font-bold text-slate-700 mb-1">Ubicación o Enlace</label>
                 <input
+                  id="event-form-location"
                   type="text"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
@@ -1004,10 +1019,11 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="event-form-survey-url" className="block text-xs font-bold text-slate-700 mb-1">
                   Enlace de Encuesta / Evaluación (Forms)
                 </label>
                 <input
+                  id="event-form-survey-url"
                   type="url"
                   value={surveyUrl}
                   onChange={(e) => setSurveyUrl(e.target.value)}
@@ -1018,8 +1034,9 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">URL de Imagen de Portada</label>
+              <label htmlFor="event-form-image-url" className="block text-xs font-bold text-slate-700 mb-1">URL de Imagen de Portada</label>
               <input
+                id="event-form-image-url"
                 type="url"
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
@@ -1292,6 +1309,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                           <button
                             type="button"
                             onClick={() => handleRemoveModule(mod.id)}
+                            aria-label={`Eliminar módulo ${idx + 1}`}
                             className="p-1 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer rounded-lg hover:bg-slate-50"
                             title="Eliminar módulo"
                           >
@@ -1486,6 +1504,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                   <button
                     type="button"
                     onClick={prevMonth}
+                    aria-label="Mes Anterior"
                     className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
                     title="Mes Anterior"
                   >
@@ -1497,6 +1516,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                   <button
                     type="button"
                     onClick={nextMonth}
+                    aria-label="Mes Siguiente"
                     className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
                     title="Mes Siguiente"
                   >
@@ -1897,6 +1917,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                             <button
                               type="button"
                               onClick={() => handleRemoveDate(sch.date)}
+                              aria-label={`Eliminar fecha completa ${sch.date}`}
                               className="text-slate-400 hover:text-rose-600 transition-colors p-1 cursor-pointer"
                               title="Eliminar esta fecha completa"
                             >
@@ -1936,6 +1957,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => handleRemoveSlot(sch.date, sl.time)}
+                                  aria-label={`Eliminar turno ${sl.time} del ${sch.date}`}
                                   className="text-slate-400 hover:text-rose-600 transition-colors p-1 cursor-pointer rounded-lg hover:bg-slate-100"
                                   title="Eliminar este turno"
                                 >

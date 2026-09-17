@@ -1080,8 +1080,9 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                           onClick={() => setCancelingItem(item)}
                           className="p-2 rounded-xl text-rose-600 hover:text-rose-800 hover:bg-rose-50 transition-colors"
                           title="Cancelar inscripción y liberar cupo"
+                          aria-label={`Cancelar inscripción en ${event.title}`}
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4" aria-hidden="true" />
                         </button>
                       ) : null}
                     </div>
@@ -1214,18 +1215,21 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                 <Search className="w-4 h-4 text-slate-400" />
               </div>
               <input
+                id="my-history-search"
                 type="text"
                 value={historySearchQuery}
                 onChange={(e) => setHistorySearchQuery(e.target.value)}
                 placeholder="Buscar por curso, facilitador o categoría..."
+                aria-label="Buscar por curso, facilitador o categoría en el historial"
                 className="w-full pl-10 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
               />
               {historySearchQuery && (
                 <button
                   onClick={() => setHistorySearchQuery('')}
+                  aria-label="Limpiar búsqueda en el historial"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-700 cursor-pointer"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <X className="w-3.5 h-3.5" aria-hidden="true" />
                 </button>
               )}
             </div>
@@ -1426,13 +1430,18 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
 
       {/* Cancel Confirmation Modal */}
       {cancelingItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="cancel-reservation-title"
+        >
           <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto border border-rose-200">
-              <AlertTriangle className="w-6 h-6" />
+              <AlertTriangle className="w-6 h-6" aria-hidden="true" />
             </div>
             <div className="text-center">
-              <h2 className="text-base font-extrabold text-slate-900">¿Cancelar tu inscripción?</h2>
+              <h2 id="cancel-reservation-title" className="text-base font-extrabold text-slate-900">¿Cancelar tu inscripción?</h2>
               <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                 Al cancelar, liberarás tu cupo en <strong>{cancelingItem.event.title}</strong> ({cancelingItem.schedule.date} a las {cancelingItem.slot.time}) para que otro colaborador pueda registrarse.
               </p>

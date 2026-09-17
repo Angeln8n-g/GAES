@@ -276,24 +276,26 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
               onClick={handleCopyText}
               className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
               title="Copiar texto formal al portapapeles"
+              aria-label="Copiar texto formal al portapapeles"
             >
-              {isCopied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4 text-slate-600" />}
-              <span>{isCopied ? '¡Copiado!' : 'Copiar Texto'}</span>
+              {isCopied ? <Check className="w-4 h-4 text-emerald-600" aria-hidden="true" /> : <Copy className="w-4 h-4 text-slate-600" aria-hidden="true" />}
+              <span role="status" aria-live="polite">{isCopied ? '¡Copiado!' : 'Copiar Texto'}</span>
             </button>
 
             <button
               onClick={handlePrint}
               className="px-4 py-2 rounded-xl bg-[#DA291C] hover:bg-red-700 text-white text-xs font-black shadow-md shadow-red-500/25 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
             >
-              <Printer className="w-4 h-4" />
+              <Printer className="w-4 h-4" aria-hidden="true" />
               <span>Imprimir / Guardar PDF</span>
             </button>
 
             <button
               onClick={onClose}
+              aria-label="Cerrar ventana de elaboración de carta formal"
               className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer ml-1"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -311,14 +313,15 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
 
             {/* 1. Datos del Colaborador */}
             <div className="space-y-3">
-              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-[#DA291C]" />
+              <span id="formal-letter-collab-section-title" className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-[#DA291C]" aria-hidden="true" />
                 Datos del Colaborador:
-              </label>
+              </span>
               <div className="space-y-2">
                 <div>
-                  <span className="text-[11px] text-slate-500 font-medium">Nombre Completo:</span>
+                  <label htmlFor="formal-letter-collab-name" className="text-[11px] text-slate-500 font-medium">Nombre Completo:</label>
                   <input
+                    id="formal-letter-collab-name"
                     type="text"
                     value={collaboratorName}
                     onChange={(e) => setCollaboratorName(e.target.value)}
@@ -327,8 +330,9 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <span className="text-[11px] text-slate-500 font-medium">Cédula:</span>
+                    <label htmlFor="formal-letter-collab-cedula" className="text-[11px] text-slate-500 font-medium">Cédula:</label>
                     <input
+                      id="formal-letter-collab-cedula"
                       type="text"
                       value={collaboratorCedula}
                       onChange={(e) => setCollaboratorCedula(e.target.value)}
@@ -336,8 +340,9 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                     />
                   </div>
                   <div>
-                    <span className="text-[11px] text-slate-500 font-medium">No. Carnet:</span>
+                    <label htmlFor="formal-letter-collab-card" className="text-[11px] text-slate-500 font-medium">No. Carnet:</label>
                     <input
+                      id="formal-letter-collab-card"
                       type="text"
                       value={collaboratorCard}
                       onChange={(e) => setCollaboratorCard(e.target.value)}
@@ -346,8 +351,9 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                   </div>
                 </div>
                 <div>
-                  <span className="text-[11px] text-slate-500 font-medium">Departamento / Posición:</span>
+                  <label htmlFor="formal-letter-collab-dept" className="text-[11px] text-slate-500 font-medium">Departamento / Posición:</label>
                   <input
+                    id="formal-letter-collab-dept"
                     type="text"
                     value={collaboratorDept}
                     onChange={(e) => setCollaboratorDept(e.target.value)}
@@ -410,21 +416,26 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                 </button>
               </div>
               {recipientType === 'personalizado' && (
-                <input
-                  type="text"
-                  value={customRecipient}
-                  onChange={(e) => setCustomRecipient(e.target.value)}
-                  placeholder="Ej: Lic. Marcos Peña, Banco Central..."
-                  className="w-full mt-2 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#DA291C]"
-                />
+                <div>
+                  <label htmlFor="formal-letter-custom-recipient" className="sr-only">Destinatario personalizado</label>
+                  <input
+                    id="formal-letter-custom-recipient"
+                    type="text"
+                    value={customRecipient}
+                    onChange={(e) => setCustomRecipient(e.target.value)}
+                    placeholder="Ej: Lic. Marcos Peña, Banco Central..."
+                    className="w-full mt-2 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                  />
+                </div>
               )}
             </div>
 
             {/* 3. Fecha y Lugar de Emisión */}
             <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
               <div>
-                <span className="text-[11px] text-slate-500 font-medium">Fecha de Emisión:</span>
+                <label htmlFor="formal-letter-issue-date" className="text-[11px] text-slate-500 font-medium">Fecha de Emisión:</label>
                 <input
+                  id="formal-letter-issue-date"
                   type="date"
                   value={issueDate}
                   onChange={(e) => setIssueDate(e.target.value)}
@@ -432,8 +443,9 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                 />
               </div>
               <div>
-                <span className="text-[11px] text-slate-500 font-medium">Ciudad:</span>
+                <label htmlFor="formal-letter-issue-city" className="text-[11px] text-slate-500 font-medium">Ciudad:</label>
                 <input
+                  id="formal-letter-issue-city"
                   type="text"
                   value={issueCity}
                   onChange={(e) => setIssueCity(e.target.value)}
@@ -543,14 +555,15 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
 
             {/* 5. Datos del Firmante */}
             <div className="space-y-2 pt-2 border-t border-slate-100">
-              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#DA291C]" />
+              <span id="formal-letter-signer-section-title" className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#DA291C]" aria-hidden="true" />
                 Firma & Autenticidad:
-              </label>
+              </span>
               <div className="space-y-2 text-xs">
                 <div>
-                  <span className="text-[11px] text-slate-500 font-medium">Nombre del Firmante:</span>
+                  <label htmlFor="formal-letter-signer-name" className="text-[11px] text-slate-500 font-medium">Nombre del Firmante:</label>
                   <input
+                    id="formal-letter-signer-name"
                     type="text"
                     value={signerName}
                     onChange={(e) => setSignerName(e.target.value)}
@@ -558,8 +571,9 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                   />
                 </div>
                 <div>
-                  <span className="text-[11px] text-slate-500 font-medium">Cargo / Rol:</span>
+                  <label htmlFor="formal-letter-signer-title" className="text-[11px] text-slate-500 font-medium">Cargo / Rol:</label>
                   <input
+                    id="formal-letter-signer-title"
                     type="text"
                     value={signerTitle}
                     onChange={(e) => setSignerTitle(e.target.value)}
@@ -567,8 +581,9 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                   />
                 </div>
                 <div className="flex items-center justify-between pt-1">
-                  <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
+                  <label htmlFor="formal-letter-include-stamp" className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
                     <input
+                      id="formal-letter-include-stamp"
                       type="checkbox"
                       checked={includeStamp}
                       onChange={(e) => setIncludeStamp(e.target.checked)}
@@ -576,8 +591,9 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                     />
                     <span>Incluir Sello Digital Claro</span>
                   </label>
-                  <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
+                  <label htmlFor="formal-letter-include-qr" className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
                     <input
+                      id="formal-letter-include-qr"
                       type="checkbox"
                       checked={includeQr}
                       onChange={(e) => setIncludeQr(e.target.checked)}
@@ -591,8 +607,9 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
 
             {/* 6. Nota o párrafo adicional */}
             <div className="pt-2 border-t border-slate-100">
-              <span className="text-[11px] text-slate-500 font-medium">Nota o párrafo adicional (Opcional):</span>
+              <label htmlFor="formal-letter-custom-note" className="text-[11px] text-slate-500 font-medium">Nota o párrafo adicional (Opcional):</label>
               <textarea
+                id="formal-letter-custom-note"
                 value={customNote}
                 onChange={(e) => setCustomNote(e.target.value)}
                 placeholder="Ej: Se destaca su excelente desempeño y alto compromiso en el cumplimiento de los estándares corporativos..."

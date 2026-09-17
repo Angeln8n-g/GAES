@@ -582,8 +582,10 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
         {/* Search & Filters */}
         <div className="flex items-center gap-3 flex-wrap flex-1">
           <div className="relative flex-1 min-w-[220px]">
-            <Search className="w-4 h-4 text-slate-400 absolute inset-y-0 left-3.5 my-auto" />
+            <Search className="w-4 h-4 text-slate-400 absolute inset-y-0 left-3.5 my-auto" aria-hidden="true" />
+            <label htmlFor="participants-search" className="sr-only">Buscar colaborador por nombre, tarjeta, cédula, empresa o supervisor</label>
             <input
+              id="participants-search"
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -596,6 +598,8 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
             {/* Filtro Empresa */}
             {companies.length > 0 && isSuperAdmin && (
               <select
+                id="participants-company-filter"
+                aria-label="Filtrar colaboradores por empresa"
                 value={selectedCompanyFilter}
                 onChange={(e) => setSelectedCompanyFilter(e.target.value)}
                 className="px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs text-slate-800 font-bold focus:outline-none focus:border-[#DA291C]"
@@ -609,6 +613,8 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
 
             {/* Filtro Estado */}
             <select
+              id="participants-status-filter"
+              aria-label="Filtrar colaboradores por estado laboral"
               value={selectedStatusFilter}
               onChange={(e) => setSelectedStatusFilter(e.target.value)}
               className="px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#DA291C]"
@@ -621,6 +627,8 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
 
             {/* Filtro Depto */}
             <select
+              id="participants-dept-filter"
+              aria-label="Filtrar colaboradores por departamento"
               value={selectedDeptFilter}
               onChange={(e) => setSelectedDeptFilter(e.target.value)}
               className="px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#DA291C]"
@@ -632,6 +640,8 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
 
             {/* Filtro Supervisor */}
             <select
+              id="participants-super-filter"
+              aria-label="Filtrar colaboradores por supervisor"
               value={selectedSuperFilter}
               onChange={(e) => setSelectedSuperFilter(e.target.value)}
               className="px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#DA291C]"
@@ -645,6 +655,8 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
 
             {/* Filtro Nivel Educativo */}
             <select
+              id="participants-edu-filter"
+              aria-label="Filtrar colaboradores por nivel educativo"
               value={selectedEducationFilter}
               onChange={(e) => setSelectedEducationFilter(e.target.value)}
               className="px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#DA291C]"
@@ -659,6 +671,8 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
 
             {/* Filtro Estudia Actualmente */}
             <select
+              id="participants-studying-filter"
+              aria-label="Filtrar colaboradores por situación académica"
               value={selectedStudyingFilter}
               onChange={(e) => setSelectedStudyingFilter(e.target.value)}
               className="px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#DA291C]"
@@ -995,6 +1009,7 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
                         <input
                           type="checkbox"
                           checked={isSelected}
+                          aria-label={`Seleccionar a ${p.name}`}
                           onChange={() => handleToggleCard(p.card)}
                           className="rounded border-slate-300 text-[#DA291C] focus:ring-[#DA291C] cursor-pointer"
                         />
@@ -1087,6 +1102,7 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
                       <td className="p-4">
                         <select
                           value={p.supervisorId || ""}
+                          aria-label={`Supervisor asignado para ${p.name}`}
                           onChange={(e) => handleInlineSupervisorChange(p.card, e.target.value)}
                           className={`px-2.5 py-1 rounded-xl text-[11px] font-bold bg-white border ${
                             p.supervisorId
@@ -1108,24 +1124,27 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
                             onClick={() => setViewingProfileParticipant(p)}
                             className="p-1.5 text-slate-600 hover:text-red-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
                             title="Ver Ficha 360°"
+                            aria-label={`Ver ficha 360° de ${p.name}`}
                           >
-                            <Eye className="w-3.5 h-3.5" />
+                            <Eye className="w-3.5 h-3.5" aria-hidden="true" />
                           </button>
 
                           <button
                             onClick={() => setEditingParticipant(p)}
                             className="p-1.5 text-slate-600 hover:text-amber-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
                             title="Editar Datos"
+                            aria-label={`Editar datos de ${p.name}`}
                           >
-                            <Edit3 className="w-3.5 h-3.5" />
+                            <Edit3 className="w-3.5 h-3.5" aria-hidden="true" />
                           </button>
 
                           <button
                             onClick={() => handleDelete(p.card, p.name)}
                             className="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                             title="Eliminar del padrón"
+                            aria-label={`Eliminar a ${p.name} del padrón`}
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
                           </button>
                         </div>
                       </td>

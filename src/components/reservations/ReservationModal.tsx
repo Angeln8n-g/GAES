@@ -138,9 +138,10 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
           </div>
           <button
             onClick={onClose}
+            aria-label="Cerrar ventana de reserva"
             className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 
@@ -149,7 +150,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
           
           {isSuccess ? (
             /* Success Confirmation Screen */
-            <div className="text-center py-6 space-y-5 animate-in zoom-in-95 duration-300">
+            <div role="status" aria-live="polite" className="text-center py-6 space-y-5 animate-in zoom-in-95 duration-300">
               <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto shadow-md">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
@@ -242,11 +243,11 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
               {/* 1. Date Selector */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-2 flex items-center gap-1.5">
-                  <CalendarIcon className="w-3.5 h-3.5 text-[#DA291C]" />
+                <span id="reservation-date-label" className="block text-xs font-bold text-slate-700 mb-2 flex items-center gap-1.5">
+                  <CalendarIcon className="w-3.5 h-3.5 text-[#DA291C]" aria-hidden="true" />
                   1. Selecciona la Fecha Disponible:
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                </span>
+                <div role="group" aria-labelledby="reservation-date-label" className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {event.schedule.map(sch => {
                     const isSelected = selectedDate === sch.date;
                     const isPast = sch.date < todayStr;
@@ -255,6 +256,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                       <button
                         key={sch.date}
                         type="button"
+                        aria-pressed={isSelected}
                         onClick={() => handleDateChange(sch.date)}
                         className={`p-3 rounded-2xl border text-left transition-all ${
                           isSelected
@@ -287,11 +289,11 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               {/* 2. Slot / Time Selector */}
               {currentSchedule && (
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-2 flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-[#DA291C]" />
+                  <span id="reservation-time-label" className="block text-xs font-bold text-slate-700 mb-2 flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-[#DA291C]" aria-hidden="true" />
                     2. Selecciona el Horario:
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  </span>
+                  <div role="group" aria-labelledby="reservation-time-label" className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {currentSchedule.slots.map((slot, idx) => {
                       const isSelected = selectedSlot?.time === slot.time;
                       const isFull = slot.registered >= slot.capacity;
@@ -302,6 +304,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                           key={idx}
                           type="button"
                           disabled={isFull}
+                          aria-pressed={isSelected}
                           onClick={() => handleSlotSelect(slot)}
                           className={`p-3 rounded-2xl border text-left transition-all ${
                             isFull
@@ -344,10 +347,11 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
               {/* 3. Collaborator Email Input */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label htmlFor="reservation-collaborator-email" className="block text-xs font-bold text-slate-700 mb-1.5">
                   3. Correo Electrónico del Colaborador:
                 </label>
                 <input
+                  id="reservation-collaborator-email"
                   type="email"
                   value={emailInput}
                   onChange={(e) => setEmailInput(e.target.value)}
@@ -359,8 +363,8 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
               {/* Error Message */}
               {errorMessage && (
-                <div className="p-3 rounded-2xl bg-rose-50 border border-rose-200 flex items-center gap-2 text-rose-700 text-xs font-medium">
-                  <AlertTriangle className="w-4 h-4 shrink-0 text-rose-500" />
+                <div role="alert" aria-live="assertive" className="p-3 rounded-2xl bg-rose-50 border border-rose-200 flex items-center gap-2 text-rose-700 text-xs font-medium">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-rose-500" aria-hidden="true" />
                   <span>{errorMessage}</span>
                 </div>
               )}

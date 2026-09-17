@@ -129,9 +129,10 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
 
           <button
             onClick={onClose}
+            aria-label="Cerrar ventana de edición de usuario"
             className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 
@@ -139,8 +140,8 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
         <form onSubmit={handleSubmit} className="p-6 flex-1 overflow-y-auto space-y-5">
           
           {error && (
-            <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-2.5 text-rose-700 text-xs font-medium animate-in shake duration-300">
-              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-rose-500" />
+            <div role="alert" aria-live="assertive" className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-2.5 text-rose-700 text-xs font-medium animate-in shake duration-300">
+              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-rose-500" aria-hidden="true" />
               <span>{error}</span>
             </div>
           )}
@@ -149,10 +150,11 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
             
             {/* Nombre Completo */}
             <div className="sm:col-span-2">
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label htmlFor="edit-user-name" className="block text-xs font-bold text-slate-700 mb-1">
                 Nombre Completo *
               </label>
               <input
+                id="edit-user-name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -164,14 +166,15 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
 
             {/* Correo Corporativo */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label htmlFor="edit-user-email" className="block text-xs font-bold text-slate-700 mb-1">
                 Correo Corporativo *
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                  <Mail className="w-4 h-4" />
+                  <Mail className="w-4 h-4" aria-hidden="true" />
                 </div>
                 <input
+                  id="edit-user-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -184,10 +187,11 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
 
             {/* Cédula */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label htmlFor="edit-user-cedula" className="block text-xs font-bold text-slate-700 mb-1">
                 Cédula de Identidad (11 dígitos)
               </label>
               <input
+                id="edit-user-cedula"
                 type="text"
                 value={cedula}
                 onChange={(e) => setCedula(formatCedula(e.target.value))}
@@ -199,12 +203,13 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
 
             {/* Empresa */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label htmlFor="edit-user-company" className="block text-xs font-bold text-slate-700 mb-1">
                 Empresa / Filial
               </label>
               {isSuperAdmin ? (
                 <div className="relative">
                   <select
+                    id="edit-user-company"
                     value={companyId}
                     onChange={(e) => setCompanyId(e.target.value)}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-[#DA291C] focus:bg-white font-bold cursor-pointer"
@@ -223,14 +228,15 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
 
             {/* Departamento */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label htmlFor="edit-user-department" className="block text-xs font-bold text-slate-700 mb-1">
                 Departamento / Área
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                  <Briefcase className="w-4 h-4" />
+                  <Briefcase className="w-4 h-4" aria-hidden="true" />
                 </div>
                 <input
+                  id="edit-user-department"
                   type="text"
                   value={department}
                   onChange={(e) => setDepartment(e.target.value)}
@@ -242,11 +248,12 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
 
             {/* Rol en Sistema */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label htmlFor="edit-user-role" className="block text-xs font-bold text-slate-700 mb-1">
                 Rol en Plataforma *
               </label>
               <div className="relative">
                 <select
+                  id="edit-user-role"
                   value={role}
                   onChange={(e) => setRole(e.target.value as UserRole)}
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-[#DA291C] focus:bg-white font-bold cursor-pointer"
@@ -264,10 +271,11 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
 
             {/* Estado Laboral */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label htmlFor="edit-user-status" className="block text-xs font-bold text-slate-700 mb-1">
                 Estado Laboral *
               </label>
               <select
+                id="edit-user-status"
                 value={employmentStatus}
                 onChange={(e) => {
                   const st = e.target.value as EmploymentStatus;
@@ -291,14 +299,15 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
 
             {/* Restablecer Contraseña (Opcional) */}
             <div className="sm:col-span-2 pt-2 border-t border-slate-100">
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label htmlFor="edit-user-password" className="block text-xs font-bold text-slate-700 mb-1">
                 Restablecer Contraseña (Dejar en blanco para mantener la actual)
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <Lock className="w-4 h-4" />
+                  <Lock className="w-4 h-4" aria-hidden="true" />
                 </div>
                 <input
+                  id="edit-user-password"
                   type={showPassword ? 'text' : 'password'}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
@@ -307,10 +316,11 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                 />
                 <button
                   type="button"
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
                 </button>
               </div>
             </div>

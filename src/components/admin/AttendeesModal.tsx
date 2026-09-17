@@ -449,7 +449,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
         
         {/* Real-time WebSocket Live Alert Toast */}
         {liveToast && (
-          <div className="bg-emerald-600 text-white text-xs font-bold px-4 py-2 text-center animate-in slide-in-from-top duration-200 flex items-center justify-center gap-2">
+          <div role="status" aria-live="polite" className="bg-emerald-600 text-white text-xs font-bold px-4 py-2 text-center animate-in slide-in-from-top duration-200 flex items-center justify-center gap-2">
             <Sparkles className="w-4 h-4 animate-pulse" />
             <span>{liveToast}</span>
           </div>
@@ -516,6 +516,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
 
             <button
               onClick={onClose}
+              aria-label="Cerrar modal de gestión de asistencia"
               className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
@@ -531,7 +532,9 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
             <div className="relative flex-1 max-w-sm">
               <Search className="w-4 h-4 text-slate-400 absolute inset-y-0 left-3.5 my-auto" />
               <input
+                id="attendees-modal-search"
                 type="text"
+                aria-label="Buscar colaborador por nombre, tarjeta, cédula o depto"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Buscar por nombre, tarjeta, cédula o depto..."

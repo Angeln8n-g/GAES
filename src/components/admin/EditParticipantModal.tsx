@@ -163,9 +163,10 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
 
           <button
             onClick={onClose}
+            aria-label="Cerrar ventana de edición de colaborador"
             className="p-2 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-200 transition-colors cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 
@@ -174,14 +175,15 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
           
           {/* Estado Laboral / Contratación */}
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-            <label className="block text-xs font-bold text-slate-700">
+            <span id="edit-participant-status-label" className="block text-xs font-bold text-slate-700">
               Estado Laboral & Proceso de Contratación *
-            </label>
+            </span>
             
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div role="group" aria-labelledby="edit-participant-status-label" className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               {/* Opción 1: Contratado */}
               <button
                 type="button"
+                aria-pressed={employmentStatus === 'contratado'}
                 onClick={() => { setEmploymentStatus('contratado'); setIsActive(true); }}
                 className={`p-3 rounded-2xl border text-left flex items-start gap-2.5 transition-all cursor-pointer ${
                   employmentStatus === 'contratado'
@@ -190,7 +192,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                 }`}
               >
                 <div className={`p-1.5 rounded-xl mt-0.5 ${employmentStatus === 'contratado' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
-                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-xs font-bold text-emerald-900">Contratado</p>
@@ -201,6 +203,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
               {/* Opción 2: En Proceso de Contratación */}
               <button
                 type="button"
+                aria-pressed={employmentStatus === 'en_proceso'}
                 onClick={() => { setEmploymentStatus('en_proceso'); setIsActive(true); }}
                 className={`p-3 rounded-2xl border text-left flex items-start gap-2.5 transition-all cursor-pointer ${
                   employmentStatus === 'en_proceso'
@@ -209,7 +212,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                 }`}
               >
                 <div className={`p-1.5 rounded-xl mt-0.5 ${employmentStatus === 'en_proceso' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
-                  <Clock className="w-3.5 h-3.5" />
+                  <Clock className="w-3.5 h-3.5" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-xs font-bold text-amber-900">En Proceso</p>
@@ -220,6 +223,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
               {/* Opción 3: Inactivo / Baja */}
               <button
                 type="button"
+                aria-pressed={employmentStatus === 'inactivo'}
                 onClick={() => { setEmploymentStatus('inactivo'); setIsActive(false); }}
                 className={`p-3 rounded-2xl border text-left flex items-start gap-2.5 transition-all cursor-pointer ${
                   employmentStatus === 'inactivo'
@@ -228,7 +232,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                 }`}
               >
                 <div className={`p-1.5 rounded-xl mt-0.5 ${employmentStatus === 'inactivo' ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
-                  <UserX className="w-3.5 h-3.5" />
+                  <UserX className="w-3.5 h-3.5" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-xs font-bold text-rose-900">Inactivo / Baja</p>
@@ -241,10 +245,11 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
           {/* Datos Personales y de Identidad */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+              <label htmlFor="edit-participant-name" className="block text-xs font-bold text-slate-700 mb-1.5">
                 Nombre Completo *
               </label>
               <input
+                id="edit-participant-name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -255,10 +260,11 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+              <label htmlFor="edit-participant-cedula" className="block text-xs font-bold text-slate-700 mb-1.5">
                 Cédula (11 dígitos)
               </label>
               <input
+                id="edit-participant-cedula"
                 type="text"
                 value={cedula}
                 onChange={(e) => setCedula(formatCedula(e.target.value))}
@@ -269,10 +275,11 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+              <label htmlFor="edit-participant-email" className="block text-xs font-bold text-slate-700 mb-1.5">
                 Correo Electrónico Corporativo *
               </label>
               <input
+                id="edit-participant-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -283,10 +290,11 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+              <label htmlFor="edit-participant-department" className="block text-xs font-bold text-slate-700 mb-1.5">
                 Departamento / Área
               </label>
               <input
+                id="edit-participant-department"
                 type="text"
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
@@ -299,11 +307,12 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
           {/* Empresa Asignada */}
           {companies.length > 0 && (
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+              <label htmlFor="edit-participant-company" className="block text-xs font-bold text-slate-700 mb-1.5">
                 Empresa / Entidad Corporativa *
               </label>
               {isSuperAdmin ? (
                 <select
+                  id="edit-participant-company"
                   value={companyId}
                   onChange={(e) => setCompanyId(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#DA291C]"
@@ -324,10 +333,11 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
 
           {/* Supervisor Asignado */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+            <label htmlFor="edit-participant-supervisor" className="block text-xs font-bold text-slate-700 mb-1.5">
               Supervisor / Líder de Área Asignado
             </label>
             <select
+              id="edit-participant-supervisor"
               value={supervisorId}
               onChange={(e) => setSupervisorId(e.target.value)}
               className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#DA291C]"
@@ -349,10 +359,11 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                <label htmlFor="edit-participant-education-level" className="block text-[11px] font-bold text-slate-700 mb-1">
                   Nivel de Estudio
                 </label>
                 <select
+                  id="edit-participant-education-level"
                   value={educationLevel}
                   onChange={(e) => setEducationLevel(e.target.value)}
                   className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-[#DA291C]"
@@ -369,10 +380,11 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                <label htmlFor="edit-participant-profession-title" className="block text-[11px] font-bold text-slate-700 mb-1">
                   Título / Profesión
                 </label>
                 <input
+                  id="edit-participant-profession-title"
                   type="text"
                   value={professionTitle}
                   onChange={(e) => setProfessionTitle(e.target.value)}
@@ -382,10 +394,11 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                <label htmlFor="edit-participant-birthdate" className="block text-[11px] font-bold text-slate-700 mb-1">
                   Fecha de Nacimiento
                 </label>
                 <input
+                  id="edit-participant-birthdate"
                   type="date"
                   value={birthDate}
                   onChange={(e) => setBirthDate(e.target.value)}
@@ -394,10 +407,11 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                <label htmlFor="edit-participant-phone" className="block text-[11px] font-bold text-slate-700 mb-1">
                   Teléfono / WhatsApp
                 </label>
                 <input
+                  id="edit-participant-phone"
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
@@ -407,10 +421,11 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                <label htmlFor="edit-participant-address" className="block text-[11px] font-bold text-slate-700 mb-1">
                   Dirección / Sector
                 </label>
                 <input
+                  id="edit-participant-address"
                   type="text"
                   value={currentAddress}
                   onChange={(e) => setCurrentAddress(e.target.value)}
@@ -422,10 +437,11 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
               {/* ¿Estudia actualmente? */}
               <div className="sm:col-span-2 pt-1 border-t border-slate-200/80">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-700">¿Estudia actualmente?</span>
-                  <div className="flex items-center gap-2">
+                  <span id="edit-participant-studying-label" className="text-xs font-bold text-slate-700">¿Estudia actualmente?</span>
+                  <div role="group" aria-labelledby="edit-participant-studying-label" className="flex items-center gap-2">
                     <button
                       type="button"
+                      aria-pressed={!isCurrentlyStudying}
                       onClick={() => setIsCurrentlyStudying(false)}
                       className={`px-2.5 py-1 rounded-lg text-xs font-bold ${!isCurrentlyStudying ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-700'}`}
                     >
@@ -433,6 +449,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                     </button>
                     <button
                       type="button"
+                      aria-pressed={isCurrentlyStudying}
                       onClick={() => setIsCurrentlyStudying(true)}
                       className={`px-2.5 py-1 rounded-lg text-xs font-bold ${isCurrentlyStudying ? 'bg-[#DA291C] text-white' : 'bg-slate-200 text-slate-700'}`}
                     >
@@ -443,20 +460,28 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
 
                 {isCurrentlyStudying && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 pt-2 border-t border-slate-200/60">
-                    <input
-                      type="text"
-                      value={currentStudyField}
-                      onChange={(e) => setCurrentStudyField(e.target.value)}
-                      placeholder="Carrera / Curso que estudia"
-                      className="px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-800"
-                    />
-                    <input
-                      type="text"
-                      value={institutionName}
-                      onChange={(e) => setInstitutionName(e.target.value)}
-                      placeholder="Universidad / Instituto"
-                      className="px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-800"
-                    />
+                    <div>
+                      <label htmlFor="edit-participant-study-field" className="sr-only">Carrera o curso que estudia</label>
+                      <input
+                        id="edit-participant-study-field"
+                        type="text"
+                        value={currentStudyField}
+                        onChange={(e) => setCurrentStudyField(e.target.value)}
+                        placeholder="Carrera / Curso que estudia"
+                        className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-800"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="edit-participant-institution" className="sr-only">Universidad o instituto</label>
+                      <input
+                        id="edit-participant-institution"
+                        type="text"
+                        value={institutionName}
+                        onChange={(e) => setInstitutionName(e.target.value)}
+                        placeholder="Universidad / Instituto"
+                        className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-800"
+                      />
+                    </div>
                   </div>
                 )}
               </div>
@@ -466,8 +491,8 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
           {/* Rol del Usuario Vinculado */}
           <div className="p-4 rounded-2xl bg-red-50/50 border border-red-200 space-y-2">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-[#DA291C]" />
-              <label className="block text-xs font-bold text-slate-900">
+              <ShieldCheck className="w-4 h-4 text-[#DA291C]" aria-hidden="true" />
+              <label htmlFor="edit-participant-user-role" className="block text-xs font-bold text-slate-900">
                 Rol de Acceso al Sistema
               </label>
             </div>
@@ -475,6 +500,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
               Define los privilegios de inicio de sesión y módulos accesibles para este colaborador.
             </p>
             <select
+              id="edit-participant-user-role"
               value={userRole}
               onChange={(e) => setUserRole(e.target.value as UserRole)}
               className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold focus:outline-none focus:border-[#DA291C]"

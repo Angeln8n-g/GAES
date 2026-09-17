@@ -288,7 +288,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           <>
             {/* QR Context Alert Banner if user clicked a QR code */}
         {attendanceEventTitle && viewMode === 'login' && (
-          <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 shadow-sm animate-in slide-in-from-top-3 duration-300">
+          <div role="region" aria-label="Aviso de confirmación QR" className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 shadow-sm animate-in slide-in-from-top-3 duration-300">
             <div className="flex items-start gap-3">
               <div className="p-2 rounded-xl bg-red-100 text-[#DA291C] shrink-0 mt-0.5">
                 <QrCode className="w-5 h-5" />
@@ -307,7 +307,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
         {/* Success Alert Banner */}
         {successMessage && (
-          <div className="mb-5 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 text-emerald-800 text-xs font-medium animate-in fade-in duration-300 shadow-xs">
+          <div role="status" aria-live="polite" className="mb-5 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 text-emerald-800 text-xs font-medium animate-in fade-in duration-300 shadow-xs">
             <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600" />
             <span>{successMessage}</span>
           </div>
@@ -315,7 +315,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
         {/* Error Alert Banner */}
         {error && (
-          <div className="mb-5 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-3 text-rose-700 text-xs font-medium animate-in shake duration-300 shadow-xs">
+          <div role="alert" aria-live="assertive" className="mb-5 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-3 text-rose-700 text-xs font-medium animate-in shake duration-300 shadow-xs">
             <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-rose-500" />
             <span>{error}</span>
           </div>
@@ -336,7 +336,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               
               {/* Email or Cedula Input */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label htmlFor="login-email" className="block text-xs font-bold text-slate-700 mb-1.5">
                   Correo Corporativo o Cédula
                 </label>
                 <div className="relative">
@@ -344,6 +344,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                     <Mail className="w-4 h-4" />
                   </div>
                   <input
+                    id="login-email"
                     type="text"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -357,7 +358,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               {/* Password Input */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs font-bold text-slate-700">
+                  <label htmlFor="login-password" className="block text-xs font-bold text-slate-700">
                     Contraseña
                   </label>
                   <button
@@ -378,6 +379,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                     <Lock className="w-4 h-4" />
                   </div>
                   <input
+                    id="login-password"
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -388,6 +390,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
                     className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -446,6 +449,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   setError('');
                   setViewMode('login');
                 }}
+                aria-label="Volver al inicio de sesión"
                 className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors"
                 title="Volver"
               >
@@ -463,7 +467,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
             <form onSubmit={handleRequestRecoveryOtp} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label htmlFor="login-recovery-identifier" className="block text-xs font-bold text-slate-700 mb-1.5">
                   Correo Corporativo o Cédula
                 </label>
                 <div className="relative">
@@ -471,6 +475,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                     <Mail className="w-4 h-4" />
                   </div>
                   <input
+                    id="login-recovery-identifier"
                     type="text"
                     value={recoveryIdentifier}
                     onChange={(e) => setRecoveryIdentifier(e.target.value)}
@@ -525,6 +530,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   setError('');
                   setViewMode('recover-request');
                 }}
+                aria-label="Volver a identificación de cuenta"
                 className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors"
                 title="Volver"
               >
@@ -554,10 +560,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               
               {/* OTP Input */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label htmlFor="login-otp" className="block text-xs font-bold text-slate-700 mb-1.5">
                   Código de Seguridad (6 dígitos)
                 </label>
                 <input
+                  id="login-otp"
                   type="text"
                   maxLength={6}
                   value={enteredOtp}
@@ -571,7 +578,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
               {/* New Password Input */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label htmlFor="login-new-password" className="block text-xs font-bold text-slate-700 mb-1.5">
                   Nueva Contraseña
                 </label>
                 <div className="relative">
@@ -579,6 +586,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                     <Lock className="w-4 h-4" />
                   </div>
                   <input
+                    id="login-new-password"
                     type={showNewPassword ? 'text' : 'password'}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
@@ -589,6 +597,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
+                    aria-label={showNewPassword ? 'Ocultar nueva contraseña' : 'Ver nueva contraseña'}
                     className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600"
                   >
                     {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -607,7 +616,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
               {/* Confirm Password Input */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label htmlFor="login-confirm-password" className="block text-xs font-bold text-slate-700 mb-1.5">
                   Confirmar Nueva Contraseña
                 </label>
                 <div className="relative">
@@ -615,6 +624,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                     <Lock className="w-4 h-4" />
                   </div>
                   <input
+                    id="login-confirm-password"
                     type={showConfirmPassword ? 'text' : 'password'}
                     value={confirmNewPassword}
                     onChange={(e) => setConfirmNewPassword(e.target.value)}
@@ -625,6 +635,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    aria-label={showConfirmPassword ? 'Ocultar confirmación de contraseña' : 'Ver confirmación de contraseña'}
                     className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600"
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}

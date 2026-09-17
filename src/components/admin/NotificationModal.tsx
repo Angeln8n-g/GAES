@@ -90,9 +90,10 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
           </div>
           <button
             onClick={onClose}
+            aria-label="Cerrar centro de notificaciones"
             className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 
@@ -108,7 +109,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
             <div className="text-right">
               <span className="text-[10px] text-slate-500 font-semibold">Destinatarios</span>
               <p className="text-xs font-black text-slate-800 flex items-center gap-1 justify-end">
-                <Users className="w-3.5 h-3.5 text-[#DA291C]" />
+                <Users className="w-3.5 h-3.5 text-[#DA291C]" aria-hidden="true" />
                 <span>{totalRecipients} colaboradores</span>
               </p>
             </div>
@@ -120,6 +121,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
+                aria-pressed={channel === 'Email'}
                 onClick={() => setChannel('Email')}
                 className={`p-3 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
                   channel === 'Email'
@@ -127,12 +129,13 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                     : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
                 }`}
               >
-                <Mail className="w-4 h-4" />
+                <Mail className="w-4 h-4" aria-hidden="true" />
                 <span>Correo Corporativo (Email)</span>
               </button>
 
               <button
                 type="button"
+                aria-pressed={channel === 'Teams'}
                 onClick={() => setChannel('Teams')}
                 className={`p-3 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
                   channel === 'Teams'
@@ -140,7 +143,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                     : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
                 }`}
               >
-                <Bell className="w-4 h-4" />
+                <Bell className="w-4 h-4" aria-hidden="true" />
                 <span>Microsoft Teams</span>
               </button>
             </div>
@@ -149,11 +152,12 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
           {/* Template Message Input */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-bold text-slate-700">Mensaje Personalizado:</label>
+              <label htmlFor="notification-message" className="block text-xs font-bold text-slate-700">Mensaje Personalizado:</label>
               <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-semibold">
                 <span>Variables:</span>
                 <button
                   type="button"
+                  aria-label="Insertar variable título del evento"
                   onClick={() => setMessage(prev => `${prev} [EVENT_TITLE]`)}
                   className="px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-[#DA291C] font-bold cursor-pointer"
                 >
@@ -161,6 +165,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                 </button>
                 <button
                   type="button"
+                  aria-label="Insertar variable instructor"
                   onClick={() => setMessage(prev => `${prev} [INSTRUCTOR]`)}
                   className="px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-[#DA291C] font-bold cursor-pointer"
                 >
@@ -168,6 +173,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                 </button>
                 <button
                   type="button"
+                  aria-label="Insertar variable enlace de encuesta"
                   onClick={() => setMessage(prev => `${prev} [SURVEY_LINK]`)}
                   className="px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-[#DA291C] font-bold cursor-pointer"
                 >
@@ -176,6 +182,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
               </div>
             </div>
             <textarea
+              id="notification-message"
               rows={3}
               value={message}
               onChange={(e) => setMessage(e.target.value)}

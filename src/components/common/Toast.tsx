@@ -42,7 +42,11 @@ export const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
 
   return (
     <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-bottom-5 duration-300">
-      <div className={`flex items-start gap-3 p-4 rounded-2xl border shadow-2xl backdrop-blur-xl max-w-md ${getBorderColor()}`}>
+      <div 
+        role={toast.type === 'error' ? 'alert' : 'status'}
+        aria-live={toast.type === 'error' ? 'assertive' : 'polite'}
+        className={`flex items-start gap-3 p-4 rounded-2xl border shadow-2xl backdrop-blur-xl max-w-md ${getBorderColor()}`}
+      >
         {getIcon()}
         <div className="flex-1 pr-2">
           <h4 className="text-sm font-semibold tracking-wide">{toast.title}</h4>
@@ -50,9 +54,10 @@ export const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
         </div>
         <button
           onClick={onClose}
-          className="text-white/60 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10"
+          aria-label="Cerrar notificación"
+          className="text-white/60 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10 cursor-pointer"
         >
-          <X className="w-4 h-4" />
+          <X className="w-4 h-4" aria-hidden="true" />
         </button>
       </div>
     </div>

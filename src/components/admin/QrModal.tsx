@@ -81,9 +81,10 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
           </div>
           <button
             onClick={onClose}
+            aria-label="Cerrar ventana de control de asistencia"
             className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 
@@ -91,6 +92,7 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
         <div className="p-3 bg-slate-100/80 border-b border-slate-200 grid grid-cols-2 gap-2">
           <button
             type="button"
+            aria-pressed={activeMode === 'checkin'}
             onClick={() => setActiveMode('checkin')}
             className={`py-2.5 px-4 rounded-2xl text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${
               activeMode === 'checkin'
@@ -98,12 +100,13 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
                 : 'bg-white text-slate-700 hover:bg-slate-100 hover:text-emerald-800 border border-slate-200'
             }`}
           >
-            <LogIn className="w-4 h-4" />
+            <LogIn className="w-4 h-4" aria-hidden="true" />
             <span>1. Código de ENTRADA (Inicio)</span>
           </button>
 
           <button
             type="button"
+            aria-pressed={activeMode === 'checkout'}
             onClick={() => setActiveMode('checkout')}
             className={`py-2.5 px-4 rounded-2xl text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${
               activeMode === 'checkout'
@@ -111,7 +114,7 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
                 : 'bg-white text-slate-700 hover:bg-slate-100 hover:text-red-800 border border-slate-200'
             }`}
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-4 h-4" aria-hidden="true" />
             <span>2. Código de SALIDA (Cierre)</span>
           </button>
         </div>
@@ -260,8 +263,8 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
               onClick={handleCopyLink}
               className="flex-1 py-2.5 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center gap-2 border border-slate-300 transition-colors cursor-pointer"
             >
-              {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-              <span>{copied ? '¡Enlace Copiado!' : `Copiar Enlace (${activeMode === 'checkin' ? 'Entrada' : 'Salida'})`}</span>
+              {copied ? <Check className="w-4 h-4 text-emerald-600" aria-hidden="true" /> : <Copy className="w-4 h-4" aria-hidden="true" />}
+              <span role="status" aria-live="polite">{copied ? '¡Enlace Copiado!' : `Copiar Enlace (${activeMode === 'checkin' ? 'Entrada' : 'Salida'})`}</span>
             </button>
 
             <button

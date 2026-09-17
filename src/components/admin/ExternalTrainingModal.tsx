@@ -293,6 +293,7 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
         <div className="bg-gradient-to-r from-[#DA291C] via-red-600 to-[#0F172A] p-5 sm:p-6 text-white relative">
           <button
             onClick={onClose}
+            aria-label="Cerrar modal de capacitación externa"
             className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
             title="Cerrar modal"
           >
@@ -326,7 +327,7 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
         <form onSubmit={handleSubmit} className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-6">
           
           {errorMessage && (
-            <div className="p-3.5 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2 animate-in fade-in">
+            <div role="alert" aria-live="assertive" className="p-3.5 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2 animate-in fade-in">
               <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
               <span>{errorMessage}</span>
             </div>
@@ -371,7 +372,9 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
             <div className="relative">
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
               <input
+                id="ext-participant-search"
                 type="text"
+                aria-label="Buscar colaborador por nombre, tarjeta, cédula o departamento"
                 placeholder="Buscar por nombre, tarjeta, cédula o departamento..."
                 value={participantSearch}
                 onChange={(e) => setParticipantSearch(e.target.value)}
@@ -391,12 +394,14 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
                   return (
                     <label 
                       key={p.card} 
+                      htmlFor={`ext-user-${p.card}`}
                       className={`flex items-center justify-between p-2.5 hover:bg-slate-50 cursor-pointer transition-colors text-xs ${
                         isChecked ? 'bg-red-50/50' : ''
                       }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <input
+                          id={`ext-user-${p.card}`}
                           type={isEdit ? 'radio' : 'checkbox'}
                           name="participant_select"
                           checked={isChecked}
@@ -453,6 +458,7 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
                         <button
                           type="button"
                           onClick={() => toggleParticipantCard(p.card)}
+                          aria-label={`Quitar a ${p.name} de la selección`}
                           className="hover:text-red-600 ml-0.5 cursor-pointer text-slate-400"
                           title={`Quitar ${p.name}`}
                         >
@@ -476,10 +482,11 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               {/* Título de la capacitación */}
               <div className="sm:col-span-2">
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="ext-title" className="block text-xs font-bold text-slate-700 mb-1">
                   Nombre o Título de la Capacitación Externa <span className="text-red-500">*</span>
                 </label>
                 <input
+                  id="ext-title"
                   type="text"
                   required
                   placeholder="Ej. Certificación Internacional en AWS Solutions Architect / Taller de Ciberseguridad"
@@ -491,10 +498,11 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
 
               {/* Suplidor / Entidad Emisora */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="ext-supplier" className="block text-xs font-bold text-slate-700 mb-1">
                   Suplidor / Entidad Emisora <span className="text-red-500">*</span>
                 </label>
                 <input
+                  id="ext-supplier"
                   type="text"
                   required
                   placeholder="Ej. INFOTEP, Platzi, Coursera, INTEC, Microsoft..."
@@ -524,10 +532,11 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
               {/* Empresa asignada */}
               {companies.length > 0 && (
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label htmlFor="ext-company-id" className="block text-xs font-bold text-slate-700 mb-1">
                     Empresa / Entidad Vinculada
                   </label>
                   <select
+                    id="ext-company-id"
                     value={companyId}
                     onChange={(e) => setCompanyId(e.target.value)}
                     className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 font-medium bg-white"
@@ -543,10 +552,11 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
 
               {/* Descripción */}
               <div className="sm:col-span-2">
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="ext-description" className="block text-xs font-bold text-slate-700 mb-1">
                   Descripción o Alcance de la Capacitación
                 </label>
                 <textarea
+                  id="ext-description"
                   rows={2}
                   placeholder="Describe los temas abordados, competencias adquiridas u objetivos del curso..."
                   value={description}
@@ -572,10 +582,11 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 bg-emerald-50/40 p-4 rounded-2xl border border-emerald-100">
               {/* Programa Oficial */}
               <div className="sm:col-span-2 md:col-span-2">
-                <label className="block text-xs font-bold text-slate-800 mb-1">
+                <label htmlFor="ext-program-category" className="block text-xs font-bold text-slate-800 mb-1">
                   Programa Corporativo <span className="text-red-500">*</span>
                 </label>
                 <select
+                  id="ext-program-category"
                   value={programCategory}
                   onChange={(e) => handleProgramCategoryChange(e.target.value)}
                   className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-slate-800 font-semibold bg-white"
@@ -590,10 +601,11 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
 
               {/* Subprograma (Dependiente) */}
               <div>
-                <label className="block text-xs font-bold text-slate-800 mb-1">
+                <label htmlFor="ext-subprogram" className="block text-xs font-bold text-slate-800 mb-1">
                   Subprograma <span className="text-red-500">*</span>
                 </label>
                 <select
+                  id="ext-subprogram"
                   value={subprogram}
                   onChange={(e) => setSubprogram(e.target.value)}
                   className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-slate-800 font-semibold bg-white"
@@ -608,10 +620,11 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
 
               {/* Tipo de Sesión */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="ext-session-type" className="block text-xs font-bold text-slate-700 mb-1">
                   Tipo de Sesión <span className="text-red-500">*</span>
                 </label>
                 <select
+                  id="ext-session-type"
                   value={sessionType}
                   onChange={(e) => setSessionType(e.target.value as SessionType)}
                   className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-slate-800 font-medium bg-white"
@@ -624,10 +637,11 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
 
               {/* Tipo de Entrenamiento */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="ext-training-type" className="block text-xs font-bold text-slate-700 mb-1">
                   Tipo de Entrenamiento <span className="text-red-500">*</span>
                 </label>
                 <select
+                  id="ext-training-type"
                   value={trainingType}
                   onChange={(e) => setTrainingType(e.target.value as TrainingType)}
                   className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-slate-800 font-medium bg-white"
@@ -640,10 +654,11 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
 
               {/* Formato de Capacitación */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="ext-training-format" className="block text-xs font-bold text-slate-700 mb-1">
                   Formato de Capacitación <span className="text-red-500">*</span>
                 </label>
                 <select
+                  id="ext-training-format"
                   value={trainingFormat}
                   onChange={(e) => setTrainingFormat(e.target.value as TrainingFormat)}
                   className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-slate-800 font-medium bg-white"
@@ -656,10 +671,11 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
 
               {/* Modalidad */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="ext-modality" className="block text-xs font-bold text-slate-700 mb-1">
                   Modalidad <span className="text-red-500">*</span>
                 </label>
                 <select
+                  id="ext-modality"
                   value={modality}
                   onChange={(e) => setModality(e.target.value as any)}
                   className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-slate-800 font-medium bg-white"
@@ -672,10 +688,11 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
 
               {/* Fecha Desde */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="ext-start-date" className="block text-xs font-bold text-slate-700 mb-1">
                   Fecha Desde <span className="text-red-500">*</span>
                 </label>
                 <input
+                  id="ext-start-date"
                   type="date"
                   required
                   value={startDate}
@@ -686,10 +703,11 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
 
               {/* Fecha Hasta */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="ext-end-date" className="block text-xs font-bold text-slate-700 mb-1">
                   Fecha Hasta <span className="text-red-500">*</span>
                 </label>
                 <input
+                  id="ext-end-date"
                   type="date"
                   required
                   value={endDate}
@@ -700,12 +718,13 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
 
               {/* Duración en Horas */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="ext-total-hours" className="block text-xs font-bold text-slate-700 mb-1">
                   Duración Total (Horas) <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <Clock className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                   <input
+                    id="ext-total-hours"
                     type="number"
                     min="0.5"
                     step="0.5"
@@ -746,10 +765,11 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               {/* Folio / Número de Certificado */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="ext-certificate-number" className="block text-xs font-bold text-slate-700 mb-1">
                   Folio o Código de Certificado
                 </label>
                 <input
+                  id="ext-certificate-number"
                   type="text"
                   placeholder="Ej. CERT-2026-98741"
                   value={certificateNumber}
@@ -760,10 +780,11 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
 
               {/* Calificación obtenida */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="ext-score" className="block text-xs font-bold text-slate-700 mb-1">
                   Calificación / Nota Obtenida (0-100)
                 </label>
                 <input
+                  id="ext-score"
                   type="number"
                   min="0"
                   max="100"
@@ -777,10 +798,11 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
 
               {/* Estado Académico */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="ext-academic-status" className="block text-xs font-bold text-slate-700 mb-1">
                   Estado de Culminación
                 </label>
                 <select
+                  id="ext-academic-status"
                   value={academicStatus}
                   onChange={(e) => setAcademicStatus(e.target.value)}
                   className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 font-medium bg-white"
@@ -795,7 +817,7 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
               {/* URL de Credencial o Enlace de Verificación */}
               <div className="sm:col-span-3">
                 <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-bold text-slate-700">
+                  <label htmlFor="ext-credential-url" className="block text-xs font-bold text-slate-700">
                     Enlace de Validación / URL de Credencial Digital
                   </label>
                   {credentialUrl.trim().startsWith('http') && (
@@ -813,6 +835,7 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
                 <div className="relative">
                   <LinkIcon className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                   <input
+                    id="ext-credential-url"
                     type="url"
                     placeholder="https://coursera.org/verify/... o link de Google Drive / PDF"
                     value={credentialUrl}

@@ -108,6 +108,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
         {/* Close Button */}
         <button
           onClick={onClose}
+          aria-label="Cerrar modal de cambio de contraseña"
           className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
         >
           <X className="w-5 h-5" />
@@ -130,7 +131,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
 
         {/* Error Alert */}
         {error && (
-          <div className="mb-5 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-2.5 text-rose-700 text-xs font-medium animate-in shake duration-300">
+          <div role="alert" aria-live="assertive" className="mb-5 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-2.5 text-rose-700 text-xs font-medium animate-in shake duration-300">
             <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-rose-500" />
             <span>{error}</span>
           </div>
@@ -141,7 +142,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
           
           {/* Current Password */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
+            <label htmlFor="chpass-current" className="block text-xs font-bold text-slate-700 mb-1">
               Contraseña Actual
             </label>
             <div className="relative">
@@ -149,6 +150,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
                 <Lock className="w-4 h-4" />
               </div>
               <input
+                id="chpass-current"
                 type={showCurrent ? 'text' : 'password'}
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
@@ -159,6 +161,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
               <button
                 type="button"
                 onClick={() => setShowCurrent(!showCurrent)}
+                aria-label={showCurrent ? 'Ocultar contraseña actual' : 'Ver contraseña actual'}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
               >
                 {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -168,7 +171,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
 
           {/* New Password */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
+            <label htmlFor="chpass-new" className="block text-xs font-bold text-slate-700 mb-1">
               Nueva Contraseña
             </label>
             <div className="relative">
@@ -176,6 +179,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
                 <Lock className="w-4 h-4" />
               </div>
               <input
+                id="chpass-new"
                 type={showNew ? 'text' : 'password'}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
@@ -186,6 +190,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
               <button
                 type="button"
                 onClick={() => setShowNew(!showNew)}
+                aria-label={showNew ? 'Ocultar nueva contraseña' : 'Ver nueva contraseña'}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
               >
                 {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -210,7 +215,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
 
           {/* Confirm New Password */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
+            <label htmlFor="chpass-confirm" className="block text-xs font-bold text-slate-700 mb-1">
               Confirmar Nueva Contraseña
             </label>
             <div className="relative">
@@ -218,6 +223,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
                 <Lock className="w-4 h-4" />
               </div>
               <input
+                id="chpass-confirm"
                 type={showConfirm ? 'text' : 'password'}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -228,6 +234,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
               <button
                 type="button"
                 onClick={() => setShowConfirm(!showConfirm)}
+                aria-label={showConfirm ? 'Ocultar confirmación de contraseña' : 'Ver confirmación de contraseña'}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
               >
                 {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}

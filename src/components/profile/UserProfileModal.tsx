@@ -239,6 +239,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
           {!isMandatory && (
             <button
               onClick={onClose}
+              aria-label="Cerrar modal de perfil"
               className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
               title="Cerrar modal"
             >
@@ -358,7 +359,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
           </div>
 
           {errorMessage && (
-            <div className="p-3.5 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2 animate-in fade-in">
+            <div role="alert" aria-live="assertive" className="p-3.5 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2 animate-in fade-in">
               <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
               <span>{errorMessage}</span>
             </div>
@@ -374,11 +375,12 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               {/* Fecha de Nacimiento */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="profile-birthdate" className="block text-xs font-bold text-slate-700 mb-1">
                   Fecha de Nacimiento <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <input
+                    id="profile-birthdate"
                     type="date"
                     required
                     value={birthDate}
@@ -397,12 +399,13 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
               {/* Teléfono / WhatsApp */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="profile-phone" className="block text-xs font-bold text-slate-700 mb-1">
                   Teléfono / WhatsApp <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <Phone className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                   <input
+                    id="profile-phone"
                     type="tel"
                     required
                     placeholder="Ej. (809) 555-0123"
@@ -415,10 +418,11 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
               {/* Género */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="profile-gender" className="block text-xs font-bold text-slate-700 mb-1">
                   Género
                 </label>
                 <select
+                  id="profile-gender"
                   value={gender}
                   onChange={(e) => setGender(e.target.value as Gender)}
                   className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 font-medium bg-white"
@@ -432,12 +436,13 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
               {/* Dirección actual */}
               <div className="sm:col-span-2">
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="profile-address" className="block text-xs font-bold text-slate-700 mb-1">
                   Dirección de Residencia Actual <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <MapPin className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                   <input
+                    id="profile-address"
                     type="text"
                     required
                     placeholder="Sector, calle o municipio (Ej. Bella Vista, Santo Domingo D.N.)"
@@ -460,10 +465,11 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               {/* Grado / Nivel de Estudio */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="profile-education-level" className="block text-xs font-bold text-slate-700 mb-1">
                   Nivel de Estudio Alcanzado <span className="text-red-500">*</span>
                 </label>
                 <select
+                  id="profile-education-level"
                   value={educationLevel}
                   onChange={(e) => setEducationLevel(e.target.value as EducationLevel)}
                   className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 font-medium bg-white"
@@ -481,12 +487,13 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
               {/* Título o Profesión */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="profile-profession-title" className="block text-xs font-bold text-slate-700 mb-1">
                   Título / Profesión Obtenida
                 </label>
                 <div className="relative">
                   <Briefcase className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                   <input
+                    id="profile-profession-title"
                     type="text"
                     placeholder="Ej. Bachiller, Ing. Sistemas, Lic. Administración, Técnico..."
                     value={professionTitle}
@@ -537,10 +544,11 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
               {isCurrentlyStudying && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 mt-3 border-t border-amber-200/60 animate-in fade-in">
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                    <label htmlFor="profile-study-field" className="block text-[11px] font-bold text-slate-700 mb-1">
                       ¿Qué estudias actualmente? <span className="text-red-500">*</span>
                     </label>
                     <input
+                      id="profile-study-field"
                       type="text"
                       required={isCurrentlyStudying}
                       placeholder="Ej. Ing. en Ciberseguridad, Técnico en Redes..."
@@ -550,10 +558,11 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                    <label htmlFor="profile-institution-name" className="block text-[11px] font-bold text-slate-700 mb-1">
                       Institución / Universidad
                     </label>
                     <input
+                      id="profile-institution-name"
                       type="text"
                       placeholder="Ej. UASD, INTEC, ITLA, INFOTEP, PUCMM..."
                       value={institutionName}
@@ -604,6 +613,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
             {/* Custom interests tag input */}
             <div className="flex items-center gap-2 pt-1">
               <input
+                id="profile-custom-interest"
                 type="text"
                 placeholder="¿Otro tema que necesites para tu puesto? Escríbelo aquí..."
                 value={customInterest}
@@ -614,6 +624,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
               <button
                 type="button"
                 onClick={handleAddCustomInterest}
+                aria-label="Agregar interés formativo personalizado"
                 className="px-3 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold cursor-pointer transition-colors"
               >
                 Agregar

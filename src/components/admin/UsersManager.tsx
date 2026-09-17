@@ -427,8 +427,10 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
         {/* Search & Filters */}
         <div className="flex items-center gap-3 flex-wrap flex-1">
           <div className="relative flex-1 min-w-[220px]">
-            <Search className="w-4 h-4 text-slate-400 absolute inset-y-0 left-3.5 my-auto" />
+            <Search className="w-4 h-4 text-slate-400 absolute inset-y-0 left-3.5 my-auto" aria-hidden="true" />
+            <label htmlFor="users-search" className="sr-only">Buscar por nombre, correo, cédula, empresa o rol</label>
             <input
+              id="users-search"
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -441,6 +443,8 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
             {/* Filtro Empresa */}
             {companies.length > 0 && isSuperAdmin && (
               <select
+                id="users-filter-company"
+                aria-label="Filtrar usuarios por empresa"
                 value={selectedCompanyFilter}
                 onChange={(e) => setSelectedCompanyFilter(e.target.value)}
                 className="px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs text-slate-800 font-bold focus:outline-none focus:border-[#DA291C]"
@@ -454,6 +458,8 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
 
             {/* Filtro Estado */}
             <select
+              id="users-filter-status"
+              aria-label="Filtrar usuarios por estado laboral"
               value={selectedStatusFilter}
               onChange={(e) => setSelectedStatusFilter(e.target.value)}
               className="px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#DA291C]"
@@ -466,6 +472,8 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
 
             {/* Filtro Rol */}
             <select
+              id="users-filter-role"
+              aria-label="Filtrar usuarios por rol"
               value={selectedRoleFilter}
               onChange={(e) => setSelectedRoleFilter(e.target.value)}
               className="px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#DA291C]"
@@ -793,8 +801,9 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                             onClick={() => setSelectedUserForEdit(u)}
                             className="p-1.5 text-slate-600 hover:text-blue-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
                             title="Editar usuario"
+                            aria-label={`Editar usuario ${u.name}`}
                           >
-                            <Edit3 className="w-3.5 h-3.5" />
+                            <Edit3 className="w-3.5 h-3.5" aria-hidden="true" />
                           </button>
 
                           <button
@@ -804,8 +813,9 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                             }}
                             className="p-1.5 text-slate-600 hover:text-amber-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
                             title="Cambiar contraseña"
+                            aria-label={`Cambiar contraseña de ${u.name}`}
                           >
-                            <KeyRound className="w-3.5 h-3.5" />
+                            <KeyRound className="w-3.5 h-3.5" aria-hidden="true" />
                           </button>
 
                           {u.id !== currentUser?.id && (
@@ -813,8 +823,9 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                               onClick={() => handleDeleteUser(u.id)}
                               className="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                               title="Eliminar usuario"
+                              aria-label={`Eliminar usuario ${u.name}`}
                             >
-                              <Trash2 className="w-3.5 h-3.5" />
+                              <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
                             </button>
                           )}
                         </div>
@@ -842,25 +853,34 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
 
       {/* Change Password Modal */}
       {selectedUserForPassword && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="change-password-modal-title"
+        >
           <div className="bg-white border border-slate-200 rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4">
             <div className="flex items-center gap-2.5 text-amber-600">
-              <KeyRound className="w-5 h-5" />
-              <h2 className="text-base font-black text-slate-900">Cambiar Contraseña</h2>
+              <KeyRound className="w-5 h-5" aria-hidden="true" />
+              <h2 id="change-password-modal-title" className="text-base font-black text-slate-900">Cambiar Contraseña</h2>
             </div>
             <p className="text-xs text-slate-500">
               Ingresa la nueva contraseña para <strong className="text-slate-800">{selectedUserForPassword.name}</strong> ({selectedUserForPassword.email}).
             </p>
 
             <form onSubmit={handleChangePasswordSubmit} className="space-y-4">
-              <input
-                type="text"
-                value={newPasswordInput}
-                onChange={(e) => setNewPasswordInput(e.target.value)}
-                placeholder="Nueva contraseña..."
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#DA291C]"
-                required
-              />
+              <div>
+                <label htmlFor="user-new-password-input" className="sr-only">Nueva contraseña</label>
+                <input
+                  id="user-new-password-input"
+                  type="text"
+                  value={newPasswordInput}
+                  onChange={(e) => setNewPasswordInput(e.target.value)}
+                  placeholder="Nueva contraseña..."
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                  required
+                />
+              </div>
               <div className="flex items-center gap-2">
                 <button
                   type="button"

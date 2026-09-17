@@ -392,8 +392,10 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
 
             {/* Buscador de Colaborador */}
             <div className="relative">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" aria-hidden="true" />
+              <label htmlFor="formal-letters-search" className="sr-only">Buscar colaborador por nombre, cédula o cargo</label>
               <input
+                id="formal-letters-search"
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -403,6 +405,7 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
+                  aria-label="Limpiar búsqueda de colaboradores"
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 font-bold"
                 >
                   ✕
@@ -413,7 +416,9 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
             {/* Filtros rápidos: Empresa y Asistencias */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
               <div className="flex-1 relative">
+                <label htmlFor="formal-letters-company-filter" className="sr-only">Filtrar por empresa</label>
                 <select
+                  id="formal-letters-company-filter"
                   value={selectedCompanyFilter}
                   onChange={(e) => setSelectedCompanyFilter(e.target.value)}
                   className="w-full text-xs font-bold bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-700 focus:outline-none focus:border-[#DA291C] cursor-pointer"
@@ -673,12 +678,13 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                                 e.stopPropagation();
                                 toggleRecordSelection(rec.id);
                               }}
+                              aria-label={isChecked ? `Deseleccionar curso ${rec.title}` : `Seleccionar curso ${rec.title}`}
                               className="text-slate-400 hover:text-slate-600 cursor-pointer shrink-0"
                             >
                               {isChecked ? (
-                                <CheckSquare className="w-5 h-5 text-[#DA291C]" />
+                                <CheckSquare className="w-5 h-5 text-[#DA291C]" aria-hidden="true" />
                               ) : (
-                                <Square className="w-5 h-5 text-slate-300" />
+                                <Square className="w-5 h-5 text-slate-300" aria-hidden="true" />
                               )}
                             </button>
 
@@ -754,8 +760,9 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                               }}
                               className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-bold transition-colors cursor-pointer"
                               title="Emitir constancia solo para este curso"
+                              aria-label={`Emitir constancia para ${rec.title}`}
                             >
-                              <Printer className="w-4 h-4" />
+                              <Printer className="w-4 h-4" aria-hidden="true" />
                             </button>
                           </div>
                         </div>
