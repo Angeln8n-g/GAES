@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { TrainingEvent, Participant, UserAccount, Slot, ParticipantGroup } from '../../types';
 import { formatDateLong } from '../../utils/formatters';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface TeamAssignmentModalProps {
   isOpen: boolean;
@@ -182,8 +183,13 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+    <AccessibleModal
+      isOpen={isOpen}
+      onClose={onClose}
+      ariaLabel="Asignar Capacitación a Mi Equipo"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
+    >
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
         <div className="p-6 border-b border-slate-200 flex items-start justify-between bg-slate-50">
@@ -485,6 +491,6 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
         </div>
 
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

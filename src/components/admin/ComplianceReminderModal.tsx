@@ -20,6 +20,7 @@ import {
   TrainingEvent 
 } from '../../types';
 import { formatDateLong } from '../../utils/formatters';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface ComplianceReminderModalProps {
   program: TrainingProgram;
@@ -105,8 +106,13 @@ export const ComplianceReminderModal: React.FC<ComplianceReminderModalProps> = (
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+    <AccessibleModal
+      isOpen={isOpen}
+      onClose={onClose}
+      ariaLabel="Despacho de Recordatorios de Cumplimiento"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
+    >
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         
         {/* Modal Header */}
         <div className="flex items-center justify-between">
@@ -312,6 +318,6 @@ export const ComplianceReminderModal: React.FC<ComplianceReminderModalProps> = (
         </div>
 
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

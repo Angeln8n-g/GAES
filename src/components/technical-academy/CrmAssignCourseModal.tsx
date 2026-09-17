@@ -19,6 +19,7 @@ import {
   Participant
 } from '../../types';
 import { apiService } from '../../services/api';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface CrmAssignCourseModalProps {
   isOpen: boolean;
@@ -132,8 +133,13 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-      <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-6 animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] overflow-y-auto">
+    <AccessibleModal
+      isOpen={isOpen}
+      onClose={onClose}
+      ariaLabel={isReassignment ? 'Reasignar Curso Técnico' : 'Asignar Curso Técnico'}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+    >
+      <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-6 animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         
         {/* Modal Header */}
         <div className="flex items-start justify-between border-b border-slate-100 pb-4">
@@ -362,6 +368,6 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

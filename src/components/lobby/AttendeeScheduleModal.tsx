@@ -24,6 +24,7 @@ import { AttendeeLookupResult, ScheduledSessionItem } from '../../utils/attendee
 import { formatDateLong, getEventDurationMetrics } from '../../utils/formatters';
 import { downloadIcsFile, getGoogleCalendarUrl } from '../../utils/icsUtils';
 import { TrainingEvent } from '../../types';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface AttendeeScheduleModalProps {
   isOpen: boolean;
@@ -61,7 +62,12 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
   const todaySessionsCount = sessions.filter(s => s.isToday).length;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-900/80 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
+    <AccessibleModal
+      isOpen={isOpen}
+      onClose={onClose}
+      ariaLabel={`Agenda de Capacitaciones - ${displayName}`}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-900/80 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200"
+    >
       <div 
         className="relative w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-auto flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
@@ -458,8 +464,13 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
       </div>
 
       {/* SUB-MODAL: Pase QR Individual para Mostrar en Puerta */}
-      {selectedPassSession && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-150">
+      <AccessibleModal
+        isOpen={Boolean(selectedPassSession)}
+        onClose={() => setSelectedPassSession(null)}
+        ariaLabel="Pase de Entrada Claro"
+        className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-150"
+      >
+        {selectedPassSession && (
           <div 
             className="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center space-y-4 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
@@ -478,25 +489,21 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
 
             {/* QR Code Graphic */}
             <div className="p-4 bg-white border-2 border-slate-200 rounded-2xl inline-block shadow-inner">
-              <QRCodeSVG
-                value={`${window.location.origin}${window.location.pathname}?tab=attendance&event=${selectedPassSession.event.id}&date=${selectedPassSession.schedule.date}&time=${encodeURIComponent(selectedPassSession.slot.time)}`}
+              <QRCodeSVG 
+                value={`${window.location.origin}${window.location.pathname}?tab=attendance&event=${selectedPassSession.event.id}&date=${selectedPassSession.schedule.date}&time=${encodeURIComponent(selectedPassSession.slot.time)}&attendee=${encodeURIComponent(displayEmail || displayCedula || '')}`}
                 size={180}
-                level="M"
+                level="H"
                 includeMargin={false}
               />
             </div>
 
             <div>
-              <h4 className="text-sm font-black text-slate-900 leading-tight">
+              <h4 className="text-sm font-black text-slate-900 leading-snug">
                 {selectedPassSession.event.title}
               </h4>
-              <p className="text-xs text-slate-500 font-medium mt-1">
-                {formatDateLong(selectedPassSession.schedule.date)} • {selectedPassSession.slot.time}{selectedPassSession.slot.endTime ? ` - ${selectedPassSession.slot.endTime}` : ''}
+              <p className="text-xs text-slate-500 mt-1">
+                {formatDateLong(selectedPassSession.schedule.date)} • {selectedPassSession.slot.time}
               </p>
-              <div className="mt-1.5 inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-900 bg-amber-50 px-2.5 py-0.5 rounded-lg border border-amber-200">
-                <Clock className="w-3 h-3 text-amber-600" />
-                <span>{getEventDurationMetrics(selectedPassSession.event).totalHours} hrs ({getEventDurationMetrics(selectedPassSession.event).totalDays} {getEventDurationMetrics(selectedPassSession.event).totalDays === 1 ? 'día' : 'días'})</span>
-              </div>
               <p className="text-[11px] text-[#DA291C] font-bold mt-1.5">
                 {displayName} ({displayCedula || displayCard})
               </p>
@@ -529,9 +536,9 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
               Listo
             </button>
           </div>
-        </div>
-      )}
+        )}
+      </AccessibleModal>
 
-    </div>
+    </AccessibleModal>
   );
 };

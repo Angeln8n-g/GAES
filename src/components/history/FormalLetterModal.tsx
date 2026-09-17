@@ -20,6 +20,7 @@ import {
 import { QRCodeSVG } from 'qrcode.react';
 import { TrainingEvent, UserAccount, Participant, Company } from '../../types';
 import { formatDateLong, formatDateShort, formatCedula } from '../../utils/formatters';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 export interface TrainingHistoryRecord {
   id: string;
@@ -213,7 +214,12 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200 overflow-y-auto">
+    <AccessibleModal
+      isOpen={isOpen}
+      onClose={onClose}
+      ariaLabel="Elaboración de Carta Formal"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200 overflow-y-auto"
+    >
       
       {/* Estilos específicos de impresión: Aislar únicamente la hoja formal */}
       <style>{`
@@ -243,7 +249,7 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
         }
       `}</style>
 
-      <div className="bg-slate-100 rounded-3xl w-full max-w-7xl shadow-2xl border border-slate-300 flex flex-col max-h-[95vh] overflow-hidden my-auto">
+      <div className="bg-slate-100 rounded-3xl w-full max-w-7xl shadow-2xl border border-slate-300 flex flex-col max-h-[95vh] overflow-hidden my-auto" onClick={(e) => e.stopPropagation()}>
         
         {/* Modal Header */}
         <div className="bg-white px-6 py-4 border-b border-slate-200 flex items-center justify-between gap-4 shrink-0">
@@ -808,6 +814,6 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
 
       </div>
 
-    </div>
+    </AccessibleModal>
   );
 };

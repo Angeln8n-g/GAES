@@ -34,6 +34,7 @@ import {
   parseCohortParticipantsExcel
 } from '../../utils/excelUtils';
 import { formatCedula, formatDateShort } from '../../utils/formatters';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface TechnicalCohortEnrollmentModalProps {
   isOpen: boolean;
@@ -500,8 +501,13 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-200/90 overflow-hidden flex flex-col max-h-[92vh]">
+    <AccessibleModal
+      isOpen={isOpen}
+      onClose={onClose}
+      ariaLabel={`Gestión de Participantes: ${cohort.courseTitle}`}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto bg-slate-900/60 backdrop-blur-sm animate-fade-in"
+    >
+      <div className="relative w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-200/90 overflow-hidden flex flex-col max-h-[92vh]" onClick={(e) => e.stopPropagation()}>
         {/* Cabecera del Modal */}
         <div className="px-6 py-5 border-b border-slate-100 bg-white">
           <div className="flex items-start justify-between gap-4">
@@ -1388,9 +1394,14 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
         </div>
 
         {/* Sub-modal: Calificación Rápida Individual */}
-        {gradingParticipant && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-            <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-md w-full p-6 space-y-4 animate-scale-up">
+        <AccessibleModal
+          isOpen={Boolean(gradingParticipant)}
+          onClose={() => setGradingParticipant(null)}
+          ariaLabel={`Calificar a ${gradingParticipant?.name || 'Participante'}`}
+          className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in"
+        >
+          {gradingParticipant && (
+            <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-md w-full p-6 space-y-4 animate-scale-up" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-start justify-between">
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-[#DA291C] bg-red-50 px-2.5 py-0.5 rounded-full border border-red-100">
@@ -1491,9 +1502,9 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                 </div>
               </form>
             </div>
-          </div>
-        )}
+          )}
+        </AccessibleModal>
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

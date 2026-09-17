@@ -25,6 +25,7 @@ import {
 import { UserAccount, Participant, EducationLevel, Gender, ExternalTraining } from '../../types';
 import { formatDateShort, formatCedula } from '../../utils/formatters';
 import { getProgramShortName } from '../../constants/sustainabilityPrograms';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface UserProfileModalProps {
   isOpen: boolean;
@@ -223,13 +224,15 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
   };
 
   return (
-    <div 
+    <AccessibleModal
+      isOpen={isOpen}
+      onClose={isMandatory ? () => {} : onClose}
+      closeOnEscape={!isMandatory}
+      closeOnBackdropClick={!isMandatory}
+      ariaLabel={`Perfil de Formación - ${currentUser.name}`}
       className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
-      onClick={(e) => {
-        if (!isMandatory && e.target === e.currentTarget) onClose();
-      }}
     >
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-2xl w-full overflow-hidden flex flex-col max-h-[92vh]">
+      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-2xl w-full overflow-hidden flex flex-col max-h-[92vh]" onClick={(e) => e.stopPropagation()}>
         
         {/* Header con gradiente institucional */}
         <div className="bg-gradient-to-r from-[#DA291C] via-red-600 to-[#0F172A] p-5 sm:p-6 text-white relative">
@@ -787,6 +790,6 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
         )}
 
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

@@ -34,10 +34,13 @@ import {
   DEFAULT_SUPPLIER_OPTIONS, 
   getSubprogramsForProgram,
   getProgramLabel,
+  getProgramShortName,
   SessionType,
   TrainingType,
   TrainingFormat
 } from '../../constants/sustainabilityPrograms';
+import { formatDateShort } from '../../utils/formatters';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface ExternalTrainingModalProps {
   isOpen: boolean;
@@ -278,8 +281,13 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-4xl w-full overflow-hidden flex flex-col max-h-[92vh]">
+    <AccessibleModal
+      isOpen={isOpen}
+      onClose={onClose}
+      ariaLabel={isEdit ? 'Editar Capacitación Externa' : 'Registrar Capacitación Externa'}
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
+    >
+      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-4xl w-full overflow-hidden flex flex-col max-h-[92vh]" onClick={(e) => e.stopPropagation()}>
         
         {/* Header con gradiente institucional */}
         <div className="bg-gradient-to-r from-[#DA291C] via-red-600 to-[#0F172A] p-5 sm:p-6 text-white relative">
@@ -843,6 +851,6 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
         </form>
 
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

@@ -12,6 +12,7 @@ import {
   Link as LinkIcon
 } from 'lucide-react';
 import { TrainingEvent } from '../../types';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface NotificationModalProps {
   event: TrainingEvent | null;
@@ -69,8 +70,12 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
+    <AccessibleModal
+      onClose={onClose}
+      ariaLabel="Despacho de Recordatorio de Capacitación"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
+    >
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
         <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
@@ -227,6 +232,6 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
         </div>
 
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

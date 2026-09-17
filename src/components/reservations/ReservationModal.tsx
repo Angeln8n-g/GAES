@@ -14,6 +14,7 @@ import {
 import { TrainingEvent, UserAccount, Slot } from '../../types';
 import { formatDateLong, getEventDurationMetrics, calculateTimeDurationHours } from '../../utils/formatters';
 import { downloadIcsFile, getGoogleCalendarUrl } from '../../utils/icsUtils';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface ReservationModalProps {
   event: TrainingEvent | null;
@@ -118,8 +119,12 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+    <AccessibleModal
+      onClose={onClose}
+      ariaLabel={`Reservar Curso - ${event.title}`}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
+    >
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
         
         {/* Modal Header */}
         <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
@@ -375,6 +380,6 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
         </div>
 
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

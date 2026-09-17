@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Participant, UserAccount, UserRole, EmploymentStatus, Company } from '../../types';
 import { formatCedula, isValidCedula } from '../../utils/formatters';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface EditParticipantModalProps {
   participant: Participant;
@@ -135,8 +136,13 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <AccessibleModal
+      isOpen={isOpen}
+      onClose={onClose}
+      ariaLabel="Editar Colaborador"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
+    >
+      <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
         <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
@@ -507,6 +513,6 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
         </div>
 
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

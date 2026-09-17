@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { TechnicalAcademyCourse, Company, TrainingEvent } from '../../types';
 import { apiService } from '../../services/api';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface TechnicalCourseModalProps {
   isOpen: boolean;
@@ -119,8 +120,13 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-xl overflow-hidden flex flex-col">
+    <AccessibleModal
+      isOpen={isOpen}
+      onClose={onClose}
+      ariaLabel={isEdit ? 'Editar Curso Técnico' : 'Nuevo Curso Técnico Recurrente'}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-200"
+    >
+      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-xl overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-slate-900 text-white">
           <div className="flex items-center gap-3">
@@ -360,6 +366,6 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

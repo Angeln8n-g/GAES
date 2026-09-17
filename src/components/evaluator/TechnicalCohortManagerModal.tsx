@@ -25,6 +25,7 @@ import { apiService } from '../../services/api';
 import { attendanceWs } from '../../services/websocket';
 import { exportTechnicalAcademyAttendanceToExcel } from '../../utils/excelUtils';
 import { TechnicalQrModal } from '../technical-academy/TechnicalQrModal';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface TechnicalCohortManagerModalProps {
   isOpen: boolean;
@@ -293,13 +294,13 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
   };
 
   return (
-    <div 
+    <AccessibleModal
+      isOpen={isOpen}
+      onClose={onClose}
+      ariaLabel={`Academia Técnica - ${cohort.courseTitle || 'Cohorte'}`}
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-200"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="tech-cohort-manager-title"
     >
-      <div className="bg-white w-full max-w-5xl rounded-3xl shadow-2xl border border-slate-200 flex flex-col max-h-[92vh] overflow-hidden">
+      <div className="bg-white w-full max-w-5xl rounded-3xl shadow-2xl border border-slate-200 flex flex-col max-h-[92vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
         
         {/* Cabecera del Modal */}
         <div className="p-5 sm:p-6 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 shrink-0">
@@ -783,6 +784,6 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
           }}
         />
       )}
-    </div>
+    </AccessibleModal>
   );
 };

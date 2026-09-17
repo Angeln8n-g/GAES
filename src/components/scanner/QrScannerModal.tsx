@@ -17,6 +17,7 @@ import type { Html5Qrcode } from 'html5-qrcode';
 import { loadHtml5Qrcode, checkCameraSupport, formatCameraError } from '../../utils/scannerUtils';
 import { TrainingEvent, UserAccount } from '../../types';
 import { formatDateLong } from '../../utils/formatters';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface QrScannerModalProps {
   isOpen: boolean;
@@ -313,7 +314,15 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/75 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
+    <AccessibleModal
+      isOpen={isOpen}
+      onClose={() => {
+        stopScannerSafe();
+        onClose();
+      }}
+      ariaLabel="Escanear QR de Asistencia"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/75 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200"
+    >
       <div 
         className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-auto flex flex-col animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
@@ -547,6 +556,6 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
 
         </div>
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

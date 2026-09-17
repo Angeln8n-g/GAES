@@ -30,6 +30,7 @@ import {
 import { Participant, UserAccount, TrainingEvent, TrainingProgram, Company, ParticipantGrade, ExternalTraining, TechnicalAcademyHistoryRecord } from "../../types";
 import { FormalLetterModal, TrainingHistoryRecord } from "../history/FormalLetterModal";
 import { getProgramShortName } from "../../constants/sustainabilityPrograms";
+import { AccessibleModal } from "../common/AccessibleModal";
 
 interface ParticipantProfileModalProps {
   participant: Participant | null;
@@ -250,8 +251,12 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
   const empStatus = participant.employmentStatus || "contratado";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <AccessibleModal
+      onClose={onClose}
+      ariaLabel={`Perfil de ${participant.name}`}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
+    >
+      <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
         
         {/* Profile Header */}
         <div className="p-6 border-b border-slate-200 bg-slate-50 relative">
@@ -863,6 +868,6 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
         />
       )}
 
-    </div>
+    </AccessibleModal>
   );
 };

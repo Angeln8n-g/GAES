@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { UserAccount, UserRole, EmploymentStatus, Company } from '../../types';
 import { formatCedula, isValidCedula } from '../../utils/formatters';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface EditUserModalProps {
   user: UserAccount;
@@ -100,8 +101,12 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+    <AccessibleModal
+      onClose={onClose}
+      ariaLabel="Editar Usuario"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
+    >
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
         
         {/* Modal Header */}
         <div className="p-6 border-b border-slate-200 flex items-start justify-between bg-slate-50">
@@ -334,6 +339,6 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
         </form>
 
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

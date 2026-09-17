@@ -41,6 +41,7 @@ import {
   calculateTimeDurationHours,
   formatDurationHuman
 } from '../../utils/formatters';
+import { AccessibleModal } from '../common/AccessibleModal';
 import { 
   SUSTAINABILITY_PROGRAMS, 
   SESSION_TYPES, 
@@ -574,8 +575,12 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200">
+    <AccessibleModal
+      onClose={onClose}
+      ariaLabel={isEditing ? 'Editar Capacitación' : 'Crear Nueva Capacitación'}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
+    >
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
         <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
@@ -2016,6 +2021,6 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
         </form>
 
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

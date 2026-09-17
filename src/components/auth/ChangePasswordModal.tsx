@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { UserAccount } from '../../types';
 import { apiService } from '../../services/api';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface ChangePasswordModalProps {
   currentUser: UserAccount;
@@ -97,8 +98,12 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md bg-white border border-slate-200 rounded-3xl shadow-2xl p-6 sm:p-8 animate-in zoom-in-95 duration-300">
+    <AccessibleModal
+      onClose={onClose}
+      ariaLabel="Cambiar Contraseña"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-in fade-in duration-200"
+    >
+      <div className="relative w-full max-w-md bg-white border border-slate-200 rounded-3xl shadow-2xl p-6 sm:p-8 animate-in zoom-in-95 duration-300" onClick={(e) => e.stopPropagation()}>
         
         {/* Close Button */}
         <button
@@ -264,6 +269,6 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
         </form>
 
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

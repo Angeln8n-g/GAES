@@ -69,6 +69,17 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && viewMode !== 'login') {
+        setViewMode('login');
+        setError('');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [viewMode]);
+
   // Helper for masking email
   const maskEmail = (str: string) => {
     if (!str || !str.includes('@')) return str;

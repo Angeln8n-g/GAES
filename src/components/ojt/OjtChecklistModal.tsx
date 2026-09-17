@@ -17,6 +17,7 @@ import {
   GraduationCap
 } from 'lucide-react';
 import { OjtChecklist, Participant, UserAccount, Company, OjtRubricItem, OjtObservationType, OjtOperationalStatus } from '../../types';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface OjtChecklistModalProps {
   initialChecklist?: OjtChecklist | null;
@@ -138,8 +139,12 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
+    <AccessibleModal
+      onClose={onClose}
+      ariaLabel={isEditing ? 'Editar Bitácora de Observación' : 'Nueva Bitácora y Checklist OJT'}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
+    >
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
         <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
@@ -406,6 +411,6 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
         </div>
 
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

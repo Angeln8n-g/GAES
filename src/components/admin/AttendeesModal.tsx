@@ -35,6 +35,7 @@ import { exportAttendeesToExcel, exportEventGradesToExcel, exportSessionGradesFo
 import { formatDateLong } from '../../utils/formatters';
 import { apiService } from '../../services/api';
 import { attendanceWs } from '../../services/websocket';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface AttendeesModalProps {
   event: TrainingEvent | null;
@@ -439,8 +440,12 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
+    <AccessibleModal
+      onClose={onClose}
+      ariaLabel={`Gestión de Asistencia - ${event?.title || ''}`}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
+    >
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
         
         {/* Real-time WebSocket Live Alert Toast */}
         {liveToast && (
@@ -1294,163 +1299,170 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
       </div>
 
       {/* Projector Mode Modal for In-Person Training Room Check-In */}
-      {isProjectorOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/90 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 flex flex-col items-center text-center relative animate-in zoom-in-95 duration-200">
-            <button
-              onClick={() => setIsProjectorOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
-              title="Cerrar Proyector"
-            >
-              <X className="w-5 h-5" />
-            </button>
+      <AccessibleModal
+        isOpen={isProjectorOpen}
+        onClose={() => setIsProjectorOpen(false)}
+        ariaLabel="Modo Proyección en Sala"
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/90 backdrop-blur-md animate-in fade-in duration-200"
+      >
+        <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 flex flex-col items-center text-center relative animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+          <button
+            onClick={() => setIsProjectorOpen(false)}
+            className="absolute top-4 right-4 p-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
+            title="Cerrar Proyector"
+          >
+            <X className="w-5 h-5" />
+          </button>
 
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 border border-red-200 text-[#DA291C] text-xs font-bold mb-3">
-              <span className="w-2 h-2 rounded-full bg-[#DA291C] animate-pulse" />
-              <span>MODO PROYECCIÓN EN SALA</span>
-            </div>
-
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight max-w-xl">
-              {event.title}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1 mb-4">
-              Facilitador: <strong className="text-slate-700">{event.instructor}</strong> • {formatDateLong(selectedDate)} ({selectedTime}{currentSlot?.endTime ? ` - ${currentSlot.endTime}` : ''})
-            </p>
-
-            {/* Mode Switcher */}
-            <div className="flex items-center gap-2 p-1.5 bg-slate-100 rounded-2xl mb-4 border border-slate-200">
-              <button
-                type="button"
-                onClick={() => setProjectorMode('checkin')}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  projectorMode === 'checkin'
-                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <LogIn className="w-3.5 h-3.5" />
-                <span>Modo Entrada (Check-In)</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setProjectorMode('checkout')}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  projectorMode === 'checkout'
-                    ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/30'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>Modo Salida (Check-Out)</span>
-              </button>
-            </div>
-
-            {/* Large QR */}
-            <div className="my-2 p-5 bg-white rounded-3xl border-2 border-slate-200 shadow-xl inline-block">
-              <QRCodeSVG
-                value={`${window.location.origin}${window.location.pathname}?tab=attendance&event=${event.id}&date=${selectedDate}&time=${encodeURIComponent(selectedTime)}&type=${projectorMode}`}
-                size={240}
-                level="H"
-                includeMargin={false}
-              />
-            </div>
-
-            {/* PIN Prominently Displayed */}
-            <div className="mt-3 mb-4 inline-flex items-center gap-3 px-5 py-2 rounded-2xl bg-slate-50 border border-slate-200 shadow-xs">
-              <span className="text-xs font-bold text-slate-500">
-                O ingresa el PIN de {projectorMode === 'checkin' ? 'Entrada' : 'Salida'}:
-              </span>
-              <span className={`text-2xl font-black font-mono tracking-widest ${
-                projectorMode === 'checkin' ? 'text-emerald-700' : 'text-[#DA291C]'
-              }`}>
-                {projectorMode === 'checkin' ? (currentSlot?.checkinCode || '----') : (currentSlot?.checkoutCode || '----')}
-              </span>
-            </div>
-
-            {/* Live Counters */}
-            <div className="w-full max-w-md bg-slate-50 border border-slate-200 rounded-2xl p-3.5 mb-4 grid grid-cols-4 gap-2 text-center text-xs">
-              <div>
-                <span className="text-slate-400 font-bold block text-[10px] uppercase">Inscritos</span>
-                <span className="text-lg font-black text-slate-800">{attendeesList.length}</span>
-              </div>
-              <div className="border-l border-slate-200">
-                <span className="text-emerald-600 font-bold block text-[10px] uppercase">Entradas</span>
-                <span className="text-lg font-black text-emerald-700">{checkInList.length}</span>
-              </div>
-              <div className="border-l border-slate-200">
-                <span className="text-blue-600 font-bold block text-[10px] uppercase">Salidas</span>
-                <span className="text-lg font-black text-blue-700">{checkOutList.length}</span>
-              </div>
-              <div className="border-l border-slate-200">
-                <span className="text-indigo-600 font-bold block text-[10px] uppercase">Completas</span>
-                <span className="text-lg font-black text-indigo-700">{completedAttendanceList.length}</span>
-              </div>
-            </div>
-
-            <p className="text-xs text-slate-500 max-w-md">
-              Abre la cámara de tu smartphone y enfoca el código QR o digita el PIN de 4 dígitos para registrar tu {projectorMode === 'checkin' ? 'entrada' : 'salida'}.
-            </p>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 border border-red-200 text-[#DA291C] text-xs font-bold mb-3">
+            <span className="w-2 h-2 rounded-full bg-[#DA291C] animate-pulse" />
+            <span>MODO PROYECCIÓN EN SALA</span>
           </div>
+
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight max-w-xl">
+            {event.title}
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1 mb-4">
+            Facilitador: <strong className="text-slate-700">{event.instructor}</strong> • {formatDateLong(selectedDate)} ({selectedTime}{currentSlot?.endTime ? ` - ${currentSlot.endTime}` : ''})
+          </p>
+
+          {/* Mode Switcher */}
+          <div className="flex items-center gap-2 p-1.5 bg-slate-100 rounded-2xl mb-4 border border-slate-200">
+            <button
+              type="button"
+              onClick={() => setProjectorMode('checkin')}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                projectorMode === 'checkin'
+                  ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span>Modo Entrada (Check-In)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setProjectorMode('checkout')}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                projectorMode === 'checkout'
+                  ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/30'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Modo Salida (Check-Out)</span>
+            </button>
+          </div>
+
+          {/* Large QR */}
+          <div className="my-2 p-5 bg-white rounded-3xl border-2 border-slate-200 shadow-xl inline-block">
+            <QRCodeSVG
+              value={`${window.location.origin}${window.location.pathname}?tab=attendance&event=${event.id}&date=${selectedDate}&time=${encodeURIComponent(selectedTime)}&type=${projectorMode}`}
+              size={240}
+              level="H"
+              includeMargin={false}
+            />
+          </div>
+
+          {/* PIN Prominently Displayed */}
+          <div className="mt-3 mb-4 inline-flex items-center gap-3 px-5 py-2 rounded-2xl bg-slate-50 border border-slate-200 shadow-xs">
+            <span className="text-xs font-bold text-slate-500">
+              O ingresa el PIN de {projectorMode === 'checkin' ? 'Entrada' : 'Salida'}:
+            </span>
+            <span className={`text-2xl font-black font-mono tracking-widest ${
+              projectorMode === 'checkin' ? 'text-emerald-700' : 'text-[#DA291C]'
+            }`}>
+              {projectorMode === 'checkin' ? (currentSlot?.checkinCode || '----') : (currentSlot?.checkoutCode || '----')}
+            </span>
+          </div>
+
+          {/* Live Counters */}
+          <div className="w-full max-w-md bg-slate-50 border border-slate-200 rounded-2xl p-3.5 mb-4 grid grid-cols-4 gap-2 text-center text-xs">
+            <div>
+              <span className="text-slate-400 font-bold block text-[10px] uppercase">Inscritos</span>
+              <span className="text-lg font-black text-slate-800">{attendeesList.length}</span>
+            </div>
+            <div className="border-l border-slate-200">
+              <span className="text-emerald-600 font-bold block text-[10px] uppercase">Entradas</span>
+              <span className="text-lg font-black text-emerald-700">{checkInList.length}</span>
+            </div>
+            <div className="border-l border-slate-200">
+              <span className="text-blue-600 font-bold block text-[10px] uppercase">Salidas</span>
+              <span className="text-lg font-black text-blue-700">{checkOutList.length}</span>
+            </div>
+            <div className="border-l border-slate-200">
+              <span className="text-indigo-600 font-bold block text-[10px] uppercase">Completas</span>
+              <span className="text-lg font-black text-indigo-700">{completedAttendanceList.length}</span>
+            </div>
+          </div>
+
+          <p className="text-xs text-slate-500 max-w-md">
+            Abre la cámara de tu smartphone y enfoca el código QR o digita el PIN de 4 dígitos para registrar tu {projectorMode === 'checkin' ? 'entrada' : 'salida'}.
+          </p>
         </div>
-      )}
+      </AccessibleModal>
 
       {/* Modal de Confirmación para Desasignar Participante */}
-      {participantToUnassign && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4 animate-in fade-in zoom-in-95">
-            <div className="flex items-center gap-3">
-              <div className="p-3 rounded-2xl bg-rose-50 text-rose-600">
-                <Trash2 className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-base font-black text-slate-900">Eliminar Asignación de Curso</h3>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
-                  Super Admin
-                </span>
-              </div>
+      <AccessibleModal
+        isOpen={!!participantToUnassign}
+        onClose={() => setParticipantToUnassign(null)}
+        role="alertdialog"
+        ariaLabel="Eliminar Asignación de Curso"
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+      >
+        <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4 animate-in fade-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center gap-3">
+            <div className="p-3 rounded-2xl bg-rose-50 text-rose-600">
+              <Trash2 className="w-5 h-5" />
             </div>
-
-            <p className="text-xs text-slate-600 leading-relaxed">
-              ¿Estás seguro de que deseas eliminar la asignación de <strong className="text-slate-900">{participantToUnassign.name}</strong> para el curso <strong className="text-slate-900">{event.title}</strong> en fecha <strong className="text-slate-900">{selectedDate} ({selectedTime})</strong>?
-            </p>
-            <p className="text-[11px] text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-100">
-              Esta acción liberará el cupo y cancelará el registro del participante en este horario, independientemente de si el curso ya se impartió o está por impartirse.
-            </p>
-
-            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
-              <button
-                type="button"
-                onClick={() => setParticipantToUnassign(null)}
-                disabled={isUnassigning}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={async () => {
-                  try {
-                    setIsUnassigning(true);
-                    if (onCancelRegistration) {
-                      await onCancelRegistration(event.id, selectedDate, selectedTime, participantToUnassign.email, true, true);
-                    }
-                    setParticipantToUnassign(null);
-                  } catch (err: any) {
-                    console.error('Error al desasignar participante:', err);
-                  } finally {
-                    setIsUnassigning(false);
-                  }
-                }}
-                disabled={isUnassigning}
-                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
-              >
-                <Trash2 className={`w-3.5 h-3.5 ${isUnassigning ? 'animate-spin' : ''}`} />
-                <span>{isUnassigning ? 'Eliminando...' : 'Eliminar Asignación'}</span>
-              </button>
+            <div>
+              <h3 className="text-base font-black text-slate-900">Eliminar Asignación de Curso</h3>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
+                Super Admin
+              </span>
             </div>
           </div>
+
+          <p className="text-xs text-slate-600 leading-relaxed">
+            ¿Estás seguro de que deseas eliminar la asignación de <strong className="text-slate-900">{participantToUnassign?.name}</strong> para el curso <strong className="text-slate-900">{event.title}</strong> en fecha <strong className="text-slate-900">{selectedDate} ({selectedTime})</strong>?
+          </p>
+          <p className="text-[11px] text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-100">
+            Esta acción liberará el cupo y cancelará el registro del participante en este horario, independientemente de si el curso ya se impartió o está por impartirse.
+          </p>
+
+          <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => setParticipantToUnassign(null)}
+              disabled={isUnassigning}
+              className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  setIsUnassigning(true);
+                  if (onCancelRegistration && participantToUnassign) {
+                    await onCancelRegistration(event.id, selectedDate, selectedTime, participantToUnassign.email, true, true);
+                  }
+                  setParticipantToUnassign(null);
+                } catch (err: any) {
+                  console.error('Error al desasignar participante:', err);
+                } finally {
+                  setIsUnassigning(false);
+                }
+              }}
+              disabled={isUnassigning}
+              className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+            >
+              <Trash2 className={`w-3.5 h-3.5 ${isUnassigning ? 'animate-spin' : ''}`} />
+              <span>{isUnassigning ? 'Eliminando...' : 'Eliminar Asignación'}</span>
+            </button>
+          </div>
         </div>
-      )}
-    </div>
+      </AccessibleModal>
+    </AccessibleModal>
   );
 };

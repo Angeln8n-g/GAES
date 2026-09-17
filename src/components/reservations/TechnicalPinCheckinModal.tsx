@@ -20,6 +20,7 @@ import { loadHtml5Qrcode, checkCameraSupport, formatCameraError } from '../../ut
 import { TechnicalAcademyHistoryRecord, UserAccount, Participant } from '../../types';
 import { apiService } from '../../services/api';
 import { formatDateShort } from '../../utils/formatters';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface TechnicalPinCheckinModalProps {
   isOpen: boolean;
@@ -351,13 +352,16 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
   };
 
   return (
-    <div 
+    <AccessibleModal
+      isOpen={isOpen}
+      onClose={() => {
+        stopScannerSafe();
+        onClose();
+      }}
+      ariaLabel={`Registrar Asistencia - ${training.title || 'Academia'}`}
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-200"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="tech-checkin-modal-title"
     >
-      <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-200">
+      <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
         
         {/* Cabecera del Modal */}
         <div className="p-5 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white flex items-center justify-between border-b border-white/10 shrink-0">
@@ -627,6 +631,6 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
         </div>
 
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

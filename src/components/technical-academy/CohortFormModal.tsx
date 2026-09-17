@@ -22,6 +22,7 @@ import {
   TrainingEvent
 } from '../../types';
 import { apiService } from '../../services/api';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface CohortFormModalProps {
   isOpen: boolean;
@@ -214,8 +215,13 @@ export const CohortFormModal: React.FC<CohortFormModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[92vh] overflow-hidden flex flex-col">
+    <AccessibleModal
+      isOpen={isOpen}
+      onClose={onClose}
+      ariaLabel={isEdit ? 'Modificar Cohorte de Academia Técnica' : 'Programar Semana de Capacitación Recurrente'}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-200"
+    >
+      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[92vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-slate-900 text-white">
           <div className="flex items-center gap-3">
@@ -509,6 +515,6 @@ export const CohortFormModal: React.FC<CohortFormModalProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

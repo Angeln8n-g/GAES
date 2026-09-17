@@ -19,6 +19,7 @@ import {
   downloadUsersTemplateExcel 
 } from '../../utils/excelUtils';
 import { isValidCedula, formatCedula } from '../../utils/formatters';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface BulkUsersModalProps {
   existingUsers: UserAccount[];
@@ -219,8 +220,12 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+    <AccessibleModal
+      onClose={onClose}
+      ariaLabel="Creación Masiva de Usuarios"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
+    >
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
         
         {/* Modal Header */}
         <div className="p-6 border-b border-slate-200 flex items-start justify-between bg-slate-50">
@@ -655,6 +660,6 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
         </div>
 
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

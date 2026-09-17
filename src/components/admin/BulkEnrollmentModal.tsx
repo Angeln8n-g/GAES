@@ -19,6 +19,7 @@ import {
 import { TrainingEvent, Participant, UserAccount } from '../../types';
 import { formatDateLong } from '../../utils/formatters';
 import * as XLSX from 'xlsx';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface BulkEnrollmentModalProps {
   events: TrainingEvent[];
@@ -338,8 +339,12 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+    <AccessibleModal
+      onClose={onClose}
+      ariaLabel="Matricular Usuarios de Forma Masiva"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
+    >
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
         
         {/* Modal Header */}
         <div className="p-6 border-b border-slate-200 flex items-start justify-between bg-slate-50">
@@ -787,6 +792,6 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
         </div>
 
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

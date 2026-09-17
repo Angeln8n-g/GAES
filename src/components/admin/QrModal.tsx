@@ -18,6 +18,7 @@ import {
 import { QRCodeSVG } from 'qrcode.react';
 import { TrainingEvent } from '../../types';
 import { formatDateLong } from '../../utils/formatters';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface QrModalProps {
   event: TrainingEvent | null;
@@ -52,8 +53,12 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
+    <AccessibleModal
+      onClose={onClose}
+      ariaLabel="Código QR de Asistencia"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
+    >
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
         <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
@@ -276,6 +281,6 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
         </div>
 
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

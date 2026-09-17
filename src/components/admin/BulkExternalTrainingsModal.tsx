@@ -26,6 +26,7 @@ import {
 } from '../../utils/excelUtils';
 import { getProgramShortName } from '../../constants/sustainabilityPrograms';
 import { formatDateShort, formatCedula } from '../../utils/formatters';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface BulkExternalTrainingsModalProps {
   isOpen: boolean;
@@ -180,8 +181,13 @@ export const BulkExternalTrainingsModal: React.FC<BulkExternalTrainingsModalProp
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-5xl w-full overflow-hidden flex flex-col max-h-[92vh]">
+    <AccessibleModal
+      isOpen={isOpen}
+      onClose={onClose}
+      ariaLabel="Importación Masiva de Capacitaciones Externas"
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
+    >
+      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-5xl w-full overflow-hidden flex flex-col max-h-[92vh]" onClick={(e) => e.stopPropagation()}>
         
         {/* Header con gradiente institucional */}
         <div className="bg-gradient-to-r from-slate-900 via-[#0F172A] to-slate-900 p-5 sm:p-6 text-white relative">
@@ -525,6 +531,6 @@ export const BulkExternalTrainingsModal: React.FC<BulkExternalTrainingsModalProp
         </div>
 
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

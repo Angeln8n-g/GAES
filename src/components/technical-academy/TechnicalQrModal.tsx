@@ -19,6 +19,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { TechnicalAcademyCohort } from '../../types';
 import { apiService } from '../../services/api';
 import { attendanceWs } from '../../services/websocket';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface TechnicalQrModalProps {
   isOpen: boolean;
@@ -153,11 +154,11 @@ export const TechnicalQrModal: React.FC<TechnicalQrModalProps> = ({
   };
 
   return (
-    <div 
+    <AccessibleModal
+      isOpen={isOpen}
+      onClose={onClose}
+      ariaLabel={`Auto-Registro Diario - ${cohort.courseTitle || 'Taller Técnico Recurrente'}`}
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-200"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="technical-qr-modal-title"
     >
       <div 
         className={`bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col transition-all duration-300 ${
@@ -165,6 +166,7 @@ export const TechnicalQrModal: React.FC<TechnicalQrModalProps> = ({
             ? 'w-full h-full max-w-none rounded-none' 
             : 'w-full max-w-3xl max-h-[92vh]'
         }`}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-slate-900 text-white shrink-0">
@@ -399,6 +401,6 @@ export const TechnicalQrModal: React.FC<TechnicalQrModalProps> = ({
           </button>
         </div>
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

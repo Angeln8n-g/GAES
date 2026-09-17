@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { TechnicalAcademyCohort, ParticipantGroup, UserAccount } from '../../types';
 import { apiService } from '../../services/api';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface ReassignCohortModalProps {
   isOpen: boolean;
@@ -120,8 +121,13 @@ export const ReassignCohortModal: React.FC<ReassignCohortModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden flex flex-col">
+    <AccessibleModal
+      isOpen={isOpen}
+      onClose={onClose}
+      ariaLabel="Reasignar Cohorte Técnica"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-200"
+    >
+      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-slate-900 text-white">
           <div className="flex items-center gap-3">
@@ -298,6 +304,6 @@ export const ReassignCohortModal: React.FC<ReassignCohortModalProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </AccessibleModal>
   );
 };

@@ -23,6 +23,7 @@ import {
   TEC_SURVEY_INFO,
   calculateTecScores 
 } from '../../constants/tecSurveyQuestions';
+import { AccessibleModal } from '../common/AccessibleModal';
 
 interface TecEvaluationModalProps {
   event: TrainingEvent;
@@ -125,7 +126,12 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/70 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
+    <AccessibleModal
+      isOpen={isOpen}
+      onClose={onClose}
+      ariaLabel={`Evaluación TEC - ${event.title}`}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/70 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200"
+    >
       <div 
         className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-auto flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
@@ -520,6 +526,6 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
         )}
 
       </div>
-    </div>
+    </AccessibleModal>
   );
 };
