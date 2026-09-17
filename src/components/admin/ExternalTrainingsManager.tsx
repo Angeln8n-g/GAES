@@ -524,7 +524,7 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                             <p className="text-[11px] text-slate-500 font-mono">
                               Tarj: #{item.participantCard} {pCedula && `• ${formatCedula(pCedula)}`}
                             </p>
-                            <span className="text-[10px] text-slate-400 block">{pDept}</span>
+                            <span className="text-[10px] text-slate-500 block">{pDept}</span>
                           </div>
                         </div>
                       </td>
@@ -560,7 +560,7 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                           <p className="text-[11px] text-slate-600 truncate" title={item.subprogram}>
                             {item.subprogram}
                           </p>
-                          <span className="text-[10px] text-slate-400 block">
+                          <span className="text-[10px] text-slate-500 block">
                             {item.sessionType} • {item.trainingType}
                           </span>
                         </div>
@@ -591,7 +591,7 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                             )}
                           </div>
                           {item.certificateNumber && (
-                            <p className="text-[10px] text-slate-400 font-mono">
+                            <p className="text-[10px] text-slate-500 font-mono">
                               Folio: {item.certificateNumber}
                             </p>
                           )}
@@ -688,7 +688,7 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                         </button>
                       );
                     } else if (pNum === currentPage - 2 || pNum === currentPage + 2) {
-                      return <span key={pNum} className="text-slate-400 text-xs px-0.5">...</span>;
+                      return <span key={pNum} className="text-slate-500 font-bold text-xs px-0.5">...</span>;
                     }
                     return null;
                   })}
@@ -744,7 +744,7 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div className="text-center space-y-1">
-              <h3 className="text-base font-black text-slate-900">¿Eliminar Capacitación Externa?</h3>
+              <h2 className="text-base font-black text-slate-900">¿Eliminar Capacitación Externa?</h2>
               <p className="text-xs text-slate-500">
                 Esta acción removerá el registro externo y las horas acreditadas del colaborador. No se puede deshacer.
               </p>

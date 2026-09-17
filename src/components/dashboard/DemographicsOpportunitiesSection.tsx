@@ -540,7 +540,7 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-slate-200 text-slate-400 font-bold uppercase tracking-wider text-[10px] bg-slate-50/50">
+              <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px] bg-slate-50/50">
                 <th className="py-3 px-4 rounded-l-xl">Nivel de Estudio</th>
                 <th className="py-3 px-4">Colaboradores</th>
                 <th className="py-3 px-4">% de Fuerza</th>
@@ -619,7 +619,7 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
 
           <div className="space-y-2.5">
             {trainingInterestsAnalysis.length === 0 ? (
-              <p className="text-xs text-slate-400 py-4 text-center">Aún no hay intereses registrados en las fichas.</p>
+              <p className="text-xs text-slate-500 py-4 text-center">Aún no hay intereses registrados en las fichas.</p>
             ) : (
               trainingInterestsAnalysis.map((item, idx) => (
                 <div key={item.topic} className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3 text-xs">
@@ -629,7 +629,7 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
                     </span>
                     <div className="truncate">
                       <p className="font-bold text-slate-800 truncate">{item.topic}</p>
-                      <span className="text-[10px] text-slate-400">
+                      <span className="text-[10px] text-slate-500">
                         {item.requestCount} solicitudes ({item.percentage}% colaboradores)
                       </span>
                     </div>
@@ -700,7 +700,7 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
 
           <div className="space-y-2 max-h-80 overflow-y-auto custom-scrollbar pr-1">
             {filteredStudents.length === 0 ? (
-              <p className="text-xs text-slate-400 py-6 text-center">No se encontraron colaboradores cursando estudios con ese criterio.</p>
+              <p className="text-xs text-slate-500 py-6 text-center">No se encontraron colaboradores cursando estudios con ese criterio.</p>
             ) : (
               filteredStudents.map(student => (
                 <div key={student.card} className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1 text-xs">
@@ -712,7 +712,7 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
                     <span className="font-semibold text-amber-800">
                       🎓 {student.currentStudyField || 'Carrera en curso'}
                     </span>
-                    <span className="text-slate-400">{student.institutionName || 'Centro Universitario'}</span>
+                    <span className="text-slate-500 font-medium">{student.institutionName || 'Centro Universitario'}</span>
                   </div>
                   {student.department && (
                     <span className="text-[10px] text-slate-500 block pt-0.5">
@@ -737,8 +737,8 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
                   <Target className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Demanda Formativa DNC</span>
-                  <h3 className="text-base font-black text-white">{selectedTopicModal}</h3>
+                  <span className="text-[10px] uppercase font-bold text-slate-300 tracking-wider">Demanda Formativa DNC</span>
+                  <h2 className="text-base font-black text-white">{selectedTopicModal}</h2>
                 </div>
               </div>
               <button
@@ -773,7 +773,7 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
 
                     <div className="space-y-2">
                       {topicParticipants.length === 0 ? (
-                        <p className="text-xs text-slate-400 py-4 text-center">No hay colaboradores asociados.</p>
+                        <p className="text-xs text-slate-500 py-4 text-center">No hay colaboradores asociados.</p>
                       ) : (
                         topicParticipants.map(p => (
                           <div key={p.card} className="p-3 rounded-2xl bg-slate-50 border border-slate-200/70 flex items-center justify-between text-xs">

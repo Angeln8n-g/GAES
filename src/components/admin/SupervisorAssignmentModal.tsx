@@ -139,7 +139,7 @@ export const SupervisorAssignmentModal: React.FC<SupervisorAssignmentModalProps>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-lg font-black text-slate-900">Asignación de Colaboradores a Supervisor</h3>
+                <h2 className="text-lg font-black text-slate-900">Asignación de Colaboradores a Supervisor</h2>
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-[#DA291C] border border-red-200">
                   Líder de Área
                 </span>

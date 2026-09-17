@@ -151,12 +151,12 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
               {participant.name.charAt(0)}
             </div>
             <div>
-              <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+              <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
                 <span>Editar Colaborador</span>
                 <span className="font-mono text-xs px-2 py-0.5 rounded-lg bg-red-50 text-[#DA291C] border border-red-200">
                   #{participant.card}
                 </span>
-              </h3>
+              </h2>
               <p className="text-xs text-slate-500">Actualizar información laboral, jerarquía y estado de contratación</p>
             </div>
           </div>
@@ -343,9 +343,9 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
 
           {/* Ficha Académica & Sociodemográfica */}
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3.5">
-            <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+            <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
               🎓 Ficha Académica & Sociodemográfica
-            </h4>
+            </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>

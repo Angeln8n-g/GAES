@@ -121,7 +121,7 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
             <Activity className="w-4 h-4" />
           </div>
           <p className="text-2xl font-black text-slate-900">{total}</p>
-          <p className="text-[10px] text-slate-400">Acompañamientos registrados</p>
+          <p className="text-[10px] text-slate-500 font-medium">Acompañamientos registrados</p>
         </div>
 
         <div className="bg-white border border-slate-200 p-4 rounded-3xl space-y-1 shadow-sm">
@@ -129,7 +129,7 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
             <span className="text-[11px] font-black uppercase tracking-wider">Promedio en Campo</span>
             <Award className="w-4 h-4 text-emerald-600" />
           </div>
-          <p className="text-2xl font-black text-emerald-700">{avgScore}<span className="text-xs text-slate-400">/100</span></p>
+          <p className="text-2xl font-black text-emerald-700">{avgScore}<span className="text-xs text-slate-500 font-medium">/100</span></p>
           <p className="text-[10px] text-emerald-600">{complianceRate}% conforme a estándar</p>
         </div>
 
@@ -416,7 +416,7 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
                             }`}>
                               {c.overallScore}
                             </span>
-                            <span className="text-slate-400 text-[10px]"> /100</span>
+                            <span className="text-slate-500 text-[10px] font-medium"> /100</span>
                           </td>
 
                           {/* Diagnóstico */}
@@ -524,11 +524,11 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
                   <div className="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-2xl border border-slate-200/80 text-xs">
                     <div>
                       <span className="text-[10px] uppercase font-bold text-slate-500">Nota Aula (Teoría)</span>
-                      <p className="text-base font-black text-slate-800">{cal.averageTheoryScore} <span className="text-[10px] text-slate-400">/100</span></p>
+                      <p className="text-base font-black text-slate-800">{cal.averageTheoryScore} <span className="text-[10px] text-slate-500 font-medium">/100</span></p>
                     </div>
                     <div>
                       <span className="text-[10px] uppercase font-bold text-slate-500">Nota Campo (Práctica)</span>
-                      <p className="text-base font-black text-[#DA291C]">{cal.averageFieldScore} <span className="text-[10px] text-slate-400">/100</span></p>
+                      <p className="text-base font-black text-[#DA291C]">{cal.averageFieldScore} <span className="text-[10px] text-slate-500 font-medium">/100</span></p>
                     </div>
                   </div>
 

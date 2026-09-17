@@ -264,13 +264,13 @@ export const CompaniesManager: React.FC<CompaniesManagerProps> = ({
               <div className="space-y-1.5 text-xs text-slate-600 border-t border-b border-slate-100 py-3 mb-4">
                 {comp.rncTaxId && (
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-slate-400">RNC / Tax ID:</span>
+                    <span className="text-slate-500 font-medium">RNC / Tax ID:</span>
                     <span className="font-mono text-slate-800 font-bold">{comp.rncTaxId}</span>
                   </div>
                 )}
                 {comp.contactEmail && (
                   <div className="flex items-center justify-between text-[11px] truncate">
-                    <span className="text-slate-400 flex items-center gap-1">
+                    <span className="text-slate-500 font-medium flex items-center gap-1">
                       <Mail className="w-3 h-3 text-slate-400" />
                       Email:
                     </span>
@@ -279,7 +279,7 @@ export const CompaniesManager: React.FC<CompaniesManagerProps> = ({
                 )}
                 {comp.contactPhone && (
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-slate-400 flex items-center gap-1">
+                    <span className="text-slate-500 font-medium flex items-center gap-1">
                       <Phone className="w-3 h-3 text-slate-400" />
                       Tel:
                     </span>
@@ -358,9 +358,9 @@ export const CompaniesManager: React.FC<CompaniesManagerProps> = ({
             <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
               <div className="flex items-center gap-2 text-slate-900">
                 <Building2 className="w-5 h-5 text-[#DA291C]" />
-                <h3 className="font-black text-base">
+                <h2 className="font-black text-base">
                   {editingCompany ? "Editar Empresa" : "Registrar Nueva Empresa"}
-                </h3>
+                </h2>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}

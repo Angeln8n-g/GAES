@@ -474,7 +474,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                     </option>
                   ))}
                 </select>
-                <p className="text-[10px] text-slate-400 mt-1">
+                <p className="text-[10px] text-slate-500 mt-1">
                   {EDUCATION_LEVEL_OPTIONS.find(o => o.value === educationLevel)?.desc}
                 </p>
               </div>
@@ -573,7 +573,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                 <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
                 3. Intereses de Desarrollo & Oportunidades de Mejora
               </h3>
-              <span className="text-[10px] text-slate-400">Selecciona al menos 1</span>
+              <span className="text-[10px] text-slate-500 font-medium">Selecciona al menos 1</span>
             </div>
 
             <p className="text-[11px] text-slate-500">
@@ -680,11 +680,11 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
               </div>
               <div className="flex items-center gap-4 text-xs">
                 <div className="text-right">
-                  <span className="text-[10px] font-bold text-slate-400 block uppercase">Cursos</span>
+                  <span className="text-[10px] font-bold text-slate-500 block uppercase">Cursos</span>
                   <span className="text-base font-black text-slate-900">{userExternalTrainings.length}</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] font-bold text-slate-400 block uppercase">Horas Totales</span>
+                  <span className="text-[10px] font-bold text-slate-500 block uppercase">Horas Totales</span>
                   <span className="text-base font-black text-blue-700">
                     {userExternalTrainings.reduce((acc, t) => acc + (Number(t.totalHours) || 0), 0)} hrs
                   </span>
@@ -716,7 +716,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                           <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                             {getProgramShortName(t.programCategory)}
                           </span>
-                          <span className="text-[10px] font-bold text-slate-400">
+                          <span className="text-[10px] font-bold text-slate-500">
                             {t.trainingFormat} • {t.modality}
                           </span>
                         </div>
@@ -755,7 +755,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                     {(t.credentialUrl || t.certificateNumber) && (
                       <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
                         {t.certificateNumber && (
-                          <span className="text-slate-400 font-mono text-[10px]">
+                          <span className="text-slate-500 font-mono text-[10px]">
                             Folio: {t.certificateNumber}
                           </span>
                         )}

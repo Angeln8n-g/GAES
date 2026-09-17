@@ -251,7 +251,7 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
             <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Cursos Asignados</p>
             <div className="flex items-baseline gap-1.5 mt-1">
               <span className="text-2xl font-black text-slate-900">{metrics.totalCourses}</span>
-              <span className="text-xs font-semibold text-slate-400">capacitaciones</span>
+              <span className="text-xs font-semibold text-slate-500">capacitaciones</span>
             </div>
           </div>
 
@@ -259,7 +259,7 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
             <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Con Estructura Modular</p>
             <div className="flex items-baseline gap-1.5 mt-1">
               <span className="text-2xl font-black text-[#DA291C]">{metrics.totalModular}</span>
-              <span className="text-xs font-semibold text-slate-400">con submódulos</span>
+              <span className="text-xs font-semibold text-slate-500">con submódulos</span>
             </div>
           </div>
 
@@ -267,7 +267,7 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
             <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Participantes Inscritos</p>
             <div className="flex items-baseline gap-1.5 mt-1">
               <span className="text-2xl font-black text-slate-900">{metrics.totalEnrolled}</span>
-              <span className="text-xs font-semibold text-slate-400">colaboradores</span>
+              <span className="text-xs font-semibold text-slate-500">colaboradores</span>
             </div>
           </div>
 
@@ -275,7 +275,7 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
             <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Tasa de Asistencia</p>
             <div className="flex items-baseline gap-1.5 mt-1">
               <span className="text-2xl font-black text-emerald-600">{metrics.attendanceRate}%</span>
-              <span className="text-xs font-semibold text-slate-400">({metrics.totalAttended} presentes)</span>
+              <span className="text-xs font-semibold text-slate-500">({metrics.totalAttended} presentes)</span>
             </div>
           </div>
         </div>
@@ -519,7 +519,7 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
                       )}
                     </div>
 
-                    <span className="text-[11px] font-bold text-slate-400">
+                    <span className="text-[11px] font-bold text-slate-500">
                       ID: {event.id}
                     </span>
                   </div>
@@ -663,9 +663,9 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
             <BookOpen className="w-8 h-8" />
           </div>
           <div className="max-w-md mx-auto space-y-2">
-            <h3 className="text-lg font-black text-slate-900">
+            <h2 className="text-lg font-black text-slate-900">
               No se encontraron cursos asignados
-            </h3>
+            </h2>
             <p className="text-xs sm:text-sm text-slate-500">
               {searchQuery 
                 ? `No hay cursos asignados que coincidan con "${searchQuery}". Intenta ajustar el término de búsqueda.`
@@ -718,9 +718,9 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-black text-slate-900">
+                  <h2 className="text-lg font-black text-slate-900">
                     Eliminar Asignación de Curso
-                  </h3>
+                  </h2>
                   <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
                     Super Admin
                   </span>

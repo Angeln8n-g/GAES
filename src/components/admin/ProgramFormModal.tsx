@@ -191,9 +191,9 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
               <Calendar className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-black text-slate-900">
+              <h2 className="text-base font-black text-slate-900">
                 {program ? 'Editar Cronograma de Capacitación' : 'Crear Nuevo Cronograma de Capacitación'}
-              </h3>
+              </h2>
               <p className="text-xs text-slate-500">
                 Estructura rutas formativas con plazos y cursos obligatorios para tus grupos.
               </p>
@@ -213,9 +213,9 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
           
           {/* General Information */}
           <div className="space-y-4">
-            <h4 className="text-xs font-black text-[#DA291C] uppercase tracking-wider flex items-center gap-1.5">
+            <h3 className="text-xs font-black text-[#DA291C] uppercase tracking-wider flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" /> 1. Datos Generales del Programa
-            </h4>
+            </h3>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
@@ -332,9 +332,9 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
           {/* Target Groups Assignment */}
           <div className="pt-4 border-t border-slate-200 space-y-3">
             <div className="flex items-center justify-between">
-              <h4 className="text-xs font-black text-[#DA291C] uppercase tracking-wider flex items-center gap-1.5">
+              <h3 className="text-xs font-black text-[#DA291C] uppercase tracking-wider flex items-center gap-1.5">
                 <Users className="w-3.5 h-3.5" /> 2. Grupos Asignados ({selectedGroupIds.size} seleccionados)
-              </h4>
+              </h3>
               <span className="text-[11px] text-slate-500">
                 Los colaboradores de estos grupos tendrán asignada esta ruta formativa.
               </span>
@@ -385,9 +385,9 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
           {/* Courses Selection */}
           <div className="pt-4 border-t border-slate-200 space-y-3">
             <div className="flex items-center justify-between">
-              <h4 className="text-xs font-black text-[#DA291C] uppercase tracking-wider flex items-center gap-1.5">
+              <h3 className="text-xs font-black text-[#DA291C] uppercase tracking-wider flex items-center gap-1.5">
                 <BookOpen className="w-3.5 h-3.5" /> 3. Capacitaciones Incluidas ({selectedEvents.size} seleccionadas)
-              </h4>
+              </h3>
               <span className="text-[11px] text-slate-500">
                 Marca los eventos y define si son obligatorios para aprobar el cronograma.
               </span>

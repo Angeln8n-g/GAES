@@ -272,7 +272,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
           <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto border border-amber-200">
             <AlertTriangle className="w-6 h-6" />
           </div>
-          <h2 className="text-base font-black text-slate-900">Sesión no encontrada</h2>
+          <h1 className="text-base font-black text-slate-900">Sesión no encontrada</h1>
           <p className="text-xs text-slate-500">
             El enlace de asistencia no corresponde a ningún evento u horario activo.
           </p>
@@ -347,9 +347,9 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
                 <CheckCircle2 className="w-7 h-7" />
               </div>
               <div>
-                <h3 className="text-sm font-black text-emerald-950">
+                <h2 className="text-sm font-black text-emerald-950">
                   ¡Asistencia Completa Verificada!
-                </h3>
+                </h2>
                 <p className="text-xs text-emerald-700 font-medium mt-0.5">
                   Has cumplido con el registro de Entrada y Salida para esta capacitación.
                 </p>
@@ -579,7 +579,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
                     <Lock className="w-4 h-4" />
                     <span>Evaluación Bloqueada (Requiere Registro de Salida)</span>
                   </button>
-                  <p className="text-[10px] text-center text-slate-400 font-medium">
+                  <p className="text-[10px] text-center text-slate-500 font-medium">
                     Solo los participantes con asistencia completa (entrada y salida) pueden responder la encuesta.
                   </p>
                 </div>

@@ -886,7 +886,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                                     <Clock className="w-3.5 h-3.5" /> Agendado
                                   </span>
                                 ) : (
-                                  <span className="text-[11px] font-semibold text-slate-400">
+                                  <span className="text-[11px] font-semibold text-slate-500">
                                     Pendiente
                                   </span>
                                 )}
@@ -1341,7 +1341,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                           </td>
                           <td className="py-4 px-4 text-slate-600 whitespace-nowrap">
                             <span className="font-bold text-slate-900 block">{formatDateShort(rec.date)}</span>
-                            <span className="text-[11px] text-slate-400 font-medium">{rec.time}</span>
+                            <span className="text-[11px] text-slate-500 font-medium">{rec.time}</span>
                           </td>
                           <td className="py-4 px-4 text-slate-700">
                             <span className="font-medium line-clamp-1">{rec.instructor}</span>
@@ -1405,7 +1405,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
               <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
                 <FileText className="w-6 h-6" />
               </div>
-              <h4 className="text-sm font-bold text-slate-800">No se encontraron capacitaciones en el historial</h4>
+              <h3 className="text-sm font-bold text-slate-800">No se encontraron capacitaciones en el historial</h3>
               <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
                 No hay registros que coincidan con el filtro seleccionado o los términos de búsqueda.
               </p>
@@ -1432,7 +1432,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div className="text-center">
-              <h3 className="text-base font-extrabold text-slate-900">¿Cancelar tu inscripción?</h3>
+              <h2 className="text-base font-extrabold text-slate-900">¿Cancelar tu inscripción?</h2>
               <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                 Al cancelar, liberarás tu cupo en <strong>{cancelingItem.event.title}</strong> ({cancelingItem.schedule.date} a las {cancelingItem.slot.time}) para que otro colaborador pueda registrarse.
               </p>
@@ -1468,7 +1468,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
         >
           <div className="bg-white border border-slate-200 rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <span id="qr-pass-title" className="text-xs font-extrabold text-claro uppercase tracking-wider">Pase Digital de Asistencia</span>
+              <h2 id="qr-pass-title" className="text-xs font-extrabold text-[#DA291C] uppercase tracking-wider">Pase Digital de Asistencia</h2>
               <button 
                 type="button"
                 onClick={() => setSelectedPassItem(null)} 
@@ -1489,7 +1489,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
             </div>
 
             <div>
-              <h4 className="text-sm font-bold text-slate-900 line-clamp-1">{selectedPassItem.event.title}</h4>
+              <h3 className="text-sm font-bold text-slate-900 line-clamp-1">{selectedPassItem.event.title}</h3>
               <p className="text-xs text-slate-500 mt-0.5">{selectedPassItem.schedule.date} • {selectedPassItem.slot.time}{selectedPassItem.slot.endTime ? ` - ${selectedPassItem.slot.endTime}` : ''}</p>
               <div className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-bold text-amber-900 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200">
                 <Clock className="w-3 h-3 text-amber-600" />
@@ -1498,7 +1498,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
               <p className="text-[11px] font-bold text-slate-800 mt-1.5">{currentUser.name} ({currentUser.email})</p>
             </div>
 
-            <p className="text-[10px] text-slate-400">
+            <p className="text-[10px] text-slate-500">
               Presenta este código QR al instructor en la entrada para registrar tu asistencia.
             </p>
 

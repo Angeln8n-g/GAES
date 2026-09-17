@@ -236,7 +236,7 @@ export const ProgramsManager: React.FC<ProgramsManagerProps> = ({
                         );
                       })
                     ) : (
-                      <span className="text-[11px] text-slate-400 italic">Sin grupos asignados</span>
+                      <span className="text-[11px] text-slate-500 italic">Sin grupos asignados</span>
                     )}
                   </div>
 

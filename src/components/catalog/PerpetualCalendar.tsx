@@ -114,7 +114,7 @@ export const PerpetualCalendar: React.FC<PerpetualCalendarProps> = ({
         {DAY_NAMES_SHORT_ES.map((d, i) => (
           <div 
             key={d} 
-            className={`text-[11px] font-black py-1 tracking-wider ${i === 0 || i === 6 ? 'text-red-500' : 'text-slate-400'}`}
+            className={`text-[11px] font-black py-1 tracking-wider ${i === 0 || i === 6 ? 'text-[#DA291C]' : 'text-slate-600'}`}
           >
             {d}
           </div>

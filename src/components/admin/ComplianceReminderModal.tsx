@@ -121,7 +121,7 @@ export const ComplianceReminderModal: React.FC<ComplianceReminderModalProps> = (
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-lg font-black text-slate-900">Despacho de Recordatorios de Cumplimiento</h3>
+              <h2 className="text-lg font-black text-slate-900">Despacho de Recordatorios de Cumplimiento</h2>
               <p className="text-xs text-slate-500">
                 Programa: <strong className="text-slate-800 font-bold">{program.title}</strong>
               </p>

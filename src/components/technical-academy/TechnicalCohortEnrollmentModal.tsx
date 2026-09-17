@@ -554,7 +554,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                   <span className={enrolledParticipants.length > cohort.capacity ? 'text-[#DA291C]' : 'text-emerald-700'}>
                     {enrolledParticipants.length}
                   </span>
-                  <span className="text-slate-400 font-normal"> / {cohort.capacity}</span>
+                  <span className="text-slate-500 font-normal"> / {cohort.capacity}</span>
                 </span>
               </div>
 
@@ -805,7 +805,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                       <tbody className="divide-y divide-slate-100 font-medium">
                         {filteredEnrolled.map((p, idx) => (
                           <tr key={p.card} className="hover:bg-slate-50/80 transition-colors">
-                            <td className="py-3 px-4 text-slate-400 font-bold">{idx + 1}</td>
+                            <td className="py-3 px-4 text-slate-500 font-bold">{idx + 1}</td>
                             <td className="py-3 px-4">
                               <div className="font-bold text-slate-900">{p.name}</div>
                               <div className="text-[11px] text-slate-500">{p.email}</div>
@@ -859,7 +859,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                                   )}
                                 </div>
                               ) : (
-                                <span className="text-slate-400 italic text-[11px]">Sin calificar</span>
+                                <span className="text-slate-500 italic text-[11px]">Sin calificar</span>
                               )}
                             </td>
                             <td className="py-3 px-4 text-center">
@@ -1120,7 +1120,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                 />
 
                 <div className="flex items-center justify-between gap-3 mt-3">
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-[11px] text-slate-500 font-medium">
                     Puedes pegar desde una columna de Excel directamente.
                   </span>
                   <button

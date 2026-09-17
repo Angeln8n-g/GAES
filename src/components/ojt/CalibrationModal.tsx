@@ -256,12 +256,12 @@ export const CalibrationModal: React.FC<CalibrationModalProps> = ({
 
           {/* Historical List */}
           <div className="space-y-3">
-            <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+            <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">
               Historial de Mesas de Calibración ({calibrations.length})
-            </h4>
+            </h3>
 
             {calibrations.length === 0 ? (
-              <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-2xl text-slate-400 text-xs">
+              <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-2xl text-slate-500 text-xs">
                 No hay sesiones de calibración registradas aún.
               </div>
             ) : (
@@ -269,12 +269,12 @@ export const CalibrationModal: React.FC<CalibrationModalProps> = ({
                 <div key={c.id} className="p-4 rounded-2xl bg-white border border-slate-200 space-y-3 hover:border-slate-300 transition-colors shadow-xs">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                     <div>
-                      <h5 className="text-xs font-bold text-slate-900 flex items-center gap-2">
+                      <h4 className="text-xs font-bold text-slate-900 flex items-center gap-2">
                         <span>{c.title}</span>
                         <span className="text-[10px] text-[#DA291C] font-bold bg-red-50 px-2 py-0.2 rounded-md border border-red-200">
                           {c.participantsReviewed} colaboradores analizados
                         </span>
-                      </h5>
+                      </h4>
                       <p className="text-[11px] text-slate-500 mt-0.5 font-medium">
                         📅 {c.date} • Facilitado por: {c.conductedBy}
                       </p>

@@ -119,9 +119,9 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
             <KeyRound className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-lg font-black text-slate-900 tracking-tight">
+            <h2 className="text-lg font-black text-slate-900 tracking-tight">
               Cambiar Contraseña
-            </h3>
+            </h2>
             <p className="text-xs text-slate-500 font-medium">
               Actualiza tus credenciales de acceso de forma segura
             </p>

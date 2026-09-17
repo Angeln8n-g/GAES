@@ -155,7 +155,7 @@ export const ComplianceTrackerModal: React.FC<ComplianceTrackerModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-lg font-black text-slate-900 line-clamp-1">{program.title}</h3>
+                <h2 className="text-lg font-black text-slate-900 line-clamp-1">{program.title}</h2>
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                   program.status === 'active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600'
                 }`}>
@@ -226,7 +226,7 @@ export const ComplianceTrackerModal: React.FC<ComplianceTrackerModalProps> = ({
               <p className="text-2xl font-black text-slate-900 mt-1">
                 {complianceSummary.totalParticipants}
               </p>
-              <span className="text-[10px] text-slate-400 font-semibold">Colaboradores</span>
+              <span className="text-[10px] text-slate-500 font-semibold">Colaboradores</span>
             </div>
 
             {/* Completed */}
@@ -386,7 +386,7 @@ export const ComplianceTrackerModal: React.FC<ComplianceTrackerModalProps> = ({
                 <tbody className="divide-y divide-slate-100">
                   {filteredParticipants.length === 0 ? (
                     <tr>
-                      <td colSpan={4 + program.eventItems.length} className="p-8 text-center text-slate-400">
+                      <td colSpan={4 + program.eventItems.length} className="p-8 text-center text-slate-500">
                         No se encontraron colaboradores con los filtros seleccionados.
                       </td>
                     </tr>
@@ -403,7 +403,7 @@ export const ComplianceTrackerModal: React.FC<ComplianceTrackerModalProps> = ({
                               <span>• Cédula: {participant.participantCedula}</span>
                             )}
                           </div>
-                          <div className="text-[10px] text-slate-400 font-mono">{participant.participantEmail}</div>
+                          <div className="text-[10px] text-slate-500 font-mono">{participant.participantEmail}</div>
                         </td>
 
                         {/* Groups */}
@@ -416,7 +416,7 @@ export const ComplianceTrackerModal: React.FC<ComplianceTrackerModalProps> = ({
                                 </span>
                               ))
                             ) : (
-                              <span className="text-[11px] text-slate-400 italic">Asignación directa</span>
+                              <span className="text-[11px] text-slate-500 italic">Asignación directa</span>
                             )}
                           </div>
                         </td>

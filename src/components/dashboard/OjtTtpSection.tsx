@@ -68,9 +68,9 @@ export const OjtTtpSection: React.FC<OjtTtpSectionProps> = ({
             <Sparkles className="w-4 h-4" />
             <span>Diagnóstico Integral & Aceleración Operativa (Plan 90 Días)</span>
           </div>
-          <h3 className="text-lg sm:text-xl font-black text-slate-900">
+          <h2 className="text-lg sm:text-xl font-black text-slate-900">
             Tablero de Time to Productivity (TTP), First-Time Fix & Calibración
-          </h3>
+          </h2>
           <p className="text-xs text-slate-600 mt-1 max-w-2xl leading-relaxed">
             Monitoreo en tiempo real de la curva de aprendizaje de los nuevos técnicos, reducción de dispersión inter-equipos y alineación entre evaluación teórica y desempeño en campo.
           </p>
@@ -155,7 +155,7 @@ export const OjtTtpSection: React.FC<OjtTtpSectionProps> = ({
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
               <Scale className="w-5 h-5 text-[#DA291C]" />
-              <h4 className="text-sm font-extrabold text-slate-900">Mesas de Calibración Quincenales</h4>
+              <h3 className="text-sm font-extrabold text-slate-900">Mesas de Calibración Quincenales</h3>
             </div>
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-50 text-[#DA291C] border border-red-200">
               {calibrations.length} Sesiones Auditadas
@@ -204,7 +204,7 @@ export const OjtTtpSection: React.FC<OjtTtpSectionProps> = ({
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
               <Wrench className="w-5 h-5 text-purple-600" />
-              <h4 className="text-sm font-extrabold text-slate-900">Top Debilidades Observadas en Campo</h4>
+              <h3 className="text-sm font-extrabold text-slate-900">Top Debilidades Observadas en Campo</h3>
             </div>
             <span className="text-xs text-slate-500 font-medium">
               Checklists ({checklists.length})
@@ -232,7 +232,7 @@ export const OjtTtpSection: React.FC<OjtTtpSectionProps> = ({
               ))}
             </div>
           ) : (
-            <div className="p-6 text-center text-slate-400 bg-slate-50 rounded-2xl border border-slate-200">
+            <div className="p-6 text-center text-slate-500 bg-slate-50 rounded-2xl border border-slate-200">
               <ShieldCheck className="w-8 h-8 text-emerald-500 mx-auto mb-1.5" />
               <p className="text-xs font-bold text-slate-700">Sin debilidades críticas recurrentes</p>
               <p className="text-[11px] text-slate-500 mt-0.5">El estándar operativo se mantiene en conformidad.</p>

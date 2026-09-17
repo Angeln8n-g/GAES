@@ -603,7 +603,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
               <Calendar className="w-4 h-4 text-red-600" />
             </div>
             <div className="text-2xl font-black text-slate-900">{metrics.activeCohortsCount}</div>
-            <span className="text-[11px] text-slate-400">En curso o programadas</span>
+            <span className="text-[11px] text-slate-500">En curso o programadas</span>
           </div>
 
           <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
@@ -612,7 +612,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
               <Users className="w-4 h-4 text-slate-600" />
             </div>
             <div className="text-2xl font-black text-slate-900">{metrics.totalEnrolled}</div>
-            <span className="text-[11px] text-slate-400">En todas las semanas</span>
+            <span className="text-[11px] text-slate-500">En todas las semanas</span>
           </div>
 
           <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
@@ -621,7 +621,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
               <UserCheck className="w-4 h-4 text-slate-600" />
             </div>
             <div className="text-2xl font-black text-slate-900">{metrics.uniqueFacilitators}</div>
-            <span className="text-[11px] text-slate-400">Instructores asignados</span>
+            <span className="text-[11px] text-slate-500">Instructores asignados</span>
           </div>
 
           <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
@@ -814,7 +814,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
             {activeCohort && (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 text-xs">
                 <div>
-                  <span className="text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Facilitador Asignado</span>
+                  <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider block">Facilitador Asignado</span>
                   <span className="font-bold text-slate-800 truncate block">
                     {activeCohort.facilitatorName || 'No Asignado'}
                     {isUserFacilitatorOfCohort(activeCohort) && (
@@ -825,17 +825,17 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Grupo / Cuadrilla</span>
+                  <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider block">Grupo / Cuadrilla</span>
                   <span className="font-bold text-slate-800 truncate block">{activeCohort.groupName || 'Sin Grupo'}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Período Semanal</span>
+                  <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider block">Período Semanal</span>
                   <span className="font-bold text-slate-800 truncate block">
                     {activeCohort.startDate} al {activeCohort.endDate}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-400 text-[10px] uppercase font-bold tracking-wider block">PIN Diario</span>
+                  <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider block">PIN Diario</span>
                   <span className="font-mono font-extrabold text-red-600 tracking-wider text-sm block">
                     {activeCohort.dailyPin || '----'}
                   </span>
@@ -933,14 +933,14 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                   <tbody className="divide-y divide-slate-100">
                     {isLoadingAttendance ? (
                       <tr>
-                        <td colSpan={8} className="py-12 text-center text-slate-400">
+                        <td colSpan={8} className="py-12 text-center text-slate-500">
                           <RotateCw className="w-6 h-6 animate-spin mx-auto mb-2 text-red-600" />
                           <span>Cargando matriz de asistencia...</span>
                         </td>
                       </tr>
                     ) : filteredParticipants.length === 0 ? (
                       <tr>
-                        <td colSpan={8} className="py-10 text-center text-slate-400">
+                        <td colSpan={8} className="py-10 text-center text-slate-500">
                           No hay técnicos enrolados en esta cohorte o no coinciden con la búsqueda.
                         </td>
                       </tr>
@@ -953,7 +953,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
 
                         return (
                           <tr key={p.card} className="hover:bg-slate-50/80 transition-colors">
-                            <td className="py-3 px-3 text-center text-slate-400 font-mono text-[11px]">
+                            <td className="py-3 px-3 text-center text-slate-500 font-mono text-[11px]">
                               {idx + 1}
                             </td>
                             <td className="py-3 px-3 font-mono font-bold text-slate-700">
@@ -961,23 +961,23 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                             </td>
                             <td className="py-3 px-4">
                               <div className="font-bold text-slate-900">{p.name}</div>
-                              <div className="text-[10px] text-slate-400">{p.email}</div>
+                              <div className="text-[10px] text-slate-500">{p.email}</div>
                             </td>
                             <td className="py-3 px-3 text-slate-600 text-[11px]">
                               {p.department || 'Planta Externa'}
                             </td>
 
                             {/* 1-Click Status Toggle Buttons for Current Date */}
-                            <td className="py-2.5 px-4">
+                            <td className="py-3 px-3">
                               <div className="flex items-center justify-center gap-1">
                                 <button
                                   type="button"
                                   onClick={() => handleToggleAttendance(p.card, 'present')}
                                   title="Marcar Presente"
-                                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-all ${
+                                  className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all flex items-center gap-1 ${
                                     currentStatus === 'present'
-                                      ? 'bg-emerald-600 text-white shadow-sm'
-                                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-emerald-700'
+                                      ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-500/20'
+                                      : 'bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
                                   }`}
                                 >
                                   <CheckCircle2 className="w-3 h-3" />
@@ -988,13 +988,13 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                                   type="button"
                                   onClick={() => handleToggleAttendance(p.card, 'late')}
                                   title="Marcar Tardanza"
-                                  className={`px-2 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-all ${
+                                  className={`px-2 py-1 text-[11px] font-bold rounded-lg transition-all flex items-center gap-1 ${
                                     currentStatus === 'late'
                                       ? 'bg-amber-500 text-white shadow-sm'
-                                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-amber-700'
+                                      : 'bg-slate-100 text-slate-600 hover:bg-amber-50 hover:text-amber-700'
                                   }`}
                                 >
-                                  <Clock3 className="w-3 h-3" />
+                                  <Clock className="w-3 h-3" />
                                   <span>Tardanza</span>
                                 </button>
 
@@ -1002,10 +1002,10 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                                   type="button"
                                   onClick={() => handleToggleAttendance(p.card, 'absent')}
                                   title="Marcar Ausente"
-                                  className={`px-2 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-all ${
+                                  className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all flex items-center gap-1 ${
                                     currentStatus === 'absent'
-                                      ? 'bg-red-600 text-white shadow-sm'
-                                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-red-700'
+                                      ? 'bg-red-600 text-white shadow-sm ring-2 ring-red-500/20'
+                                      : 'bg-slate-100 text-slate-600 hover:bg-red-50 hover:text-red-700'
                                   }`}
                                 >
                                   <XCircle className="w-3 h-3" />
@@ -1016,19 +1016,19 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                                   type="button"
                                   onClick={() => handleToggleAttendance(p.card, 'excused')}
                                   title="Marcar Excusado"
-                                  className={`px-2 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-all ${
+                                  className={`px-2 py-1 text-[11px] font-bold rounded-lg transition-all flex items-center gap-1 ${
                                     currentStatus === 'excused'
-                                      ? 'bg-sky-600 text-white shadow-sm'
-                                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-sky-700'
+                                      ? 'bg-blue-600 text-white shadow-sm'
+                                      : 'bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-700'
                                   }`}
                                 >
                                   <ShieldAlert className="w-3 h-3" />
-                                  <span>Exc.</span>
+                                  <span>Excusado</span>
                                 </button>
                               </div>
 
                               {currentDayAtt?.method && currentDayAtt.method !== 'manual' && (
-                                <div className="text-[9px] text-center text-slate-400 mt-1 uppercase font-semibold">
+                                <div className="text-[9px] text-center text-slate-500 mt-1 uppercase font-semibold">
                                   Vía {currentDayAtt.method === 'qr_scan' ? 'QR Móvil' : 'PIN'}
                                 </div>
                               )}
@@ -1049,7 +1049,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                                   {p.attendancePercentage}%
                                 </span>
                               </div>
-                              <span className="text-[10px] text-slate-400 block mt-0.5">
+                              <span className="text-[10px] text-slate-500 block mt-0.5">
                                 {p.attendedDays} de {p.totalDays} días
                               </span>
                             </td>
@@ -1136,10 +1136,10 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
           {/* Cohorts Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredCohorts.length === 0 ? (
-              <div className="col-span-full py-16 text-center text-slate-400 bg-white rounded-3xl border border-slate-200">
+              <div className="col-span-full py-16 text-center text-slate-500 bg-white rounded-3xl border border-slate-200">
                 <Calendar className="w-10 h-10 mx-auto mb-2 text-slate-300" />
                 <p className="text-sm font-semibold text-slate-600">No se encontraron cohortes programadas</p>
-                <p className="text-xs text-slate-400 mt-1">Crea una nueva cohorte para habilitar la rotación semanal.</p>
+                <p className="text-xs text-slate-500 mt-1">Crea una nueva cohorte para habilitar la rotación semanal.</p>
               </div>
             ) : (
               filteredCohorts.map(coh => {
@@ -1181,7 +1181,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                           <Users className="w-3.5 h-3.5 text-red-600 shrink-0" />
                           <span className="font-semibold text-slate-800">Grupo:</span>
                           <span className="truncate">{coh.groupName || 'Abierto'}</span>
-                          <span className="text-[10px] text-slate-400">({coh.enrolledCount || 0} técnicos)</span>
+                          <span className="text-[10px] text-slate-500">({coh.enrolledCount || 0} técnicos)</span>
                         </div>
 
                         <div className="flex items-center gap-2">
@@ -1351,7 +1351,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                       {course.category}
                     </span>
                     {course.code && (
-                      <span className="text-[10px] font-mono font-bold text-slate-400">
+                      <span className="text-[10px] font-mono font-bold text-slate-500">
                         {course.code}
                       </span>
                     )}
@@ -1362,19 +1362,19 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
 
                   <div className="pt-2 border-t border-slate-100 grid grid-cols-2 gap-2 text-[11px] text-slate-600">
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Horas Diarias:</span>
+                      <span className="text-slate-500 block text-[10px] font-medium">Horas Diarias:</span>
                       <strong className="text-slate-800">{course.dailyHours} hrs</strong>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Duración:</span>
+                      <span className="text-slate-500 block text-[10px] font-medium">Duración:</span>
                       <strong className="text-slate-800">{course.durationDays} días ({course.dailyHours * course.durationDays}h tot)</strong>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Modalidad:</span>
+                      <span className="text-slate-500 block text-[10px] font-medium">Modalidad:</span>
                       <span className="truncate block">{course.modality}</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Taller:</span>
+                      <span className="text-slate-500 block text-[10px] font-medium">Taller:</span>
                       <span className="truncate block">{course.location || 'Laboratorio'}</span>
                     </div>
                   </div>
@@ -1521,7 +1521,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
               <tbody className="divide-y divide-slate-100">
                 {!attendanceMatrix || attendanceMatrix.participants.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="py-12 text-center text-slate-400">
+                    <td colSpan={9} className="py-12 text-center text-slate-500">
                       No hay registros de técnicos disponibles en esta cohorte.
                     </td>
                   </tr>
@@ -1533,7 +1533,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
 
                     return (
                       <tr key={p.card} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="py-3 px-3 font-mono text-slate-400 font-bold">{idx + 1}</td>
+                        <td className="py-3 px-3 font-mono text-slate-500 font-bold">{idx + 1}</td>
                         <td className="py-3 px-3 font-mono font-bold text-slate-800">#{p.card}</td>
                         <td className="py-3 px-4">
                           <div className="font-bold text-slate-900">{p.name}</div>
@@ -1543,7 +1543,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                           <span className={`font-mono font-bold ${p.attendancePercentage >= 80 ? 'text-emerald-700' : 'text-slate-700'}`}>
                             {p.attendancePercentage}%
                           </span>
-                          <span className="block text-[10px] text-slate-400">
+                          <span className="block text-[10px] text-slate-500">
                             {p.attendedDays} / {p.totalDays} d
                           </span>
                         </td>
@@ -1574,7 +1574,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                                 }}
                                 className="w-16 px-2 py-1 text-center font-mono font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white text-xs"
                               />
-                              <span className="text-[10px] font-bold text-slate-400">pts</span>
+                              <span className="text-[10px] font-bold text-slate-500">pts</span>
                             </div>
                           ) : (
                             <span className="font-mono font-bold text-slate-800">

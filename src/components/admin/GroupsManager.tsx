@@ -333,7 +333,7 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
                         </div>
                       )}
                       {group.memberCards.length === 0 && (
-                        <span className="text-[11px] text-slate-400 italic">Sin integrantes asignados</span>
+                        <span className="text-[11px] text-slate-500 italic">Sin integrantes asignados</span>
                       )}
                     </div>
                   </div>
@@ -376,9 +376,9 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
                   <Layers className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-slate-900">
+                  <h2 className="text-base font-black text-slate-900">
                     {editingGroup ? 'Editar Grupo de Participantes' : 'Crear Nuevo Grupo / Cohorte'}
-                  </h3>
+                  </h2>
                   <p className="text-xs text-slate-500">
                     Segmenta a los colaboradores para asignar cronogramas formativos personalizados.
                   </p>
@@ -495,10 +495,10 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
               <div className="pt-3 border-t border-slate-200">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3">
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <h3 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
                       <Users className="w-3.5 h-3.5 text-[#DA291C]" />
                       Asignar Colaboradores al Grupo ({formData.memberCards.size} seleccionados)
-                    </h4>
+                    </h3>
                     <p className="text-[11px] text-slate-500">
                       Selecciona los integrantes del padrón que formarán parte de este grupo.
                     </p>
@@ -562,7 +562,7 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
                           </div>
 
                           {p.cedula && (
-                            <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">
+                            <span className="text-[10px] text-slate-500 font-mono hidden sm:inline">
                               {p.cedula}
                             </span>
                           )}

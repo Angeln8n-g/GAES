@@ -677,17 +677,17 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
             <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
               {isLoadingHistory ? (
                 <tr>
-                  <td colSpan={7} className="py-16 text-center text-slate-400">
+                  <td colSpan={7} className="py-16 text-center text-slate-500">
                     <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-[#DA291C]" />
                     <p className="text-xs font-bold text-slate-600">Cargando base de datos de asignaciones...</p>
                   </td>
                 </tr>
               ) : paginatedParticipants.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-16 text-center text-slate-400">
+                  <td colSpan={7} className="py-16 text-center text-slate-500">
                     <Users className="w-8 h-8 mx-auto mb-2 text-slate-300" />
                     <p className="text-sm font-bold text-slate-600">No se encontraron colaboradores</p>
-                    <p className="text-xs text-slate-400 mt-0.5">Prueba ajustando los términos de búsqueda o filtros.</p>
+                    <p className="text-xs text-slate-500 mt-0.5">Prueba ajustando los términos de búsqueda o filtros.</p>
                   </td>
                 </tr>
               ) : (
@@ -728,7 +728,7 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                             <div className="font-black text-slate-900 flex items-center gap-2">
                               <span>{p.name}</span>
                               {p.cedula && (
-                                <span className="text-[10px] text-slate-400 font-normal">
+                                <span className="text-[10px] text-slate-500 font-normal">
                                   • C.I. {p.cedula}
                                 </span>
                               )}
@@ -758,7 +758,7 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                             <div className="text-[11px] text-slate-500 flex flex-wrap items-center gap-2">
                               <span className="font-semibold text-slate-700">{p.currentCohortName}</span>
                               {p.currentDates && (
-                                <span className="text-slate-400 flex items-center gap-1">
+                                <span className="text-slate-500 flex items-center gap-1">
                                   <Calendar className="w-3 h-3" />
                                   {p.currentDates}
                                 </span>
@@ -766,7 +766,7 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                             </div>
                           </div>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-400 italic">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 italic">
                             Sin curso asignado
                           </span>
                         )}
@@ -807,7 +807,7 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                           <div className="inline-flex flex-col items-center gap-1">
                             <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
                               <span>{p.attendancePct}%</span>
-                              <span className="text-[10px] text-slate-400 font-normal">
+                              <span className="text-[10px] text-slate-500 font-normal">
                                 ({p.attendedDays}/{p.totalDays} d)
                               </span>
                             </div>
@@ -966,9 +966,9 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                 <Trash2 className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-lg font-black text-slate-900">
+                <h2 className="text-lg font-black text-slate-900">
                   Gestionar Asignación de Curso
-                </h3>
+                </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
                   Elige cómo deseas procesar la desmatriculación del colaborador.
                 </p>

@@ -726,7 +726,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                             <span>+ Salida</span>
                           </button>
                         ) : (
-                          <span className="px-2.5 py-1 rounded-xl text-[10px] font-medium bg-slate-50 text-slate-400 border border-slate-200">
+                          <span className="px-2.5 py-1 rounded-xl text-[10px] font-medium bg-slate-50 text-slate-500 border border-slate-200">
                             Salida Pendiente
                           </span>
                         )}
@@ -762,7 +762,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-slate-400 text-xs">
+              <div className="text-center py-8 text-slate-500 text-xs">
                 No hay colaboradores inscritos que coincidan con la búsqueda en este horario.
               </div>
             )}
@@ -779,12 +779,12 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="bg-white border border-slate-200 rounded-2xl p-3.5 text-center shadow-xs">
                 <span className="text-[10px] text-slate-500 uppercase font-black tracking-wider">Promedio General</span>
-                <p className="text-xl font-black text-[#DA291C] mt-0.5">{gradeStats.avgScore} <span className="text-xs text-slate-400">pts</span></p>
+                <p className="text-xl font-black text-[#DA291C] mt-0.5">{gradeStats.avgScore} <span className="text-xs text-slate-500">pts</span></p>
               </div>
 
               <div className="bg-white border border-slate-200 rounded-2xl p-3.5 text-center shadow-xs">
                 <span className="text-[10px] text-slate-500 uppercase font-black tracking-wider">Evaluados</span>
-                <p className="text-xl font-black text-slate-900 mt-0.5">{gradeStats.totalGraded} <span className="text-xs text-slate-400">/ {currentSlotParticipants.length}</span></p>
+                <p className="text-xl font-black text-slate-900 mt-0.5">{gradeStats.totalGraded} <span className="text-xs text-slate-500">/ {currentSlotParticipants.length}</span></p>
               </div>
 
               <div className="bg-white border border-emerald-200 rounded-2xl p-3.5 text-center shadow-xs">
@@ -885,7 +885,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                             {eventModules.map(m => (
                               <th key={m.id} className="p-3 text-center whitespace-nowrap">
                                 <div>{m.title}</div>
-                                <div className="text-[10px] text-slate-400 font-normal">Mín: {m.passingScore ?? 70} pts</div>
+                                <div className="text-[10px] text-slate-500 font-normal">Mín: {m.passingScore ?? 70} pts</div>
                               </th>
                             ))}
                             <th className="p-3 text-center">Promedio Final</th>
@@ -899,7 +899,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                               <tr key={item.card || item.email} className="hover:bg-slate-50/50">
                                 <td className="p-3">
                                   <p className="font-bold text-slate-900">{item.name}</p>
-                                  <p className="text-[10px] text-slate-400">{item.email}</p>
+                                  <p className="text-[10px] text-slate-500">{item.email}</p>
                                 </td>
                                 <td className="p-3 text-slate-600 font-mono">#{item.card || 'N/A'}</td>
                                 <td className="p-3 text-slate-600">{item.department}</td>
@@ -943,7 +943,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-8 text-slate-400 text-xs">
+                <div className="text-center py-8 text-slate-500 text-xs">
                   No hay participantes inscritos para evaluar en este horario.
                 </div>
               )
@@ -1065,7 +1065,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                         })}
                       </div>
                     ) : (
-                      <div className="text-center py-8 text-slate-400 text-xs">
+                      <div className="text-center py-8 text-slate-500 text-xs">
                         No hay participantes inscritos para evaluar en este horario.
                       </div>
                     )}
@@ -1260,7 +1260,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                   })}
                 </div>
               ) : (
-                <div className="text-center py-8 text-slate-400 text-xs">
+                <div className="text-center py-8 text-slate-500 text-xs">
                   No hay participantes inscritos para evaluar en este horario.
                 </div>
               )
@@ -1379,7 +1379,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
           {/* Live Counters */}
           <div className="w-full max-w-md bg-slate-50 border border-slate-200 rounded-2xl p-3.5 mb-4 grid grid-cols-4 gap-2 text-center text-xs">
             <div>
-              <span className="text-slate-400 font-bold block text-[10px] uppercase">Inscritos</span>
+              <span className="text-slate-500 font-bold block text-[10px] uppercase">Inscritos</span>
               <span className="text-lg font-black text-slate-800">{attendeesList.length}</span>
             </div>
             <div className="border-l border-slate-200">

@@ -580,7 +580,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
           </div>
           <div>
             <div className="flex items-center gap-2.5 flex-wrap">
-              <h2 className="text-xl font-black text-slate-900 tracking-tight">Portal de Mi Equipo & Cumplimiento</h2>
+              <h1 className="text-xl font-black text-slate-900 tracking-tight">Portal de Mi Equipo & Cumplimiento</h1>
               <span className="px-3 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 flex items-center gap-1.5 shadow-sm">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 Líder de Área
@@ -1120,7 +1120,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
           <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
             <div className="p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-black text-slate-900">Historial Consolidado de Asistencias & Horas del Equipo</h3>
+                <h2 className="text-sm font-black text-slate-900">Historial Consolidado de Asistencias & Horas del Equipo</h2>
                 <p className="text-xs text-slate-500 mt-0.5">Todas las capacitaciones acumuladas en la empresa</p>
               </div>
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-[#DA291C] border border-red-200">
@@ -1205,7 +1205,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                         {item.registeredFutureCount > 0 ? (
                           <span className="text-cyan-700 font-bold">{item.registeredFutureCount} agendados</span>
                         ) : (
-                          <span className="text-slate-400 italic">Ninguno agendado</span>
+                          <span className="text-slate-500 italic">Ninguno agendado</span>
                         )}
                       </td>
 
@@ -1294,9 +1294,9 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
             {/* Header & Controls */}
             <div className="p-5 border-b border-slate-200 bg-slate-50 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
-                <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
+                <h2 className="text-sm font-black text-slate-900 flex items-center gap-2">
                   <span>Asignaciones de Capacitaciones a Miembros del Equipo</span>
-                </h3>
+                </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
                   Gestiona las matrículas, verifica el carácter obligatorio y desasigna si es necesario.
                 </p>
@@ -1372,7 +1372,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                         <td className="p-4">
                           <p className="font-bold text-slate-900 text-xs">{item.participant.name}</p>
                           <p className="text-[11px] text-slate-500">{item.participant.email}</p>
-                          <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-slate-400 font-medium">
+                          <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-slate-500 font-medium">
                             <span>ID: #{item.participant.card}</span>
                             {item.participant.cedula && <span>• Céd: {item.participant.cedula}</span>}
                           </div>
@@ -1447,7 +1447,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                               )}
                             </div>
                           ) : (
-                            <span className="text-slate-400 italic">Inscripción Directa</span>
+                            <span className="text-slate-500 italic">Inscripción Directa</span>
                           )}
                         </td>
 
@@ -1529,7 +1529,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
               <span className="text-xs font-bold text-slate-500">Promedio General del Equipo</span>
               <div className="flex items-baseline justify-between mt-2">
                 <span className="text-2xl font-black text-blue-700">{teamGradesAnalysis.overallTeamAvg}</span>
-                <span className="text-xs font-bold text-slate-400">Escala 0 - 100</span>
+                <span className="text-xs font-bold text-slate-500">Escala 0 - 100</span>
               </div>
               <p className="text-[11px] text-slate-500 mt-1">Calculado sobre cursos con evaluación formal</p>
             </div>
@@ -1574,9 +1574,9 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Target className="w-5 h-5 text-[#DA291C]" />
-                  <h3 className="text-sm font-black text-slate-900">
+                  <h2 className="text-sm font-black text-slate-900">
                     Matriz de Detección de Debilidades en el Equipo (Skills Gap Analysis)
-                  </h3>
+                  </h2>
                 </div>
                 <span className="text-[11px] text-blue-800 font-bold bg-blue-50 px-3 py-1 rounded-xl border border-blue-200 shadow-xs">
                   {teamGradesAnalysis.topGaps.length} áreas identificadas
@@ -1684,7 +1684,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                         </div>
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h4 className="text-sm font-bold text-slate-900">{p.name}</h4>
+                            <h3 className="text-sm font-bold text-slate-900">{p.name}</h3>
                             <span className="px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-bold rounded-lg">
                               Tarjeta: #{p.card}
                             </span>
@@ -1707,7 +1707,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                           <div className="px-3.5 py-1.5 bg-slate-50 rounded-2xl border border-slate-200 text-right">
                             <span className="text-[10px] text-slate-500 uppercase font-bold block">Promedio</span>
                             <span className={`text-base font-extrabold ${item.avgScore >= 70 ? 'text-emerald-700' : 'text-rose-700'}`}>
-                              {item.avgScore} <span className="text-xs text-slate-400 font-normal">pts</span>
+                              {item.avgScore} <span className="text-xs text-slate-500 font-medium">pts</span>
                             </span>
                           </div>
                         ) : (
@@ -1764,7 +1764,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                                 <div className="flex items-start justify-between gap-2">
                                   <div>
                                     <span className="text-[10px] text-[#DA291C] font-bold">{grd.category}</span>
-                                    <h5 className="text-xs font-bold text-slate-900 line-clamp-1">{grd.eventTitle}</h5>
+                                    <h4 className="text-xs font-bold text-slate-900 line-clamp-1">{grd.eventTitle}</h4>
                                   </div>
 
                                   <div className="flex items-center gap-1.5 shrink-0">
@@ -1819,7 +1819,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                         </div>
                       </div>
                     ) : (
-                      <div className="pt-2 text-xs text-slate-400 italic">
+                      <div className="pt-2 text-xs text-slate-500 italic">
                         Este colaborador aún no ha completado capacitaciones con calificación formal.
                       </div>
                     )}

@@ -508,7 +508,7 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
             <Users className="w-4 h-4 text-[#DA291C]" />
           </div>
           <p className="text-2xl font-black text-slate-900 mt-1.5">{stats.total}</p>
-          <p className="text-[10px] text-slate-400 mt-0.5">Colaboradores registrados</p>
+          <p className="text-[10px] text-slate-500 mt-0.5 font-medium">Colaboradores registrados</p>
         </div>
 
         <div 
@@ -1008,7 +1008,7 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
                             {p.cedula}
                           </span>
                         ) : (
-                          <span className="text-slate-400 italic text-[11px]">—</span>
+                          <span className="text-slate-500 italic text-[11px]">—</span>
                         )}
                       </td>
 
@@ -1057,7 +1057,7 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
                             {p.department}
                           </span>
                         ) : (
-                          <span className="text-slate-400 text-[11px]">—</span>
+                          <span className="text-slate-500 text-[11px]">—</span>
                         )}
                       </td>
 
@@ -1136,7 +1136,7 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
                 <tr>
                   <td colSpan={9} className="p-12 text-center text-slate-500">
                     <p className="text-sm font-bold text-slate-800">No se encontraron colaboradores</p>
-                    <p className="text-xs text-slate-400 mt-1">Prueba ajustando los filtros de búsqueda o empresa.</p>
+                    <p className="text-xs text-slate-500 mt-1">Prueba ajustando los filtros de búsqueda o empresa.</p>
                   </td>
                 </tr>
               )}

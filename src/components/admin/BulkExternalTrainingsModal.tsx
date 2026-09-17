@@ -349,7 +349,7 @@ export const BulkExternalTrainingsModal: React.FC<BulkExternalTrainingsModalProp
                 <span className="font-semibold">
                   Pega filas copiadas de Excel o Google Sheets separadas por tabulación:
                 </span>
-                <span className="text-[11px] text-slate-400">
+                <span className="text-[11px] text-slate-500 font-medium">
                   Columnas mínimas: Identificación (Cédula/Tarj/Email) y Título de capacitación
                 </span>
               </div>
@@ -469,7 +469,7 @@ export const BulkExternalTrainingsModal: React.FC<BulkExternalTrainingsModalProp
                             <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                               {getProgramShortName(item.programCategory)}
                             </span>
-                            <span className="text-[10px] text-slate-400 block truncate max-w-[150px]">{item.subprogram}</span>
+                            <span className="text-[10px] text-slate-500 block truncate max-w-[150px] font-medium">{item.subprogram}</span>
                           </td>
                           <td className="py-2.5 px-3">
                             <span className="font-bold text-slate-800 flex items-center gap-1">

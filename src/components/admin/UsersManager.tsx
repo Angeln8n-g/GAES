@@ -353,7 +353,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
             <UsersIcon className="w-4 h-4 text-[#DA291C]" />
           </div>
           <p className="text-2xl font-black text-slate-900 mt-1.5">{stats.total}</p>
-          <p className="text-[10px] text-slate-400 mt-0.5">Usuarios con acceso</p>
+          <p className="text-[10px] text-slate-500 mt-0.5 font-medium">Usuarios con acceso</p>
         </div>
 
         <div 
@@ -686,7 +686,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                             {u.cedula}
                           </span>
                         ) : (
-                          <span className="text-slate-400 italic text-[11px]">No asignada</span>
+                          <span className="text-slate-500 italic text-[11px]">No asignada</span>
                         )}
                       </td>
 
@@ -715,7 +715,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                             {u.department}
                           </span>
                         ) : (
-                          <span className="text-slate-400 text-[11px]">—</span>
+                          <span className="text-slate-500 text-[11px]">—</span>
                         )}
                       </td>
 
@@ -826,7 +826,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                 <tr>
                   <td colSpan={8} className="p-12 text-center text-slate-500">
                     <p className="text-sm font-bold text-slate-800">No se encontraron usuarios</p>
-                    <p className="text-xs text-slate-400 mt-1">Prueba ajustando los filtros de búsqueda o empresa.</p>
+                    <p className="text-xs text-slate-500 mt-1">Prueba ajustando los filtros de búsqueda o empresa.</p>
                   </td>
                 </tr>
               )}
@@ -846,7 +846,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
           <div className="bg-white border border-slate-200 rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4">
             <div className="flex items-center gap-2.5 text-amber-600">
               <KeyRound className="w-5 h-5" />
-              <h3 className="text-base font-black text-slate-900">Cambiar Contraseña</h3>
+              <h2 className="text-base font-black text-slate-900">Cambiar Contraseña</h2>
             </div>
             <p className="text-xs text-slate-500">
               Ingresa la nueva contraseña para <strong className="text-slate-800">{selectedUserForPassword.name}</strong> ({selectedUserForPassword.email}).

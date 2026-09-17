@@ -699,7 +699,7 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
                       }`}
                     >
                       {/* No. */}
-                      <td className="p-3.5 pl-5 font-bold text-slate-400">
+                      <td className="p-3.5 pl-5 font-bold text-slate-500">
                         {idx + 1}
                       </td>
 
@@ -803,7 +803,7 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
                       {/* Métrica: Inscritos / Asistentes */}
                       <td className="p-3.5 pr-5 text-right whitespace-nowrap">
                         <div className="font-bold text-slate-900">
-                          {attCount} <span className="text-slate-400 font-normal">/ {regCount}</span>
+                          {attCount} <span className="text-slate-500 font-normal">/ {regCount}</span>
                         </div>
                         <div className="text-[10px] text-slate-500">
                           {regCount > 0 ? `${Math.round((attCount / regCount) * 100)}% asist.` : '0%'}

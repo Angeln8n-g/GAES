@@ -157,9 +157,9 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-xl font-black text-slate-900">
+                <h2 className="text-xl font-black text-slate-900">
                   {isReassignment ? 'Reasignar Curso Técnico' : 'Asignar Curso Técnico'}
-                </h3>
+                </h2>
                 <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-red-100 text-[#DA291C]">
                   Super Admin CRM
                 </span>
@@ -172,8 +172,9 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 hover:bg-slate-100 rounded-xl text-slate-400 hover:text-slate-600 transition-colors"
+            className="p-1.5 hover:bg-slate-100 rounded-xl text-slate-500 hover:text-slate-600 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -219,7 +220,7 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
                 </div>
                 <div className="leading-tight">
                   <span className="font-bold text-slate-800 block text-[11px]">{p.name}</span>
-                  <span className="text-[10px] text-slate-400 font-mono">Ficha #{p.card}</span>
+                  <span className="text-[10px] text-slate-500 font-mono">Ficha #{p.card}</span>
                 </div>
               </div>
             ))}

@@ -275,7 +275,7 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
                 onChange={(e) => setDailyHours(Number(e.target.value))}
                 className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 text-slate-800 bg-white"
               />
-              <span className="text-[10px] text-slate-400 block">Total acumulado: {(dailyHours * durationDays)} hrs</span>
+              <span className="text-[10px] text-slate-500 font-medium block">Total acumulado: {(dailyHours * durationDays)} hrs</span>
             </div>
 
             <div className="space-y-1.5">
@@ -290,7 +290,7 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
                 onChange={(e) => setDurationDays(Number(e.target.value))}
                 className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 text-slate-800 bg-white"
               />
-              <span className="text-[10px] text-slate-400 block">Típicamente 5 días (Semana técnica)</span>
+              <span className="text-[10px] text-slate-500 font-medium block">Típicamente 5 días (Semana técnica)</span>
             </div>
           </div>
 

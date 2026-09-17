@@ -381,10 +381,10 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
         <div className="lg:col-span-5 space-y-4">
           <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
                 <User className="w-4 h-4 text-[#DA291C]" />
                 <span>Directorio de Colaboradores</span>
-              </h3>
+              </h2>
               <span className="text-xs font-bold text-slate-500">
                 {filteredParticipants.length} de {participants.length}
               </span>
@@ -517,10 +517,10 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                   );
                 })
               ) : (
-                <div className="py-12 text-center text-slate-400">
-                  <User className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                  <p className="text-xs font-bold">No se encontraron colaboradores</p>
-                  <p className="text-[11px] mt-1">Prueba ajustando los criterios de búsqueda o filtros.</p>
+                <div className="py-12 text-center text-slate-500">
+                  <User className="w-8 h-8 mx-auto mb-2 opacity-40 text-slate-400" />
+                  <p className="text-xs font-bold text-slate-700">No se encontraron colaboradores</p>
+                  <p className="text-[11px] text-slate-500 mt-1">Prueba ajustando los criterios de búsqueda o filtros.</p>
                 </div>
               )}
             </div>
@@ -606,7 +606,7 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                     <p className="text-[10px] font-bold text-slate-500 uppercase mt-0.5">Horas Formativas</p>
                   </div>
                   <div className="bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
-                    <p className="text-lg font-black text-indigo-600">{activeStats.avgScore} <span className="text-[10px] font-normal text-slate-400">pts</span></p>
+                    <p className="text-lg font-black text-indigo-600">{activeStats.avgScore} <span className="text-[10px] font-medium text-slate-500">pts</span></p>
                     <p className="text-[10px] font-bold text-slate-500 uppercase mt-0.5">Promedio Notas</p>
                   </div>
                   <div className="bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
@@ -709,9 +709,9 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                               <p className="text-xs font-black text-slate-900 truncate">
                                 {rec.title}
                               </p>
-                              <div className="flex items-center gap-2 text-[10px] text-slate-400 font-medium mt-0.5">
+                              <div className="flex items-center gap-2 text-[10px] text-slate-500 font-medium mt-0.5">
                                 <span className="flex items-center gap-1">
-                                  <Calendar className="w-3 h-3" />
+                                  <Calendar className="w-3 h-3 text-slate-400" />
                                   {formatDateShort(rec.date)} {rec.time}
                                 </span>
                                 <span>•</span>
@@ -762,10 +762,10 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                       );
                     })
                   ) : (
-                    <div className="py-12 text-center text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                    <div className="py-12 text-center text-slate-500 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
                       <FileText className="w-8 h-8 mx-auto mb-2 opacity-30 text-slate-400" />
-                      <p className="text-xs font-bold text-slate-600">Sin capacitaciones registradas</p>
-                      <p className="text-[11px] text-slate-400 mt-1 max-w-sm mx-auto">
+                      <p className="text-xs font-bold text-slate-700">Sin capacitaciones registradas</p>
+                      <p className="text-[11px] text-slate-500 mt-1 max-w-sm mx-auto">
                         Este colaborador aún no ha sido inscrito en capacitaciones de la plataforma.
                       </p>
                     </div>
@@ -792,7 +792,7 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
           ) : (
             <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center shadow-xs">
               <User className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <h3 className="text-base font-black text-slate-800">Selecciona un Colaborador</h3>
+              <h2 className="text-base font-black text-slate-800">Selecciona un Colaborador</h2>
               <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
                 Elige un colaborador del directorio de la izquierda para visualizar su historial de capacitaciones, horas acumuladas y emitir cartas formales personalizadas.
               </p>

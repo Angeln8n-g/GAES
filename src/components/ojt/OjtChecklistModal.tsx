@@ -284,10 +284,10 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
 
           {/* 5-Criteria Rubric */}
           <div className="space-y-3 pt-2">
-            <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+            <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
               <Award className="w-4 h-4 text-[#DA291C]" />
               <span>Rúbrica de Desempeño Operativo (5 Dimensiones)</span>
-            </h4>
+            </h3>
 
             <div className="space-y-2.5">
               {DEFAULT_RUBRIC_CATEGORIES.map(cat => {

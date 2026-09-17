@@ -1027,7 +1027,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] mb-2"
               />
               <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                <span className="text-[10px] text-slate-400 font-semibold whitespace-nowrap">Presets:</span>
+                <span className="text-[10px] text-slate-500 font-semibold whitespace-nowrap">Presets:</span>
                 {SAMPLE_IMAGES.map((img, i) => (
                   <img
                     key={i}
@@ -1050,7 +1050,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 <GraduationCap className="w-4 h-4 text-[#DA291C]" />
                 2. Esquema de Evaluación & Detección de Debilidades
               </h3>
-              <span className="text-[11px] text-slate-400 font-medium">
+              <span className="text-[11px] text-slate-500 font-medium">
                 Determina si los participantes recibirán calificación formal
               </span>
             </div>
@@ -1132,7 +1132,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                     </span>
                   ))}
                   {skillsEvaluated.length === 0 && (
-                    <span className="text-[11px] text-slate-400 italic py-1">
+                    <span className="text-[11px] text-slate-500 italic py-1 font-medium">
                       No hay competencias añadidas aún. Agrega temas o habilidades específicas.
                     </span>
                   )}
@@ -1165,7 +1165,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
 
                 {/* Suggestions */}
                 <div className="flex items-center gap-1.5 flex-wrap pt-1">
-                  <span className="text-[10px] text-slate-400 font-bold">Sugerencias rápidas:</span>
+                  <span className="text-[10px] text-slate-500 font-bold">Sugerencias rápidas:</span>
                   {[
                     "Seguridad Operacional",
                     "Atención al Cliente",
@@ -1236,7 +1236,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 {/* Preset Buttons */}
                 <div className="flex flex-wrap items-center justify-between gap-2 pb-1">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-[10px] text-slate-400 font-bold">Plantillas rápidas:</span>
+                    <span className="text-[10px] text-slate-500 font-bold">Plantillas rápidas:</span>
                     <button
                       type="button"
                       onClick={() => handleApplyModulePreset(2)}
@@ -1360,7 +1360,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-6 text-slate-400 text-xs bg-white rounded-2xl border border-dashed border-slate-300">
+                  <div className="text-center py-6 text-slate-500 text-xs bg-white rounded-2xl border border-dashed border-slate-300 font-medium">
                     No has agregado módulos aún. Haz clic en "Agregar Módulo" o selecciona una plantilla rápida.
                   </div>
                 )}
@@ -1431,7 +1431,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
 
                 {/* Presets rápidos de duración total */}
                 <div className="flex flex-wrap gap-1.5 items-center">
-                  <span className="text-[10px] text-slate-400 font-bold mr-1">Presets comunes:</span>
+                  <span className="text-[10px] text-slate-500 font-bold mr-1">Presets comunes:</span>
                   {[4, 8, 16, 20, 40].map(h => (
                     <button
                       key={h}
@@ -1751,7 +1751,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="block text-[11px] font-bold text-slate-600">Hora Inicio *</label>
-                    <span className="text-[10px] text-slate-400">ej. 09:00 AM</span>
+                    <span className="text-[10px] text-slate-500 font-medium">ej. 09:00 AM</span>
                   </div>
                   <input
                     type="text"
@@ -1852,7 +1852,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
               </div>
 
               {schedule.length === 0 ? (
-                <div className="text-center py-6 text-slate-400 text-xs bg-slate-50 rounded-2xl border border-dashed border-slate-300">
+                <div className="text-center py-6 text-slate-500 text-xs bg-slate-50 rounded-2xl border border-dashed border-slate-300">
                   No hay fechas u horarios programados. Selecciona días en el calendario superior y añade turnos.
                 </div>
               ) : (
@@ -1993,7 +1993,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 onChange={(e) => setCustomMessage(e.target.value)}
                 className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#DA291C]"
               />
-              <p className="text-[10px] text-slate-400 mt-1">
+              <p className="text-[10px] text-slate-500 mt-1">
                 Variables disponibles: <code>[EVENT_TITLE]</code>, <code>[INSTRUCTOR]</code>, <code>[SURVEY_LINK]</code>
               </p>
             </div>

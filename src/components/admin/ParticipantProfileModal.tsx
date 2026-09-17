@@ -358,7 +358,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
             <p className="text-[10px] text-slate-500 font-semibold mt-0.5">Asistencias</p>
           </div>
           <div className="p-3">
-            <p className="text-lg font-black text-indigo-600">{avgScore} <span className="text-[10px] text-slate-400 font-normal">pts</span></p>
+            <p className="text-lg font-black text-indigo-600">{avgScore} <span className="text-[10px] text-slate-500 font-medium">pts</span></p>
             <p className="text-[10px] text-slate-500 font-semibold mt-0.5">Promedio Notas</p>
           </div>
           <div className="p-3">
@@ -379,10 +379,10 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
           {/* Ficha Académica & Sociodemográfica 360° */}
           <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-50 to-amber-50/20 border border-slate-200/90 space-y-3">
             <div className="flex items-center justify-between">
-              <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+              <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                 <BookOpen className="w-3.5 h-3.5 text-[#DA291C]" />
                 <span>Perfil Académico & Sociodemográfico</span>
-              </h4>
+              </h3>
               {participant.profileCompleted ? (
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1">
                   <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Ficha Completa
@@ -396,21 +396,21 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs">
-                <span className="text-[10px] text-slate-400 font-bold block uppercase">Nivel de Estudio</span>
+                <span className="text-[10px] text-slate-500 font-bold block uppercase">Nivel de Estudio</span>
                 <span className="font-bold text-slate-800">{participant.educationLevel || 'No especificado'}</span>
               </div>
               <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs">
-                <span className="text-[10px] text-slate-400 font-bold block uppercase">Profesión / Título</span>
+                <span className="text-[10px] text-slate-500 font-bold block uppercase">Profesión / Título</span>
                 <span className="font-bold text-slate-800">{participant.professionTitle || 'No especificado'}</span>
               </div>
               <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs">
-                <span className="text-[10px] text-slate-400 font-bold block uppercase">Fecha Nacimiento</span>
+                <span className="text-[10px] text-slate-500 font-bold block uppercase">Fecha Nacimiento</span>
                 <span className="font-bold text-slate-800">
                   {participant.birthDate || 'No especificada'}
                 </span>
               </div>
               <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs">
-                <span className="text-[10px] text-slate-400 font-bold block uppercase">Teléfono</span>
+                <span className="text-[10px] text-slate-500 font-bold block uppercase">Teléfono</span>
                 <span className="font-bold text-slate-800 font-mono">{participant.phone || 'No especificado'}</span>
               </div>
             </div>
@@ -453,9 +453,9 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
             <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 space-y-2">
               <div className="flex items-center gap-2">
                 <ShieldAlert className="w-5 h-5 text-rose-600 shrink-0" />
-                <h4 className="text-xs font-black text-rose-900">
+                <h3 className="text-xs font-black text-rose-900">
                   Plan de Refuerzo / Re-capacitación Recomendado
-                </h4>
+                </h3>
               </div>
               <p className="text-xs text-rose-800 leading-relaxed">
                 Este colaborador presenta brechas en competencias evaluadas o calificaciones pendientes de refuerzo.

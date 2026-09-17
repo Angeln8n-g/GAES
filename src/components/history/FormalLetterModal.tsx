@@ -530,13 +530,13 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                             className="w-12 px-1.5 py-1 text-center bg-slate-50 border border-slate-300 rounded-lg text-xs font-bold text-slate-800 disabled:opacity-50"
                             title="Horas acreditadas"
                           />
-                          <span className="text-[10px] font-bold text-slate-400">hrs</span>
+                          <span className="text-[10px] font-bold text-slate-500">hrs</span>
                         </div>
                       </div>
                     );
                   })
                 ) : (
-                  <p className="text-xs text-slate-400 text-center py-4">No hay capacitaciones registradas.</p>
+                  <p className="text-xs text-slate-500 text-center py-4">No hay capacitaciones registradas.</p>
                 )}
               </div>
             </div>
@@ -621,20 +621,20 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                       <span className="text-3xl font-black tracking-tighter text-[#DA291C]">
                         Claro<span className="text-slate-900">.</span>
                       </span>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-2 border-l border-slate-200">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 pl-2 border-l border-slate-200">
                         República Dominicana
                       </span>
                     </div>
                     <p className="text-[10px] font-bold text-slate-600 mt-1 uppercase tracking-wider">
                       Dirección de Gestión Humana & Desarrollo Organizacional
                     </p>
-                    <p className="text-[9px] text-slate-400">
+                    <p className="text-[9px] text-slate-500">
                       Av. John F. Kennedy No. 54, Santo Domingo • RNC: 101-00157-7 • Tel: (809) 220-1111
                     </p>
                   </div>
 
                   <div className="text-right">
-                    <span className="text-[9px] font-bold text-slate-400 block uppercase">Código de Verificación:</span>
+                    <span className="text-[9px] font-bold text-slate-500 block uppercase">Código de Verificación:</span>
                     <span className="text-[11px] font-mono font-black text-[#DA291C] bg-red-50 px-2.5 py-1 rounded-lg border border-red-200 inline-block mt-0.5">
                       {folioCode}
                     </span>
@@ -649,17 +649,17 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                 {/* Destinatario */}
                 <div className="mb-6 space-y-0.5">
                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Señores:</p>
-                  <h3 className="text-sm font-black text-slate-900 tracking-wide">
+                  <p className="text-sm font-black text-slate-900 tracking-wide">
                     {resolvedRecipient}
-                  </h3>
+                  </p>
                   <p className="text-[11px] font-bold text-slate-600">Ciudad.-</p>
                 </div>
 
                 {/* Título Central */}
                 <div className="text-center my-6">
-                  <h2 className="text-sm sm:text-base font-black uppercase text-slate-900 tracking-wider underline decoration-[#DA291C] decoration-2 underline-offset-4">
+                  <h3 className="text-sm sm:text-base font-black uppercase text-slate-900 tracking-wider underline decoration-[#DA291C] decoration-2 underline-offset-4">
                     CONSTANCIA FORMAL DE HISTORIAL DE CAPACITACIONES
-                  </h2>
+                  </h3>
                 </div>
 
                 {/* Cuerpo de la Carta */}
@@ -711,7 +711,7 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                             const hrs = courseHours[course.id] || 2;
                             return (
                               <tr key={course.id} className="hover:bg-slate-50/50">
-                                <td className="py-2 px-3 text-center text-slate-400 font-bold">{idx + 1}</td>
+                                <td className="py-2 px-3 text-center text-slate-500 font-bold">{idx + 1}</td>
                                 <td className="py-2 px-3 font-bold text-slate-900">
                                   {course.title}
                                   {course.isExternal && (
@@ -730,7 +730,7 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                           })
                         ) : (
                           <tr>
-                            <td colSpan={6} className="py-4 text-center text-slate-400 italic">
+                            <td colSpan={6} className="py-4 text-center text-slate-500 italic">
                               No se han seleccionado capacitaciones para esta constancia.
                             </td>
                           </tr>
@@ -783,7 +783,7 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                       <ShieldCheck className="w-6 h-6 stroke-1" />
                       <span className="text-[7.5px] font-black uppercase tracking-tighter mt-0.5">SELLO DIGITAL</span>
                       <span className="text-[6.5px] font-bold uppercase tracking-widest text-slate-600">CAPACITACIÓN</span>
-                      <span className="text-[6px] text-slate-400 font-mono">{todayDateObj.getFullYear()}</span>
+                      <span className="text-[6px] text-slate-500 font-mono font-bold">{todayDateObj.getFullYear()}</span>
                     </div>
                   )}
 
@@ -797,7 +797,7 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                           level="M"
                         />
                       </div>
-                      <span className="text-[7.5px] font-mono text-slate-400 font-bold uppercase tracking-tighter">
+                      <span className="text-[7.5px] font-mono text-slate-500 font-bold uppercase tracking-tighter">
                         Verificar Autenticidad
                       </span>
                     </div>

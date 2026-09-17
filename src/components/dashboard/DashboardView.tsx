@@ -857,10 +857,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             {/* Categories Breakdown */}
             <div className="lg:col-span-2 bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-[#DA291C]" />
                   Rendimiento por Categoría de Capacitación
-                </h3>
+                </h2>
                 <span className="text-xs text-slate-500 font-medium">{Object.keys(categoryStats).length} categorías</span>
               </div>
 
@@ -896,10 +896,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             {/* Modalities Distribution */}
             <div className="lg:col-span-1 bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4 flex flex-col justify-between">
               <div>
-                <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2 mb-4">
+                <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2 mb-4">
                   <Layers className="w-4 h-4 text-[#DA291C]" />
                   Distribución por Modalidad
-                </h3>
+                </h2>
 
                 <div className="space-y-4">
                   {Object.entries(modalityStats).map(([mod, s]) => {
@@ -948,10 +948,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           {/* Header & Program Selector */}
           <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+              <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 Monitoreo de Rutas Formativas & Cohortes
-              </h3>
+              </h2>
               <p className="text-xs text-slate-500 mt-0.5">
                 Evalúa el avance de cada área en sus planes de capacitación asignados.
               </p>
@@ -1155,7 +1155,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
               <div className="mt-4">
                 <p className="text-3xl font-black text-slate-900 leading-none">
-                  {tecSurveyMetrics.avgComposite} <span className="text-sm font-semibold text-slate-400">/ 5.0</span>
+                  {tecSurveyMetrics.avgComposite} <span className="text-sm font-semibold text-slate-500">/ 5.0</span>
                 </p>
                 <p className="text-[11px] text-slate-500 font-medium mt-1">
                   {tecSurveyMetrics.totalResponses} evaluaciones recibidas
@@ -1173,7 +1173,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
               <div className="mt-4">
                 <p className="text-3xl font-black text-[#DA291C] leading-none">
-                  {tecSurveyMetrics.avgCourse} <span className="text-sm font-semibold text-slate-400">/ 5.0</span>
+                  {tecSurveyMetrics.avgCourse} <span className="text-sm font-semibold text-slate-500">/ 5.0</span>
                 </p>
                 <p className="text-[11px] text-slate-500 font-medium mt-1">
                   8 dimensiones pedagógicas evaluadas
@@ -1191,7 +1191,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
               <div className="mt-4">
                 <p className="text-3xl font-black text-amber-700 leading-none">
-                  {tecSurveyMetrics.avgFacilitator} <span className="text-sm font-semibold text-slate-400">/ 5.0</span>
+                  {tecSurveyMetrics.avgFacilitator} <span className="text-sm font-semibold text-slate-500">/ 5.0</span>
                 </p>
                 <p className="text-[11px] text-slate-500 font-medium mt-1">
                   7 competencias docentes evaluadas
@@ -1250,7 +1250,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           {q.shortLabel}
                         </span>
                         <span className="font-black text-slate-900 shrink-0">
-                          {data.avg.toFixed(1)} <span className="text-[10px] text-slate-400 font-normal">/ 5.0</span>
+                          {data.avg.toFixed(1)} <span className="text-[10px] text-slate-500 font-normal">/ 5.0</span>
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-500 line-clamp-1 italic">
@@ -1296,7 +1296,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           {q.shortLabel}
                         </span>
                         <span className="font-black text-slate-900 shrink-0">
-                          {data.avg.toFixed(1)} <span className="text-[10px] text-slate-400 font-normal">/ 5.0</span>
+                          {data.avg.toFixed(1)} <span className="text-[10px] text-slate-500 font-normal">/ 5.0</span>
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-500 line-clamp-1 italic">
@@ -1319,10 +1319,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           {/* Facilitators Table */}
           <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+              <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
                 <Award className="w-4 h-4 text-[#DA291C]" />
                 Matriz de Rendimiento Docente & Satisfacción
-              </h3>
+              </h2>
               <span className="text-xs text-slate-500 font-medium">{Object.keys(instructorStats).length} facilitadores evaluados</span>
             </div>
 
@@ -1364,7 +1364,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                               <span className="text-[10px] text-amber-700 font-normal">({s.ratings.length})</span>
                             </span>
                           ) : (
-                            <span className="text-slate-400 text-xs italic">Sin valoraciones</span>
+                            <span className="text-slate-500 text-xs italic">Sin valoraciones</span>
                           )}
                         </td>
                       </tr>
@@ -1379,10 +1379,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           {surveyFilteredFeedbacks.length > 0 && (
             <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-[#DA291C]" />
                   Muro de Comentarios y Evaluaciones TEC
-                </h3>
+                </h2>
                 <span className="text-xs text-slate-500 font-medium">
                   {surveyFilteredFeedbacks.length} opiniones registradas
                 </span>
@@ -1421,7 +1421,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       {fb.comment ? (
                         <p className="text-xs text-slate-700 italic leading-relaxed">"{fb.comment}"</p>
                       ) : (
-                        <p className="text-[11px] text-slate-400 italic">Evaluación cuantitativa sin comentario adicional.</p>
+                        <p className="text-[11px] text-slate-500 italic">Evaluación cuantitativa sin comentario adicional.</p>
                       )}
                     </div>
                     
@@ -1451,9 +1451,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <Target className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-base font-extrabold text-slate-900">
+                <h2 className="text-base font-extrabold text-slate-900">
                   Diagnóstico Estratégico de Brechas de Habilidades (Skills Gap)
-                </h3>
+                </h2>
                 <p className="text-xs text-slate-600 mt-0.5">
                   Identifica las debilidades académicas y operativas detectadas por instructores para enfocar planes de re-capacitación y refuerzo técnico.
                 </p>
@@ -1521,10 +1521,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           {skillsGapGlobalMetrics.topGaps.length > 0 && (
             <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
                   <ShieldAlert className="w-4 h-4 text-rose-600" />
                   <span>Ranking de Temas & Competencias con Mayor Dificultad</span>
-                </h4>
+                </h3>
                 <span className="text-xs text-slate-500">
                   {skillsGapGlobalMetrics.topGaps.length} competencias con observaciones
                 </span>
@@ -1555,9 +1555,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <div>
-                <h4 className="text-sm font-extrabold text-slate-900">
+                <h3 className="text-sm font-extrabold text-slate-900">
                   Matriz de Calificaciones por Colaborador
-                </h4>
+                </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
                   Consulta el desempeño individual y el diagnóstico pedagógico de cada colaborador.
                 </p>
@@ -1620,14 +1620,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                                 {item.avgScore} pts
                               </span>
                             ) : (
-                              <span className="text-slate-400 italic text-[11px]">Sin notas</span>
+                              <span className="text-slate-500 italic text-[11px]">Sin notas</span>
                             )}
                           </td>
                           <td className="p-3.5 text-center text-slate-700 font-semibold">
                             {item.grades.length > 0 ? (
                               <span>{item.passedCount} aprob. / {item.failedCount} reprob.</span>
                             ) : (
-                              <span className="text-slate-400">-</span>
+                              <span className="text-slate-500">-</span>
                             )}
                           </td>
                           <td className="p-3.5">
@@ -1640,7 +1640,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                                 ))}
                               </div>
                             ) : (
-                              <span className="text-slate-400 italic text-[11px]">Sin debilidades señaladas</span>
+                              <span className="text-slate-500 italic text-[11px]">Sin debilidades señaladas</span>
                             )}
                           </td>
                           <td className="p-3.5 text-center">
@@ -1707,7 +1707,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <FileSpreadsheet className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-base font-extrabold text-emerald-950">Centro de Exportación de Reportes Oficiales</h3>
+              <h2 className="text-base font-extrabold text-emerald-950">Centro de Exportación de Reportes Oficiales</h2>
               <p className="text-xs text-emerald-800 mt-0.5">
                 Genera con un solo clic libros de Excel (.xlsx) estructurados y formateados para comités ejecutivos, auditorías de RRHH y cumplimiento laboral.
               </p>
@@ -1727,9 +1727,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     ESG & Sustentable
                   </span>
                 </div>
-                <h4 className="text-base font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">
+                <h3 className="text-base font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">
                   Reporte de Sustentabilidad & Capacitaciones
-                </h4>
+                </h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Matriz oficial de 11 dimensiones requerida para programas corporativos: Tipo de sesión, Tipo de entrenamiento, Formato, Modalidad, Programa, Subprograma, Fechas, Horas y Suplidor.
                 </p>
@@ -1758,9 +1758,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <div className="w-10 h-10 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-[#DA291C]">
                   <BarChart3 className="w-5 h-5" />
                 </div>
-                <h4 className="text-base font-extrabold text-slate-900 group-hover:text-[#DA291C] transition-colors">
+                <h3 className="text-base font-extrabold text-slate-900 group-hover:text-[#DA291C] transition-colors">
                   Informe Ejecutivo Consolidado
-                </h4>
+                </h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Libro multicapa con resumen ejecutivo, indicadores de ocupación, horas-hombre, distribución por categorías y rendimiento por facilitador.
                 </p>
@@ -1790,9 +1790,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
                   <UserCheck className="w-5 h-5" />
                 </div>
-                <h4 className="text-base font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">
+                <h3 className="text-base font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">
                   Libro Oficial de Asistencias & Auditoría
-                </h4>
+                </h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Registro detallado de cada participante, número de cédula, carnet, curso, fecha, horario, facilitador y verificación de asistencia QR para auditorías laborales.
                 </p>
@@ -1821,9 +1821,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <div className="w-10 h-10 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-[#DA291C]">
                   <CheckCircle2 className="w-5 h-5" />
                 </div>
-                <h4 className="text-base font-extrabold text-slate-900 group-hover:text-[#DA291C] transition-colors">
+                <h3 className="text-base font-extrabold text-slate-900 group-hover:text-[#DA291C] transition-colors">
                   Matriz de Cumplimiento de Cronogramas
-                </h4>
+                </h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Matriz completa del programa formativo seleccionado con desglose por colaborador, porcentajes de aprobación y resumen consolidado por grupos.
                 </p>
@@ -1857,9 +1857,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700">
                   <Award className="w-5 h-5" />
                 </div>
-                <h4 className="text-base font-extrabold text-slate-900 group-hover:text-amber-700 transition-colors">
+                <h3 className="text-base font-extrabold text-slate-900 group-hover:text-amber-700 transition-colors">
                   Reporte de Calidad Docente y Encuestas
-                </h4>
+                </h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Histórico de todas las evaluaciones enviadas por los colaboradores con puntuación en estrellas (1 a 5), comentarios cualitativos y facilitador evaluado.
                 </p>
@@ -1888,9 +1888,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <div className="w-10 h-10 rounded-2xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-700">
                   <Layers className="w-5 h-5" />
                 </div>
-                <h4 className="text-base font-extrabold text-slate-900 group-hover:text-cyan-700 transition-colors">
+                <h3 className="text-base font-extrabold text-slate-900 group-hover:text-cyan-700 transition-colors">
                   Padrón Segmentado por Grupos & Áreas
-                </h4>
+                </h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Catálogo de grupos formativos con el listado de cada uno de sus integrantes, número de tarjeta, cédula y correo corporativo asignado.
                 </p>
@@ -1919,9 +1919,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <div className="w-10 h-10 rounded-2xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-700">
                   <Target className="w-5 h-5" />
                 </div>
-                <h4 className="text-base font-extrabold text-slate-900 group-hover:text-purple-700 transition-colors">
+                <h3 className="text-base font-extrabold text-slate-900 group-hover:text-purple-700 transition-colors">
                   Diagnóstico de Brechas & Debilidades (Skills Gap)
-                </h4>
+                </h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Informe integral con las notas de cada capacitación evaluada, lista de debilidades técnicas detectadas por facilitadores y colaboradores prioritarios para re-capacitación.
                 </p>

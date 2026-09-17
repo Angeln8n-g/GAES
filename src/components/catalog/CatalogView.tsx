@@ -286,9 +286,9 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <Flame className="w-5 h-5 text-[#DA291C] animate-pulse" />
-                <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                   Cursos <span className="text-[#DA291C]">Recomendados & Tendencias</span>
-                </h3>
+                </h2>
               </div>
               <p className="text-xs text-slate-500 mt-1">
                 Formaciones de alto impacto sugeridas según tu plan de desarrollo y demanda operativa.
@@ -326,9 +326,9 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
                   <div className="p-4 flex-1 flex flex-col justify-between">
                     <div>
-                      <h4 className="text-xs sm:text-sm font-black text-slate-900 group-hover:text-[#DA291C] transition-colors line-clamp-2 mb-1.5 leading-snug">
+                      <h3 className="text-xs sm:text-sm font-black text-slate-900 group-hover:text-[#DA291C] transition-colors line-clamp-2 mb-1.5 leading-snug">
                         {course.title}
-                      </h4>
+                      </h3>
                       <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
                         {course.description}
                       </p>
@@ -358,9 +358,9 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
             <span>Impulsa tu crecimiento, certificaciones y desarrollo continuo</span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight mb-2">
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight mb-2">
             Catálogo General de <span className="text-[#DA291C]">Capacitaciones</span>
-          </h2>
+          </h1>
           <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed mb-6">
             Inscríbete a talleres prácticos, conferencias interactivas, certificaciones técnicas y clínicas operativas.
           </p>

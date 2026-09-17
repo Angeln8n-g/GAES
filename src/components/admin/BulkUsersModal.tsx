@@ -308,10 +308,10 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-5 rounded-2xl bg-slate-50 border border-slate-200">
                 <div>
-                  <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
                     <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
                     <span>Carga mediante Plantilla Excel (.xlsx, .xls, .csv)</span>
-                  </h4>
+                  </h3>
                   <p className="text-xs text-slate-500 mt-1 leading-relaxed">
                     Plantilla oficial con todos los campos: <strong>Cédula *</strong> (11 dígitos ej. <span className="text-[#DA291C] font-bold">402-2196163-1</span>), <strong>Nombre Completo *</strong>, <strong>Correo Corporativo *</strong>, <strong>Empresa</strong>, <strong>Departamento</strong>, <strong>Rol</strong>, <strong>Estado Laboral</strong> y <strong>Contraseña</strong>.
                   </p>
@@ -486,7 +486,7 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
                               {p.cedula}
                             </span>
                           ) : (
-                            <span className="text-[10px] text-slate-400 italic">Sin cédula</span>
+                            <span className="text-[10px] text-slate-500 italic">Sin cédula</span>
                           )}
                         </div>
                       </div>
@@ -494,7 +494,7 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
                   })}
                 </div>
               ) : (
-                <div className="text-center py-8 text-slate-400 text-xs">
+                <div className="text-center py-8 text-slate-500 text-xs">
                   {unregisteredParticipants.length === 0 
                     ? '¡Todos los colaboradores del padrón ya cuentan con un usuario registrado!'
                     : 'No se encontraron colaboradores que coincidan con el filtro.'}
@@ -509,9 +509,9 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-t border-slate-200 pt-4">
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-[#DA291C]" />
-                  <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">
                     Previsualización ({usersToImport.length} usuarios a procesar)
-                  </h4>
+                  </h3>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
@@ -570,7 +570,7 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
                                 {u.cedula}
                               </span>
                             ) : (
-                              <span className="text-slate-400 italic text-[11px]">Opcional</span>
+                              <span className="text-slate-500 italic text-[11px]">Opcional</span>
                             )}
                           </td>
                           <td className="p-3 font-bold text-slate-900">{u.name}</td>

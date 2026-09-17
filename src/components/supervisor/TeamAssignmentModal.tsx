@@ -298,7 +298,7 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
                             <Clock className="w-3.5 h-3.5" />
                             <span>{slot.time}</span>
                           </div>
-                          <span className={`text-[10px] mt-0.5 block ${isSelected ? 'text-red-100' : isFull ? 'text-rose-600 font-bold' : 'text-slate-400'}`}>
+                          <span className={`text-[10px] mt-0.5 block ${isSelected ? 'text-red-100' : isFull ? 'text-rose-600 font-bold' : 'text-slate-500 font-medium'}`}>
                             {slot.registered}/{slot.capacity} ocupados
                           </span>
                         </button>
