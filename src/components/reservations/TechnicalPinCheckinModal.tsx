@@ -15,7 +15,8 @@ import {
   User,
   RefreshCw
 } from 'lucide-react';
-import { Html5Qrcode } from 'html5-qrcode';
+import type { Html5Qrcode } from 'html5-qrcode';
+import { loadHtml5Qrcode, checkCameraSupport, formatCameraError } from '../../utils/scannerUtils';
 import { TechnicalAcademyHistoryRecord, UserAccount, Participant } from '../../types';
 import { apiService } from '../../services/api';
 import { formatDateShort } from '../../utils/formatters';
@@ -41,7 +42,9 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
 }) => {
   if (!isOpen || !training) return null;
 
-  const [activeTab, setActiveTab] = useState<'qr' | 'pin'>('qr');
+  const [activeTab, setActiveTab] = useState<'qr' | 'pin'>(() => {
+    return checkCameraSupport().supported ? 'qr' : 'pin';
+  });
   const [pin, setPin] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -99,6 +102,12 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
     setScannerError(null);
     if (activeTab === 'qr') {
       await stopScannerSafe();
+    }
+    if (tab === 'qr') {
+      const support = checkCameraSupport();
+      if (!support.supported) {
+        setScannerError(support.reason || 'El acceso a la cámara no está disponible en este entorno.');
+      }
     }
     setActiveTab(tab);
   };
@@ -215,6 +224,14 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
         await new Promise(resolve => setTimeout(resolve, 150));
         if (!isMounted) return;
 
+        const support = checkCameraSupport();
+        if (!support.supported) {
+          if (isMounted) {
+            setScannerError(support.reason || 'Cámara no soportada en este entorno.');
+          }
+          return;
+        }
+
         const scannerElement = document.getElementById('technical-qr-scanner-viewport');
         if (!scannerElement) return;
 
@@ -228,11 +245,14 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
           html5QrCodeRef.current = null;
         }
 
-        const qrInstance = new Html5Qrcode('technical-qr-scanner-viewport');
+        const Html5QrcodeClass = await loadHtml5Qrcode();
+        if (!isMounted) return;
+
+        const qrInstance = new Html5QrcodeClass('technical-qr-scanner-viewport');
         html5QrCodeRef.current = qrInstance;
 
         try {
-          const devices = await Html5Qrcode.getCameras();
+          const devices = await Html5QrcodeClass.getCameras();
           if (isMounted && devices && devices.length > 0) {
             setCameras(devices);
             if (!selectedCameraId) {
@@ -271,7 +291,7 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
       } catch (err: any) {
         console.error('Error al iniciar cámara QR:', err);
         if (isMounted) {
-          setScannerError('No se pudo acceder a la cámara. Verifica los permisos del navegador o cambia al modo PIN manual.');
+          setScannerError(formatCameraError(err));
         }
       }
     };
@@ -298,9 +318,10 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
 
     try {
       setScannerError(null);
+      const Html5QrcodeClass = await loadHtml5Qrcode();
       let scanner = html5QrCodeRef.current;
       if (!scanner) {
-        scanner = new Html5Qrcode('technical-qr-scanner-viewport');
+        scanner = new Html5QrcodeClass('technical-qr-scanner-viewport');
         html5QrCodeRef.current = scanner;
       }
 
@@ -311,7 +332,12 @@ export const TechnicalPinCheckinModal: React.FC<TechnicalPinCheckinModalProps> =
       const decodedText = await scanner.scanFile(file, true);
       await handleQrDetected(decodedText);
     } catch (err: any) {
-      setScannerError('No se detectó un código QR nítido en la imagen seleccionada. Intenta con otra foto o usa el PIN.');
+      console.warn('Error escaneando archivo QR:', err);
+      setScannerError(
+        err?.message?.includes('No barcode or QR code detected')
+          ? 'No se detectó un código QR nítido en la imagen seleccionada. Intenta con otra foto o usa el PIN.'
+          : formatCameraError(err)
+      );
     } finally {
       if (fileInputRef.current) {
         fileInputRef.current.value = '';

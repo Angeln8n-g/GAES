@@ -13,7 +13,8 @@ import {
   Star,
   ExternalLink
 } from 'lucide-react';
-import { Html5Qrcode } from 'html5-qrcode';
+import type { Html5Qrcode } from 'html5-qrcode';
+import { loadHtml5Qrcode, checkCameraSupport, formatCameraError } from '../../utils/scannerUtils';
 import { TrainingEvent, UserAccount } from '../../types';
 import { formatDateLong } from '../../utils/formatters';
 
@@ -194,15 +195,26 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
         await new Promise(resolve => setTimeout(resolve, 150));
         if (!isMounted) return;
 
+        const support = checkCameraSupport();
+        if (!support.supported) {
+          if (isMounted) {
+            setScannerError(support.reason || 'El acceso a la cámara no está disponible en este entorno.');
+          }
+          return;
+        }
+
         const scannerElement = document.getElementById('qr-scanner-viewport');
         if (!scannerElement) return;
 
-        const qrInstance = new Html5Qrcode('qr-scanner-viewport');
+        const Html5QrcodeClass = await loadHtml5Qrcode();
+        if (!isMounted) return;
+
+        const qrInstance = new Html5QrcodeClass('qr-scanner-viewport');
         html5QrCodeRef.current = qrInstance;
 
         // Obtener cámaras disponibles
         try {
-          const devices = await Html5Qrcode.getCameras();
+          const devices = await Html5QrcodeClass.getCameras();
           if (isMounted && devices && devices.length > 0) {
             setCameras(devices);
             if (!selectedCameraId) {
@@ -242,9 +254,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
       } catch (err: any) {
         console.error('Error al iniciar cámara:', err);
         if (isMounted) {
-          setScannerError(
-            'No se pudo acceder a la cámara. Verifica los permisos de tu navegador o sube una fotografía del código QR.'
-          );
+          setScannerError(formatCameraError(err));
         }
       }
     };
@@ -264,9 +274,10 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
 
     try {
       setScannerError(null);
+      const Html5QrcodeClass = await loadHtml5Qrcode();
       let scanner = html5QrCodeRef.current;
       if (!scanner) {
-        scanner = new Html5Qrcode('qr-scanner-viewport');
+        scanner = new Html5QrcodeClass('qr-scanner-viewport');
         html5QrCodeRef.current = scanner;
       }
 
@@ -278,7 +289,12 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
       const decodedText = await scanner.scanFile(file, true);
       handleQrDetected(decodedText);
     } catch (err: any) {
-      setScannerError('No se detectó un código QR nítido en la imagen seleccionada. Intenta con otra foto.');
+      console.warn('Error al procesar foto QR:', err);
+      setScannerError(
+        err?.message?.includes('No barcode or QR code detected')
+          ? 'No se detectó un código QR nítido en la imagen seleccionada. Intenta con otra foto.'
+          : formatCameraError(err)
+      );
     } finally {
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -496,7 +512,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
                   <button
                     type="button"
                     onClick={handleSwitchCamera}
-                    className="flex-1 py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    className="flex-1 py-2.5 px-3 min-h-[44px] rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                   >
                     <RotateCw className="w-3.5 h-3.5 text-slate-600" />
                     <span>Cambiar Cámara</span>
@@ -514,7 +530,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex-1 py-2 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-[#DA291C] border border-red-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  className="flex-1 py-2.5 px-3 min-h-[44px] rounded-xl bg-red-50 hover:bg-red-100 text-[#DA291C] border border-red-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <Upload className="w-3.5 h-3.5 text-[#DA291C]" />
                   <span>Subir Foto de QR</span>
@@ -522,7 +538,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
               </div>
 
               <div className="text-center pt-2">
-                <p className="text-[11px] text-slate-400 font-medium">
+                <p className="text-[11px] text-slate-600 font-medium">
                   También puedes escanear con la cámara nativa de tu teléfono si estás desde el móvil.
                 </p>
               </div>

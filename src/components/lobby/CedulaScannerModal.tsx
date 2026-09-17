@@ -10,7 +10,8 @@ import {
   Sparkles,
   ShieldCheck
 } from 'lucide-react';
-import { Html5Qrcode } from 'html5-qrcode';
+import type { Html5Qrcode } from 'html5-qrcode';
+import { loadHtml5Qrcode, checkCameraSupport, formatCameraError } from '../../utils/scannerUtils';
 import { formatCedula } from '../../utils/formatters';
 
 interface CedulaScannerModalProps {
@@ -115,14 +116,25 @@ export const CedulaScannerModal: React.FC<CedulaScannerModalProps> = ({
         await new Promise(resolve => setTimeout(resolve, 150));
         if (!isMounted) return;
 
+        const support = checkCameraSupport();
+        if (!support.supported) {
+          if (isMounted) {
+            setScannerError(support.reason || 'El acceso a la cámara no está disponible en este entorno.');
+          }
+          return;
+        }
+
         const scannerElement = document.getElementById('cedula-scanner-viewport');
         if (!scannerElement) return;
 
-        const qrInstance = new Html5Qrcode('cedula-scanner-viewport');
+        const Html5QrcodeClass = await loadHtml5Qrcode();
+        if (!isMounted) return;
+
+        const qrInstance = new Html5QrcodeClass('cedula-scanner-viewport');
         html5QrCodeRef.current = qrInstance;
 
         try {
-          const devices = await Html5Qrcode.getCameras();
+          const devices = await Html5QrcodeClass.getCameras();
           if (isMounted && devices && devices.length > 0) {
             setCameras(devices);
             if (!selectedCameraId) {
@@ -161,9 +173,7 @@ export const CedulaScannerModal: React.FC<CedulaScannerModalProps> = ({
       } catch (err: any) {
         console.error('Error al inicializar cámara de cédula:', err);
         if (isMounted) {
-          setScannerError(
-            'No se pudo acceder a la cámara. Por favor autoriza el permiso en tu navegador o sube una fotografía de tu documento.'
-          );
+          setScannerError(formatCameraError(err));
         }
       }
     };
@@ -183,9 +193,10 @@ export const CedulaScannerModal: React.FC<CedulaScannerModalProps> = ({
 
     try {
       setScannerError(null);
+      const Html5QrcodeClass = await loadHtml5Qrcode();
       let scanner = html5QrCodeRef.current;
       if (!scanner) {
-        scanner = new Html5Qrcode('cedula-scanner-viewport');
+        scanner = new Html5QrcodeClass('cedula-scanner-viewport');
         html5QrCodeRef.current = scanner;
       }
 
@@ -196,7 +207,12 @@ export const CedulaScannerModal: React.FC<CedulaScannerModalProps> = ({
       const decodedText = await scanner.scanFile(file, true);
       handleScanSuccess(decodedText);
     } catch (err: any) {
-      setScannerError('No se pudo leer el código de la imagen. Asegúrate de que el código de barras o QR de la cédula esté nítido.');
+      console.warn('Error al procesar archivo de cédula:', err);
+      setScannerError(
+        err?.message?.includes('No barcode or QR code detected')
+          ? 'No se pudo leer el código de la imagen. Asegúrate de que el código de barras o QR de la cédula esté nítido.'
+          : formatCameraError(err)
+      );
     } finally {
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -295,7 +311,7 @@ export const CedulaScannerModal: React.FC<CedulaScannerModalProps> = ({
                   <button
                     type="button"
                     onClick={handleSwitchCamera}
-                    className="flex-1 py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    className="flex-1 py-2.5 px-3 min-h-[44px] rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                   >
                     <RotateCw className="w-3.5 h-3.5 text-slate-600" />
                     <span>Cambiar Cámara</span>
@@ -312,7 +328,7 @@ export const CedulaScannerModal: React.FC<CedulaScannerModalProps> = ({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex-1 py-2 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-[#DA291C] border border-red-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  className="flex-1 py-2.5 px-3 min-h-[44px] rounded-xl bg-red-50 hover:bg-red-100 text-[#DA291C] border border-red-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <Upload className="w-3.5 h-3.5 text-[#DA291C]" />
                   <span>Subir Foto Cédula</span>

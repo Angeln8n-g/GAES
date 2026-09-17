@@ -12,7 +12,8 @@ export default defineConfig({
           'vendor-react': ['react', 'react-dom'],
           'vendor-xlsx': ['xlsx'],
           'vendor-icons': ['lucide-react'],
-          'vendor-qr': ['qrcode.react']
+          'vendor-qr': ['qrcode.react'],
+          'vendor-scanner': ['html5-qrcode']
         }
       }
     }
