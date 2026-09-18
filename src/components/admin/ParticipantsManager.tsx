@@ -18,7 +18,8 @@ import {
   Edit3,
   Eye,
   Filter,
-  Building2
+  Building2,
+  ArrowRightLeft
 } from "lucide-react";
 import { Participant, UserAccount, UserRole, EmploymentStatus, TrainingEvent, TrainingProgram, Company } from "../../types";
 import { exportParticipantsToExcel, parseParticipantsExcelFile } from "../../utils/excelUtils";
@@ -971,8 +972,15 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
 
       {/* Participants Table (Light Theme) */}
       <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+        <div className="table-scroll-hint">
+          <span className="flex items-center gap-1.5">
+            <ArrowRightLeft className="w-3.5 h-3.5 text-[#DA291C]" />
+            Desliza horizontalmente para ver todas las columnas
+          </span>
+          <span className="font-mono text-slate-400">9 columnas</span>
+        </div>
+        <div className="table-responsive-container">
+          <table className="w-full text-left text-xs min-w-[920px]">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50 text-slate-600">
                 <th className="p-4 w-10 text-center">
@@ -1122,29 +1130,29 @@ export const ParticipantsManager: React.FC<ParticipantsManagerProps> = ({
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => setViewingProfileParticipant(p)}
-                            className="p-1.5 text-slate-600 hover:text-red-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 text-slate-600 hover:text-red-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center"
                             title="Ver Ficha 360°"
                             aria-label={`Ver ficha 360° de ${p.name}`}
                           >
-                            <Eye className="w-3.5 h-3.5" aria-hidden="true" />
+                            <Eye className="w-4 h-4 sm:w-3.5 sm:h-3.5" aria-hidden="true" />
                           </button>
 
                           <button
                             onClick={() => setEditingParticipant(p)}
-                            className="p-1.5 text-slate-600 hover:text-amber-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-                            title="Editar Datos"
-                            aria-label={`Editar datos de ${p.name}`}
+                            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 text-slate-600 hover:text-blue-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center"
+                            title="Editar"
+                            aria-label={`Editar participante: ${p.name}`}
                           >
-                            <Edit3 className="w-3.5 h-3.5" aria-hidden="true" />
+                            <Edit3 className="w-4 h-4 sm:w-3.5 sm:h-3.5" aria-hidden="true" />
                           </button>
 
                           <button
                             onClick={() => handleDelete(p.card, p.name)}
-                            className="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                            title="Eliminar del padrón"
-                            aria-label={`Eliminar a ${p.name} del padrón`}
+                            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center"
+                            title="Eliminar"
+                            aria-label={`Eliminar participante: ${p.name}`}
                           >
-                            <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
+                            <Trash2 className="w-4 h-4 sm:w-3.5 sm:h-3.5" aria-hidden="true" />
                           </button>
                         </div>
                       </td>

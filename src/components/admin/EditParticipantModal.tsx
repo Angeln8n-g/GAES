@@ -164,7 +164,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
           <button
             onClick={onClose}
             aria-label="Cerrar ventana de edición de colaborador"
-            className="p-2 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-200 transition-colors cursor-pointer"
+            className="p-2 sm:p-1.5 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 touch-target-44 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-200 transition-colors cursor-pointer inline-flex items-center justify-center"
           >
             <X className="w-5 h-5" aria-hidden="true" />
           </button>

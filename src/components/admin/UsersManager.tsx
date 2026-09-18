@@ -18,7 +18,8 @@ import {
   Users as UsersIcon,
   Eye,
   Building2,
-  FileSpreadsheet
+  FileSpreadsheet,
+  ArrowRightLeft
 } from "lucide-react";
 import { UserAccount, UserRole, Participant, EmploymentStatus, TrainingEvent, TrainingProgram, Company, TechnicalAcademyHistoryRecord } from "../../types";
 import { exportUsersToExcel, downloadUsersTemplateExcel } from "../../utils/excelUtils";
@@ -648,8 +649,15 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
 
       {/* Users Table (Light Theme) */}
       <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+        <div className="table-scroll-hint">
+          <span className="flex items-center gap-1.5">
+            <ArrowRightLeft className="w-3.5 h-3.5 text-[#DA291C]" />
+            Desliza horizontalmente para ver todas las columnas
+          </span>
+          <span className="font-mono text-slate-400">8 columnas</span>
+        </div>
+        <div className="table-responsive-container">
+          <table className="w-full text-left text-xs min-w-[920px]">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50 text-slate-600">
                 <th className="p-4 font-bold">Usuario</th>
@@ -780,16 +788,16 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => handleOpenUserProfile(u)}
-                            className="p-1.5 text-slate-600 hover:text-red-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 text-slate-600 hover:text-red-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center"
                             title="Ver Ficha 360°"
                           >
-                            <Eye className="w-3.5 h-3.5" />
+                            <Eye className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                           </button>
 
                           {(u.role === "Líder de Área / Supervisor" || u.role === "Super Administrador") && (
                             <button
                               onClick={() => setSelectedSupervisorForAssignment(u)}
-                              className="px-2.5 py-1 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-[11px] font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                              className="px-2.5 py-1.5 min-h-[36px] sm:min-h-0 touch-target-44 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-[11px] font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                               title="Gestionar equipo asignado a este supervisor"
                             >
                               <UsersIcon className="w-3.5 h-3.5 text-emerald-600" />
@@ -799,11 +807,11 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
 
                           <button
                             onClick={() => setSelectedUserForEdit(u)}
-                            className="p-1.5 text-slate-600 hover:text-blue-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 text-slate-600 hover:text-blue-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center"
                             title="Editar usuario"
                             aria-label={`Editar usuario ${u.name}`}
                           >
-                            <Edit3 className="w-3.5 h-3.5" aria-hidden="true" />
+                            <Edit3 className="w-4 h-4 sm:w-3.5 sm:h-3.5" aria-hidden="true" />
                           </button>
 
                           <button
@@ -811,21 +819,21 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                               setSelectedUserForPassword(u);
                               setNewPasswordInput("");
                             }}
-                            className="p-1.5 text-slate-600 hover:text-amber-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 text-slate-600 hover:text-amber-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center"
                             title="Cambiar contraseña"
                             aria-label={`Cambiar contraseña de ${u.name}`}
                           >
-                            <KeyRound className="w-3.5 h-3.5" aria-hidden="true" />
+                            <KeyRound className="w-4 h-4 sm:w-3.5 sm:h-3.5" aria-hidden="true" />
                           </button>
 
                           {u.id !== currentUser?.id && (
                             <button
                               onClick={() => handleDeleteUser(u.id)}
-                              className="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                              className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center"
                               title="Eliminar usuario"
                               aria-label={`Eliminar usuario ${u.name}`}
                             >
-                              <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
+                              <Trash2 className="w-4 h-4 sm:w-3.5 sm:h-3.5" aria-hidden="true" />
                             </button>
                           )}
                         </div>

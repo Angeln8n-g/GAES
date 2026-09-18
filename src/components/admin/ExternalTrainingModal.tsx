@@ -294,7 +294,7 @@ export const ExternalTrainingModal: React.FC<ExternalTrainingModalProps> = ({
           <button
             onClick={onClose}
             aria-label="Cerrar modal de capacitación externa"
-            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer min-w-[44px] min-h-[44px] touch-target-44 inline-flex items-center justify-center"
             title="Cerrar modal"
           >
             <X className="w-5 h-5" />

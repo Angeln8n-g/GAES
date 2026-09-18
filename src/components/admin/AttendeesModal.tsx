@@ -517,7 +517,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
             <button
               onClick={onClose}
               aria-label="Cerrar modal de gestión de asistencia"
-              className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
+              className="p-2 sm:p-1.5 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer inline-flex items-center justify-center"
             >
               <X className="w-5 h-5" />
             </button>
@@ -704,7 +704,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                           <button
                             type="button"
                             onClick={() => onConfirmAttendance(event.id, selectedDate, selectedTime, item.email, 'checkin')}
-                            className="px-2.5 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold transition-colors cursor-pointer shadow-xs flex items-center gap-1"
+                            className="px-3 py-1.5 min-h-[36px] sm:min-h-0 touch-target-44 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold transition-colors cursor-pointer shadow-xs flex items-center gap-1"
                           >
                             <LogIn className="w-3 h-3" />
                             <span>+ Entrada</span>
@@ -723,7 +723,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                           <button
                             type="button"
                             onClick={() => onConfirmAttendance(event.id, selectedDate, selectedTime, item.email, 'checkout')}
-                            className="px-2.5 py-1 rounded-xl bg-[#DA291C] hover:bg-red-700 text-white text-[10px] font-bold transition-colors cursor-pointer shadow-xs flex items-center gap-1"
+                            className="px-3 py-1.5 min-h-[36px] sm:min-h-0 touch-target-44 rounded-xl bg-[#DA291C] hover:bg-red-700 text-white text-[10px] font-bold transition-colors cursor-pointer shadow-xs flex items-center gap-1"
                           >
                             <LogOut className="w-3 h-3" />
                             <span>+ Salida</span>
@@ -740,7 +740,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                         <button
                           type="button"
                           onClick={() => onRevertAttendance(event.id, selectedDate, selectedTime, item.email, item.isCheckedOut ? 'checkout' : 'all')}
-                          className="px-2 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 text-[10px] font-semibold transition-colors cursor-pointer flex items-center gap-1"
+                          className="px-2.5 py-1.5 min-h-[36px] sm:min-h-0 touch-target-44 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 text-[10px] font-semibold transition-colors cursor-pointer flex items-center gap-1"
                           title={item.isCheckedOut ? 'Revertir solo la salida (mantener entrada)' : 'Revertir asistencia'}
                         >
                           <RotateCcw className="w-3 h-3" />
@@ -753,7 +753,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                         <button
                           type="button"
                           onClick={() => setParticipantToUnassign(item)}
-                          className="px-2 py-1 rounded-xl text-rose-600 hover:text-rose-700 hover:bg-rose-50 border border-rose-200 text-[10px] font-bold transition-colors cursor-pointer flex items-center gap-1"
+                          className="px-2.5 py-1.5 min-h-[36px] sm:min-h-0 touch-target-44 rounded-xl text-rose-600 hover:text-rose-700 hover:bg-rose-50 border border-rose-200 text-[10px] font-bold transition-colors cursor-pointer flex items-center gap-1"
                           title="Eliminar asignación del participante (Super Admin - Antes o después de impartirse)"
                         >
                           <Trash2 className="w-3 h-3 text-rose-600" />
@@ -878,8 +878,8 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
               filteredParticipants.length > 0 ? (
                 <div className="space-y-4">
                   <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-xs border-collapse">
+                    <div className="table-responsive-container">
+                      <table className="w-full text-left text-xs border-collapse min-w-[750px]">
                         <thead>
                           <tr className="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold">
                             <th className="p-3">Colaborador</th>

@@ -19,7 +19,8 @@ import {
   ChevronRight,
   Video,
   MapPin,
-  Laptop
+  Laptop,
+  ArrowRightLeft
 } from 'lucide-react';
 import { TrainingEvent, Participant, Company, UserAccount } from '../../types';
 import { 
@@ -652,8 +653,16 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
             </button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
+          <>
+            <div className="table-scroll-hint">
+              <span className="flex items-center gap-1.5">
+                <ArrowRightLeft className="w-3.5 h-3.5 text-[#DA291C]" />
+                Desliza horizontalmente para ver todas las columnas del reporte oficial
+              </span>
+              <span className="font-mono text-slate-400">13 dimensiones</span>
+            </div>
+            <div className="table-responsive-container">
+            <table className="w-full text-left border-collapse text-xs min-w-[1100px]">
               <thead>
                 <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold text-[11px] whitespace-nowrap">
                   <th className="p-3.5 pl-5">#</th>
@@ -815,6 +824,7 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
               </tbody>
             </table>
           </div>
+          </>
         )}
       </div>
 

@@ -537,8 +537,8 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
           </span>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+        <div className="table-responsive-container">
+          <table className="w-full text-left text-xs min-w-[700px]">
             <thead>
               <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px] bg-slate-50/50">
                 <th className="py-3 px-4 rounded-l-xl">Nivel de Estudio</th>

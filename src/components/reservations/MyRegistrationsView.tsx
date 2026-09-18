@@ -28,7 +28,8 @@ import {
   Filter,
   TrendingUp,
   Layers,
-  KeyRound
+  KeyRound,
+  ArrowRightLeft
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { TrainingEvent, UserAccount, Slot, Schedule, TrainingProgram, ParticipantGroup, Participant, Company, ExternalTraining, TechnicalAcademyHistoryRecord } from '../../types';
@@ -1284,8 +1285,15 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
           {/* 3. Tabla / Listado de Registros del Histórico */}
           {filteredHistoryRecords.length > 0 ? (
             <div className="bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-xs">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse text-xs">
+              <div className="table-scroll-hint">
+                <span className="flex items-center gap-1.5">
+                  <ArrowRightLeft className="w-3.5 h-3.5 text-[#DA291C]" />
+                  Desliza horizontalmente para consultar fecha, facilitador y estado
+                </span>
+                <span className="font-mono text-slate-400">7 columnas</span>
+              </div>
+              <div className="table-responsive-container">
+                <table className="w-full text-left border-collapse text-xs min-w-[780px]">
                   <thead>
                     <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase text-[10px] tracking-wider">
                       <th className="py-3.5 px-4">Capacitación</th>

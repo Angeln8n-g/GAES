@@ -293,7 +293,7 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
             <button
               onClick={onClose}
               aria-label="Cerrar ventana de elaboración de carta formal"
-              className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer ml-1"
+              className="p-2 sm:p-1.5 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer ml-1 inline-flex items-center justify-center"
             >
               <X className="w-5 h-5" aria-hidden="true" />
             </button>

@@ -109,7 +109,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
         <button
           onClick={onClose}
           aria-label="Cerrar modal de cambio de contraseña"
-          className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+          className="absolute top-5 right-5 p-2 sm:p-1.5 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer inline-flex items-center justify-center"
         >
           <X className="w-5 h-5" />
         </button>
