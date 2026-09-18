@@ -2,7 +2,214 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Estilos de scroll personalizados */
+/* ============================================================
+   ARQUITECTURA DE TOKENS DE DISEÑO - IDENTIDAD CLARO
+   Soporte nativo para prefers-color-scheme: dark & selector [data-theme="dark"]
+   WCAG 2.1 AA Contrast Compliant
+   ============================================================ */
+:root {
+  /* Superficies & Fondos (Modo Claro) */
+  --bg-canvas: #F4F6F9;
+  --bg-surface: #FFFFFF;
+  --bg-surface-subtle: #F8FAFC;
+  --bg-surface-elevated: #FFFFFF;
+  --bg-surface-overlay: rgba(15, 23, 42, 0.65);
+
+  /* Tipografía & Textos (Modo Claro) */
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --text-subtle: #94A3B8;
+  --text-inverse: #FFFFFF;
+
+  /* Bordes & Separadores (Modo Claro) */
+  --border-subtle: #F1F5F9;
+  --border-default: #E2E8F0;
+  --border-strong: #CBD5E1;
+
+  /* Identidad Corporativa Claro (Pantone 485 C) */
+  --claro-red: #DA291C;
+  --claro-red-hover: #C22418;
+  --claro-red-active: #A11B10;
+  --claro-red-text: #DA291C;
+  --claro-red-subtle: rgba(218, 41, 28, 0.08);
+  --claro-red-border: rgba(218, 41, 28, 0.20);
+  --claro-navy: #0B1329;
+  --claro-dark: #0F172A;
+  --claro-badge-bg: #FFF1F0;
+  --claro-badge-text: #DA291C;
+  --claro-badge-border: #FFC5C1;
+
+  /* Tokens de Estado & Feedback */
+  --color-success: #10B981;
+  --color-success-subtle: rgba(16, 185, 129, 0.10);
+  --color-warning: #F59E0B;
+  --color-warning-subtle: rgba(245, 158, 11, 0.10);
+  --color-info: #0284C7;
+  --color-info-subtle: rgba(2, 132, 199, 0.10);
+  --color-focus-ring: #DA291C;
+
+  /* Utilidades de Interfaz */
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(226, 232, 240, 0.8);
+  --scrollbar-track: #F1F5F9;
+  --scrollbar-thumb: #CBD5E1;
+  --scrollbar-thumb-hover: #94A3B8;
+  --table-scroll-hint-bg: #F8FAFC;
+  --table-scroll-hint-border: #E2E8F0;
+  --table-scroll-hint-text: #64748B;
+}
+
+/* Modo Oscuro Nativo por Preferencia del Sistema Operativo */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-canvas: #0B0F19;
+    --bg-surface: #131B2E;
+    --bg-surface-subtle: #182238;
+    --bg-surface-elevated: #1D2A45;
+    --bg-surface-overlay: rgba(0, 0, 0, 0.78);
+
+    --text-primary: #F8FAFC;
+    --text-secondary: #CBD5E1;
+    --text-muted: #94A3B8;
+    --text-subtle: #64748B;
+    --text-inverse: #0F172A;
+
+    --border-subtle: #1C2740;
+    --border-default: #263554;
+    --border-strong: #384C74;
+
+    /* Identidad Claro en Oscuro: Calibración de contraste WCAG 2.1 AA */
+    --claro-red: #E03126;
+    --claro-red-hover: #F54438;
+    --claro-red-active: #D32F2F;
+    --claro-red-text: #FF6659;
+    --claro-red-subtle: rgba(224, 49, 38, 0.16);
+    --claro-red-border: rgba(224, 49, 38, 0.35);
+    --claro-navy: #070C18;
+    --claro-dark: #050811;
+    --claro-badge-bg: rgba(224, 49, 38, 0.16);
+    --claro-badge-text: #FF7066;
+    --claro-badge-border: rgba(224, 49, 38, 0.40);
+
+    --color-success: #34D399;
+    --color-success-subtle: rgba(52, 211, 153, 0.16);
+    --color-warning: #FBBF24;
+    --color-warning-subtle: rgba(251, 191, 36, 0.16);
+    --color-info: #38BDF8;
+    --color-info-subtle: rgba(56, 189, 248, 0.16);
+    --color-focus-ring: #FF6659;
+
+    --glass-bg: rgba(19, 27, 46, 0.88);
+    --glass-border: rgba(38, 53, 84, 0.8);
+    --scrollbar-track: #131B2E;
+    --scrollbar-thumb: #2E4064;
+    --scrollbar-thumb-hover: #435882;
+    --table-scroll-hint-bg: #182238;
+    --table-scroll-hint-border: #263554;
+    --table-scroll-hint-text: #94A3B8;
+  }
+}
+
+/* Modo Oscuro Forzado por Selector o Clase */
+:root[data-theme="dark"],
+.dark {
+  --bg-canvas: #0B0F19;
+  --bg-surface: #131B2E;
+  --bg-surface-subtle: #182238;
+  --bg-surface-elevated: #1D2A45;
+  --bg-surface-overlay: rgba(0, 0, 0, 0.78);
+
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-muted: #94A3B8;
+  --text-subtle: #64748B;
+  --text-inverse: #0F172A;
+
+  --border-subtle: #1C2740;
+  --border-default: #263554;
+  --border-strong: #384C74;
+
+  --claro-red: #E03126;
+  --claro-red-hover: #F54438;
+  --claro-red-active: #D32F2F;
+  --claro-red-text: #FF6659;
+  --claro-red-subtle: rgba(224, 49, 38, 0.16);
+  --claro-red-border: rgba(224, 49, 38, 0.35);
+  --claro-navy: #070C18;
+  --claro-dark: #050811;
+  --claro-badge-bg: rgba(224, 49, 38, 0.16);
+  --claro-badge-text: #FF7066;
+  --claro-badge-border: rgba(224, 49, 38, 0.40);
+
+  --color-success: #34D399;
+  --color-success-subtle: rgba(52, 211, 153, 0.16);
+  --color-warning: #FBBF24;
+  --color-warning-subtle: rgba(251, 191, 36, 0.16);
+  --color-info: #38BDF8;
+  --color-info-subtle: rgba(56, 189, 248, 0.16);
+  --color-focus-ring: #FF6659;
+
+  --glass-bg: rgba(19, 27, 46, 0.88);
+  --glass-border: rgba(38, 53, 84, 0.8);
+  --scrollbar-track: #131B2E;
+  --scrollbar-thumb: #2E4064;
+  --scrollbar-thumb-hover: #435882;
+  --table-scroll-hint-bg: #182238;
+  --table-scroll-hint-border: #263554;
+  --table-scroll-hint-text: #94A3B8;
+}
+
+/* Modo Claro Forzado Explícito */
+:root[data-theme="light"],
+.light {
+  --bg-canvas: #F4F6F9;
+  --bg-surface: #FFFFFF;
+  --bg-surface-subtle: #F8FAFC;
+  --bg-surface-elevated: #FFFFFF;
+  --bg-surface-overlay: rgba(15, 23, 42, 0.65);
+
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --text-subtle: #94A3B8;
+  --text-inverse: #FFFFFF;
+
+  --border-subtle: #F1F5F9;
+  --border-default: #E2E8F0;
+  --border-strong: #CBD5E1;
+
+  --claro-red: #DA291C;
+  --claro-red-hover: #C22418;
+  --claro-red-active: #A11B10;
+  --claro-red-text: #DA291C;
+  --claro-red-subtle: rgba(218, 41, 28, 0.08);
+  --claro-red-border: rgba(218, 41, 28, 0.20);
+  --claro-navy: #0B1329;
+  --claro-dark: #0F172A;
+  --claro-badge-bg: #FFF1F0;
+  --claro-badge-text: #DA291C;
+  --claro-badge-border: #FFC5C1;
+
+  --color-success: #10B981;
+  --color-success-subtle: rgba(16, 185, 129, 0.10);
+  --color-warning: #F59E0B;
+  --color-warning-subtle: rgba(245, 158, 11, 0.10);
+  --color-info: #0284C7;
+  --color-info-subtle: rgba(2, 132, 199, 0.10);
+  --color-focus-ring: #DA291C;
+
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(226, 232, 240, 0.8);
+  --scrollbar-track: #F1F5F9;
+  --scrollbar-thumb: #CBD5E1;
+  --scrollbar-thumb-hover: #94A3B8;
+  --table-scroll-hint-bg: #F8FAFC;
+  --table-scroll-hint-border: #E2E8F0;
+  --table-scroll-hint-text: #64748B;
+}
+
+/* Estilos de scroll personalizados adaptados a tokens */
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
@@ -16,15 +223,15 @@
   width: 6px;
 }
 .scrollbar-thin::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--scrollbar-track);
   border-radius: 9999px;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--scrollbar-thumb);
   border-radius: 9999px;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--scrollbar-thumb-hover);
 }
 
 @keyframes fadeIn {
@@ -144,7 +351,7 @@
 
 /* Anillos de enfoque accesibles por teclado (WCAG 2.4.7 Focus Visible) */
 :focus-visible {
-  outline: 2px solid #DA291C;
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
@@ -197,11 +404,11 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 1rem;
-  background-color: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
+  background-color: var(--table-scroll-hint-bg);
+  border-bottom: 1px solid var(--table-scroll-hint-border);
   font-size: 0.6875rem;
   font-weight: 700;
-  color: #64748b;
+  color: var(--table-scroll-hint-text);
 }
 
 @media (min-width: 640px) {
@@ -210,12 +417,12 @@
   }
 }
 
-/* Glassmorphism utility classes */
+/* Glassmorphism utility classes adaptadas a tokens */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.88);
+  background: var(--glass-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  border: 1px solid var(--glass-border);
 }
 
 /* Estilos de impresión para QR de asistencia */

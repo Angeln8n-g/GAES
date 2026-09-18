@@ -20,9 +20,13 @@ import {
   KeyRound,
   GraduationCap,
   Camera,
-  Wrench
+  Wrench,
+  Sun,
+  Moon,
+  Monitor
 } from 'lucide-react';
 import { UserAccount, TabView, Company } from '../../types';
+import { ThemePreference, getStoredThemePreference, setThemePreference } from '../../utils/theme';
 
 interface NavbarProps {
   currentUser: UserAccount | null;
@@ -60,6 +64,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenUserProfile
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [themePreference, setThemePrefState] = useState<ThemePreference>(() => getStoredThemePreference());
+
+  const handleThemeChange = (pref: ThemePreference) => {
+    setThemePreference(pref);
+    setThemePrefState(pref);
+  };
 
   if (!currentUser) return null;
 
@@ -444,6 +454,59 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             )}
 
+            {/* Selector de Tema Accesible Claro / Sistema / Oscuro (Desktop) */}
+            <div 
+              className="hidden sm:inline-flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200/80 shadow-inner shrink-0"
+              role="radiogroup"
+              aria-label="Selector de tema visual"
+            >
+              <button
+                type="button"
+                onClick={() => handleThemeChange('light')}
+                className={`p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center rounded-xl transition-all cursor-pointer ${
+                  themePreference === 'light'
+                    ? 'bg-white text-amber-600 shadow-xs font-bold'
+                    : 'text-slate-400 hover:text-slate-700'
+                }`}
+                title="Modo Claro"
+                aria-label="Activar Modo Claro"
+                aria-checked={themePreference === 'light'}
+                role="radio"
+              >
+                <Sun className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => handleThemeChange('system')}
+                className={`p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center rounded-xl transition-all cursor-pointer ${
+                  themePreference === 'system'
+                    ? 'bg-white text-[#DA291C] shadow-xs font-bold'
+                    : 'text-slate-400 hover:text-slate-700'
+                }`}
+                title="Modo Automático del Sistema"
+                aria-label="Sincronizar con tema del sistema operativo"
+                aria-checked={themePreference === 'system'}
+                role="radio"
+              >
+                <Monitor className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => handleThemeChange('dark')}
+                className={`p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center rounded-xl transition-all cursor-pointer ${
+                  themePreference === 'dark'
+                    ? 'bg-white text-indigo-600 shadow-xs font-bold'
+                    : 'text-slate-400 hover:text-slate-700'
+                }`}
+                title="Modo Oscuro"
+                aria-label="Activar Modo Oscuro"
+                aria-checked={themePreference === 'dark'}
+                role="radio"
+              >
+                <Moon className="w-4 h-4" />
+              </button>
+            </div>
+
             {/* Logout Button (Desktop) */}
             <button
               type="button"
@@ -715,6 +778,59 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <ChevronRight className="w-4 h-4 opacity-70" />
               </button>
             )}
+          </div>
+
+          {/* Selector de Tema Accesible (Mobile) */}
+          <div className="pt-3 border-t border-slate-200 flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-700">Tema Visual:</span>
+            <div 
+              className="inline-flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200"
+              role="radiogroup"
+              aria-label="Selector de tema móvil"
+            >
+              <button
+                type="button"
+                onClick={() => handleThemeChange('light')}
+                className={`flex items-center gap-1 px-2.5 py-1 text-xs rounded-lg transition-all cursor-pointer ${
+                  themePreference === 'light'
+                    ? 'bg-white text-amber-600 shadow-xs font-bold'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+                aria-checked={themePreference === 'light'}
+                role="radio"
+              >
+                <Sun className="w-3.5 h-3.5" />
+                <span>Claro</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleThemeChange('system')}
+                className={`flex items-center gap-1 px-2.5 py-1 text-xs rounded-lg transition-all cursor-pointer ${
+                  themePreference === 'system'
+                    ? 'bg-white text-[#DA291C] shadow-xs font-bold'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+                aria-checked={themePreference === 'system'}
+                role="radio"
+              >
+                <Monitor className="w-3.5 h-3.5" />
+                <span>Auto</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleThemeChange('dark')}
+                className={`flex items-center gap-1 px-2.5 py-1 text-xs rounded-lg transition-all cursor-pointer ${
+                  themePreference === 'dark'
+                    ? 'bg-white text-indigo-600 shadow-xs font-bold'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+                aria-checked={themePreference === 'dark'}
+                role="radio"
+              >
+                <Moon className="w-3.5 h-3.5" />
+                <span>Oscuro</span>
+              </button>
+            </div>
           </div>
 
           {/* Contact Support in Mobile Menu */}

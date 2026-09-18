@@ -45,6 +45,7 @@ const AttendeeScheduleModal = React.lazy(() => import('./components/lobby/Attend
 import { findAttendeeByCedula, AttendeeLookupResult } from './utils/attendeeLookup';
 import { UserProfileModal } from './components/profile/UserProfileModal';
 import { attendanceWs } from './services/websocket';
+import { initThemeListener } from './utils/theme';
 
 // Helper seguro para obtener el usuario autenticado desde localStorage
 const getSafeStoredUser = (): UserAccount | null => {
@@ -246,6 +247,12 @@ export function App() {
     } else if (tabParam === 'kiosk' || tabParam === 'lobby') {
       setCurrentTab('kiosk');
     }
+  }, []);
+
+  // Escucha activa de preferencias de color del sistema (prefers-color-scheme: dark)
+  useEffect(() => {
+    const cleanup = initThemeListener();
+    return cleanup;
   }, []);
 
   // Suscripción reactiva a eventos en tiempo real de asistencia vía WebSocket
@@ -754,7 +761,7 @@ export function App() {
   const isSuperAdminUser = currentUser?.role === 'Super Administrador';
 
   return (
-    <div className="min-h-screen bg-[#F4F6F9] text-slate-800 flex flex-col selection:bg-[#DA291C] selection:text-white font-sans">
+    <div className="min-h-screen bg-[var(--bg-canvas)] text-[var(--text-primary)] flex flex-col selection:bg-[#DA291C] selection:text-white font-sans transition-colors duration-200">
       
       {/* PWA Offline Network Banner */}
       <OfflineBanner />

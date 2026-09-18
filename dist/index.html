@@ -13,20 +13,39 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     
-    <!-- Theme & Mobile App Capability -->
-    <meta name="theme-color" content="#DA291C" />
+    <!-- Theme & Mobile App Capability con soporte prefers-color-scheme -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#DA291C" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0B0F19" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="CapacitaHub" />
     <meta name="application-name" content="CapacitaHub" />
     <meta name="format-detection" content="telephone=no" />
-    <script type="module" crossorigin src="/assets/index-v5SrTmHh.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/vendor-icons-5ihP9AQh.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-react-P-mXz2r_.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-BNQLIdyt.css">
+
+    <!-- Script Anti-FOUC para sincronización inmediata del tema antes del primer renderizado -->
+    <script>
+      (function() {
+        try {
+          var pref = localStorage.getItem('ch_theme_preference') || 'system';
+          var isDark = pref === 'dark' || (pref === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          var root = document.documentElement;
+          if (isDark) {
+            root.setAttribute('data-theme', 'dark');
+            root.classList.add('dark');
+          } else {
+            root.setAttribute('data-theme', 'light');
+            root.classList.remove('dark');
+          }
+        } catch(e) {}
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-C-JoygBk.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/vendor-icons-DpVFCmTt.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-react-DMcNojwr.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-o0e_2EeV.css">
   </head>
-  <body class="bg-slate-50 text-slate-900 selection:bg-[#DA291C] selection:text-white">
+  <body class="bg-[var(--bg-canvas)] text-[var(--text-primary)] selection:bg-[#DA291C] selection:text-white transition-colors duration-200">
     <div id="root"></div>
   </body>
 </html>
