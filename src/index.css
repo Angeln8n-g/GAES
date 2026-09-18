@@ -51,17 +51,94 @@
   animation: floatSubtle 4s ease-in-out infinite;
 }
 
-/* Soporte respetuoso para accesibilidad y reducción de movimiento (WCAG 2.3.3) */
+/* Animaciones de entrada estándar (con movimiento sutil en condiciones normales) */
+@keyframes enterNormal {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-in {
+  animation: enterNormal 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ============================================================
+   Soporte Respetuoso para Accesibilidad: Reducción de Movimiento (WCAG 2.3.3)
+   Impeccable: Reemplazar traslaciones/desplazamientos por desvanecimientos suaves
+   sin destruir la transición de estados (colores, fondos, opacidad, bordes)
+   ============================================================ */
 @media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
+  /* 1. Desactivar desplazamiento suave a través del viewport (evita mareo vestibular) */
+  html,
+  body {
     scroll-behavior: auto !important;
   }
-  /* Preserva transiciones suaves de opacidad y color sin transformaciones espaciales */
-  * {
-    transition-duration: 0.15s !important;
+
+  /* 2. Reemplazar traslaciones en keyframes por desvanecimientos suaves de opacidad */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes enterNormal {
+    from {
+      opacity: 0;
+      transform: none;
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Desactivar desplazamientos continuos de flotación o rebote */
+  .animate-floatSubtle {
+    animation: none !important;
+  }
+
+  /* Suavizar animaciones de entrada manteniéndolas como desvanecimientos puros */
+  .animate-fadeIn,
+  .animate-in {
+    animation-duration: 0.2s !important;
+  }
+
+  /* 3. Desactivar traslaciones espaciales y escalados en hover/active/group-hover
+        sin afectar el centrado de componentes ni layout transforms */
+  [class*="hover:-translate"]:hover,
+  [class*="hover:translate"]:hover,
+  [class*="hover:scale"]:hover,
+  [class*="active:scale"]:active,
+  .group:hover [class*="group-hover:scale"],
+  .group:hover [class*="group-hover:translate"],
+  .group:hover [class*="group-hover:-translate"] {
     transform: none !important;
+  }
+
+  /* 4. Preservar la transición de estados (colores, fondos, bordes, opacidad, sombras)
+        eliminando únicamente transiciones de transformación física que desplazan elementos */
+  *,
+  ::before,
+  ::after {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, filter, backdrop-filter;
+  }
+
+  /* Asegurar que pseudo-elementos utilitarios (como touch-target-44) preserven su centrado */
+  .touch-target-44::after {
+    transform: translate(-50%, -50%) !important;
+  }
+
+  /* Suavizar giro continuo a rotación muy lenta no desorientadora */
+  .animate-spin {
+    animation-duration: 3s !important;
   }
 }
 
