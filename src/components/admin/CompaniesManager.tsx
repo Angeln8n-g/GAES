@@ -232,7 +232,13 @@ export const CompaniesManager: React.FC<CompaniesManagerProps> = ({
                 <div className="flex items-center gap-3">
                   <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 p-1 flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
                     {comp.logoUrl ? (
-                      <img src={comp.logoUrl} alt={comp.name} className="w-full h-full object-cover rounded-xl" />
+                      <img
+                        src={comp.logoUrl}
+                        alt={comp.name}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover rounded-xl"
+                      />
                     ) : (
                       <Building2 className="w-7 h-7 text-[#DA291C]" />
                     )}

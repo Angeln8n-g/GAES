@@ -1050,6 +1050,8 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                     key={i}
                     src={img}
                     alt={`Preset ${i}`}
+                    loading="lazy"
+                    decoding="async"
                     onClick={() => setImageUrl(img)}
                     className={`w-10 h-8 rounded-lg object-cover cursor-pointer border-2 transition-all ${
                       imageUrl === img ? 'border-[#DA291C] scale-105 shadow-sm' : 'border-slate-200 opacity-70 hover:opacity-100'

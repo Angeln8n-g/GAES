@@ -95,6 +95,8 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ onExplore }) => {
             <img
               src={s.imageUrl}
               alt={s.title}
+              loading={idx === 0 ? "eager" : "lazy"}
+              decoding="async"
               className="w-full h-full object-cover object-center transform transition-transform duration-10000 ease-out"
             />
           </div>

@@ -296,6 +296,8 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
           <img
             src={event.imageUrl}
             alt={event.title}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover opacity-40"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />

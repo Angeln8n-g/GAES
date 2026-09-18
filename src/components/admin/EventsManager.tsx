@@ -201,6 +201,8 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
                   <img
                     src={event.imageUrl || "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80"}
                     alt={event.title}
+                    loading="lazy"
+                    decoding="async"
                     className="w-20 h-20 rounded-2xl object-cover shrink-0 border border-slate-200 hidden sm:block shadow-xs"
                   />
                   <div className="space-y-1.5">
