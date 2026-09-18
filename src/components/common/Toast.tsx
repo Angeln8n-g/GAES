@@ -55,7 +55,7 @@ export const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
         <button
           onClick={onClose}
           aria-label="Cerrar notificación"
-          className="text-white/60 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10 cursor-pointer"
+          className="text-white/60 hover:text-white transition-colors p-2 sm:p-1 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 touch-target-44 inline-flex items-center justify-center rounded-lg hover:bg-white/10 cursor-pointer"
         >
           <X className="w-4 h-4" aria-hidden="true" />
         </button>

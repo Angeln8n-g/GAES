@@ -224,7 +224,8 @@ export const SuperAdminSidebar: React.FC<SuperAdminSidebarProps> = ({
                   <button
                     onClick={onOpenChangePassword}
                     title="Cambiar Mi Contraseña"
-                    className="p-1.5 rounded-xl text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 transition-colors cursor-pointer"
+                    aria-label="Cambiar mi contraseña"
+                    className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 inline-flex items-center justify-center rounded-xl text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 transition-colors cursor-pointer"
                   >
                     <KeyRound className="w-4 h-4" />
                   </button>
@@ -232,7 +233,8 @@ export const SuperAdminSidebar: React.FC<SuperAdminSidebarProps> = ({
                 <button
                   onClick={onLogout}
                   title="Cerrar Sesión"
-                  className="p-1.5 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                  aria-label="Cerrar sesión"
+                  className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 inline-flex items-center justify-center rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
@@ -243,7 +245,8 @@ export const SuperAdminSidebar: React.FC<SuperAdminSidebarProps> = ({
           {/* Desktop Collapse / Expand Button */}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="hidden lg:flex w-full items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-colors cursor-pointer"
+            aria-label={isCollapsed ? "Expandir panel lateral" : "Contraer panel lateral"}
+            className="hidden lg:flex w-full items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-claro"
           >
             {isCollapsed ? <ChevronRight className="w-4 h-4" /> : (
               <>
