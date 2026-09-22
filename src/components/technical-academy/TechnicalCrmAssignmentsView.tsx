@@ -468,53 +468,53 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
 
       {/* KPI Ribbon / Metric Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-xs font-bold text-slate-600">Total Colaboradores</span>
-            <div className="p-1.5 rounded-lg bg-slate-100 text-slate-600">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-1">
+          <div className="flex items-center justify-between text-slate-400 dark:text-slate-500">
+            <span className="text-xs font-bold text-slate-600 dark:text-slate-300">Total Colaboradores</span>
+            <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-slate-900">{metrics.total}</div>
-          <div className="text-[11px] text-slate-500 font-medium">Registrados en plantilla</div>
+          <div className="text-2xl font-black text-slate-900 dark:text-white">{metrics.total}</div>
+          <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Registrados en plantilla</div>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-amber-700">Con Curso Activo</span>
-            <div className="p-1.5 rounded-lg bg-amber-50 text-amber-600">
+            <span className="text-xs font-bold text-amber-700 dark:text-amber-400">Con Curso Activo</span>
+            <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
               <Clock className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-amber-600">{metrics.active}</div>
-          <div className="text-[11px] text-slate-500 font-medium">En curso o programados</div>
+          <div className="text-2xl font-black text-amber-600 dark:text-amber-400">{metrics.active}</div>
+          <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">En curso o programados</div>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-emerald-700">Cursos Concluidos</span>
-            <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
+            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">Cursos Concluidos</span>
+            <div className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-emerald-600">{metrics.completed}</div>
-          <div className="text-[11px] text-slate-500 font-medium">Listos para nuevo curso</div>
+          <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{metrics.completed}</div>
+          <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Listos para nuevo curso</div>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-700">Sin Asignación</span>
-            <div className="p-1.5 rounded-lg bg-slate-100 text-slate-500">
+            <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Sin Asignación</span>
+            <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
               <UserPlus className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-slate-700">{metrics.unassigned}</div>
-          <div className="text-[11px] text-slate-500 font-medium">Disponibles para enrolar</div>
+          <div className="text-2xl font-black text-slate-700 dark:text-slate-300">{metrics.unassigned}</div>
+          <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Disponibles para enrolar</div>
         </div>
       </div>
 
       {/* Control Bar: Search & Filters */}
-      <div className="bg-white p-4 rounded-3xl border border-slate-200 shadow-2xs space-y-3">
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-3">
         <div className="flex flex-col md:flex-row items-center justify-between gap-3">
           
           {/* Search Input */}
@@ -528,7 +528,7 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                 setCurrentPage(1);
               }}
               placeholder="Buscar colaborador, cédula, ficha o curso..."
-              className="w-full pl-9.5 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white transition-all"
+              className="w-full pl-9.5 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white dark:focus:bg-slate-800 transition-all"
             />
           </div>
 
@@ -542,7 +542,7 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                   setSelectedCompanyId(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#DA291C] cursor-pointer"
+                className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#DA291C] cursor-pointer"
               >
                 <option value="all">🏢 Todas las Empresas</option>
                 {companies.map(c => (
@@ -559,7 +559,7 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                   setSelectedDepartment(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#DA291C] cursor-pointer max-w-[180px] truncate"
+                className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[#DA291C] cursor-pointer max-w-[180px] truncate"
               >
                 <option value="all">📂 Todos los Deptos.</option>
                 {departments.map(d => (
@@ -569,14 +569,14 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
             )}
 
             {/* Filter CRM Status */}
-            <div className="inline-flex p-1 bg-slate-100 rounded-xl border border-slate-200">
+            <div className="inline-flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
               <button
                 type="button"
                 onClick={() => { setStatusFilter('all'); setCurrentPage(1); }}
                 className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
                   statusFilter === 'all'
-                    ? 'bg-white text-slate-900 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 Todos ({metrics.total})
@@ -586,8 +586,8 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                 onClick={() => { setStatusFilter('active'); setCurrentPage(1); }}
                 className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
                   statusFilter === 'active'
-                    ? 'bg-white text-amber-800 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white dark:bg-slate-700 text-amber-800 dark:text-amber-300 shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 Activos ({metrics.active})
@@ -597,8 +597,8 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                 onClick={() => { setStatusFilter('completed'); setCurrentPage(1); }}
                 className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
                   statusFilter === 'completed'
-                    ? 'bg-white text-emerald-800 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white dark:bg-slate-700 text-emerald-800 dark:text-emerald-300 shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 Concluidos ({metrics.completed})
@@ -608,8 +608,8 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                 onClick={() => { setStatusFilter('unassigned'); setCurrentPage(1); }}
                 className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
                   statusFilter === 'unassigned'
-                    ? 'bg-white text-slate-900 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 Sin Asignar ({metrics.unassigned})
@@ -620,7 +620,7 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
 
         {/* Bulk Selection Summary Banner */}
         {selectedCards.size > 0 && (
-          <div className="p-3 bg-red-50/70 border border-red-200 rounded-2xl flex items-center justify-between gap-3 text-xs text-red-900 animate-in fade-in">
+          <div className="p-3 bg-red-50/70 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 rounded-2xl flex items-center justify-between gap-3 text-xs text-red-900 dark:text-red-200 animate-in fade-in">
             <div className="flex items-center gap-2 font-bold">
               <CheckSquare className="w-4 h-4 text-[#DA291C]" />
               <span>{selectedCards.size} colaborador(es) seleccionado(s)</span>
@@ -629,7 +629,7 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
               <button
                 type="button"
                 onClick={() => setSelectedCards(new Set())}
-                className="px-3 py-1 text-xs text-red-700 hover:text-red-900 font-bold hover:bg-red-100 rounded-lg transition-colors cursor-pointer"
+                className="px-3 py-1 text-xs text-red-700 dark:text-red-300 hover:text-red-900 dark:hover:text-white font-bold hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg transition-colors cursor-pointer"
               >
                 Deseleccionar todos
               </button>
@@ -647,16 +647,16 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
       </div>
 
       {/* Main CRM Collaborators Table */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="bg-slate-50/80 border-b border-slate-200 text-[11px] font-black text-slate-500 uppercase tracking-wider">
+              <tr className="bg-slate-50/80 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 <th className="py-3.5 px-4 w-10 text-center">
                   <button
                     type="button"
                     onClick={handleToggleSelectAllVisible}
-                    className="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
                     title="Seleccionar / Deseleccionar visibles"
                   >
                     {paginatedParticipants.length > 0 && paginatedParticipants.every(p => selectedCards.has(p.card)) ? (
@@ -674,20 +674,20 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                 <th className="py-3.5 px-4 text-right">Acciones Super Admin</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium text-slate-700 dark:text-slate-300">
               {isLoadingHistory ? (
                 <tr>
-                  <td colSpan={7} className="py-16 text-center text-slate-500">
+                  <td colSpan={7} className="py-16 text-center text-slate-500 dark:text-slate-400">
                     <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-[#DA291C]" />
-                    <p className="text-xs font-bold text-slate-600">Cargando base de datos de asignaciones...</p>
+                    <p className="text-xs font-bold text-slate-600 dark:text-slate-300">Cargando base de datos de asignaciones...</p>
                   </td>
                 </tr>
               ) : paginatedParticipants.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-16 text-center text-slate-500">
-                    <Users className="w-8 h-8 mx-auto mb-2 text-slate-300" />
-                    <p className="text-sm font-bold text-slate-600">No se encontraron colaboradores</p>
-                    <p className="text-xs text-slate-500 mt-0.5">Prueba ajustando los términos de búsqueda o filtros.</p>
+                  <td colSpan={7} className="py-16 text-center text-slate-500 dark:text-slate-400">
+                    <Users className="w-8 h-8 mx-auto mb-2 text-slate-300 dark:text-slate-600" />
+                    <p className="text-sm font-bold text-slate-600 dark:text-slate-300">No se encontraron colaboradores</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Prueba ajustando los términos de búsqueda o filtros.</p>
                   </td>
                 </tr>
               ) : (
@@ -699,8 +699,8 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                   return (
                     <tr 
                       key={p.card}
-                      className={`hover:bg-slate-50/70 transition-colors ${
-                        isSelected ? 'bg-red-50/30' : ''
+                      className={`hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors ${
+                        isSelected ? 'bg-red-50/30 dark:bg-red-950/20' : ''
                       }`}
                     >
                       {/* Checkbox */}
@@ -708,7 +708,7 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                         <button
                           type="button"
                           onClick={() => handleToggleCard(p.card)}
-                          className="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                          className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
                         >
                           {isSelected ? (
                             <CheckSquare className="w-4 h-4 text-[#DA291C]" />
@@ -721,24 +721,24 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                       {/* Collaborator info */}
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-slate-900 text-white font-black text-xs flex items-center justify-center shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-slate-900 dark:bg-slate-800 text-white font-black text-xs flex items-center justify-center shrink-0">
                             {p.name.charAt(0)}
                           </div>
                           <div>
-                            <div className="font-black text-slate-900 flex items-center gap-2">
+                            <div className="font-black text-slate-900 dark:text-white flex items-center gap-2">
                               <span>{p.name}</span>
                               {p.cedula && (
-                                <span className="text-[10px] text-slate-500 font-normal">
+                                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">
                                   • C.I. {p.cedula}
                                 </span>
                               )}
                             </div>
-                            <div className="flex items-center gap-2 text-[11px] text-slate-500 font-mono mt-0.5">
-                              <span className="bg-slate-100 px-1.5 py-0.5 rounded text-slate-700 font-bold">
+                            <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">
+                              <span className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-700 dark:text-slate-300 font-bold">
                                 #{p.card}
                               </span>
                               {p.department && (
-                                <span className="font-sans text-slate-500 font-medium">
+                                <span className="font-sans text-slate-500 dark:text-slate-400 font-medium">
                                   {p.department}
                                 </span>
                               )}
@@ -751,14 +751,14 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                       <td className="py-3.5 px-4">
                         {p.currentCourseTitle ? (
                           <div className="space-y-0.5">
-                            <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                            <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                               <BookOpen className="w-3.5 h-3.5 text-red-600 shrink-0" />
                               <span className="truncate max-w-[220px]">{p.currentCourseTitle}</span>
                             </div>
-                            <div className="text-[11px] text-slate-500 flex flex-wrap items-center gap-2">
-                              <span className="font-semibold text-slate-700">{p.currentCohortName}</span>
+                            <div className="text-[11px] text-slate-500 dark:text-slate-400 flex flex-wrap items-center gap-2">
+                              <span className="font-semibold text-slate-700 dark:text-slate-300">{p.currentCohortName}</span>
                               {p.currentDates && (
-                                <span className="text-slate-500 flex items-center gap-1">
+                                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
                                   <Calendar className="w-3 h-3" />
                                   {p.currentDates}
                                 </span>
@@ -766,7 +766,7 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                             </div>
                           </div>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 italic">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-400 dark:text-slate-500 italic">
                             Sin curso asignado
                           </span>
                         )}
@@ -775,27 +775,27 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                       {/* Status CRM Badge */}
                       <td className="py-3.5 px-4 text-center">
                         {p.crmStatus === 'in_progress' ? (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-amber-50 text-amber-800 border border-amber-200">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900/50">
                             <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
                             En Curso
                           </span>
                         ) : p.crmStatus === 'scheduled' ? (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-blue-50 text-blue-700 border border-blue-200">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900/50">
                             <Clock className="w-3 h-3 text-blue-500" />
                             Programado
                           </span>
                         ) : p.crmStatus === 'completed_passed' ? (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-emerald-50 text-emerald-800 border border-emerald-200">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/50">
                             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                             Concluido (Aprobado)
                           </span>
                         ) : p.crmStatus === 'completed_failed' ? (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-rose-50 text-rose-800 border border-rose-200">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-900/50">
                             <XCircle className="w-3.5 h-3.5 text-rose-600" />
                             Concluido (Reprobado)
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                             Disponible
                           </span>
                         )}
@@ -805,14 +805,14 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                       <td className="py-3.5 px-4 text-center">
                         {hasActive || hasCompleted ? (
                           <div className="inline-flex flex-col items-center gap-1">
-                            <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
+                            <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
                               <span>{p.attendancePct}%</span>
-                              <span className="text-[10px] text-slate-500 font-normal">
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">
                                 ({p.attendedDays}/{p.totalDays} d)
                               </span>
                             </div>
                             {/* Attendance Progress Bar */}
-                            <div className="w-20 bg-slate-100 h-1.5 rounded-full overflow-hidden border border-slate-200">
+                            <div className="w-20 bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700">
                               <div
                                 className={`h-full rounded-full ${
                                   p.attendancePct >= 80
@@ -825,25 +825,25 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                               />
                             </div>
                             {p.score !== null && (
-                              <span className="text-[10px] font-bold text-slate-600">
+                              <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400">
                                 Nota: {p.score}/100
                               </span>
                             )}
                           </div>
                         ) : (
-                          <span className="text-slate-300 font-mono text-xs">-</span>
+                          <span className="text-slate-300 dark:text-slate-600 font-mono text-xs">-</span>
                         )}
                       </td>
 
                       {/* History counter */}
                       <td className="py-3.5 px-4 text-center">
                         {p.completedRecords.length > 0 ? (
-                          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-[10px] font-black text-slate-700">
+                          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-black text-slate-700 dark:text-slate-300">
                             <Award className="w-3 h-3 text-amber-500" />
                             <span>{p.completedRecords.length} curso(s)</span>
                           </div>
                         ) : (
-                          <span className="text-slate-300 text-[11px] font-medium">0 previo</span>
+                          <span className="text-slate-300 dark:text-slate-600 text-[11px] font-medium">0 previo</span>
                         )}
                       </td>
 
@@ -856,7 +856,7 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                               <button
                                 type="button"
                                 onClick={() => handleOpenReassign(p)}
-                                className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                                className="px-2.5 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
                                 title="Reasignar al siguiente ciclo o cambiar de cohorte"
                               >
                                 <ArrowRightLeft className="w-3.5 h-3.5" />
@@ -867,7 +867,7 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                               <button
                                 type="button"
                                 onClick={() => handleOpenUnenrollModal(p)}
-                                className="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                                className="px-2.5 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
                                 title="Eliminar asignación o archivar como concluida"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -879,7 +879,7 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                             <button
                               type="button"
                               onClick={() => handleOpenAssignIndividual(p)}
-                              className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-[#DA291C] text-white text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+                              className="px-3 py-1.5 rounded-xl bg-slate-900 dark:bg-slate-100 hover:bg-[#DA291C] dark:hover:bg-[#DA291C] text-white dark:text-slate-900 dark:hover:text-white text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
                             >
                               <UserPlus className="w-3.5 h-3.5" />
                               <span>{hasCompleted ? 'Siguiente Curso' : 'Asignar Curso'}</span>
@@ -897,31 +897,31 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
 
         {/* Pagination Footer */}
         {filteredParticipants.length > pageSize && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-50/50 text-xs text-slate-500">
+          <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-xs text-slate-500 dark:text-slate-400">
             <div>
-              Mostrando <span className="font-bold text-slate-800">{((currentPage - 1) * pageSize) + 1}</span> a{' '}
-              <span className="font-bold text-slate-800">
+              Mostrando <span className="font-bold text-slate-800 dark:text-slate-200">{((currentPage - 1) * pageSize) + 1}</span> a{' '}
+              <span className="font-bold text-slate-800 dark:text-slate-200">
                 {Math.min(currentPage * pageSize, filteredParticipants.length)}
               </span>{' '}
-              de <span className="font-bold text-slate-800">{filteredParticipants.length}</span> colaboradores
+              de <span className="font-bold text-slate-800 dark:text-slate-200">{filteredParticipants.length}</span> colaboradores
             </div>
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white font-bold hover:bg-slate-50 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
+                className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
               >
                 Anterior
               </button>
-              <span className="font-bold text-slate-800">
+              <span className="font-bold text-slate-800 dark:text-slate-200">
                 Página {currentPage} de {totalPages}
               </span>
               <button
                 type="button"
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}
-                className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white font-bold hover:bg-slate-50 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
+                className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
               >
                 Siguiente
               </button>
@@ -959,41 +959,41 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
       {/* ========================================================================= */}
       {isUnenrollModalOpen && targetParticipantToUnenroll && targetCohortToUnenroll && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-6 animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-6 animate-in fade-in zoom-in-95 duration-150">
             
             <div className="flex items-start gap-4">
-              <div className="p-3 rounded-2xl bg-rose-50 text-rose-600 shrink-0">
+              <div className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 shrink-0">
                 <Trash2 className="w-6 h-6" />
               </div>
               <div>
-                <h2 className="text-lg font-black text-slate-900">
+                <h2 className="text-lg font-black text-slate-900 dark:text-white">
                   Gestionar Asignación de Curso
                 </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   Elige cómo deseas procesar la desmatriculación del colaborador.
                 </p>
               </div>
             </div>
 
             {/* Target info card */}
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2 text-xs">
+            <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2 text-xs">
               <div className="flex justify-between">
-                <span className="text-slate-500 font-semibold">Colaborador:</span>
-                <span className="font-black text-slate-900">{targetParticipantToUnenroll.name} (Ficha #{targetParticipantToUnenroll.card})</span>
+                <span className="text-slate-500 dark:text-slate-400 font-semibold">Colaborador:</span>
+                <span className="font-black text-slate-900 dark:text-white">{targetParticipantToUnenroll.name} (Ficha #{targetParticipantToUnenroll.card})</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500 font-semibold">Curso Actual:</span>
-                <span className="font-bold text-slate-800">{targetCohortToUnenroll.courseTitle}</span>
+                <span className="text-slate-500 dark:text-slate-400 font-semibold">Curso Actual:</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">{targetCohortToUnenroll.courseTitle}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500 font-semibold">Cohorte:</span>
-                <span className="font-bold text-slate-700">{targetCohortToUnenroll.groupName}</span>
+                <span className="text-slate-500 dark:text-slate-400 font-semibold">Cohorte:</span>
+                <span className="font-bold text-slate-700 dark:text-slate-300">{targetCohortToUnenroll.groupName}</span>
               </div>
             </div>
 
             {/* Mode selection options */}
             <div className="space-y-3">
-              <label className="block text-xs font-bold text-slate-700">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
                 Selecciona la acción a realizar:
               </label>
 
@@ -1002,20 +1002,20 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                 onClick={() => setUnenrollMode('archive')}
                 className={`p-4 rounded-2xl border transition-all cursor-pointer space-y-1 ${
                   unenrollMode === 'archive'
-                    ? 'border-emerald-500 bg-emerald-50/40 ring-1 ring-emerald-500'
-                    : 'border-slate-200 bg-white hover:border-slate-300'
+                    ? 'border-emerald-500 bg-emerald-50/40 dark:bg-emerald-950/30 ring-1 ring-emerald-500'
+                    : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60 hover:border-slate-300 dark:hover:border-slate-600'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 font-bold text-xs text-slate-900">
-                    <CheckCircle2 className={`w-4 h-4 ${unenrollMode === 'archive' ? 'text-emerald-600' : 'text-slate-400'}`} />
+                  <div className="flex items-center gap-2 font-bold text-xs text-slate-900 dark:text-white">
+                    <CheckCircle2 className={`w-4 h-4 ${unenrollMode === 'archive' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`} />
                     <span>Concluir y Archivar en Historial</span>
                   </div>
-                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/50">
                     Recomendado
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500 pl-6">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 pl-6">
                   Marca la matrícula como concluida (completed). El colaborador queda liberado en el CRM para su siguiente curso y se preservan todas sus asistencias y notas para el récord de RRHH.
                 </p>
               </div>
@@ -1025,27 +1025,27 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                 onClick={() => setUnenrollMode('hard_delete')}
                 className={`p-4 rounded-2xl border transition-all cursor-pointer space-y-1 ${
                   unenrollMode === 'hard_delete'
-                    ? 'border-rose-500 bg-rose-50/40 ring-1 ring-rose-500'
-                    : 'border-slate-200 bg-white hover:border-slate-300'
+                    ? 'border-rose-500 bg-rose-50/40 dark:bg-rose-950/30 ring-1 ring-rose-500'
+                    : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/60 hover:border-slate-300 dark:hover:border-slate-600'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 font-bold text-xs text-slate-900">
-                    <Trash2 className={`w-4 h-4 ${unenrollMode === 'hard_delete' ? 'text-rose-600' : 'text-slate-400'}`} />
+                  <div className="flex items-center gap-2 font-bold text-xs text-slate-900 dark:text-white">
+                    <Trash2 className={`w-4 h-4 ${unenrollMode === 'hard_delete' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400'}`} />
                     <span>Eliminar Asignación Definitivamente</span>
                   </div>
-                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-900/50">
                     Purga Total
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500 pl-6">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 pl-6">
                   Borra permanentemente la inscripción y asistencias de esta cohorte. Úsalo si la asignación fue un error administrativo y no debe quedar registro.
                 </p>
               </div>
             </div>
 
             {/* Modal actions */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => {
@@ -1054,7 +1054,7 @@ export const TechnicalCrmAssignmentsView: React.FC<TechnicalCrmAssignmentsViewPr
                   setTargetCohortToUnenroll(null);
                 }}
                 disabled={isUnenrolling}
-                className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 Cancelar
               </button>

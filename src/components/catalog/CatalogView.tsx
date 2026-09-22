@@ -238,64 +238,64 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
       {/* 2. Live KPI Stats Ribbon (Modern Executive Strip) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <div className="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-red-200 transition-all flex items-center gap-4 group">
-          <div className="w-12 h-12 rounded-2xl bg-red-50 text-[#DA291C] border border-red-100 flex items-center justify-center group-hover:scale-105 group-hover:bg-[#DA291C] group-hover:text-white transition-all shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-red-200 dark:hover:border-slate-700 transition-all flex items-center gap-4 group">
+          <div className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border border-red-100 dark:border-red-900/50 flex items-center justify-center group-hover:scale-105 group-hover:bg-[#DA291C] group-hover:text-white transition-all shadow-sm">
             <GraduationCap className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-2xl font-black text-slate-900 tracking-tight">{stats.activeEventsCount}</div>
-            <p className="text-xs font-semibold text-slate-500">Cursos & Talleres Activos</p>
+            <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{stats.activeEventsCount}</div>
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Cursos & Talleres Activos</p>
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-cyan-200 transition-all flex items-center gap-4 group">
-          <div className="w-12 h-12 rounded-2xl bg-cyan-50 text-cyan-700 border border-cyan-100 flex items-center justify-center group-hover:scale-105 group-hover:bg-cyan-600 group-hover:text-white transition-all shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-cyan-200 dark:hover:border-slate-700 transition-all flex items-center gap-4 group">
+          <div className="w-12 h-12 rounded-2xl bg-cyan-50 dark:bg-cyan-950/40 text-cyan-700 dark:text-cyan-400 border border-cyan-100 dark:border-cyan-900/50 flex items-center justify-center group-hover:scale-105 group-hover:bg-cyan-600 group-hover:text-white transition-all shadow-sm">
             <Users className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-2xl font-black text-slate-900 tracking-tight">{stats.totalRegistered}</div>
-            <p className="text-xs font-semibold text-slate-500">Inscripciones Registradas</p>
+            <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{stats.totalRegistered}</div>
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Inscripciones Registradas</p>
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-emerald-200 transition-all flex items-center gap-4 group">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center justify-center group-hover:scale-105 group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-emerald-200 dark:hover:border-slate-700 transition-all flex items-center gap-4 group">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/50 flex items-center justify-center group-hover:scale-105 group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-sm">
             <CalendarCheck className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-2xl font-black text-slate-900 tracking-tight">{stats.availableSlots}</div>
-            <p className="text-xs font-semibold text-slate-500">Cupos Disponibles</p>
+            <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{stats.availableSlots}</div>
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Cupos Disponibles</p>
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-purple-200 transition-all flex items-center gap-4 group">
-          <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-700 border border-purple-100 flex items-center justify-center group-hover:scale-105 group-hover:bg-purple-600 group-hover:text-white transition-all shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-purple-200 dark:hover:border-slate-700 transition-all flex items-center gap-4 group">
+          <div className="w-12 h-12 rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-400 border border-purple-100 dark:border-purple-900/50 flex items-center justify-center group-hover:scale-105 group-hover:bg-purple-600 group-hover:text-white transition-all shadow-sm">
             <Building2 className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-2xl font-black text-slate-900 tracking-tight">{stats.companiesCount}</div>
-            <p className="text-xs font-semibold text-slate-500">Empresas & Sedes</p>
+            <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{stats.companiesCount}</div>
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Empresas & Sedes</p>
           </div>
         </div>
       </div>
 
       {/* 3. Sección Cursos Sugeridos & Tendencias */}
       {suggestedCourses.length > 0 && (
-        <section className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-xs">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 border-b border-slate-100 pb-4">
+        <section className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">
             <div>
               <div className="flex items-center gap-2">
                 <Flame className="w-5 h-5 text-[#DA291C] animate-pulse" />
-                <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                  Cursos <span className="text-[#DA291C]">Recomendados & Tendencias</span>
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                  Cursos <span className="text-[#DA291C] dark:text-red-400">Recomendados & Tendencias</span>
                 </h2>
               </div>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 Formaciones de alto impacto sugeridas según tu plan de desarrollo y demanda operativa.
               </p>
             </div>
-            <span className="text-xs font-black text-[#DA291C] bg-red-50 border border-red-200/80 px-3.5 py-1.5 rounded-2xl shadow-xs self-start sm:self-auto flex items-center gap-1.5">
-              <Star className="w-3.5 h-3.5 fill-[#DA291C]" />
+            <span className="text-xs font-black text-[#DA291C] dark:text-red-400 bg-red-50 dark:bg-red-950/40 border border-red-200/80 dark:border-red-900/50 px-3.5 py-1.5 rounded-2xl shadow-xs self-start sm:self-auto flex items-center gap-1.5">
+              <Star className="w-3.5 h-3.5 fill-[#DA291C] dark:fill-red-400" />
               <span>Alta Prioridad</span>
             </span>
           </div>
@@ -307,9 +307,9 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                 <div 
                   key={course.id}
                   onClick={() => onOpenReservationModal(course)}
-                  className="bg-white border border-slate-200 rounded-3xl overflow-hidden hover:border-[#DA291C] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between"
+                  className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-3xl overflow-hidden hover:border-[#DA291C] dark:hover:border-red-500 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between"
                 >
-                  <div className="relative h-36 w-full overflow-hidden bg-slate-100">
+                  <div className="relative h-36 w-full overflow-hidden bg-slate-100 dark:bg-slate-900">
                     <img 
                       src={course.imageUrl || "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=80"}
                       alt={course.title}
@@ -321,26 +321,26 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                     <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-[#DA291C] text-white shadow-md">
                       {course.category}
                     </span>
-                    <span className="absolute top-2.5 right-2.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/90 text-slate-900 backdrop-blur-md shadow-xs">
+                    <span className="absolute top-2.5 right-2.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/90 dark:bg-slate-900/90 text-slate-900 dark:text-white backdrop-blur-md shadow-xs">
                       {course.modality}
                     </span>
                   </div>
 
                   <div className="p-4 flex-1 flex flex-col justify-between">
                     <div>
-                      <h3 className="text-xs sm:text-sm font-black text-slate-900 group-hover:text-[#DA291C] transition-colors line-clamp-2 mb-1.5 leading-snug">
+                      <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white group-hover:text-[#DA291C] dark:group-hover:text-red-400 transition-colors line-clamp-2 mb-1.5 leading-snug">
                         {course.title}
                       </h3>
-                      <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
                         {course.description}
                       </p>
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2 text-[11px]">
-                      <span className="text-slate-500 font-medium truncate max-w-[150px]">
-                        Facilitador: <strong className="text-slate-800 font-bold">{course.instructor}</strong>
+                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/80 flex items-center justify-between gap-2 text-[11px]">
+                      <span className="text-slate-500 dark:text-slate-400 font-medium truncate max-w-[150px]">
+                        Facilitador: <strong className="text-slate-800 dark:text-slate-200 font-bold">{course.instructor}</strong>
                       </span>
-                      <span className="text-[#DA291C] font-black flex items-center gap-1 group-hover:translate-x-1 transition-transform shrink-0">
+                      <span className="text-[#DA291C] dark:text-red-400 font-black flex items-center gap-1 group-hover:translate-x-1 transition-transform shrink-0">
                         Inscribirme <ChevronRight className="w-3.5 h-3.5" />
                       </span>
                     </div>
@@ -353,36 +353,36 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
       )}
 
       {/* 4. Barra de Búsqueda Command-Bar */}
-      <div id="catalog-search-section" className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-red-50/80 via-white to-slate-50 border border-slate-200/90 p-6 sm:p-8 shadow-xs">
+      <div id="catalog-search-section" className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-red-50/80 via-white to-slate-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 border border-slate-200/90 dark:border-slate-800 p-6 sm:p-8 shadow-xs">
         <div className="max-w-3xl relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100 text-[#DA291C] text-xs font-black mb-2.5 shadow-xs">
-            <Sparkles className="w-3.5 h-3.5 text-[#DA291C]" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100 dark:bg-red-950/60 text-[#DA291C] dark:text-red-400 text-xs font-black mb-2.5 shadow-xs">
+            <Sparkles className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
             <span>Impulsa tu crecimiento, certificaciones y desarrollo continuo</span>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight mb-2">
-            Catálogo General de <span className="text-[#DA291C]">Capacitaciones</span>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-tight mb-2">
+            Catálogo General de <span className="text-[#DA291C] dark:text-red-400">Capacitaciones</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed mb-6">
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed mb-6">
             Inscríbete a talleres prácticos, conferencias interactivas, certificaciones técnicas y clínicas operativas.
           </p>
 
           {/* Command-Bar Search Input */}
           <div className="relative max-w-2xl">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <Search className="w-5 h-5 text-[#DA291C]" />
+              <Search className="w-5 h-5 text-[#DA291C] dark:text-red-400" />
             </div>
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar por tema, instructor, palabra clave, código o lugar..."
-              className="w-full pl-12 pr-10 py-3.5 bg-white border border-slate-300/90 rounded-2xl text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] focus:ring-4 focus:ring-red-500/10 shadow-md shadow-slate-200/50 transition-all font-medium"
+              className="w-full pl-12 pr-10 py-3.5 bg-white dark:bg-slate-800/90 border border-slate-300/90 dark:border-slate-700 rounded-2xl text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] dark:focus:border-red-500 focus:ring-4 focus:ring-red-500/10 dark:focus:ring-red-950/50 shadow-md shadow-slate-200/50 dark:shadow-none transition-all font-medium"
             />
             {searchQuery && (
               <button 
                 onClick={() => setSearchQuery('')}
-                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-700 cursor-pointer"
+                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -409,12 +409,12 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
                     isSelected
                       ? 'bg-gradient-to-r from-[#DA291C] to-red-600 text-white shadow-md shadow-red-500/25 scale-[1.02]'
-                      : 'bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:bg-slate-50'
+                      : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
                   }`}
                 >
                   <span>{cat}</span>
                   <span className={`px-2 py-0.2 rounded-full text-[10px] font-black ${
-                    isSelected ? 'bg-white text-[#DA291C]' : 'bg-slate-100 text-slate-600'
+                    isSelected ? 'bg-white dark:bg-slate-900 text-[#DA291C] dark:text-red-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                   }`}>
                     {count}
                   </span>
@@ -424,19 +424,19 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           </div>
 
           {/* Secondary Filter Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-3xl border border-slate-200/90 shadow-xs text-xs">
-            <div className="flex items-center gap-2 text-slate-700">
-              <Filter className="w-4 h-4 text-[#DA291C]" />
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-xs text-xs">
+            <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+              <Filter className="w-4 h-4 text-[#DA291C] dark:text-red-400" />
               <span className="font-bold">Filtros rápidos:</span>
             </div>
 
             <div className="flex flex-wrap items-center gap-2.5">
               {/* Modality Filter */}
-              <div className="flex items-center bg-slate-100/90 rounded-2xl p-1 border border-slate-200">
+              <div className="flex items-center bg-slate-100/90 dark:bg-slate-800 rounded-2xl p-1 border border-slate-200 dark:border-slate-700">
                 <button
                   onClick={() => setSelectedModality("Todos")}
                   className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer text-xs ${
-                    selectedModality === "Todos" ? 'bg-[#DA291C] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    selectedModality === "Todos" ? 'bg-[#DA291C] text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   Todas
@@ -444,7 +444,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                 <button
                   onClick={() => setSelectedModality("Presencial")}
                   className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer text-xs flex items-center gap-1.5 ${
-                    selectedModality === "Presencial" ? 'bg-[#DA291C] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    selectedModality === "Presencial" ? 'bg-[#DA291C] text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   <MapPin className="w-3.5 h-3.5" /> Presencial
@@ -452,7 +452,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                 <button
                   onClick={() => setSelectedModality("Virtual")}
                   className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer text-xs flex items-center gap-1.5 ${
-                    selectedModality === "Virtual" ? 'bg-[#DA291C] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    selectedModality === "Virtual" ? 'bg-[#DA291C] text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   <Video className="w-3.5 h-3.5" /> Virtual
@@ -465,7 +465,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                 className={`px-3.5 py-1.5 rounded-2xl border font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs ${
                   onlyAvailable
                     ? 'bg-emerald-500 text-white border-emerald-600 shadow-md shadow-emerald-500/20'
-                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                    : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                 }`}
               >
                 <CalendarCheck className="w-3.5 h-3.5" />
@@ -477,8 +477,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                 onClick={() => setIncludePastEvents(!includePastEvents)}
                 className={`px-3.5 py-1.5 rounded-2xl border font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs ${
                   includePastEvents
-                    ? 'bg-slate-800 text-white border-slate-900 shadow-md shadow-slate-900/20'
-                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                    ? 'bg-slate-800 dark:bg-slate-700 text-white border-slate-900 dark:border-slate-600 shadow-md shadow-slate-900/20'
+                    : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                 }`}
                 title={includePastEvents ? "Ocultar eventos pasados" : "Mostrar también eventos pasados ya finalizados"}
               >
@@ -489,19 +489,19 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           </div>
 
           {/* Events Count Indicator */}
-          <div className="flex items-center justify-between text-xs text-slate-500 px-1 flex-wrap gap-2">
+          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-1 flex-wrap gap-2">
             <div className="flex items-center gap-2">
               <span>
-                Mostrando <strong className="text-slate-900 font-black">{filteredEvents.length}</strong> {includePastEvents ? 'capacitaciones (incluyendo historial)' : 'capacitaciones vigentes'}
+                Mostrando <strong className="text-slate-900 dark:text-white font-black">{filteredEvents.length}</strong> {includePastEvents ? 'capacitaciones (incluyendo historial)' : 'capacitaciones vigentes'}
               </span>
               {!includePastEvents && !selectedCalendarDate && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[10px]">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60 font-bold text-[10px]">
                   ● Fechas actuales y futuras
                 </span>
               )}
             </div>
             {selectedCalendarDate && (
-              <span className="text-[#DA291C] font-bold bg-red-50 px-2.5 py-0.5 rounded-full border border-red-200">
+              <span className="text-[#DA291C] dark:text-red-400 font-bold bg-red-50 dark:bg-red-950/40 px-2.5 py-0.5 rounded-full border border-red-200 dark:border-red-900/50">
                 📅 Filtrado por fecha: {selectedCalendarDate}
               </span>
             )}
@@ -522,12 +522,12 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
               ))}
             </div>
           ) : (
-            <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center shadow-sm">
-              <div className="w-16 h-16 rounded-3xl bg-red-50 text-[#DA291C] border border-red-100 flex items-center justify-center mx-auto mb-4">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center shadow-sm">
+              <div className="w-16 h-16 rounded-3xl bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border border-red-100 dark:border-red-900/50 flex items-center justify-center mx-auto mb-4">
                 <AlertCircle className="w-8 h-8" />
               </div>
-              <h3 className="text-base font-bold text-slate-800">No se encontraron capacitaciones</h3>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
+              <h3 className="text-base font-bold text-slate-800 dark:text-white">No se encontraron capacitaciones</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1">
                 Intenta ajustar los términos de búsqueda, la categoría o la fecha seleccionada en el calendario.
               </p>
               <button

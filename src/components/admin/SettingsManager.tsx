@@ -77,14 +77,14 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({
     <div className="space-y-6">
       
       {/* Header Info */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 text-xs font-bold text-[#DA291C] mb-1">
             <Sliders className="w-4 h-4" />
             <span>Panel de Gobernanza del Super Administrador</span>
           </div>
-          <h2 className="text-xl font-black text-slate-900">Configuración del Sistema & Feature Flags</h2>
-          <p className="text-xs text-slate-500 mt-1 max-w-2xl">
+          <h2 className="text-xl font-black text-slate-900 dark:text-white">Configuración del Sistema & Feature Flags</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-2xl">
             Activa o desactiva módulos avanzados para adaptar la plataforma al nivel de madurez operativa de la organización.
           </p>
         </div>
@@ -102,29 +102,29 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({
       {/* Main Feature Flag Card: Field Ops & 90-Day Plan */}
       <div className={`p-6 rounded-3xl border transition-all ${
         enabled 
-          ? 'bg-white border-[#DA291C]/40 shadow-sm' 
-          : 'bg-slate-50 border-slate-200 opacity-90'
+          ? 'bg-white dark:bg-slate-900 border-[#DA291C]/40 dark:border-[#DA291C]/50 shadow-sm' 
+          : 'bg-slate-50 dark:bg-slate-850 border-slate-200 dark:border-slate-800 opacity-90'
       }`}>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-start gap-3.5">
             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
-              enabled ? 'bg-red-50 text-[#DA291C] border border-red-200' : 'bg-slate-100 text-slate-400'
+              enabled ? 'bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-900/50' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'
             }`}>
               <Activity className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2.5">
-                <h3 className="text-base font-black text-slate-900">Módulo de Operaciones de Campo & Plan a 90 Días</h3>
+                <h3 className="text-base font-black text-slate-900 dark:text-white">Módulo de Operaciones de Campo & Plan a 90 Días</h3>
                 <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wide uppercase ${
                   enabled 
-                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
-                    : 'bg-slate-100 text-slate-500 border border-slate-200'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50' 
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
                 }`}>
                   {enabled ? 'Activo en Plataforma' : 'Inactivo'}
                 </span>
               </div>
-              <p className="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed">
-                Habilita el seguimiento en campo mediante <strong className="text-slate-800">Checklists Digitales de Campo</strong>, cronogramas bajo el <strong className="text-slate-800">Modelo 70-20-10</strong>, <strong className="text-slate-800">Mesas de Calibración Ops-Capacitación</strong> y métricas de aceleración del <strong className="text-slate-800">Time to Productivity (TTP)</strong>.
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-2xl leading-relaxed">
+                Habilita el seguimiento en campo mediante <strong className="text-slate-800 dark:text-slate-200">Checklists Digitales de Campo</strong>, cronogramas bajo el <strong className="text-slate-800 dark:text-slate-200">Modelo 70-20-10</strong>, <strong className="text-slate-800 dark:text-slate-200">Mesas de Calibración Ops-Capacitación</strong> y métricas de aceleración del <strong className="text-slate-800 dark:text-slate-200">Time to Productivity (TTP)</strong>.
               </p>
             </div>
           </div>
@@ -136,7 +136,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({
             className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
               enabled 
                 ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25' 
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
             {enabled ? <ToggleRight className="w-5 h-5 text-white" /> : <ToggleLeft className="w-5 h-5" />}
@@ -149,51 +149,51 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-5 animate-in fade-in duration-200">
             
             {/* Sub-feature 1: 70-20-10 */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-cyan-600" />
-                  <span className="text-xs font-black text-slate-800">Framework 70-20-10</span>
+                  <Layers className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                  <span className="text-xs font-black text-slate-800 dark:text-slate-200">Framework 70-20-10</span>
                 </div>
                 <input
                   type="checkbox"
                   checked={enable702010}
                   onChange={(e) => setEnable702010(e.target.checked)}
-                  className="w-4 h-4 rounded text-[#DA291C] focus:ring-[#DA291C] border-slate-300 cursor-pointer"
+                  className="w-4 h-4 rounded text-[#DA291C] focus:ring-[#DA291C] border-slate-300 dark:border-slate-600 dark:bg-slate-700 cursor-pointer"
                 />
               </div>
-              <p className="text-[11px] text-slate-500 leading-relaxed">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
                 Permite clasificar los cronogramas en 70% Práctica de Campo, 20% Shadowing y 10% Aula Formal.
               </p>
             </div>
 
             {/* Sub-feature 2: Mesas de Calibración */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-amber-600" />
-                  <span className="text-xs font-black text-slate-800">Mesas de Calibración</span>
+                  <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                  <span className="text-xs font-black text-slate-800 dark:text-slate-200">Mesas de Calibración</span>
                 </div>
                 <input
                   type="checkbox"
                   checked={enableCalibration}
                   onChange={(e) => setEnableCalibration(e.target.checked)}
-                  className="w-4 h-4 rounded text-[#DA291C] focus:ring-[#DA291C] border-slate-300 cursor-pointer"
+                  className="w-4 h-4 rounded text-[#DA291C] focus:ring-[#DA291C] border-slate-300 dark:border-slate-600 dark:bg-slate-700 cursor-pointer"
                 />
               </div>
-              <p className="text-[11px] text-slate-500 leading-relaxed">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
                 Habilita la auditoría cruzada y sesiones conjuntas entre Líderes de Campo y Capacitación para alinear notas.
               </p>
             </div>
 
             {/* Sub-feature 3: Meta de TTP */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Target className="w-4 h-4 text-emerald-600" />
-                  <span className="text-xs font-black text-slate-800">Meta TTP (Días)</span>
+                  <Target className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-xs font-black text-slate-800 dark:text-slate-200">Meta TTP (Días)</span>
                 </div>
-                <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+                <span className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 px-2 py-0.5 rounded-md">
                   {targetTtpDays} días
                 </span>
               </div>
@@ -204,9 +204,9 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({
                 step="5"
                 value={targetTtpDays}
                 onChange={(e) => setTargetTtpDays(Number(e.target.value))}
-                className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#DA291C]"
+                className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-[#DA291C]"
               />
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
                 Objetivo esperado para que un colaborador alcance el 100% de autonomía operativa.
               </p>
             </div>

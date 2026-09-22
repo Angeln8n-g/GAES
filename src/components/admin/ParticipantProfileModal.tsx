@@ -257,50 +257,50 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
       ariaLabel={`Perfil de ${participant.name}`}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
         
         {/* Profile Header */}
-        <div className="p-6 border-b border-slate-200 bg-slate-50 relative">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 relative">
           <button
             onClick={onClose}
-            className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-200 transition-colors cursor-pointer"
+            className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <div className="w-16 h-16 rounded-3xl bg-[#DA291C] p-0.5 shadow-md shadow-red-500/20 shrink-0">
-              <div className="w-full h-full bg-white rounded-[22px] flex items-center justify-center text-xl font-black text-[#DA291C]">
+              <div className="w-full h-full bg-white dark:bg-slate-800 rounded-[22px] flex items-center justify-center text-xl font-black text-[#DA291C] dark:text-red-400">
                 {participant.name.charAt(0)}
               </div>
             </div>
 
             <div className="space-y-1.5 flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-lg font-black text-slate-900 truncate">{participant.name}</h2>
+                <h2 className="text-lg font-black text-slate-900 dark:text-white truncate">{participant.name}</h2>
                 
                 {/* Badge de Estado Laboral */}
                 {empStatus === "contratado" && (
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
                     <CheckCircle2 className="w-3 h-3" />
                     Contratado
                   </span>
                 )}
                 {empStatus === "en_proceso" && (
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1">
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     En Proceso de Contratación
                   </span>
                 )}
                 {empStatus === "inactivo" && (
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200 flex items-center gap-1">
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 flex items-center gap-1">
                     <UserX className="w-3 h-3" />
                     Inactivo / Baja
                   </span>
                 )}
 
                 {/* Badge de Rol */}
-                <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-red-50 text-[#DA291C] border border-red-200">
+                <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-red-50 dark:bg-red-950/60 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-800">
                   {linkedUser?.role || "Colaborador (User)"}
                 </span>
 
@@ -308,28 +308,28 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                 {(() => {
                   const comp = companies.find(c => c.id === (participant.companyId || 'emp_kasino'));
                   return (
-                    <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1">
+                    <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center gap-1">
                       🏢 {comp ? comp.name : 'Kasino 21 Corporativo'}
                     </span>
                   );
                 })()}
               </div>
 
-              <p className="text-xs text-slate-500 font-mono">{participant.email}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">{participant.email}</p>
               
-              <div className="flex items-center justify-between gap-3 text-xs text-slate-500 pt-1 flex-wrap font-medium">
+              <div className="flex items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400 pt-1 flex-wrap font-medium">
                 <div className="flex items-center gap-3 flex-wrap">
-                  <span className="flex items-center gap-1 font-mono text-[#DA291C] font-bold">
+                  <span className="flex items-center gap-1 font-mono text-[#DA291C] dark:text-red-400 font-bold">
                     <CreditCard className="w-3.5 h-3.5 text-slate-400" />
                     Tarj: #{participant.card}
                   </span>
                   {participant.cedula && (
-                    <span className="flex items-center gap-1 font-mono text-slate-700 font-bold">
+                    <span className="flex items-center gap-1 font-mono text-slate-700 dark:text-slate-300 font-bold">
                       Cédula: {participant.cedula}
                     </span>
                   )}
                   {participant.department && (
-                    <span className="flex items-center gap-1 text-slate-700">
+                    <span className="flex items-center gap-1 text-slate-700 dark:text-slate-300">
                       <Building className="w-3.5 h-3.5 text-slate-400" />
                       {participant.department}
                     </span>
@@ -340,7 +340,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                   <button
                     type="button"
                     onClick={() => setIsFormalLetterOpen(true)}
-                    className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white text-[11px] font-black flex items-center gap-1.5 shadow-xs cursor-pointer transition-all active:scale-95"
+                    className="px-3 py-1.5 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-black dark:hover:bg-slate-750 text-white text-[11px] font-black flex items-center gap-1.5 shadow-xs cursor-pointer transition-all active:scale-95"
                     title="Expedir carta formal de constancia para este colaborador (Exclusivo Super Administrador)"
                   >
                     <FileText className="w-3.5 h-3.5 text-amber-400" />
@@ -353,24 +353,24 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
         </div>
 
         {/* Quick KPI Bar */}
-        <div className="grid grid-cols-4 border-b border-slate-200 bg-slate-50/50 text-center divide-x divide-slate-200">
+        <div className="grid grid-cols-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/50 text-center divide-x divide-slate-200 dark:divide-slate-800">
           <div className="p-3">
-            <p className="text-lg font-black text-emerald-600">{attendedEvents.length}</p>
-            <p className="text-[10px] text-slate-500 font-semibold mt-0.5">Asistencias</p>
+            <p className="text-lg font-black text-emerald-600 dark:text-emerald-400">{attendedEvents.length}</p>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5">Asistencias</p>
           </div>
           <div className="p-3">
-            <p className="text-lg font-black text-indigo-600">{avgScore} <span className="text-[10px] text-slate-500 font-medium">pts</span></p>
-            <p className="text-[10px] text-slate-500 font-semibold mt-0.5">Promedio Notas</p>
+            <p className="text-lg font-black text-indigo-600 dark:text-indigo-400">{avgScore} <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">pts</span></p>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5">Promedio Notas</p>
           </div>
           <div className="p-3">
-            <p className="text-lg font-black text-slate-900">
-              <span className="text-emerald-600">{passedCount}</span> / <span className="text-rose-600">{failedCount}</span>
+            <p className="text-lg font-black text-slate-900 dark:text-white">
+              <span className="text-emerald-600 dark:text-emerald-400">{passedCount}</span> / <span className="text-rose-600 dark:text-rose-400">{failedCount}</span>
             </p>
-            <p className="text-[10px] text-slate-500 font-semibold mt-0.5">Aprobados / Reprobados</p>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5">Aprobados / Reprobados</p>
           </div>
           <div className="p-3">
-            <p className="text-lg font-black text-[#DA291C]">~{totalCalculatedHours}h</p>
-            <p className="text-[10px] text-slate-500 font-semibold mt-0.5">Horas Formativas</p>
+            <p className="text-lg font-black text-[#DA291C] dark:text-red-400">~{totalCalculatedHours}h</p>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5">Horas Formativas</p>
           </div>
         </div>
 
@@ -378,69 +378,69 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
         <div className="p-6 overflow-y-auto space-y-6 flex-1 custom-scrollbar">
           
           {/* Ficha Académica & Sociodemográfica 360° */}
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-50 to-amber-50/20 border border-slate-200/90 space-y-3">
+          <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-50 to-amber-50/20 dark:from-slate-850 dark:to-amber-950/10 border border-slate-200/90 dark:border-slate-800 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                <BookOpen className="w-3.5 h-3.5 text-[#DA291C]" />
+              <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+                <BookOpen className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
                 <span>Perfil Académico & Sociodemográfico</span>
               </h3>
               {participant.profileCompleted ? (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Ficha Completa
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> Ficha Completa
                 </span>
               ) : (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1">
-                  <AlertTriangle className="w-3 h-3 text-amber-600" /> Ficha Incompleta
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 flex items-center gap-1">
+                  <AlertTriangle className="w-3 h-3 text-amber-600 dark:text-amber-400" /> Ficha Incompleta
                 </span>
               )}
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-              <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs">
-                <span className="text-[10px] text-slate-500 font-bold block uppercase">Nivel de Estudio</span>
-                <span className="font-bold text-slate-800">{participant.educationLevel || 'No especificado'}</span>
+              <div className="bg-white dark:bg-slate-800 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold block uppercase">Nivel de Estudio</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">{participant.educationLevel || 'No especificado'}</span>
               </div>
-              <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs">
-                <span className="text-[10px] text-slate-500 font-bold block uppercase">Profesión / Título</span>
-                <span className="font-bold text-slate-800">{participant.professionTitle || 'No especificado'}</span>
+              <div className="bg-white dark:bg-slate-800 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold block uppercase">Profesión / Título</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">{participant.professionTitle || 'No especificado'}</span>
               </div>
-              <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs">
-                <span className="text-[10px] text-slate-500 font-bold block uppercase">Fecha Nacimiento</span>
-                <span className="font-bold text-slate-800">
+              <div className="bg-white dark:bg-slate-800 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold block uppercase">Fecha Nacimiento</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">
                   {participant.birthDate || 'No especificada'}
                 </span>
               </div>
-              <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs">
-                <span className="text-[10px] text-slate-500 font-bold block uppercase">Teléfono</span>
-                <span className="font-bold text-slate-800 font-mono">{participant.phone || 'No especificado'}</span>
+              <div className="bg-white dark:bg-slate-800 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold block uppercase">Teléfono</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200 font-mono">{participant.phone || 'No especificado'}</span>
               </div>
             </div>
 
             {participant.isCurrentlyStudying && (
-              <div className="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200 text-xs flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+              <div className="p-2.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-xs flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
                 <div>
-                  <span className="font-bold text-amber-950 block">Estudia Actualmente: {participant.currentStudyField || 'En curso'}</span>
+                  <span className="font-bold text-amber-950 dark:text-amber-200 block">Estudia Actualmente: {participant.currentStudyField || 'En curso'}</span>
                   {participant.institutionName && (
-                    <span className="text-[11px] text-amber-800">Centro / Universidad: {participant.institutionName}</span>
+                    <span className="text-[11px] text-amber-800 dark:text-amber-300">Centro / Universidad: {participant.institutionName}</span>
                   )}
                 </div>
               </div>
             )}
 
             {participant.currentAddress && (
-              <div className="text-xs text-slate-600 flex items-center gap-1.5 pt-0.5">
+              <div className="text-xs text-slate-600 dark:text-slate-300 flex items-center gap-1.5 pt-0.5">
                 <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                <span>Dirección: <strong className="text-slate-800">{participant.currentAddress}</strong></span>
+                <span>Dirección: <strong className="text-slate-800 dark:text-slate-200">{participant.currentAddress}</strong></span>
               </div>
             )}
 
             {participant.trainingInterestAreas && participant.trainingInterestAreas.length > 0 && (
-              <div className="pt-2 border-t border-slate-200/80">
-                <span className="text-[10px] font-bold text-slate-500 block mb-1 uppercase tracking-wider">Intereses Formativos & Oportunidades de Desarrollo:</span>
+              <div className="pt-2 border-t border-slate-200/80 dark:border-slate-700/80">
+                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block mb-1 uppercase tracking-wider">Intereses Formativos & Oportunidades de Desarrollo:</span>
                 <div className="flex flex-wrap gap-1.5">
                   {participant.trainingInterestAreas.map(interest => (
-                    <span key={interest} className="px-2 py-0.5 rounded-lg bg-white border border-slate-200 text-[10px] font-bold text-slate-700 shadow-2xs">
+                    <span key={interest} className="px-2 py-0.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-bold text-slate-700 dark:text-slate-300 shadow-2xs">
                       {interest}
                     </span>
                   ))}
@@ -451,14 +451,14 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
 
           {/* Alerta de Re-capacitación / Debilidades */}
           {hasRetrainingAlert && (
-            <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 space-y-2">
+            <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 space-y-2">
               <div className="flex items-center gap-2">
-                <ShieldAlert className="w-5 h-5 text-rose-600 shrink-0" />
-                <h3 className="text-xs font-black text-rose-900">
+                <ShieldAlert className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
+                <h3 className="text-xs font-black text-rose-900 dark:text-rose-200">
                   Plan de Refuerzo / Re-capacitación Recomendado
                 </h3>
               </div>
-              <p className="text-xs text-rose-800 leading-relaxed">
+              <p className="text-xs text-rose-800 dark:text-rose-300 leading-relaxed">
                 Este colaborador presenta brechas en competencias evaluadas o calificaciones pendientes de refuerzo.
               </p>
               {allSkillGaps.length > 0 && (
@@ -466,9 +466,9 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                   {allSkillGaps.map(skill => (
                     <span 
                       key={skill}
-                      className="px-2.5 py-1 rounded-lg bg-white text-rose-700 border border-rose-200 text-[11px] font-bold flex items-center gap-1 shadow-xs"
+                      className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-[11px] font-bold flex items-center gap-1 shadow-xs"
                     >
-                      <AlertTriangle className="w-3 h-3 text-rose-600" />
+                      <AlertTriangle className="w-3 h-3 text-rose-600 dark:text-rose-400" />
                       <span>{skill}</span>
                     </span>
                   ))}
@@ -480,12 +480,12 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
           {/* Calificaciones y Rendimiento Académico */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                <GraduationCap className="w-3.5 h-3.5 text-indigo-600" />
+              <h3 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <GraduationCap className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                 <span>Libro de Calificaciones & Debilidades ({academicGrades.length})</span>
               </h3>
               {academicGrades.length > 0 && (
-                <span className="text-[10px] text-indigo-700 font-bold bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-200">
+                <span className="text-[10px] text-indigo-700 dark:text-indigo-300 font-bold bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded-lg border border-indigo-200 dark:border-indigo-800">
                   Promedio: {avgScore} pts
                 </span>
               )}
@@ -504,31 +504,31 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                       key={idx}
                       className={`p-4 rounded-2xl border transition-all ${
                         isFailed || g.needsRetraining
-                          ? 'bg-rose-50/50 border-rose-200'
-                          : 'bg-slate-50 border-slate-200'
+                          ? 'bg-rose-50/50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900/50'
+                          : 'bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <span className="text-[10px] text-[#DA291C] font-black">{item.event.category}</span>
-                          <h4 className="text-xs font-bold text-slate-900 line-clamp-1">{item.event.title}</h4>
-                          <p className="text-[11px] text-slate-500 mt-0.5">Instructor: {item.event.instructor}</p>
+                          <span className="text-[10px] text-[#DA291C] dark:text-red-400 font-black">{item.event.category}</span>
+                          <h4 className="text-xs font-bold text-slate-900 dark:text-white line-clamp-1">{item.event.title}</h4>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Instructor: {item.event.instructor}</p>
                         </div>
 
                         <div className="flex items-center gap-2 shrink-0">
                           {g.score !== null && (
                             <span className={`px-2.5 py-1 rounded-xl text-xs font-black ${
-                              isPassed ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                              isPassed ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300' : 'bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300'
                             }`}>
                               {g.score} pts
                             </span>
                           )}
                           <span className={`px-2.5 py-1 rounded-xl text-[10px] font-bold uppercase ${
                             isPassed
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
                               : isFailed
-                              ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                              : 'bg-slate-200 text-slate-700'
+                              ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
+                              : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
                           }`}>
                             {isPassed ? 'Aprobado' : isFailed ? 'Requiere Refuerzo' : 'Pendiente'}
                           </span>
@@ -537,15 +537,15 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
 
                       {/* Debilidades detectadas en este curso */}
                       {hasGaps && (
-                        <div className="mt-2.5 pt-2.5 border-t border-slate-200 space-y-1">
-                          <span className="text-[10px] text-rose-700 font-black uppercase block">
+                        <div className="mt-2.5 pt-2.5 border-t border-slate-200 dark:border-slate-700 space-y-1">
+                          <span className="text-[10px] text-rose-700 dark:text-rose-400 font-black uppercase block">
                             Brechas Técnicas Observadas:
                           </span>
                           <div className="flex flex-wrap gap-1">
                             {(g.detectedSkillGaps || []).map(skill => (
                               <span 
                                 key={skill}
-                                className="px-2 py-0.5 rounded-md bg-white text-rose-700 text-[10px] font-bold border border-rose-200 flex items-center gap-1 shadow-xs"
+                                className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 text-rose-700 dark:text-rose-300 text-[10px] font-bold border border-rose-200 dark:border-rose-800 flex items-center gap-1 shadow-xs"
                               >
                                 <ShieldAlert className="w-2.5 h-2.5" />
                                 <span>{skill}</span>
@@ -557,7 +557,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
 
                       {/* Observaciones del evaluador */}
                       {g.weaknessesNotes && (
-                        <div className="mt-2 p-2.5 bg-white rounded-xl border border-slate-200 text-xs text-slate-700 italic shadow-xs">
+                        <div className="mt-2 p-2.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 italic shadow-xs">
                           "{g.weaknessesNotes}"
                         </div>
                       )}
@@ -566,28 +566,28 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                 })}
               </div>
             ) : (
-              <p className="text-xs text-slate-500 italic p-3 bg-slate-50 rounded-xl border border-slate-200 text-center">
+              <p className="text-xs text-slate-500 dark:text-slate-400 italic p-3 bg-slate-50 dark:bg-slate-850 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
                 Aún no registra evaluaciones con calificación en el sistema.
               </p>
             )}
           </div>
           
           {/* Supervisor Card */}
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 font-bold text-xs">
+              <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900/60 flex items-center justify-center text-amber-700 dark:text-amber-400 font-bold text-xs">
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[11px] font-bold text-slate-500">Supervisor Asignado</p>
-                <p className="text-sm font-black text-slate-900">
+                <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400">Supervisor Asignado</p>
+                <p className="text-sm font-black text-slate-900 dark:text-white">
                   {participant.supervisorName || "Sin supervisor asignado"}
                 </p>
               </div>
             </div>
 
             {participant.supervisorName && (
-              <span className="text-xs px-2.5 py-1 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold shadow-xs">
+              <span className="text-xs px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold shadow-xs">
                 Líder de Área
               </span>
             )}
@@ -596,8 +596,8 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
           {/* Cursos Completados (Asistencia QR) */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <h3 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>Historial de Asistencias Confirmadas ({attendedEvents.length})</span>
               </h3>
             </div>
@@ -607,11 +607,11 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                 {attendedEvents.map((item, idx) => (
                   <div 
                     key={idx} 
-                    className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3"
+                    className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3"
                   >
                     <div className="space-y-1 min-w-0">
-                      <p className="text-xs font-bold text-slate-900 truncate">{item.event.title}</p>
-                      <div className="flex items-center gap-2 text-[11px] text-slate-500 font-medium">
+                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{item.event.title}</p>
+                      <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                         <span>📅 {item.date} • {item.time}</span>
                         <span>• {item.event.modality}</span>
                         <span>• Instructor: {item.event.instructor}</span>
@@ -619,7 +619,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold flex items-center gap-1">
+                      <span className="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[10px] font-bold flex items-center gap-1">
                         <QrCode className="w-3 h-3" />
                         Asistió QR
                       </span>
@@ -628,7 +628,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-slate-500 italic p-3 bg-slate-50 rounded-xl border border-slate-200 text-center">
+              <p className="text-xs text-slate-500 dark:text-slate-400 italic p-3 bg-slate-50 dark:bg-slate-850 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
                 Aún no registra asistencias confirmadas por código QR.
               </p>
             )}
@@ -637,12 +637,12 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
           {/* Capacitaciones Externas Homologadas */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                <GraduationCap className="w-3.5 h-3.5 text-blue-600" />
+              <h3 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <GraduationCap className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                 <span>Capacitaciones Externas Homologadas ({participantExternalTrainings.length})</span>
               </h3>
               {externalHoursTotal > 0 && (
-                <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+                <span className="text-[10px] font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-800">
                   +{externalHoursTotal} hrs acreditadas
                 </span>
               )}
@@ -653,16 +653,16 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                 {participantExternalTrainings.map((ext, idx) => (
                   <div 
                     key={idx} 
-                    className="p-3.5 rounded-2xl bg-blue-50/40 border border-blue-200/80 flex items-center justify-between gap-3"
+                    className="p-3.5 rounded-2xl bg-blue-50/40 dark:bg-blue-950/20 border border-blue-200/80 dark:border-blue-900/40 flex items-center justify-between gap-3"
                   >
                     <div className="space-y-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-blue-100 text-blue-800 border border-blue-200 uppercase tracking-wider">
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800 uppercase tracking-wider">
                           Externa
                         </span>
-                        <p className="text-xs font-bold text-slate-900 truncate">{ext.title}</p>
+                        <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{ext.title}</p>
                       </div>
-                      <div className="flex items-center gap-2 text-[11px] text-slate-600 font-medium flex-wrap">
+                      <div className="flex items-center gap-2 text-[11px] text-slate-600 dark:text-slate-300 font-medium flex-wrap">
                         <span>🏢 {ext.supplier}</span>
                         <span>• 📅 {ext.startDate} → {ext.endDate}</span>
                         <span>• 🌿 {getProgramShortName(ext.programCategory)}</span>
@@ -670,7 +670,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className="px-2.5 py-1 rounded-xl bg-white border border-slate-200 text-slate-900 text-xs font-black shadow-2xs">
+                      <span className="px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-black shadow-2xs">
                         {ext.totalHours} hrs
                       </span>
                       {isSafeHttpUrl(ext.credentialUrl) && (
@@ -678,7 +678,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                           href={ext.credentialUrl!}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 p-1"
+                          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 p-1"
                           title="Ver certificado externo"
                         >
                           <FileText className="w-4 h-4" />
@@ -689,7 +689,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-slate-500 italic p-3 bg-slate-50 rounded-xl border border-slate-200 text-center">
+              <p className="text-xs text-slate-500 dark:text-slate-400 italic p-3 bg-slate-50 dark:bg-slate-850 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
                 No tiene capacitaciones externas registradas aún.
               </p>
             )}
@@ -698,12 +698,12 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
           {/* Capacitaciones Recurrentes (Academia Técnica) */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                <BookOpen className="w-3.5 h-3.5 text-purple-600" />
+              <h3 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <BookOpen className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
                 <span>Capacitaciones Recurrentes • Academia Técnica ({participantTechnicalHistory.length})</span>
               </h3>
               {recurrentHoursTotal > 0 && (
-                <span className="text-[10px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
+                <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded-full border border-purple-200 dark:border-purple-800">
                   +{recurrentHoursTotal} hrs acreditadas
                 </span>
               )}
@@ -717,16 +717,16 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                   return (
                     <div 
                       key={idx} 
-                      className="p-3.5 rounded-2xl bg-purple-50/30 border border-purple-200/70 flex items-center justify-between gap-3"
+                      className="p-3.5 rounded-2xl bg-purple-50/30 dark:bg-purple-950/20 border border-purple-200/70 dark:border-purple-900/40 flex items-center justify-between gap-3"
                     >
                       <div className="space-y-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-purple-100 text-purple-800 border border-purple-200 uppercase tracking-wider">
+                          <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-800 uppercase tracking-wider">
                             Recurrente • Taller
                           </span>
-                          <p className="text-xs font-bold text-slate-900 truncate">{rec.title}</p>
+                          <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{rec.title}</p>
                         </div>
-                        <div className="flex items-center gap-2 text-[11px] text-slate-600 font-medium flex-wrap">
+                        <div className="flex items-center gap-2 text-[11px] text-slate-600 dark:text-slate-300 font-medium flex-wrap">
                           {rec.groupName && <span>👥 {rec.groupName}</span>}
                           <span>• 👨‍🏫 Facilitador: {rec.facilitatorName || 'Facilitador Técnico'}</span>
                           <span>• 📅 {rec.startDate} → {rec.endDate}</span>
@@ -735,19 +735,19 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                       </div>
 
                       <div className="flex items-center gap-2 shrink-0">
-                        <span className="px-2.5 py-1 rounded-xl bg-white border border-slate-200 text-slate-900 text-xs font-black shadow-2xs">
+                        <span className="px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-black shadow-2xs">
                           {rec.hoursEarned || rec.totalHours || 0} hrs
                         </span>
                         {isPassed ? (
-                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
                             <CheckCircle2 className="w-3 h-3" /> Acreditado
                           </span>
                         ) : isInProgress ? (
-                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1">
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 flex items-center gap-1">
                             <Clock className="w-3 h-3" /> En Curso
                           </span>
                         ) : (
-                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1">
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 flex items-center gap-1">
                             <AlertTriangle className="w-3 h-3" /> No Acreditado
                           </span>
                         )}
@@ -757,7 +757,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                 })}
               </div>
             ) : (
-              <p className="text-xs text-slate-500 italic p-3 bg-slate-50 rounded-xl border border-slate-200 text-center">
+              <p className="text-xs text-slate-500 dark:text-slate-400 italic p-3 bg-slate-50 dark:bg-slate-850 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
                 No está enrolado en talleres recurrentes de academia técnica.
               </p>
             )}
@@ -765,8 +765,8 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
 
           {/* Cursos Agendados / Pendientes */}
           <div className="space-y-3">
-            <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-[#DA291C]" />
+            <h3 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
               <span>Capacitaciones Agendadas & Asignadas ({registeredEvents.length})</span>
             </h3>
 
@@ -775,11 +775,11 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                 {registeredEvents.map((item, idx) => (
                   <div 
                     key={idx} 
-                    className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3"
+                    className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3"
                   >
                     <div className="space-y-1 min-w-0">
-                      <p className="text-xs font-bold text-slate-900 truncate">{item.event.title}</p>
-                      <div className="flex items-center gap-2 text-[11px] text-slate-500 font-medium">
+                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{item.event.title}</p>
+                      <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                         <span>📅 {item.date} • {item.time}</span>
                         <span>• {item.event.modality}</span>
                       </div>
@@ -787,11 +787,11 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
 
                     <div className="flex items-center gap-2 shrink-0">
                       {item.isMandatory ? (
-                        <span className="px-2 py-0.5 rounded-md bg-red-50 text-[#DA291C] border border-red-200 text-[10px] font-bold">
+                        <span className="px-2 py-0.5 rounded-md bg-red-50 dark:bg-red-950/60 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-800 text-[10px] font-bold">
                           🔒 Obligatorio
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-bold">
+                        <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-[10px] font-bold">
                           Inscrito
                         </span>
                       )}
@@ -800,7 +800,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-slate-500 italic p-3 bg-slate-50 rounded-xl border border-slate-200 text-center">
+              <p className="text-xs text-slate-500 dark:text-slate-400 italic p-3 bg-slate-50 dark:bg-slate-850 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
                 No tiene capacitaciones agendadas actualmente.
               </p>
             )}
@@ -809,13 +809,13 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between flex-wrap gap-3">
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-2">
             <a
               href={`mailto:${participant.email}?subject=Aprendizaje%20y%20Desarrollo%20-%20Informaci%C3%B3n%20Formativa`}
-              className="px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-slate-300 transition-colors shadow-xs"
+              className="px-3 py-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-slate-300 dark:border-slate-700 transition-colors shadow-xs"
             >
-              <Mail className="w-3.5 h-3.5 text-[#DA291C]" />
+              <Mail className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
               <span>Enviar Correo</span>
             </a>
 
@@ -823,9 +823,9 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
               href={`https://wa.me/?text=${encodeURIComponent("Hola " + participant.name + ", te contactamos desde Aprendizaje y Desarrollo para dar seguimiento a tus capacitaciones institucionales.")}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-emerald-200 transition-colors"
+              className="px-3 py-2 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-emerald-200 dark:border-emerald-800 transition-colors"
             >
-              <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
+              <MessageSquare className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               <span>WhatsApp</span>
             </a>
           </div>
@@ -848,7 +848,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+              className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-colors cursor-pointer"
             >
               Cerrar
             </button>

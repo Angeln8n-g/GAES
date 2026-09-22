@@ -402,34 +402,34 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
   return (
     <div className="space-y-8 pb-16">
       
-      {/* Header Banner (Light Theme) */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      {/* Header Banner */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1 text-xs font-bold text-[#DA291C]">
+          <div className="flex items-center gap-2 mb-1 text-xs font-bold text-[#DA291C] dark:text-red-400">
             <CalendarCheck2 className="w-4 h-4" />
             <span>Panel del Colaborador</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Mis Capacitaciones & Rutas</h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">Mis Capacitaciones & Rutas</h1>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
             Consulta tus horarios agendados, monitorea el cumplimiento de tus cronogramas y genera tus pases de acceso QR.
           </p>
 
           {/* Ficha rápida de perfil formativo */}
           <div className="flex items-center gap-2 mt-2.5 flex-wrap text-xs">
             {currentUser.educationLevel && (
-              <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold border border-slate-200 flex items-center gap-1.5 shadow-2xs">
+              <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold border border-slate-200 dark:border-slate-700 flex items-center gap-1.5 shadow-2xs">
                 <GraduationCap className="w-3.5 h-3.5 text-amber-500" />
                 <span>{currentUser.educationLevel}</span>
               </span>
             )}
             {currentUser.isCurrentlyStudying && (
-              <span className="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-900 font-bold border border-amber-200 flex items-center gap-1.5 shadow-2xs">
+              <span className="px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-800/60 flex items-center gap-1.5 shadow-2xs">
                 <Sparkles className="w-3.5 h-3.5 text-amber-600" />
                 <span>Estudiando: {currentUser.currentStudyField || 'En curso'}</span>
               </span>
             )}
             {currentUser.professionTitle && (
-              <span className="px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-900 font-bold border border-sky-200 flex items-center gap-1.5 shadow-2xs">
+              <span className="px-2.5 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/40 text-sky-900 dark:text-sky-300 font-bold border border-sky-200 dark:border-sky-800/60 flex items-center gap-1.5 shadow-2xs">
                 <span>{currentUser.professionTitle}</span>
               </span>
             )}
@@ -437,7 +437,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
               <button
                 type="button"
                 onClick={onOpenUserProfile}
-                className="text-[#DA291C] hover:underline font-bold text-xs cursor-pointer ml-1 inline-flex items-center gap-1"
+                className="text-[#DA291C] dark:text-red-400 hover:underline font-bold text-xs cursor-pointer ml-1 inline-flex items-center gap-1"
               >
                 <span>Editar Mi Ficha</span>
                 <span className="text-[10px]">→</span>
@@ -471,9 +471,9 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
             </button>
           )}
 
-          <div className="px-5 py-3 rounded-2xl bg-red-50 border border-red-200 text-center sm:text-right">
-            <p className="text-2xl font-black text-[#DA291C]">{userRegistrations.length}</p>
-            <p className="text-[11px] text-slate-600 font-bold">Inscripciones Activas</p>
+          <div className="px-5 py-3 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-center sm:text-right">
+            <p className="text-2xl font-black text-[#DA291C] dark:text-red-400">{userRegistrations.length}</p>
+            <p className="text-[11px] text-slate-600 dark:text-slate-400 font-bold">Inscripciones Activas</p>
           </div>
         </div>
       </div>
@@ -550,14 +550,14 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
       )}
 
       {/* Sub-Tab Navigation Bar & Action CTA */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-2 sm:p-2.5 rounded-3xl border border-slate-200/90 shadow-xs">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-2 sm:p-2.5 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-xs">
         <div className="flex items-center gap-1.5 w-full sm:w-auto">
           <button
             onClick={() => setCurrentSubTab('active')}
             className={`flex-1 sm:flex-initial px-5 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
               currentSubTab === 'active'
                 ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                : 'text-slate-600 hover:text-slate-950 hover:bg-slate-100'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <CalendarIcon className="w-4 h-4" />
@@ -569,7 +569,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
             className={`flex-1 sm:flex-initial px-5 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
               currentSubTab === 'history'
                 ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                : 'text-slate-600 hover:text-slate-950 hover:bg-slate-100'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <FileText className="w-4 h-4" />
@@ -579,8 +579,8 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
 
         {currentSubTab === 'history' ? (
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end text-xs">
-            <span className="text-slate-500 font-medium">
-              Horas Acumuladas: <strong className="text-slate-900 font-black">{historyMetrics.totalHours} hrs</strong>
+            <span className="text-slate-500 dark:text-slate-400 font-medium">
+              Horas Acumuladas: <strong className="text-slate-900 dark:text-white font-black">{historyMetrics.totalHours} hrs</strong>
             </span>
           </div>
         ) : isSuperAdmin ? (
@@ -589,7 +589,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
               setSelectedRecordsForLetter(null);
               setIsFormalLetterModalOpen(true);
             }}
-            className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-red-50 hover:bg-red-100 text-[#DA291C] border border-red-200 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer transition-all"
+            className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/50 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-800/60 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer transition-all"
             title="Ver constancia formal (Exclusivo Super Administrador)"
           >
             <FileText className="w-3.5 h-3.5" />
@@ -625,23 +625,23 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
               return (
                 <div 
                   key={`user-tac-${t.id || t.cohortId}`}
-                  className="bg-white border border-amber-200/90 rounded-3xl p-6 shadow-sm hover:border-amber-400/80 transition-all flex flex-col justify-between group"
+                  className="bg-white dark:bg-slate-900 border border-amber-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:border-amber-400/80 dark:hover:border-slate-700 transition-all flex flex-col justify-between group"
                 >
                   <div>
                     {/* Header Badges */}
                     <div className="flex items-center justify-between gap-2 mb-3">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-50 text-amber-800 border border-amber-300 flex items-center gap-1">
-                        <Sparkles className="w-3 h-3 text-amber-600" />
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60 flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-amber-600 dark:text-amber-400" />
                         {t.category || 'Academia Técnica'}
                       </span>
 
                       {attendedToday ? (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-300 flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                           Asististe Hoy
                         </span>
                       ) : (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 flex items-center gap-1">
                           <Clock className="w-3 h-3 text-amber-500" />
                           En Curso
                         </span>
@@ -649,38 +649,38 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                     </div>
 
                     {/* Título y Grupo */}
-                    <h3 className="text-sm font-black text-slate-900 group-hover:text-[#DA291C] transition-colors line-clamp-2 mb-1">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-[#DA291C] dark:group-hover:text-red-400 transition-colors line-clamp-2 mb-1">
                       {t.title}
                     </h3>
-                    <p className="text-[11px] font-bold text-slate-500 line-clamp-1 mb-3">
-                      Cohorte: <span className="text-slate-800">{t.groupName || 'Cohorte General'}</span>
+                    <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 line-clamp-1 mb-3">
+                      Cohorte: <span className="text-slate-800 dark:text-slate-200">{t.groupName || 'Cohorte General'}</span>
                     </p>
 
                     {/* Info de Facilitador, Fechas, Horario y Aula */}
-                    <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/70 text-xs text-slate-600 space-y-2 mb-4">
+                    <div className="p-3.5 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200/70 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 space-y-2 mb-4">
                       {t.facilitatorName && (
                         <div className="flex items-center justify-between text-[11px]">
-                          <span className="text-slate-500">Facilitador:</span>
-                          <span className="font-bold text-slate-800">{t.facilitatorName}</span>
+                          <span className="text-slate-500 dark:text-slate-400">Facilitador:</span>
+                          <span className="font-bold text-slate-800 dark:text-slate-200">{t.facilitatorName}</span>
                         </div>
                       )}
 
                       <div className="flex items-center justify-between text-[11px]">
-                        <span className="text-slate-500">Fechas:</span>
-                        <span className="font-bold text-slate-800">
+                        <span className="text-slate-500 dark:text-slate-400">Fechas:</span>
+                        <span className="font-bold text-slate-800 dark:text-slate-200">
                           {formatDateShort(t.startDate)} - {formatDateShort(t.endDate)}
                         </span>
                       </div>
 
                       <div className="flex items-center justify-between text-[11px]">
-                        <span className="text-slate-500">Horario:</span>
-                        <span className="font-bold text-slate-800">{t.time}</span>
+                        <span className="text-slate-500 dark:text-slate-400">Horario:</span>
+                        <span className="font-bold text-slate-800 dark:text-slate-200">{t.time}</span>
                       </div>
 
                       {t.location && (
                         <div className="flex items-center justify-between text-[11px]">
-                          <span className="text-slate-500">Ubicación:</span>
-                          <span className="font-bold text-slate-800 truncate max-w-[170px]">{t.location}</span>
+                          <span className="text-slate-500 dark:text-slate-400">Ubicación:</span>
+                          <span className="font-bold text-slate-800 dark:text-slate-200 truncate max-w-[170px]">{t.location}</span>
                         </div>
                       )}
                     </div>
@@ -688,16 +688,16 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                     {/* Progreso de Asistencia Diaria */}
                     <div className="space-y-1.5 mb-4">
                       <div className="flex items-center justify-between text-[11px]">
-                        <span className="font-medium text-slate-500">Asistencia Acumulada:</span>
-                        <span className="font-bold text-slate-900">
+                        <span className="font-medium text-slate-500 dark:text-slate-400">Asistencia Acumulada:</span>
+                        <span className="font-bold text-slate-900 dark:text-white">
                           {attendedDays} de {totalDays} sesiones ({percentage}%)
                         </span>
                       </div>
 
-                      <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200/60">
+                      <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-200/60 dark:border-slate-700">
                         <div 
                           className={`h-2 rounded-full transition-all duration-500 ${
-                            percentage >= 80 ? 'bg-emerald-500' : percentage > 0 ? 'bg-amber-500' : 'bg-slate-300'
+                            percentage >= 80 ? 'bg-emerald-500' : percentage > 0 ? 'bg-amber-500' : 'bg-slate-300 dark:bg-slate-700'
                           }`}
                           style={{ width: `${Math.min(percentage, 100)}%` }}
                         />
@@ -706,17 +706,17 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                   </div>
 
                   {/* Acción de Registro de Asistencia */}
-                  <div className="pt-3 border-t border-slate-100">
+                  <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
                     {attendedToday ? (
                       <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-1.5 text-xs text-emerald-700 font-bold">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <div className="flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-300 font-bold">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                           <span>Asistencia asentada para hoy</span>
                         </div>
                         <button
                           type="button"
                           onClick={() => setSelectedPinTraining(t)}
-                          className="text-xs text-slate-600 hover:text-slate-900 underline font-semibold cursor-pointer min-h-[36px] flex items-center"
+                          className="text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white underline font-semibold cursor-pointer min-h-[36px] flex items-center"
                         >
                           Revalidar (QR / PIN)
                         </button>
@@ -801,43 +801,43 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
               return (
                 <div 
                   key={prog.id}
-                  className="bg-white border border-red-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6"
+                  className="bg-white dark:bg-slate-900 border border-red-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase border ${
                           isCompleted
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
                             : isOverdue
-                            ? 'bg-rose-50 text-rose-700 border-rose-300'
-                            : 'bg-red-50 text-[#DA291C] border-red-200'
+                            ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-800'
+                            : 'bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border-red-200 dark:border-red-900/50'
                         }`}>
                           {isCompleted ? '✓ Cronograma Completado' : isOverdue ? 'Atrasado / Por Vencer' : 'Ruta Activa'}
                         </span>
-                        <span className="text-xs text-slate-500">
-                          Fecha Límite: <strong className="text-slate-800">{formatDateLong(prog.endDate)}</strong>
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                          Fecha Límite: <strong className="text-slate-800 dark:text-slate-200">{formatDateLong(prog.endDate)}</strong>
                         </span>
                       </div>
 
-                      <h2 className="text-xl font-extrabold text-slate-900">{prog.title}</h2>
-                      <p className="text-xs text-slate-600 mt-1 max-w-2xl">{prog.description}</p>
+                      <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">{prog.title}</h2>
+                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 max-w-2xl">{prog.description}</p>
                     </div>
 
                     {/* Progress Percentage Badge */}
-                    <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center p-3 sm:p-0 rounded-2xl bg-slate-50 sm:bg-transparent border sm:border-0 border-slate-200">
+                    <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center p-3 sm:p-0 rounded-2xl bg-slate-50 dark:bg-slate-800/80 sm:bg-transparent dark:sm:bg-transparent border sm:border-0 border-slate-200 dark:border-slate-700">
                       <div className="text-left sm:text-right">
-                        <span className="text-xs text-slate-500 font-bold block">Tu Cumplimiento</span>
-                        <span className="text-2xl font-black text-[#DA291C]">{percentage}%</span>
+                        <span className="text-xs text-slate-500 dark:text-slate-400 font-bold block">Tu Cumplimiento</span>
+                        <span className="text-2xl font-black text-[#DA291C] dark:text-red-400">{percentage}%</span>
                       </div>
-                      <span className="text-[11px] text-slate-500 mt-0.5">
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                         {completedMandatory} de {mandatoryItems.length} obligatorios
                       </span>
                     </div>
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200">
+                  <div className="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700">
                     <div 
                       className={`h-full rounded-full transition-all duration-700 ${
                         isCompleted ? 'bg-emerald-500' : 'bg-[#DA291C]'
@@ -848,7 +848,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
 
                   {/* Courses Checklist */}
                   <div className="space-y-3 pt-2">
-                    <span className="text-xs font-bold text-slate-800 block">
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">
                       Capacitaciones requeridas en este programa:
                     </span>
 
@@ -862,49 +862,49 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                             key={event.id}
                             className={`p-4 rounded-2xl border transition-all flex flex-col justify-between ${
                               hasAttended 
-                                ? 'bg-emerald-50/60 border-emerald-200' 
+                                ? 'bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/60' 
                                 : isRegistered 
-                                ? 'bg-red-50/40 border-red-200' 
-                                : 'bg-slate-50 border-slate-200 hover:border-slate-300'
+                                ? 'bg-red-50/40 dark:bg-red-950/30 border-red-200 dark:border-red-900/50' 
+                                : 'bg-slate-50 dark:bg-slate-850 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
                             }`}
                           >
                             <div>
                               <div className="flex items-center justify-between gap-2 mb-2">
                                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                                   isMandatory 
-                                    ? 'bg-amber-100 text-amber-800 border border-amber-300' 
-                                    : 'bg-slate-200 text-slate-700'
+                                    ? 'bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60' 
+                                    : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
                                 }`}>
                                   {isMandatory ? '★ Obligatorio' : 'Opcional'}
                                 </span>
 
                                 {hasAttended ? (
-                                  <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1">
+                                  <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
                                     <CheckCircle2 className="w-3.5 h-3.5" /> Completado
                                   </span>
                                 ) : isRegistered ? (
-                                  <span className="text-[11px] font-bold text-[#DA291C] flex items-center gap-1">
+                                  <span className="text-[11px] font-bold text-[#DA291C] dark:text-red-400 flex items-center gap-1">
                                     <Clock className="w-3.5 h-3.5" /> Agendado
                                   </span>
                                 ) : (
-                                  <span className="text-[11px] font-semibold text-slate-500">
+                                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
                                     Pendiente
                                   </span>
                                 )}
                               </div>
 
-                              <h4 className="text-xs font-bold text-slate-900 line-clamp-2 mb-1">
+                              <h4 className="text-xs font-bold text-slate-900 dark:text-white line-clamp-2 mb-1">
                                 {event.title}
                               </h4>
-                              <p className="text-[11px] text-slate-500 line-clamp-1 mb-2">
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 mb-2">
                                 Facilitador: {event.instructor}
                               </p>
                             </div>
 
                             {/* Action / Schedule Info */}
-                            <div className="pt-2 border-t border-slate-200/80 mt-2 text-xs">
+                            <div className="pt-2 border-t border-slate-200/80 dark:border-slate-700 mt-2 text-xs">
                               {isRegistered ? (
-                                <div className="text-[11px] text-slate-600 space-y-0.5">
+                                <div className="text-[11px] text-slate-600 dark:text-slate-400 space-y-0.5">
                                   <p>📅 {registeredDate}</p>
                                   <p>⏰ {registeredTime}</p>
                                 </div>
@@ -933,7 +933,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
       {/* SECCIÓN: MIS INSCRIPCIONES INDIVIDUALES */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-extrabold text-slate-900 uppercase tracking-wider">
+          <h2 className="text-base font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">
             Sesiones Agendadas ({userRegistrations.length})
           </h2>
         </div>
@@ -946,42 +946,42 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
               return (
                 <div 
                   key={`${event.id}-${schedule.date}-${slot.time}-${idx}`}
-                  className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:border-slate-300 transition-all flex flex-col justify-between"
+                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between"
                 >
                   <div>
                     
                     {/* Status Badges Header */}
                     <div className="flex items-center justify-between gap-2 mb-4 flex-wrap">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-[#DA291C] border border-red-200">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-900/50">
                           {event.category}
                         </span>
 
                         {item.isMandatory ? (
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-100 text-red-800 border border-red-300 flex items-center gap-1">
-                            <Lock className="w-3 h-3 text-red-600" />
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-100 dark:bg-red-950/50 text-red-800 dark:text-red-300 border border-red-300 dark:border-red-800/60 flex items-center gap-1">
+                            <Lock className="w-3 h-3 text-red-600 dark:text-red-400" />
                             ★ Obligatorio
                           </span>
                         ) : item.assignedBy ? (
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-50 text-cyan-800 border border-cyan-300 flex items-center gap-1">
-                            <ShieldCheck className="w-3 h-3 text-cyan-600" />
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-50 dark:bg-cyan-950/40 text-cyan-800 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-800/60 flex items-center gap-1">
+                            <ShieldCheck className="w-3 h-3 text-cyan-600 dark:text-cyan-400" />
                             Sugerido
                           </span>
                         ) : null}
                       </div>
 
                       {hasAttended ? (
-                        <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 flex items-center gap-1.5">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                           ✓ Asistencia Completa
                         </span>
                       ) : item.isCheckedIn ? (
-                        <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-300 flex items-center gap-1.5 animate-pulse">
-                          <Clock className="w-3.5 h-3.5 text-amber-600" />
+                        <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-800 flex items-center gap-1.5 animate-pulse">
+                          <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                           🟢 En Curso (Entrada)
                         </span>
                       ) : (
-                        <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1.5">
+                        <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60 flex items-center gap-1.5">
                           <Clock className="w-3.5 h-3.5" />
                           Agendado
                         </span>
@@ -989,13 +989,13 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                     </div>
 
                     {/* Title & Instructor */}
-                    <h3 className="text-base font-extrabold text-slate-900 mb-2 line-clamp-2">{event.title}</h3>
+                    <h3 className="text-base font-extrabold text-slate-900 dark:text-white mb-2 line-clamp-2">{event.title}</h3>
                     
                     {/* Supervisor assignment details note */}
                     {item.assignedBy && (
-                      <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl text-xs space-y-1 mb-4 text-amber-900">
+                      <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-2xl text-xs space-y-1 mb-4 text-amber-900 dark:text-amber-200">
                         <div className="flex items-center gap-1.5 font-bold">
-                          <User className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                          <User className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0" />
                           <span>Asignado por: {item.assignedBy}</span>
                         </div>
                         {item.assignmentNotes && (
@@ -1004,22 +1004,22 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                       </div>
                     )}
 
-                    <div className="space-y-1.5 mb-5 text-xs text-slate-600 font-medium">
+                    <div className="space-y-1.5 mb-5 text-xs text-slate-600 dark:text-slate-400 font-medium">
                       <div className="flex items-center gap-2">
-                        <User className="w-3.5 h-3.5 text-[#DA291C] shrink-0" />
-                        <span>Facilitador: <strong className="text-slate-800">{event.instructor}</strong></span>
+                        <User className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400 shrink-0" />
+                        <span>Facilitador: <strong className="text-slate-800 dark:text-slate-200">{event.instructor}</strong></span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <CalendarIcon className="w-3.5 h-3.5 text-[#DA291C] shrink-0" />
+                        <CalendarIcon className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400 shrink-0" />
                         <span>{formatDateLong(schedule.date)}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Clock className="w-3.5 h-3.5 text-[#DA291C] shrink-0" />
-                        <span>Horario: <strong className="text-slate-800">{slot.time}{slot.endTime ? ` - ${slot.endTime}` : ''}</strong></span>
+                        <Clock className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400 shrink-0" />
+                        <span>Horario: <strong className="text-slate-800 dark:text-slate-200">{slot.time}{slot.endTime ? ` - ${slot.endTime}` : ''}</strong></span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                        <span>Duración: <strong className="text-amber-900 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">{getEventDurationMetrics(event).totalHours} hrs lectivas ({getEventDurationMetrics(event).totalDays} {getEventDurationMetrics(event).totalDays === 1 ? 'día' : 'días'})</strong></span>
+                        <span>Duración: <strong className="text-amber-900 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md border border-amber-200 dark:border-amber-800/60">{getEventDurationMetrics(event).totalHours} hrs lectivas ({getEventDurationMetrics(event).totalDays} {getEventDurationMetrics(event).totalDays === 1 ? 'día' : 'días'})</strong></span>
                       </div>
                       <div className="flex items-center gap-2">
                         {event.modality === 'Virtual' ? (
@@ -1034,16 +1034,16 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                   </div>
 
                   {/* Card Actions Footer */}
-                  <div className="pt-4 border-t border-slate-100 space-y-3">
+                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
                     
                     {/* Calendar Quick Sync */}
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => downloadIcsFile(event, schedule.date, slot.time)}
                         title="Descargar archivo de calendario .ics"
-                        className="flex-1 py-2 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center justify-center gap-1.5 border border-slate-200 transition-colors"
+                        className="flex-1 py-2 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 border border-slate-200 dark:border-slate-700 transition-colors"
                       >
-                        <Download className="w-3.5 h-3.5 text-[#DA291C]" />
+                        <Download className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
                         Descargar .ICS
                       </button>
                       <a
@@ -1051,7 +1051,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                         target="_blank"
                         rel="noreferrer"
                         title="Abrir en Google Calendar"
-                        className="py-2 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-[#DA291C] text-xs font-bold flex items-center justify-center gap-1.5 border border-red-200 transition-colors"
+                        className="py-2 px-3 rounded-xl bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/50 text-[#DA291C] dark:text-red-400 text-xs font-bold flex items-center justify-center gap-1.5 border border-red-200 dark:border-red-800/60 transition-colors"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         Google
@@ -1070,16 +1070,16 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
 
                       {item.isMandatory ? (
                         <div 
-                          className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-50 border border-red-200 text-red-700 text-xs font-bold select-none cursor-help"
+                          className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-400 text-xs font-bold select-none cursor-help"
                           title="Esta capacitación fue asignada obligatoriamente por tu supervisor y no puede ser cancelada."
                         >
-                          <Lock className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                          <Lock className="w-3.5 h-3.5 text-red-600 dark:text-red-400 shrink-0" />
                           <span>Obligatorio</span>
                         </div>
                       ) : !hasAttended && !item.isCheckedIn ? (
                         <button
                           onClick={() => setCancelingItem(item)}
-                          className="p-2 rounded-xl text-rose-600 hover:text-rose-800 hover:bg-rose-50 transition-colors"
+                          className="p-2 rounded-xl text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
                           title="Cancelar inscripción y liberar cupo"
                           aria-label={`Cancelar inscripción en ${event.title}`}
                         >
@@ -1101,10 +1101,10 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => onOpenTecEvaluation(event)}
-                                  className="w-full py-2 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-900 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                                  className="w-full py-2 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 border border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                                   title="Encuesta completada (1 sola respuesta permitida). Haz clic para consultar tus calificaciones."
                                 >
-                                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                                   <span>✓ Encuesta Completada ({userFeedback.rating}★) - Ver Respuestas</span>
                                 </button>
                               ) : (
@@ -1122,7 +1122,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                         })()
                       ) : item.isCheckedIn ? (
                         <div className="pt-2">
-                          <div className="w-full py-2 px-3 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs font-semibold flex items-center gap-2">
+                          <div className="w-full py-2 px-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs font-semibold flex items-center gap-2">
                             <Clock className="w-4 h-4 text-amber-600 shrink-0" />
                             <span>⏳ Entrada registrada. Registra tu salida para habilitar la evaluación TEC.</span>
                           </div>
@@ -1138,12 +1138,12 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
           </div>
         ) : (
           /* Empty State */
-          <div className="bg-white border border-slate-200 rounded-3xl p-16 text-center shadow-sm">
-            <div className="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-16 text-center shadow-sm">
+            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-4">
               <CalendarCheck2 className="w-8 h-8" />
             </div>
-            <h3 className="text-lg font-bold text-slate-800">No tienes capacitaciones agendadas</h3>
-            <p className="text-xs text-slate-500 max-w-md mx-auto mt-1 mb-6 leading-relaxed">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white">No tienes capacitaciones agendadas</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1 mb-6 leading-relaxed">
               Aún no te has inscrito a ningún taller o webinar. Explora nuestro catálogo y asegura tu lugar en las sesiones disponibles.
             </p>
             <button
@@ -1166,51 +1166,51 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
           
           {/* 1. KPIs del Histórico */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs hover:shadow-md transition-all flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-red-50 text-[#DA291C] border border-red-100 flex items-center justify-center shadow-2xs">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 shadow-xs hover:shadow-md transition-all flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-950/40 text-[#DA291C] border border-red-100 dark:border-red-900/50 flex items-center justify-center shadow-2xs">
                 <GraduationCap className="w-6 h-6" />
               </div>
               <div>
-                <div className="text-2xl font-black text-slate-900 tracking-tight">{historyMetrics.totalCount}</div>
-                <p className="text-xs font-semibold text-slate-500">Capacitaciones Totales</p>
+                <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{historyMetrics.totalCount}</div>
+                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Capacitaciones Totales</p>
               </div>
             </div>
 
-            <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs hover:shadow-md transition-all flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center shadow-2xs">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 shadow-xs hover:shadow-md transition-all flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-900/50 flex items-center justify-center shadow-2xs">
                 <Clock className="w-6 h-6" />
               </div>
               <div>
-                <div className="text-2xl font-black text-slate-900 tracking-tight">
-                  {historyMetrics.totalHours} <span className="text-xs font-bold text-slate-500">hrs</span>
+                <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                  {historyMetrics.totalHours} <span className="text-xs font-bold text-slate-500 dark:text-slate-400">hrs</span>
                 </div>
-                <p className="text-xs font-semibold text-slate-500">Horas Acumuladas</p>
+                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Horas Acumuladas</p>
               </div>
             </div>
 
-            <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs hover:shadow-md transition-all flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shadow-2xs">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 shadow-xs hover:shadow-md transition-all flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/50 flex items-center justify-center shadow-2xs">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
               <div>
-                <div className="text-2xl font-black text-slate-900 tracking-tight">{historyMetrics.attendedCount}</div>
-                <p className="text-xs font-semibold text-slate-500">Sesiones Asistidas</p>
+                <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{historyMetrics.attendedCount}</div>
+                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Sesiones Asistidas</p>
               </div>
             </div>
 
-            <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs hover:shadow-md transition-all flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 border border-sky-100 flex items-center justify-center shadow-2xs">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 shadow-xs hover:shadow-md transition-all flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-900/50 flex items-center justify-center shadow-2xs">
                 <TrendingUp className="w-6 h-6" />
               </div>
               <div>
-                <div className="text-2xl font-black text-slate-900 tracking-tight">{historyMetrics.rate}%</div>
-                <p className="text-xs font-semibold text-slate-500">Tasa de Asistencia</p>
+                <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{historyMetrics.rate}%</div>
+                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Tasa de Asistencia</p>
               </div>
             </div>
           </div>
 
           {/* 2. Barra de Búsqueda y Filtros Rápidos */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 rounded-3xl border border-slate-200/90 shadow-xs">
+          <div className="flex flex-col sm:row items-start sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-xs">
             <div className="relative w-full sm:w-80">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                 <Search className="w-4 h-4 text-slate-400" />
@@ -1222,13 +1222,13 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                 onChange={(e) => setHistorySearchQuery(e.target.value)}
                 placeholder="Buscar por curso, facilitador o categoría..."
                 aria-label="Buscar por curso, facilitador o categoría en el historial"
-                className="w-full pl-10 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                className="w-full pl-10 pr-8 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-medium text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
               />
               {historySearchQuery && (
                 <button
                   onClick={() => setHistorySearchQuery('')}
                   aria-label="Limpiar búsqueda en el historial"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-700 cursor-pointer"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" aria-hidden="true" />
                 </button>
@@ -1241,7 +1241,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                   historyStatusFilter === 'all'
                     ? 'bg-[#DA291C] text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
                 Todos ({historyMetrics.totalCount})
@@ -1251,7 +1251,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1 ${
                   historyStatusFilter === 'attended'
                     ? 'bg-emerald-600 text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
                 <CheckCircle2 className="w-3 h-3" />
@@ -1262,7 +1262,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1 ${
                   historyStatusFilter === 'upcoming'
                     ? 'bg-blue-600 text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
                 <Clock className="w-3 h-3" />
@@ -1273,7 +1273,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1 ${
                   historyStatusFilter === 'missed'
                     ? 'bg-amber-600 text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
                 <AlertTriangle className="w-3 h-3" />
@@ -1284,18 +1284,18 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
 
           {/* 3. Tabla / Listado de Registros del Histórico */}
           {filteredHistoryRecords.length > 0 ? (
-            <div className="bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-xs">
-              <div className="table-scroll-hint">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl overflow-hidden shadow-xs">
+              <div className="table-scroll-hint dark:border-slate-800 dark:text-slate-400">
                 <span className="flex items-center gap-1.5">
                   <ArrowRightLeft className="w-3.5 h-3.5 text-[#DA291C]" />
                   Desliza horizontalmente para consultar fecha, facilitador y estado
                 </span>
-                <span className="font-mono text-slate-400">7 columnas</span>
+                <span className="font-mono text-slate-400 dark:text-slate-500">7 columnas</span>
               </div>
               <div className="table-responsive-container">
                 <table className="w-full text-left border-collapse text-xs min-w-[780px]">
                   <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase text-[10px] tracking-wider">
+                    <tr className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-wider">
                       <th className="py-3.5 px-4">Capacitación</th>
                       <th className="py-3.5 px-4">Modalidad</th>
                       <th className="py-3.5 px-4">Fecha & Hora</th>
@@ -1305,42 +1305,42 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                       {isSuperAdmin && <th className="py-3.5 px-4 text-right">Constancia</th>}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {filteredHistoryRecords.map((rec) => {
                       const isPast = rec.date < todayStr;
                       return (
-                        <tr key={rec.id} className="hover:bg-slate-50/75 transition-colors">
-                          <td className="py-4 px-4 font-bold text-slate-900 max-w-xs">
+                        <tr key={rec.id} className="hover:bg-slate-50/75 dark:hover:bg-slate-800/50 transition-colors">
+                          <td className="py-4 px-4 font-bold text-slate-900 dark:text-white max-w-xs">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
                               {rec.isExternal && (
-                                <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-wider">
+                                <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 uppercase tracking-wider">
                                   Externa
                                 </span>
                               )}
                               {rec.isRecurrent && (
-                                <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-purple-50 text-purple-700 border border-purple-200 uppercase tracking-wider">
+                                <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800 uppercase tracking-wider">
                                   Recurrente • Academia
                                 </span>
                               )}
-                              <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-red-50 text-[#DA291C] border border-red-200">
+                              <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-red-50 dark:bg-red-950/40 text-[#DA291C] border border-red-200 dark:border-red-900/50">
                                 {rec.category}
                               </span>
                               {rec.gradeScore !== null && rec.gradeScore !== undefined && (
                                 <span className={`px-2 py-0.5 rounded-full text-[9px] font-black ${
-                                  rec.gradeScore >= 70 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'
+                                  rec.gradeScore >= 70 ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800'
                                 }`}>
                                   Nota: {rec.gradeScore} pts
                                 </span>
                               )}
                             </div>
                             <div className="flex items-center justify-between gap-1">
-                              <p className="line-clamp-1 text-slate-900 font-extrabold text-xs">{rec.title}</p>
+                              <p className="line-clamp-1 text-slate-900 dark:text-white font-extrabold text-xs">{rec.title}</p>
                               {isSafeHttpUrl(rec.credentialUrl) && (
                                 <a
                                   href={rec.credentialUrl!}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-blue-600 hover:text-blue-800 text-[10px] font-bold shrink-0 inline-flex items-center gap-0.5"
+                                  className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-[10px] font-bold shrink-0 inline-flex items-center gap-0.5"
                                   title="Ver certificado oficial externo"
                                 >
                                   <ExternalLink className="w-3 h-3" /> Certificado
@@ -1348,44 +1348,44 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                               )}
                             </div>
                           </td>
-                          <td className="py-4 px-4 text-slate-600">
-                            <span className="font-semibold block text-slate-800">{rec.modality}</span>
+                          <td className="py-4 px-4 text-slate-600 dark:text-slate-300">
+                            <span className="font-semibold block text-slate-800 dark:text-slate-200">{rec.modality}</span>
                           </td>
-                          <td className="py-4 px-4 text-slate-600 whitespace-nowrap">
-                            <span className="font-bold text-slate-900 block">{formatDateShort(rec.date)}</span>
-                            <span className="text-[11px] text-slate-500 font-medium">{rec.time}</span>
+                          <td className="py-4 px-4 text-slate-600 dark:text-slate-300 whitespace-nowrap">
+                            <span className="font-bold text-slate-900 dark:text-white block">{formatDateShort(rec.date)}</span>
+                            <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{rec.time}</span>
                           </td>
-                          <td className="py-4 px-4 text-slate-700">
+                          <td className="py-4 px-4 text-slate-700 dark:text-slate-300">
                             <span className="font-medium line-clamp-1">{rec.instructor}</span>
                           </td>
-                          <td className="py-4 px-3 text-center font-black text-slate-900">
+                          <td className="py-4 px-3 text-center font-black text-slate-900 dark:text-white">
                             {rec.hours} hrs
                           </td>
                           <td className="py-4 px-4 text-center whitespace-nowrap">
                             {rec.isRecurrent ? (
                               rec.academicStatus === 'passed' ? (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-850">
                                   <CheckCircle2 className="w-3.5 h-3.5" /> Acreditado ({rec.attendancePercentage || 0}%)
                                 </span>
                               ) : rec.academicStatus === 'in_progress' ? (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
                                   <Clock className="w-3.5 h-3.5" /> En Curso ({rec.attendancePercentage || 0}%)
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
                                   <AlertTriangle className="w-3.5 h-3.5" /> No Acreditado ({rec.attendancePercentage || 0}%)
                                 </span>
                               )
                             ) : rec.hasAttended ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800">
                                 <CheckCircle2 className="w-3.5 h-3.5" /> Asistió
                               </span>
                             ) : !isPast ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
                                 <Clock className="w-3.5 h-3.5" /> Agendado
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
                                 <AlertTriangle className="w-3.5 h-3.5" /> No Asistió
                               </span>
                             )}
@@ -1397,7 +1397,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                                   setSelectedRecordsForLetter([rec]);
                                   setIsFormalLetterModalOpen(true);
                                 }}
-                                className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold transition-all cursor-pointer inline-flex items-center gap-1.5"
+                                className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-[11px] font-bold transition-all cursor-pointer inline-flex items-center gap-1.5"
                                 title="Elaborar constancia formal para esta capacitación (Exclusivo Super Administrador)"
                               >
                                 <FileText className="w-3.5 h-3.5 text-[#DA291C]" />
@@ -1413,12 +1413,12 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
               </div>
             </div>
           ) : (
-            <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center shadow-xs">
-              <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center shadow-xs">
+              <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center mx-auto mb-3">
                 <FileText className="w-6 h-6" />
               </div>
-              <h3 className="text-sm font-bold text-slate-800">No se encontraron capacitaciones en el historial</h3>
-              <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">No se encontraron capacitaciones en el historial</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
                 No hay registros que coincidan con el filtro seleccionado o los términos de búsqueda.
               </p>
               <button
@@ -1426,7 +1426,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                   setHistoryStatusFilter('all');
                   setHistorySearchQuery('');
                 }}
-                className="mt-4 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all cursor-pointer"
+                className="mt-4 px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition-all cursor-pointer"
               >
                 Limpiar Filtros
               </button>
@@ -1439,18 +1439,18 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
       {/* Cancel Confirmation Modal */}
       {cancelingItem && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/70 backdrop-blur-sm animate-in fade-in duration-200"
           role="alertdialog"
           aria-modal="true"
           aria-labelledby="cancel-reservation-title"
         >
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto border border-rose-200">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto border border-rose-200 dark:border-rose-900/50">
               <AlertTriangle className="w-6 h-6" aria-hidden="true" />
             </div>
             <div className="text-center">
-              <h2 id="cancel-reservation-title" className="text-base font-extrabold text-slate-900">¿Cancelar tu inscripción?</h2>
-              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+              <h2 id="cancel-reservation-title" className="text-base font-extrabold text-slate-900 dark:text-white">¿Cancelar tu inscripción?</h2>
+              <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
                 Al cancelar, liberarás tu cupo en <strong>{cancelingItem.event.title}</strong> ({cancelingItem.schedule.date} a las {cancelingItem.slot.time}) para que otro colaborador pueda registrarse.
               </p>
             </div>
@@ -1458,7 +1458,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
               <button
                 type="button"
                 onClick={() => setCancelingItem(null)}
-                className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors"
+                className="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors"
               >
                 Volver
               </button>
@@ -1478,18 +1478,18 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
       {/* QR Pass Modal */}
       {selectedPassItem && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/70 backdrop-blur-sm animate-in fade-in duration-200"
           role="dialog"
           aria-modal="true"
           aria-labelledby="qr-pass-title"
         >
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
               <h2 id="qr-pass-title" className="text-xs font-extrabold text-[#DA291C] uppercase tracking-wider">Pase Digital de Asistencia</h2>
               <button 
                 type="button"
                 onClick={() => setSelectedPassItem(null)} 
-                className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-claro"
+                className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-claro"
                 aria-label="Cerrar pase digital de asistencia"
               >
                 <X className="w-5 h-5" />
@@ -1506,16 +1506,16 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
             </div>
 
             <div>
-              <h3 className="text-sm font-bold text-slate-900 line-clamp-1">{selectedPassItem.event.title}</h3>
-              <p className="text-xs text-slate-500 mt-0.5">{selectedPassItem.schedule.date} • {selectedPassItem.slot.time}{selectedPassItem.slot.endTime ? ` - ${selectedPassItem.slot.endTime}` : ''}</p>
-              <div className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-bold text-amber-900 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200">
-                <Clock className="w-3 h-3 text-amber-600" />
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">{selectedPassItem.event.title}</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{selectedPassItem.schedule.date} • {selectedPassItem.slot.time}{selectedPassItem.slot.endTime ? ` - ${selectedPassItem.slot.endTime}` : ''}</p>
+              <div className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-bold text-amber-900 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-lg border border-amber-200 dark:border-amber-800">
+                <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" />
                 <span>{getEventDurationMetrics(selectedPassItem.event).totalHours} hrs lectivas ({getEventDurationMetrics(selectedPassItem.event).totalDays} {getEventDurationMetrics(selectedPassItem.event).totalDays === 1 ? 'día' : 'días'})</span>
               </div>
-              <p className="text-[11px] font-bold text-slate-800 mt-1.5">{currentUser.name} ({currentUser.email})</p>
+              <p className="text-[11px] font-bold text-slate-800 dark:text-slate-200 mt-1.5">{currentUser.name} ({currentUser.email})</p>
             </div>
 
-            <p className="text-[10px] text-slate-500">
+            <p className="text-[10px] text-slate-500 dark:text-slate-400">
               Presenta este código QR al instructor en la entrada para registrar tu asistencia.
             </p>
 

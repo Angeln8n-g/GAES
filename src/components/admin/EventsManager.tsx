@@ -99,7 +99,7 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar por título, instructor o categoría..."
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-2xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] shadow-xs"
+              className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] shadow-xs"
             />
           </div>
 
@@ -109,7 +109,7 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
               aria-label="Filtrar por Empresa"
               value={selectedCompanyFilter}
               onChange={(e) => setSelectedCompanyFilter(e.target.value)}
-              className="px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs text-slate-800 font-bold focus:outline-none focus:border-[#DA291C]"
+              className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs text-slate-800 dark:text-slate-200 font-bold focus:outline-none focus:border-[#DA291C]"
             >
               <option value="all">🏢 Todas las Empresas</option>
               {companies.map(c => (
@@ -123,7 +123,7 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
           {isSuperAdmin && onOpenBulkEnrollment && (
             <button
               onClick={() => onOpenBulkEnrollment()}
-              className="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 text-xs font-bold rounded-2xl flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
+              className="px-3.5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-2xl flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
             >
               <UserPlus className="w-4 h-4 text-[#DA291C]" />
               <span>Matriculación Masiva</span>
@@ -142,14 +142,14 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
 
       {/* Events Table / Cards */}
       {filteredEvents.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center shadow-sm">
-          <div className="w-12 h-12 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center mx-auto text-[#DA291C] mb-3">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center shadow-sm">
+          <div className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 flex items-center justify-center mx-auto text-[#DA291C] mb-3">
             <BookOpen className="w-6 h-6" />
           </div>
-          <h3 className="text-base font-black text-slate-900">
+          <h3 className="text-base font-black text-slate-900 dark:text-white">
             {searchQuery ? 'No se encontraron capacitaciones' : 'No hay capacitaciones creadas'}
           </h3>
-          <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1">
             {searchQuery 
               ? `No hay resultados para "${searchQuery}". Intenta ajustar el término de búsqueda o el filtro de empresa.` 
               : 'Comienza creando la primera capacitación institucional con sus fechas, horarios y cupos disponibles.'}
@@ -159,7 +159,7 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer"
+                className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl transition-colors cursor-pointer"
               >
                 Limpiar Búsqueda
               </button>
@@ -193,7 +193,7 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
             return (
               <div
                 key={event.id}
-                className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm hover:border-slate-300 hover:shadow transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-6"
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 hover:shadow transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-6"
               >
                 
                 {/* Event Info */}
@@ -203,69 +203,69 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
                     alt={event.title}
                     loading="lazy"
                     decoding="async"
-                    className="w-20 h-20 rounded-2xl object-cover shrink-0 border border-slate-200 hidden sm:block shadow-xs"
+                    className="w-20 h-20 rounded-2xl object-cover shrink-0 border border-slate-200 dark:border-slate-800 hidden sm:block shadow-xs"
                   />
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-50 text-[#DA291C] border border-red-200">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-50 dark:bg-red-950/40 text-[#DA291C] border border-red-200 dark:border-red-900/50">
                         {event.category}
                       </span>
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 ${
-                        event.modality === 'Virtual' ? 'bg-cyan-50 text-cyan-700 border border-cyan-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        event.modality === 'Virtual' ? 'bg-cyan-50 dark:bg-cyan-950/40 text-cyan-700 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800' : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
                       }`}>
                         {event.modality === 'Virtual' ? <Video className="w-2.5 h-2.5" /> : <MapPin className="w-2.5 h-2.5" />}
                         {event.modality}
                       </span>
                       {event.companyId === 'all' || !event.companyId ? (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1">
-                          <Building2 className="w-3 h-3 text-indigo-600" />
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 flex items-center gap-1">
+                          <Building2 className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
                           Todas las Empresas
                         </span>
                       ) : comp ? (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center gap-1">
                           <Building2 className="w-3 h-3 text-[#DA291C]" />
                           {comp.name}
                         </span>
                       ) : null}
                       {event.ojtEvaluatorName && (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1" title="Tutor / Evaluador Asignado">
-                          <UserCheck className="w-3 h-3 text-indigo-600" />
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 flex items-center gap-1" title="Tutor / Evaluador Asignado">
+                          <UserCheck className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
                           <span>Tutor: {event.ojtEvaluatorName}</span>
                         </span>
                       )}
                     </div>
 
-                    <h3 className="text-sm font-bold text-slate-900 leading-snug">{event.title}</h3>
-                    <p className="text-xs text-slate-500">Facilitador: <strong className="text-slate-700">{event.instructor}</strong></p>
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-snug">{event.title}</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Facilitador: <strong className="text-slate-700 dark:text-slate-300">{event.instructor}</strong></p>
 
-                    <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 pt-1 font-medium">
+                    <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400 pt-1 font-medium">
                       <span className="flex items-center gap-1">
                         <CalendarIcon className="w-3.5 h-3.5 text-[#DA291C]" />
                         {event.schedule.length} fecha(s)
                       </span>
                       <span>•</span>
-                      <span className="text-cyan-700 font-bold">{totalReg} / {totalCap} inscritos</span>
+                      <span className="text-cyan-700 dark:text-cyan-400 font-bold">{totalReg} / {totalCap} inscritos</span>
                       <span>•</span>
-                      <span className="text-emerald-700 font-bold">{totalAtt} confirmados</span>
+                      <span className="text-emerald-700 dark:text-emerald-400 font-bold">{totalAtt} confirmados</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Action Buttons Toolbar */}
-                <div className="flex flex-wrap items-center gap-2 border-t lg:border-t-0 pt-4 lg:pt-0 border-slate-100">
+                <div className="flex flex-wrap items-center gap-2 border-t lg:border-t-0 pt-4 lg:pt-0 border-slate-100 dark:border-slate-800">
                   <button
                     onClick={() => exportSessionGradesForOjtAndCalibration(event, participants, companies)}
                     title="Exportar calificaciones e insumos para Bitácoras de Campo, Mesas de Calibración y Estadísticas en Excel"
-                    className="px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-indigo-700 text-xs font-bold flex items-center gap-1.5 border border-slate-200 hover:border-indigo-200 transition-colors cursor-pointer shadow-xs"
+                    className="px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-indigo-700 dark:text-indigo-400 text-xs font-bold flex items-center gap-1.5 border border-slate-200 dark:border-slate-700 hover:border-indigo-200 dark:hover:border-indigo-700 transition-colors cursor-pointer shadow-xs"
                   >
-                    <FileSpreadsheet className="w-3.5 h-3.5 text-indigo-600" />
+                    <FileSpreadsheet className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                     <span className="hidden sm:inline">Exportar Bitácoras & Calibración</span>
                   </button>
 
                   <button
                     onClick={() => onOpenAttendeesModal(event)}
                     title="Ver Asistentes"
-                    className="px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1.5 border border-slate-200 transition-colors cursor-pointer"
+                    className="px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
                   >
                     <Users className="w-3.5 h-3.5 text-[#DA291C]" />
                     <span>Asistentes ({totalReg})</span>
@@ -275,7 +275,7 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
                     <button
                       onClick={() => onMakeRecurrent(event)}
                       title="Volver Recurrente / Programar en Academia Técnica"
-                      className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                      className="px-3 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-bold flex items-center gap-1.5 border border-slate-800 dark:border-slate-700 transition-colors cursor-pointer shadow-xs"
                     >
                       <RotateCw className="w-3.5 h-3.5 text-amber-400" />
                       <span className="hidden sm:inline">Volver Recurrente</span>
@@ -287,7 +287,7 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
                   onClick={() => onOpenNotificationModal(event)}
                   aria-label={`Enviar recordatorio para ${event.title}`}
                   title="Enviar Recordatorio"
-                  className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-cyan-700 border border-slate-200 transition-colors cursor-pointer"
+                  className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-cyan-700 dark:text-cyan-400 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
                 >
                   <Bell className="w-4 h-4" />
                 </button>
@@ -297,7 +297,7 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
                   onClick={() => onOpenQrModal(event)}
                   aria-label={`Generar e imprimir QR para ${event.title}`}
                   title="Generar e Imprimir QR"
-                  className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-blue-700 border border-slate-200 transition-colors cursor-pointer"
+                  className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-blue-700 dark:text-blue-400 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
                 >
                   <QrCode className="w-4 h-4" />
                 </button>
@@ -307,7 +307,7 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
                   onClick={() => onOpenEditModal(event)}
                   aria-label={`Editar capacitación: ${event.title}`}
                   title="Editar Capacitación"
-                  className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-amber-700 border border-slate-200 transition-colors cursor-pointer"
+                  className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-amber-700 dark:text-amber-400 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
                 >
                   <Edit3 className="w-4 h-4" />
                 </button>
@@ -317,7 +317,7 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
                   onClick={() => setDeletingId(event.id)}
                   aria-label={`Eliminar capacitación: ${event.title}`}
                   title="Eliminar Capacitación"
-                  className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-rose-700 border border-slate-200 transition-colors cursor-pointer"
+                  className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-700 dark:text-rose-400 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -335,15 +335,15 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
           role="alertdialog"
           aria-modal="true"
           aria-labelledby="delete-event-dialog-title"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 dark:bg-black/70 backdrop-blur-sm animate-in fade-in duration-200"
         >
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto">
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div className="text-center">
-              <h3 id="delete-event-dialog-title" className="text-base font-black text-slate-900">¿Eliminar esta capacitación?</h3>
-              <p className="text-xs text-slate-500 mt-1">
+              <h3 id="delete-event-dialog-title" className="text-base font-black text-slate-900 dark:text-white">¿Eliminar esta capacitación?</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 Esta acción eliminará el evento, sus horarios y todas las inscripciones asociadas. Esta acción no se puede deshacer.
               </p>
             </div>
@@ -351,7 +351,7 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
               <button
                 type="button"
                 onClick={() => setDeletingId(null)}
-                className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+                className="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors cursor-pointer"
               >
                 Cancelar
               </button>

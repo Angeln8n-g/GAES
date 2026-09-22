@@ -144,22 +144,22 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
       ariaLabel={isEditing ? 'Editar Bitácora de Observación' : 'Nueva Bitácora y Checklist'}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
-        <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-850">
           <div>
-            <div className="flex items-center gap-2 text-xs font-bold text-[#DA291C] mb-0.5">
+            <div className="flex items-center gap-2 text-xs font-bold text-[#DA291C] dark:text-red-400 mb-0.5">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Acompañamiento en Campo</span>
             </div>
-            <h2 className="text-lg font-black text-slate-900">
+            <h2 className="text-lg font-black text-slate-900 dark:text-white">
               {isEditing ? 'Editar Bitácora de Observación' : 'Nueva Bitácora & Checklist'}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -171,11 +171,11 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
           {/* General Data */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Colaborador Auditado *</label>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Colaborador Auditado *</label>
               <select
                 value={participantCard}
                 onChange={(e) => setParticipantCard(e.target.value)}
-                className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-semibold focus:outline-none focus:border-[#DA291C]"
                 required
               >
                 {participants.map(p => (
@@ -187,22 +187,22 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Fecha de Observación *</label>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Fecha de Observación *</label>
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-semibold focus:outline-none focus:border-[#DA291C]"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Tipo de Acompañamiento</label>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Tipo de Acompañamiento</label>
               <select
                 value={observationType}
                 onChange={(e) => setObservationType(e.target.value as OjtObservationType)}
-                className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-semibold focus:outline-none focus:border-[#DA291C]"
               >
                 <option value="daily_observation">Acompañamiento Diario</option>
                 <option value="weekly_evaluation">Evaluación Semanal</option>
@@ -214,19 +214,19 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
 
           {/* Ficha Académica del Tutorado (Sinergia Formativa) */}
           {selectedParticipant && (selectedParticipant.educationLevel || selectedParticipant.isCurrentlyStudying) && (
-            <div className="p-3.5 bg-blue-50/80 border border-blue-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-2xs">
+            <div className="p-3.5 bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-2xs">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 flex items-center justify-center shrink-0">
                   <GraduationCap className="w-4 h-4" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-black text-blue-950">Perfil Formativo del Tutorado:</span>
-                    <span className="px-2 py-0.5 rounded-md bg-white border border-blue-200 text-blue-800 font-bold text-[10px]">
+                    <span className="font-black text-blue-950 dark:text-blue-200">Perfil Formativo del Tutorado:</span>
+                    <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 font-bold text-[10px]">
                       {selectedParticipant.educationLevel || 'Bachiller'}
                     </span>
                   </div>
-                  <p className="text-[11px] text-blue-700 mt-0.5">
+                  <p className="text-[11px] text-blue-700 dark:text-blue-300 mt-0.5">
                     {selectedParticipant.isCurrentlyStudying ? (
                       <span>
                         🎓 Cursa: <strong>{selectedParticipant.currentStudyField || 'Carrera'}</strong> en {selectedParticipant.institutionName || 'Institución'}
@@ -249,12 +249,12 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
               onClick={() => setSafetyProtocolPass(!safetyProtocolPass)}
               className={`p-3.5 rounded-2xl border cursor-pointer flex items-center justify-between transition-all ${
                 safetyProtocolPass 
-                  ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
-                  : 'bg-rose-50 border-rose-200 text-rose-800'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300' 
+                  : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <ShieldCheck className={`w-5 h-5 shrink-0 ${safetyProtocolPass ? 'text-emerald-600' : 'text-rose-600'}`} />
+                <ShieldCheck className={`w-5 h-5 shrink-0 ${safetyProtocolPass ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`} />
                 <div>
                   <p className="text-xs font-bold">Protocolo de Seguridad & EPP</p>
                   <p className="text-[11px] opacity-80 font-medium">{safetyProtocolPass ? 'Cumple al 100%' : 'Incumplimiento detectado'}</p>
@@ -267,12 +267,12 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
               onClick={() => setFirstTimeFixPass(!firstTimeFixPass)}
               className={`p-3.5 rounded-2xl border cursor-pointer flex items-center justify-between transition-all ${
                 firstTimeFixPass 
-                  ? 'bg-red-50/60 border-red-200 text-[#DA291C]' 
-                  : 'bg-amber-50 border-amber-200 text-amber-800'
+                  ? 'bg-red-50/60 dark:bg-red-950/40 border-red-200 dark:border-red-900/60 text-[#DA291C] dark:text-red-300' 
+                  : 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-850 text-amber-800 dark:text-amber-300'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <Wrench className={`w-5 h-5 shrink-0 ${firstTimeFixPass ? 'text-[#DA291C]' : 'text-amber-600'}`} />
+                <Wrench className={`w-5 h-5 shrink-0 ${firstTimeFixPass ? 'text-[#DA291C] dark:text-red-400' : 'text-amber-600 dark:text-amber-400'}`} />
                 <div>
                   <p className="text-xs font-bold">Calidad a la Primera (First-Time Fix)</p>
                   <p className="text-[11px] opacity-80 font-medium">{firstTimeFixPass ? 'Sin retrabajos' : 'Requirió corrección'}</p>
@@ -284,8 +284,8 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
 
           {/* 5-Criteria Rubric */}
           <div className="space-y-3 pt-2">
-            <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-              <Award className="w-4 h-4 text-[#DA291C]" />
+            <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+              <Award className="w-4 h-4 text-[#DA291C] dark:text-red-400" />
               <span>Rúbrica de Desempeño Operativo (5 Dimensiones)</span>
             </h3>
 
@@ -293,16 +293,16 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
               {DEFAULT_RUBRIC_CATEGORIES.map(cat => {
                 const currentVal = rubricScores[cat.category] || 0;
                 return (
-                  <div key={cat.category} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+                  <div key={cat.category} className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 space-y-1.5">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs font-bold text-slate-900">{cat.category}</p>
-                        <p className="text-[11px] text-slate-500">{cat.desc}</p>
+                        <p className="text-xs font-bold text-slate-900 dark:text-white">{cat.category}</p>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">{cat.desc}</p>
                       </div>
                       <span className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded-lg border ${
-                        currentVal >= 85 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                        currentVal >= 70 ? 'bg-amber-50 text-amber-800 border-amber-200' :
-                        'bg-rose-50 text-rose-700 border-rose-200'
+                        currentVal >= 85 ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' :
+                        currentVal >= 70 ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800' :
+                        'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800'
                       }`}>
                         {currentVal}/100
                       </span>
@@ -320,7 +320,7 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
                           [cat.category]: Number(e.target.value)
                         });
                       }}
-                      className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#DA291C]"
+                      className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-[#DA291C]"
                     />
                   </div>
                 );
@@ -330,9 +330,9 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
 
           {/* Score Summary Banner */}
           <div className={`p-4 rounded-2xl border flex items-center justify-between ${
-            computedStatus === 'compliant' ? 'bg-emerald-50 border-emerald-200 text-emerald-900' :
-            computedStatus === 'needs_coaching' ? 'bg-amber-50 border-amber-200 text-amber-900' :
-            'bg-rose-50 border-rose-200 text-rose-900'
+            computedStatus === 'compliant' ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200' :
+            computedStatus === 'needs_coaching' ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200' :
+            'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-200'
           }`}>
             <div>
               <p className="text-xs font-black">Diagnóstico Operativo Resultante</p>
@@ -351,7 +351,7 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
           {/* Weaknesses & Action Plan */}
           <div className="space-y-3">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Debilidades Específicas Observadas (separadas por coma)
               </label>
               <input
@@ -359,12 +359,12 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
                 value={weaknessesText}
                 onChange={(e) => setWeaknessesText(e.target.value)}
                 placeholder="ej. Secuencia de arranque, Ajuste de presión, Tiempo de diagnóstico"
-                className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Plan de Acción Inmediato / Compromiso de Coaching
               </label>
               <textarea
@@ -372,18 +372,18 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
                 value={immediateActionPlan}
                 onChange={(e) => setImmediateActionPlan(e.target.value)}
                 placeholder="ej. Realizar 2 sesiones de shadowing guiado con técnico senior antes de la siguiente evaluación..."
-                className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Notas Generales / Retroalimentación</label>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Notas Generales / Retroalimentación</label>
               <textarea
                 rows={2}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Observaciones adicionales sobre actitud, velocidad y comunicación..."
-                className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
               />
             </div>
           </div>
@@ -391,11 +391,11 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
         </form>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-2.5">
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 flex items-center justify-end gap-2.5">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 rounded-xl hover:bg-slate-200 transition-colors cursor-pointer"
+            className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             Cancelar
           </button>

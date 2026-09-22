@@ -225,41 +225,41 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
       ariaLabel="Creación Masiva de Usuarios"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
         
         {/* Modal Header */}
-        <div className="p-6 border-b border-slate-200 flex items-start justify-between bg-slate-50">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-start justify-between bg-slate-50 dark:bg-slate-800/50">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-[#DA291C] border border-red-200">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 dark:bg-red-950/40 text-[#DA291C] border border-red-200 dark:border-red-900/50">
                 Creación Masiva
               </span>
-              <span className="text-xs text-slate-500 font-bold">Gestión de Cuentas</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-bold">Gestión de Cuentas</span>
             </div>
-            <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
+            <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
               <Users className="w-5 h-5 text-[#DA291C]" />
               <span>Importar y Crear Usuarios Masivamente</span>
             </h2>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               Registra múltiples usuarios mediante hojas de cálculo, pegado rápido o sincronización desde el padrón.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tab Navigation */}
-        <div className="px-6 pt-4 pb-2 border-b border-slate-200 bg-slate-50/50 flex items-center gap-2 overflow-x-auto">
+        <div className="px-6 pt-4 pb-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex items-center gap-2 overflow-x-auto">
           <button
             onClick={() => setActiveTab('excel')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'excel'
                 ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <FileSpreadsheet className="w-4 h-4" />
@@ -274,7 +274,7 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
             className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'text'
                 ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <Clipboard className="w-4 h-4" />
@@ -289,7 +289,7 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
             className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'padron'
                 ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <UserCheck className="w-4 h-4" />
@@ -306,13 +306,13 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
           {/* TAB 1: EXCEL / CSV */}
           {activeTab === 'excel' && (
             <div className="space-y-4">
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-5 rounded-2xl bg-slate-50 border border-slate-200">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
                 <div>
-                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                    <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+                  <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                    <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     <span>Carga mediante Plantilla Excel (.xlsx, .xls, .csv)</span>
                   </h3>
-                  <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
                     Plantilla oficial con todos los campos: <strong>Cédula *</strong> (11 dígitos ej. <span className="text-[#DA291C] font-bold">402-2196163-1</span>), <strong>Nombre Completo *</strong>, <strong>Correo Corporativo *</strong>, <strong>Empresa</strong>, <strong>Departamento</strong>, <strong>Rol</strong>, <strong>Estado Laboral</strong> y <strong>Contraseña</strong>.
                   </p>
                 </div>
@@ -321,9 +321,9 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
                   <button
                     type="button"
                     onClick={downloadUsersTemplateExcel}
-                    className="px-3 py-2 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all shrink-0 cursor-pointer shadow-xs"
+                    className="px-3 py-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all shrink-0 cursor-pointer shadow-xs"
                   >
-                    <Download className="w-3.5 h-3.5 text-emerald-600" />
+                    <Download className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                     <span>Descargar Plantilla (.xlsx)</span>
                   </button>
 
@@ -348,12 +348,12 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
 
               {/* Error alerts from Excel */}
               {excelErrors.length > 0 && (
-                <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-800 space-y-1">
+                <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 text-xs text-amber-800 dark:text-amber-300 space-y-1">
                   <div className="flex items-center gap-2 font-bold">
-                    <AlertTriangle className="w-4 h-4 text-amber-600" />
+                    <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                     <span>{excelErrors.length} advertencia(s) en el archivo:</span>
                   </div>
-                  <ul className="list-disc pl-5 space-y-0.5 text-[11px] text-amber-900 max-h-24 overflow-y-auto">
+                  <ul className="list-disc pl-5 space-y-0.5 text-[11px] text-amber-900 dark:text-amber-200 max-h-24 overflow-y-auto">
                     {excelErrors.map((err, i) => (
                       <li key={i}>Fila {err.row}: {err.reason}</li>
                     ))}
@@ -366,13 +366,13 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
           {/* TAB 2: TEXT PASTE */}
           {activeTab === 'text' && (
             <div className="space-y-4">
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-slate-800 flex items-center gap-2">
+                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
                     <Clipboard className="w-4 h-4 text-[#DA291C]" />
                     <span>Pega filas copiadas de Excel o texto delimitado por comas / tabulaciones</span>
                   </label>
-                  <span className="text-[10px] text-slate-500 font-semibold">Formato: Cédula, Nombre, Correo, Rol, Contraseña</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">Formato: Cédula, Nombre, Correo, Rol, Contraseña</span>
                 </div>
 
                 <textarea
@@ -380,16 +380,16 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
                   onChange={(e) => handleTextChange(e.target.value)}
                   placeholder={`Ejemplo:\n402-2196163-1\tAna Morales\tana.morales@empresa.com\tColaborador (User)\t123\n001-0876543-2\tCarlos Gómez\tcarlos.gomez@empresa.com\tAdministrador / Editor\tpass2026`}
                   rows={6}
-                  className="w-full p-3.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-mono placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                  className="w-full p-3.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-mono placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                 />
 
-                <div className="flex items-center justify-between text-[11px] text-slate-500 font-medium">
+                <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                   <span>Nota: La cédula debe contener 11 dígitos (formato 000-0000000-0).</span>
                   {rawText && (
                     <button
                       type="button"
                       onClick={() => handleTextChange('')}
-                      className="text-rose-600 hover:text-rose-700 font-bold cursor-pointer"
+                      className="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-bold cursor-pointer"
                     >
                       Limpiar texto
                     </button>
@@ -398,12 +398,12 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
               </div>
 
               {textErrors.length > 0 && (
-                <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-800 space-y-1">
+                <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 text-xs text-amber-800 dark:text-amber-300 space-y-1">
                   <div className="flex items-center gap-2 font-bold">
-                    <AlertTriangle className="w-4 h-4 text-amber-600" />
+                    <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                     <span>{textErrors.length} línea(s) con formato no reconocido:</span>
                   </div>
-                  <ul className="list-disc pl-5 space-y-0.5 text-[11px] text-amber-900 max-h-24 overflow-y-auto">
+                  <ul className="list-disc pl-5 space-y-0.5 text-[11px] text-amber-900 dark:text-amber-200 max-h-24 overflow-y-auto">
                     {textErrors.map((err, i) => (
                       <li key={i}>Línea {err.line}: {err.reason}</li>
                     ))}
@@ -416,24 +416,24 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
           {/* TAB 3: DESDE PADRÓN */}
           {activeTab === 'padron' && (
             <div className="space-y-4">
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
                 <div className="flex-1 max-w-sm">
                   <input
                     type="text"
                     value={padronSearch}
                     onChange={(e) => setPadronSearch(e.target.value)}
                     placeholder="Filtrar colaboradores del padrón..."
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                   />
                 </div>
 
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] text-slate-600 font-bold">Rol a asignar:</span>
+                    <span className="text-[11px] text-slate-600 dark:text-slate-400 font-bold">Rol a asignar:</span>
                     <select
                       value={defaultPadronRole}
                       onChange={(e) => setDefaultPadronRole(e.target.value as UserRole)}
-                      className="px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none"
+                      className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none"
                     >
                       <option value="Colaborador (User)">Colaborador (User)</option>
                       <option value="Evaluador / Tutor">Evaluador / Tutor</option>
@@ -448,7 +448,7 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
                   <button
                     type="button"
                     onClick={selectAllFilteredPadron}
-                    className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-300 text-xs font-bold text-slate-700 cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer"
                   >
                     {selectedParticipants.size === filteredPadron.length && filteredPadron.length > 0 ? 'Deseleccionar Todos' : 'Seleccionar Todos'}
                   </button>
@@ -456,7 +456,7 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
               </div>
 
               {filteredPadron.length > 0 ? (
-                <div className="max-h-60 overflow-y-auto divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white shadow-xs">
+                <div className="max-h-60 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 shadow-xs">
                   {filteredPadron.map(p => {
                     const isSelected = selectedParticipants.has(p.card);
                     return (
@@ -464,7 +464,7 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
                         key={p.card}
                         onClick={() => toggleParticipant(p.card)}
                         className={`p-3 flex items-center justify-between gap-3 cursor-pointer transition-colors ${
-                          isSelected ? 'bg-red-50/60' : 'hover:bg-slate-50'
+                          isSelected ? 'bg-red-50/60 dark:bg-red-950/30' : 'hover:bg-slate-50 dark:hover:bg-slate-700/40'
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -472,21 +472,21 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => {}}
-                            className="w-4 h-4 rounded border-slate-300 text-[#DA291C] focus:ring-0 cursor-pointer"
+                            className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-[#DA291C] focus:ring-0 cursor-pointer"
                           />
                           <div>
-                            <p className="text-xs font-bold text-slate-900">{p.name}</p>
-                            <p className="text-[11px] text-slate-500">{p.email} • Tarjeta: #{p.card}</p>
+                            <p className="text-xs font-bold text-slate-900 dark:text-white">{p.name}</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400">{p.email} • Tarjeta: #{p.card}</p>
                           </div>
                         </div>
 
                         <div className="text-right">
                           {p.cedula ? (
-                            <span className="text-[10px] font-mono font-bold text-[#DA291C] bg-red-50 px-2 py-0.5 rounded-lg border border-red-200">
+                            <span className="text-[10px] font-mono font-bold text-[#DA291C] bg-red-50 dark:bg-red-950/40 px-2 py-0.5 rounded-lg border border-red-200 dark:border-red-900/50">
                               {p.cedula}
                             </span>
                           ) : (
-                            <span className="text-[10px] text-slate-500 italic">Sin cédula</span>
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400 italic">Sin cédula</span>
                           )}
                         </div>
                       </div>
@@ -494,7 +494,7 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
                   })}
                 </div>
               ) : (
-                <div className="text-center py-8 text-slate-500 text-xs">
+                <div className="text-center py-8 text-slate-500 dark:text-slate-400 text-xs">
                   {unregisteredParticipants.length === 0 
                     ? '¡Todos los colaboradores del padrón ya cuentan con un usuario registrado!'
                     : 'No se encontraron colaboradores que coincidan con el filtro.'}
@@ -506,35 +506,35 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
           {/* PREVIEW TABLE OF USERS TO IMPORT */}
           {usersToImport.length > 0 && (
             <div className="space-y-3 pt-2">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-t border-slate-200 pt-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-t border-slate-200 dark:border-slate-800 pt-4">
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-[#DA291C]" />
-                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                  <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
                     Previsualización ({usersToImport.length} usuarios a procesar)
                   </h3>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/50">
                     +{newCount} Nuevos
                   </span>
                   {duplicateCount > 0 && (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900/50">
                       {duplicateCount} Existentes
                     </span>
                   )}
                   {invalidCedulas > 0 && (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900/50">
                       {invalidCedulas} Cédula(s) Inválidas
                     </span>
                   )}
                 </div>
               </div>
 
-              <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden max-h-56 overflow-y-auto shadow-xs">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden max-h-56 overflow-y-auto shadow-xs">
                 <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="border-b border-slate-200 bg-slate-50 text-slate-600 text-[11px] font-bold">
+                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 text-[11px] font-bold">
                       <th className="p-3">Estado</th>
                       <th className="p-3">Cédula</th>
                       <th className="p-3">Nombre</th>
@@ -544,20 +544,20 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
                       <th className="p-3">Condición</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {usersToImport.map((u, i) => {
                       const isExisting = existingUserEmails.has(u.email.toLowerCase());
                       const hasValidCedula = !u.cedula || isValidCedula(u.cedula);
 
                       return (
-                        <tr key={i} className="hover:bg-slate-50/80 transition-colors">
+                        <tr key={i} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
                           <td className="p-3 whitespace-nowrap">
                             {isExisting ? (
-                              <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                              <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-900/50">
                                 Existente
                               </span>
                             ) : (
-                              <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/50">
                                 Nuevo
                               </span>
                             )}
@@ -565,29 +565,29 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
                           <td className="p-3 whitespace-nowrap">
                             {u.cedula ? (
                               <span className={`font-mono text-[11px] font-bold ${
-                                hasValidCedula ? 'text-[#DA291C]' : 'text-rose-600 underline'
+                                hasValidCedula ? 'text-[#DA291C]' : 'text-rose-600 dark:text-rose-400 underline'
                               }`}>
                                 {u.cedula}
                               </span>
                             ) : (
-                              <span className="text-slate-500 italic text-[11px]">Opcional</span>
+                              <span className="text-slate-500 dark:text-slate-400 italic text-[11px]">Opcional</span>
                             )}
                           </td>
-                          <td className="p-3 font-bold text-slate-900">{u.name}</td>
-                          <td className="p-3 text-slate-500 font-mono text-[11px]">{u.email}</td>
-                          <td className="p-3 text-slate-600 text-[11px]">{u.department || '—'}</td>
+                          <td className="p-3 font-bold text-slate-900 dark:text-white">{u.name}</td>
+                          <td className="p-3 text-slate-500 dark:text-slate-400 font-mono text-[11px]">{u.email}</td>
+                          <td className="p-3 text-slate-600 dark:text-slate-400 text-[11px]">{u.department || '—'}</td>
                           <td className="p-3">
-                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                               {u.role}
                             </span>
                           </td>
                           <td className="p-3">
                             <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${
                               u.employmentStatus === 'inactivo'
-                                ? 'bg-rose-50 text-rose-700 border-rose-200'
+                                ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-900/50'
                                 : u.employmentStatus === 'en_proceso'
-                                ? 'bg-amber-50 text-amber-700 border-amber-200'
-                                : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-900/50'
+                                : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900/50'
                             }`}>
                               {u.employmentStatus === 'inactivo' ? 'Inactivo' : u.employmentStatus === 'en_proceso' ? 'En Proceso' : 'Contratado'}
                             </span>
@@ -601,13 +601,13 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
 
               {/* Duplicate Strategy Option */}
               {duplicateCount > 0 && (
-                <div className="flex items-center gap-2 pt-2 text-xs text-slate-600">
+                <div className="flex items-center gap-2 pt-2 text-xs text-slate-600 dark:text-slate-400">
                   <input
                     type="checkbox"
                     id="overwriteToggle"
                     checked={overwriteExisting}
                     onChange={(e) => setOverwriteExisting(e.target.checked)}
-                    className="w-4 h-4 rounded border-slate-300 text-[#DA291C] focus:ring-0 cursor-pointer"
+                    className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-[#DA291C] focus:ring-0 cursor-pointer"
                   />
                   <label htmlFor="overwriteToggle" className="cursor-pointer">
                     Actualizar información de los <strong>{duplicateCount} usuarios existentes</strong> si coinciden por correo electrónico.
@@ -620,10 +620,10 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-6 border-t border-slate-200 bg-slate-50 flex items-center justify-between gap-4">
-          <div className="text-xs text-slate-500 font-medium">
+        <div className="p-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between gap-4">
+          <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
             {usersToImport.length > 0 ? (
-              <span>Listos para procesar: <strong className="text-slate-900">{usersToImport.length} usuarios</strong></span>
+              <span>Listos para procesar: <strong className="text-slate-900 dark:text-white">{usersToImport.length} usuarios</strong></span>
             ) : (
               <span>Selecciona o ingresa usuarios para continuar</span>
             )}
@@ -633,7 +633,7 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+              className="px-4 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors cursor-pointer"
             >
               Cancelar
             </button>

@@ -541,20 +541,20 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Header Banner */}
-      <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm relative overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-sm relative overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
-                <Wrench className="w-3.5 h-3.5 text-red-600" />
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/60">
+                <Wrench className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
                 Academia Técnica Claro
               </span>
-              <span className="text-xs font-medium text-slate-500">Capacitaciones Recurrentes & Rotación Semanal</span>
+              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Capacitaciones Recurrentes & Rotación Semanal</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
               Talleres Prácticos & Control de Asistencia Diaria
             </h1>
-            <p className="text-xs sm:text-sm text-slate-600 max-w-2xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
               Planifica semanas de entrenamiento técnico, asigna cuadrillas y facilitadores de forma rotativa, y realiza el pase de asistencia híbrido (marcado en 1 clic + QR dinámico).
             </p>
           </div>
@@ -580,15 +580,15 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                     setCourseToEdit(null);
                     setIsCourseModalOpen(true);
                   }}
-                  className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl text-xs font-bold transition-all shadow-sm flex items-center gap-2"
+                  className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white rounded-2xl text-xs font-bold transition-all shadow-sm flex items-center gap-2"
                 >
                   <BookOpen className="w-4 h-4 text-slate-300" />
                   <span>Nuevo Curso Técnico</span>
                 </button>
               </>
             ) : (
-              <div className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold shadow-xs">
-                <UserCheck className="w-4 h-4 text-amber-700" />
+              <div className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-amber-900 dark:text-amber-300 text-xs font-bold shadow-xs">
+                <UserCheck className="w-4 h-4 text-amber-700 dark:text-amber-400" />
                 <span>Perfil Facilitador • Registro y Pase de Asistencia</span>
               </div>
             )}
@@ -596,55 +596,55 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
         </div>
 
         {/* KPI Summary Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mt-6 pt-6 border-t border-slate-100">
-          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
-            <div className="flex items-center justify-between text-slate-500 text-xs font-semibold mb-1">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+          <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+            <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold mb-1">
               <span>Cohortes Activas</span>
-              <Calendar className="w-4 h-4 text-red-600" />
+              <Calendar className="w-4 h-4 text-red-600 dark:text-red-400" />
             </div>
-            <div className="text-2xl font-black text-slate-900">{metrics.activeCohortsCount}</div>
-            <span className="text-[11px] text-slate-500">En curso o programadas</span>
+            <div className="text-2xl font-black text-slate-900 dark:text-white">{metrics.activeCohortsCount}</div>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">En curso o programadas</span>
           </div>
 
-          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
-            <div className="flex items-center justify-between text-slate-500 text-xs font-semibold mb-1">
+          <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+            <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold mb-1">
               <span>Técnicos Matriculados</span>
-              <Users className="w-4 h-4 text-slate-600" />
+              <Users className="w-4 h-4 text-slate-600 dark:text-slate-400" />
             </div>
-            <div className="text-2xl font-black text-slate-900">{metrics.totalEnrolled}</div>
-            <span className="text-[11px] text-slate-500">En todas las semanas</span>
+            <div className="text-2xl font-black text-slate-900 dark:text-white">{metrics.totalEnrolled}</div>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">En todas las semanas</span>
           </div>
 
-          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
-            <div className="flex items-center justify-between text-slate-500 text-xs font-semibold mb-1">
+          <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+            <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold mb-1">
               <span>Facilitadores Activos</span>
-              <UserCheck className="w-4 h-4 text-slate-600" />
+              <UserCheck className="w-4 h-4 text-slate-600 dark:text-slate-400" />
             </div>
-            <div className="text-2xl font-black text-slate-900">{metrics.uniqueFacilitators}</div>
-            <span className="text-[11px] text-slate-500">Instructores asignados</span>
+            <div className="text-2xl font-black text-slate-900 dark:text-white">{metrics.uniqueFacilitators}</div>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">Instructores asignados</span>
           </div>
 
-          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
-            <div className="flex items-center justify-between text-slate-500 text-xs font-semibold mb-1">
+          <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+            <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold mb-1">
               <span>Asistencia Cohorte Activa</span>
-              <Award className="w-4 h-4 text-emerald-600" />
+              <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <div className="text-2xl font-black text-slate-900">{metrics.avgAttendance}%</div>
-            <span className="text-[11px] text-emerald-600 font-semibold">Promedio de cumplimiento</span>
+            <div className="text-2xl font-black text-slate-900 dark:text-white">{metrics.avgAttendance}%</div>
+            <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">Promedio de cumplimiento</span>
           </div>
         </div>
       </div>
 
       {/* Main Tab Navigation */}
-      <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 rounded-2xl shadow-sm">
+      <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 rounded-2xl shadow-sm">
         <div className="flex items-center gap-2 overflow-x-auto py-2">
           <button
             type="button"
             onClick={() => setActiveTab('attendance')}
             className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
               activeTab === 'attendance'
-                ? 'bg-slate-900 text-white shadow-sm'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                ? 'bg-slate-900 dark:bg-slate-800 text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <CheckCheck className="w-4 h-4 text-red-500" />
@@ -657,8 +657,8 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
               onClick={() => setActiveTab('cohorts')}
               className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
                 activeTab === 'cohorts'
-                  ? 'bg-slate-900 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  ? 'bg-slate-900 dark:bg-slate-800 text-white shadow-sm'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
               <Calendar className="w-4 h-4 text-slate-400" />
@@ -672,13 +672,13 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
               onClick={() => setActiveTab('crm')}
               className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
                 activeTab === 'crm'
-                  ? 'bg-slate-900 text-white shadow-sm ring-1 ring-red-500/50'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  ? 'bg-slate-900 dark:bg-slate-800 text-white shadow-sm ring-1 ring-red-500/50'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
               <Users className="w-4 h-4 text-red-500" />
               <span>Control de Asignaciones (CRM)</span>
-              <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-red-100 text-[#DA291C]">
+              <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-950/60 text-[#DA291C] dark:text-red-400">
                 Super Admin
               </span>
             </button>
@@ -689,8 +689,8 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
             onClick={() => setActiveTab('courses')}
             className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
               activeTab === 'courses'
-                ? 'bg-slate-900 text-white shadow-sm'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                ? 'bg-slate-900 dark:bg-slate-800 text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <BookOpen className="w-4 h-4 text-slate-400" />
@@ -702,8 +702,8 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
             onClick={() => setActiveTab('accreditation')}
             className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
               activeTab === 'accreditation'
-                ? 'bg-slate-900 text-white shadow-sm'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                ? 'bg-slate-900 dark:bg-slate-800 text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <Award className="w-4 h-4 text-slate-400" />
@@ -718,11 +718,11 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
       {activeTab === 'attendance' && (
         <div className="space-y-4">
           {/* Cohort Selector Card & Active Details */}
-          <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div className="w-full md:w-80">
                 <div className="flex items-center justify-between mb-1">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                     Seleccionar Cohorte / Semana
                   </label>
                   {isFacilitator && (
@@ -731,8 +731,8 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                       onClick={() => setOnlyMyCohorts(!onlyMyCohorts)}
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border transition-colors ${
                         onlyMyCohorts
-                          ? 'bg-red-50 text-red-700 border-red-200 font-extrabold'
-                          : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
+                          ? 'bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 border-red-200 dark:border-red-900/60 font-extrabold'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
                       }`}
                     >
                       {onlyMyCohorts ? '★ Mis Talleres Asignados' : 'Ver Todos'}
@@ -742,7 +742,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                 <select
                   value={selectedCohortId}
                   onChange={(e) => setSelectedCohortId(e.target.value)}
-                  className="w-full px-3 py-2 text-xs font-bold rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-slate-800 bg-white"
+                  className="w-full px-3 py-2 text-xs font-bold rounded-xl border border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-slate-800 dark:text-white bg-white dark:bg-slate-800"
                 >
                   {availableCohorts.length === 0 ? (
                     <option value="">No hay cohortes disponibles</option>
@@ -768,10 +768,10 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                         setCohortToReassign(activeCohort);
                         setIsReassignModalOpen(true);
                       }}
-                      className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5"
+                      className="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5"
                       title="Reasignar Facilitador o Grupo para esta cohorte"
                     >
-                      <ArrowRightLeft className="w-3.5 h-3.5 text-slate-600" />
+                      <ArrowRightLeft className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
                       <span>Reasignar Facilitador / Grupo</span>
                     </button>
                   )}
@@ -782,17 +782,17 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                       setCohortForEnrollment(activeCohort);
                       setIsEnrollmentModalOpen(true);
                     }}
-                    className="px-3.5 py-2 bg-red-50 hover:bg-red-100 text-[#DA291C] border border-red-200/80 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-xs"
+                    className="px-3.5 py-2 bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/40 text-[#DA291C] dark:text-red-400 border border-red-200/80 dark:border-red-900/60 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-xs"
                     title="Ver listado, cargar masivamente o exportar participantes de esta cohorte"
                   >
-                    <Users className="w-3.5 h-3.5 text-[#DA291C]" />
+                    <Users className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
                     <span>Participantes ({attendanceMatrix?.participants.length || activeCohort.enrolledCount || 0})</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setIsQrModalOpen(true)}
-                    className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm"
+                    className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm"
                   >
                     <QrCode className="w-3.5 h-3.5 text-red-400" />
                     <span>Proyectar QR / PIN</span>
@@ -812,31 +812,31 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
 
             {/* Active Cohort Metadata Strip */}
             {activeCohort && (
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 text-xs">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-xs">
                 <div>
-                  <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider block">Facilitador Asignado</span>
-                  <span className="font-bold text-slate-800 truncate block">
+                  <span className="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Facilitador Asignado</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-200 truncate block">
                     {activeCohort.facilitatorName || 'No Asignado'}
                     {isUserFacilitatorOfCohort(activeCohort) && (
-                      <span className="ml-1.5 text-[9px] font-black bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-full">
+                      <span className="ml-1.5 text-[9px] font-black bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 px-1.5 py-0.2 rounded-full">
                         Tú
                       </span>
                     )}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider block">Grupo / Cuadrilla</span>
-                  <span className="font-bold text-slate-800 truncate block">{activeCohort.groupName || 'Sin Grupo'}</span>
+                  <span className="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Grupo / Cuadrilla</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-200 truncate block">{activeCohort.groupName || 'Sin Grupo'}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider block">Período Semanal</span>
-                  <span className="font-bold text-slate-800 truncate block">
+                  <span className="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold tracking-wider block">Período Semanal</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-200 truncate block">
                     {activeCohort.startDate} al {activeCohort.endDate}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider block">PIN Diario</span>
-                  <span className="font-mono font-extrabold text-red-600 tracking-wider text-sm block">
+                  <span className="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold tracking-wider block">PIN Diario</span>
+                  <span className="font-mono font-extrabold text-red-600 dark:text-red-400 tracking-wider text-sm block">
                     {activeCohort.dailyPin || '----'}
                   </span>
                 </div>
@@ -846,11 +846,11 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
 
           {/* Session Dates Day Tabs & Fast Marking Bar */}
           {attendanceMatrix && (
-            <div className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+            <div className="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 {/* Day selector pills */}
                 <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider mr-1 hidden sm:inline">
+                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mr-1 hidden sm:inline">
                     Sesión:
                   </span>
                   {attendanceMatrix.sessionDates.map((date, idx) => {
@@ -863,7 +863,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                         className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
                           isSelected
                             ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
-                            : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                            : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
                         }`}
                       >
                         <Calendar className="w-3.5 h-3.5" />
@@ -879,7 +879,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                     type="button"
                     onClick={handleMarkAllPresent}
                     disabled={isBulkMarking || !selectedSessionDate}
-                    className="px-4 py-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-2 shadow-sm"
+                    className="px-4 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-2 shadow-sm"
                   >
                     {isBulkMarking ? (
                       <>
@@ -897,7 +897,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
               </div>
 
               {/* Search Technician Filter */}
-              <div className="flex items-center justify-between gap-3 pt-2 border-t border-slate-100">
+              <div className="flex items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <div className="relative flex-1 max-w-sm">
                   <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                   <input
@@ -905,19 +905,19 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                     placeholder="Buscar técnico por nombre, carnet o cédula..."
                     value={searchParticipant}
                     onChange={(e) => setSearchParticipant(e.target.value)}
-                    className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 text-slate-800 bg-white"
+                    className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 text-slate-800 dark:text-white bg-white dark:bg-slate-800 placeholder-slate-400 dark:placeholder-slate-500"
                   />
                 </div>
-                <div className="text-xs text-slate-500 font-medium">
-                  Mostrando <strong className="text-slate-800">{filteredParticipants.length}</strong> de {attendanceMatrix.participants.length} técnicos
+                <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  Mostrando <strong className="text-slate-800 dark:text-white">{filteredParticipants.length}</strong> de {attendanceMatrix.participants.length} técnicos
                 </div>
               </div>
 
               {/* Interactive Attendance Table */}
-              <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+              <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px] tracking-wider">
+                    <tr className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 font-bold uppercase text-[10px] tracking-wider">
                       <th className="py-3 px-3 w-12 text-center">No.</th>
                       <th className="py-3 px-3">Carnet</th>
                       <th className="py-3 px-4">Técnico / Colaborador</th>
@@ -930,17 +930,17 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                       <th className="py-3 px-3 text-center">Condición</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {isLoadingAttendance ? (
                       <tr>
-                        <td colSpan={8} className="py-12 text-center text-slate-500">
-                          <RotateCw className="w-6 h-6 animate-spin mx-auto mb-2 text-red-600" />
+                        <td colSpan={8} className="py-12 text-center text-slate-500 dark:text-slate-400">
+                          <RotateCw className="w-6 h-6 animate-spin mx-auto mb-2 text-red-600 dark:text-red-400" />
                           <span>Cargando matriz de asistencia...</span>
                         </td>
                       </tr>
                     ) : filteredParticipants.length === 0 ? (
                       <tr>
-                        <td colSpan={8} className="py-10 text-center text-slate-500">
+                        <td colSpan={8} className="py-10 text-center text-slate-500 dark:text-slate-400">
                           No hay técnicos enrolados en esta cohorte o no coinciden con la búsqueda.
                         </td>
                       </tr>
@@ -952,18 +952,18 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                         const isAtRisk = p.attendancePercentage >= 60 && p.attendancePercentage < 80;
 
                         return (
-                          <tr key={p.card} className="hover:bg-slate-50/80 transition-colors">
-                            <td className="py-3 px-3 text-center text-slate-500 font-mono text-[11px]">
+                          <tr key={p.card} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                            <td className="py-3 px-3 text-center text-slate-500 dark:text-slate-400 font-mono text-[11px]">
                               {idx + 1}
                             </td>
-                            <td className="py-3 px-3 font-mono font-bold text-slate-700">
+                            <td className="py-3 px-3 font-mono font-bold text-slate-700 dark:text-slate-300">
                               #{p.card}
                             </td>
                             <td className="py-3 px-4">
-                              <div className="font-bold text-slate-900">{p.name}</div>
-                              <div className="text-[10px] text-slate-500">{p.email}</div>
+                              <div className="font-bold text-slate-900 dark:text-white">{p.name}</div>
+                              <div className="text-[10px] text-slate-500 dark:text-slate-400">{p.email}</div>
                             </td>
-                            <td className="py-3 px-3 text-slate-600 text-[11px]">
+                            <td className="py-3 px-3 text-slate-600 dark:text-slate-400 text-[11px]">
                               {p.department || 'Planta Externa'}
                             </td>
 
@@ -977,7 +977,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                                   className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all flex items-center gap-1 ${
                                     currentStatus === 'present'
                                       ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-500/20'
-                                      : 'bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
+                                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-700 dark:hover:text-emerald-300'
                                   }`}
                                 >
                                   <CheckCircle2 className="w-3 h-3" />
@@ -991,7 +991,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                                   className={`px-2 py-1 text-[11px] font-bold rounded-lg transition-all flex items-center gap-1 ${
                                     currentStatus === 'late'
                                       ? 'bg-amber-500 text-white shadow-sm'
-                                      : 'bg-slate-100 text-slate-600 hover:bg-amber-50 hover:text-amber-700'
+                                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-amber-50 dark:hover:bg-amber-950/40 hover:text-amber-700 dark:hover:text-amber-300'
                                   }`}
                                 >
                                   <Clock className="w-3 h-3" />
@@ -1005,7 +1005,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                                   className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all flex items-center gap-1 ${
                                     currentStatus === 'absent'
                                       ? 'bg-red-600 text-white shadow-sm ring-2 ring-red-500/20'
-                                      : 'bg-slate-100 text-slate-600 hover:bg-red-50 hover:text-red-700'
+                                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-700 dark:hover:text-red-300'
                                   }`}
                                 >
                                   <XCircle className="w-3 h-3" />
@@ -1019,7 +1019,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                                   className={`px-2 py-1 text-[11px] font-bold rounded-lg transition-all flex items-center gap-1 ${
                                     currentStatus === 'excused'
                                       ? 'bg-blue-600 text-white shadow-sm'
-                                      : 'bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-700'
+                                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:text-blue-700 dark:hover:text-blue-300'
                                   }`}
                                 >
                                   <ShieldAlert className="w-3 h-3" />
@@ -1028,7 +1028,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                               </div>
 
                               {currentDayAtt?.method && currentDayAtt.method !== 'manual' && (
-                                <div className="text-[9px] text-center text-slate-500 mt-1 uppercase font-semibold">
+                                <div className="text-[9px] text-center text-slate-500 dark:text-slate-400 mt-1 uppercase font-semibold">
                                   Vía {currentDayAtt.method === 'qr_scan' ? 'QR Móvil' : 'PIN'}
                                 </div>
                               )}
@@ -1037,7 +1037,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                             {/* Attendance Progress % */}
                             <td className="py-3 px-4 text-center">
                               <div className="flex items-center justify-center gap-2">
-                                <div className="w-20 bg-slate-100 rounded-full h-2 overflow-hidden">
+                                <div className="w-20 bg-slate-100 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
                                   <div
                                     className={`h-2 rounded-full ${
                                       isApproved ? 'bg-emerald-500' : isAtRisk ? 'bg-amber-500' : 'bg-red-500'
@@ -1045,32 +1045,32 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                                     style={{ width: `${p.attendancePercentage}%` }}
                                   />
                                 </div>
-                                <span className="font-bold text-slate-800 font-mono text-[11px]">
+                                <span className="font-bold text-slate-800 dark:text-slate-200 font-mono text-[11px]">
                                   {p.attendancePercentage}%
                                 </span>
                               </div>
-                              <span className="text-[10px] text-slate-500 block mt-0.5">
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">
                                 {p.attendedDays} de {p.totalDays} días
                               </span>
                             </td>
 
                             {/* Hours Earned */}
-                            <td className="py-3 px-3 text-center font-mono font-bold text-slate-700">
+                            <td className="py-3 px-3 text-center font-mono font-bold text-slate-700 dark:text-slate-300">
                               {p.totalHoursEarned}h
                             </td>
 
                             {/* Academic Condition */}
                             <td className="py-3 px-3 text-center">
                               {isApproved ? (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/60">
                                   Aprobado
                                 </span>
                               ) : isAtRisk ? (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/60">
                                   En Riesgo
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/60">
                                   Reprobado
                                 </span>
                               )}
@@ -1093,7 +1093,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
       {activeTab === 'cohorts' && isAdminOrSuper && (
         <div className="space-y-4">
           {/* Filter Bar */}
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="relative flex-1 w-full sm:max-w-md">
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
               <input
@@ -1101,7 +1101,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                 placeholder="Buscar por curso, grupo o facilitador..."
                 value={cohortSearch}
                 onChange={(e) => setCohortSearch(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 text-slate-800 bg-white"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 text-slate-800 dark:text-white bg-white dark:bg-slate-800 placeholder-slate-400 dark:placeholder-slate-500"
               />
             </div>
 
@@ -1109,7 +1109,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
               <select
                 value={cohortStatusFilter}
                 onChange={(e) => setCohortStatusFilter(e.target.value)}
-                className="px-3 py-1.5 text-xs rounded-xl border border-slate-200 text-slate-700 bg-white"
+                className="px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800"
               >
                 <option value="all">Todos los estados</option>
                 <option value="scheduled">Programadas</option>
@@ -1136,10 +1136,10 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
           {/* Cohorts Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredCohorts.length === 0 ? (
-              <div className="col-span-full py-16 text-center text-slate-500 bg-white rounded-3xl border border-slate-200">
-                <Calendar className="w-10 h-10 mx-auto mb-2 text-slate-300" />
-                <p className="text-sm font-semibold text-slate-600">No se encontraron cohortes programadas</p>
-                <p className="text-xs text-slate-500 mt-1">Crea una nueva cohorte para habilitar la rotación semanal.</p>
+              <div className="col-span-full py-16 text-center text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800">
+                <Calendar className="w-10 h-10 mx-auto mb-2 text-slate-300 dark:text-slate-600" />
+                <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">No se encontraron cohortes programadas</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Crea una nueva cohorte para habilitar la rotación semanal.</p>
               </div>
             ) : (
               filteredCohorts.map(coh => {
@@ -1147,23 +1147,23 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                 return (
                   <div
                     key={coh.id}
-                    className={`bg-white rounded-3xl border p-5 shadow-sm transition-all flex flex-col justify-between ${
-                      isSelected ? 'border-red-500 ring-2 ring-red-500/20' : 'border-slate-200 hover:border-slate-300'
+                    className={`bg-white dark:bg-slate-900 rounded-3xl border p-5 shadow-sm transition-all flex flex-col justify-between ${
+                      isSelected ? 'border-red-500 ring-2 ring-red-500/20' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
                     }`}
                   >
                     <div className="space-y-3">
                       {/* Top ribbon */}
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                           Semana {coh.weekNumber || 'N/A'} • {coh.year}
                         </span>
                         <span
                           className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
                             coh.status === 'in_progress'
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/60'
                               : coh.status === 'completed'
-                              ? 'bg-slate-100 text-slate-600'
-                              : 'bg-amber-50 text-amber-700 border border-amber-200'
+                              ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                              : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/60'
                           }`}
                         >
                           {coh.status === 'in_progress' ? 'En Curso' : coh.status === 'completed' ? 'Completado' : 'Programado'}
@@ -1171,22 +1171,22 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                       </div>
 
                       {/* Title */}
-                      <h3 className="font-bold text-slate-900 text-sm leading-snug">
+                      <h3 className="font-bold text-slate-900 dark:text-white text-sm leading-snug">
                         {coh.courseTitle || 'Curso Técnico'}
                       </h3>
 
                       {/* Meta list */}
-                      <div className="space-y-1.5 text-xs text-slate-600">
+                      <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
                         <div className="flex items-center gap-2">
-                          <Users className="w-3.5 h-3.5 text-red-600 shrink-0" />
-                          <span className="font-semibold text-slate-800">Grupo:</span>
+                          <Users className="w-3.5 h-3.5 text-red-600 dark:text-red-400 shrink-0" />
+                          <span className="font-semibold text-slate-800 dark:text-slate-200">Grupo:</span>
                           <span className="truncate">{coh.groupName || 'Abierto'}</span>
-                          <span className="text-[10px] text-slate-500">({coh.enrolledCount || 0} técnicos)</span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400">({coh.enrolledCount || 0} técnicos)</span>
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <UserCheck className="w-3.5 h-3.5 text-red-600 shrink-0" />
-                          <span className="font-semibold text-slate-800">Facilitador:</span>
+                          <UserCheck className="w-3.5 h-3.5 text-red-600 dark:text-red-400 shrink-0" />
+                          <span className="font-semibold text-slate-800 dark:text-slate-200">Facilitador:</span>
                           <span className="truncate">{coh.facilitatorName || 'No asignado'}</span>
                         </div>
 
@@ -1208,7 +1208,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                     </div>
 
                     {/* Action buttons */}
-                    <div className="pt-4 mt-4 border-t border-slate-100 space-y-2">
+                    <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800 space-y-2">
                       <div className="flex items-center gap-1.5">
                         <button
                           type="button"
@@ -1216,7 +1216,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                             setSelectedCohortId(coh.id);
                             setActiveTab('attendance');
                           }}
-                          className="flex-1 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
+                          className="flex-1 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
                         >
                           <CheckCheck className="w-3.5 h-3.5 text-emerald-400" />
                           <span>Pasar Asistencia</span>
@@ -1228,7 +1228,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                             setCohortForEnrollment(coh);
                             setIsEnrollmentModalOpen(true);
                           }}
-                          className="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-[#DA291C] border border-red-200 rounded-xl text-xs font-bold transition-colors flex items-center gap-1 shrink-0"
+                          className="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/40 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-900/60 rounded-xl text-xs font-bold transition-colors flex items-center gap-1 shrink-0"
                           title="Gestionar participantes (enlistar, cargar lista, exportar)"
                         >
                           <Users className="w-3.5 h-3.5" />
@@ -1244,7 +1244,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                                 setIsReassignModalOpen(true);
                               }}
                               title="Reasignar Facilitador o Grupo Semanal"
-                              className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors"
+                              className="p-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl transition-colors"
                               aria-label="Reasignar Facilitador o Grupo"
                             >
                               <ArrowRightLeft className="w-4 h-4" />
@@ -1254,7 +1254,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                               type="button"
                               onClick={() => handleDuplicateCohort(coh.id)}
                               title="Duplicar para siguiente semana (+7 días)"
-                              className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors"
+                              className="p-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl transition-colors"
                               aria-label="Duplicar para siguiente semana"
                             >
                               <Copy className="w-4 h-4" />
@@ -1267,7 +1267,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                                 setIsCohortModalOpen(true);
                               }}
                               title="Editar Cohorte"
-                              className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors"
+                              className="p-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl transition-colors"
                               aria-label="Editar Cohorte"
                             >
                               <Edit3 className="w-4 h-4" />
@@ -1277,7 +1277,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                               type="button"
                               onClick={() => handleDeleteCohort(coh.id, coh.courseTitle)}
                               title="Eliminar Cohorte"
-                              className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-red-700 rounded-xl transition-colors"
+                              className="p-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-red-700 dark:hover:text-red-400 rounded-xl transition-colors"
                               aria-label="Eliminar Cohorte"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -1285,11 +1285,11 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                           </>
                         ) : (
                           isUserFacilitatorOfCohort(coh) ? (
-                            <span className="px-2.5 py-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 rounded-xl border border-emerald-200 flex items-center gap-1 shrink-0">
+                            <span className="px-2.5 py-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-900/60 flex items-center gap-1 shrink-0">
                               <span>Tu Asignación</span>
                             </span>
                           ) : (
-                            <span className="px-2.5 py-1 text-[11px] font-semibold text-slate-500 bg-slate-100 rounded-xl border border-slate-200 flex items-center gap-1 shrink-0">
+                            <span className="px-2.5 py-1 text-[11px] font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center gap-1 shrink-0">
                               <span>Solo Lectura</span>
                             </span>
                           )
@@ -1309,13 +1309,13 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
       {/* ========================================================================= */}
       {activeTab === 'courses' && (
         <div className="space-y-4">
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between gap-3">
+          <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Categoría:</span>
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Categoría:</span>
               <select
                 value={courseCategoryFilter}
                 onChange={(e) => setCourseCategoryFilter(e.target.value)}
-                className="px-3 py-1.5 text-xs rounded-xl border border-slate-200 text-slate-700 bg-white"
+                className="px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800"
               >
                 <option value="all">Todas las categorías</option>
                 {categories.map(cat => (
@@ -1343,44 +1343,44 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
             {filteredCourses.map(course => (
               <div
                 key={course.id}
-                className="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm hover:border-slate-300 transition-all flex flex-col justify-between"
+                className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between"
               >
                 <div className="space-y-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/60">
                       {course.category}
                     </span>
                     {course.code && (
-                      <span className="text-[10px] font-mono font-bold text-slate-500">
+                      <span className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">
                         {course.code}
                       </span>
                     )}
                   </div>
 
-                  <h3 className="font-bold text-slate-900 text-sm">{course.title}</h3>
-                  <p className="text-xs text-slate-500 line-clamp-2">{course.description || 'Sin descripción detallada.'}</p>
+                  <h3 className="font-bold text-slate-900 dark:text-white text-sm">{course.title}</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{course.description || 'Sin descripción detallada.'}</p>
 
-                  <div className="pt-2 border-t border-slate-100 grid grid-cols-2 gap-2 text-[11px] text-slate-600">
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-2 text-[11px] text-slate-600 dark:text-slate-400">
                     <div>
-                      <span className="text-slate-500 block text-[10px] font-medium">Horas Diarias:</span>
-                      <strong className="text-slate-800">{course.dailyHours} hrs</strong>
+                      <span className="text-slate-500 dark:text-slate-400 block text-[10px] font-medium">Horas Diarias:</span>
+                      <strong className="text-slate-800 dark:text-slate-200">{course.dailyHours} hrs</strong>
                     </div>
                     <div>
-                      <span className="text-slate-500 block text-[10px] font-medium">Duración:</span>
-                      <strong className="text-slate-800">{course.durationDays} días ({course.dailyHours * course.durationDays}h tot)</strong>
+                      <span className="text-slate-500 dark:text-slate-400 block text-[10px] font-medium">Duración:</span>
+                      <strong className="text-slate-800 dark:text-slate-200">{course.durationDays} días ({course.dailyHours * course.durationDays}h tot)</strong>
                     </div>
                     <div>
-                      <span className="text-slate-500 block text-[10px] font-medium">Modalidad:</span>
+                      <span className="text-slate-500 dark:text-slate-400 block text-[10px] font-medium">Modalidad:</span>
                       <span className="truncate block">{course.modality}</span>
                     </div>
                     <div>
-                      <span className="text-slate-500 block text-[10px] font-medium">Taller:</span>
+                      <span className="text-slate-500 dark:text-slate-400 block text-[10px] font-medium">Taller:</span>
                       <span className="truncate block">{course.location || 'Laboratorio'}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
                   {isAdminOrSuper ? (
                     <>
                       <button
@@ -1413,7 +1413,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                           setCourseToEdit(course);
                           setIsCourseModalOpen(true);
                         }}
-                        className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors"
+                        className="p-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl transition-colors"
                         title="Editar Curso"
                         aria-label="Editar Curso"
                       >
@@ -1423,7 +1423,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                       <button
                         type="button"
                         onClick={() => handleDeleteCourse(course.id, course.title)}
-                        className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-red-700 rounded-xl transition-colors"
+                        className="p-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-red-700 dark:hover:text-red-400 rounded-xl transition-colors"
                         title="Eliminar Curso"
                         aria-label="Eliminar Curso"
                       >
@@ -1431,8 +1431,8 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                       </button>
                     </>
                   ) : (
-                    <div className="flex-1 px-3 py-1.5 bg-slate-50 text-slate-600 rounded-xl text-[11px] font-medium border border-slate-200 flex items-center justify-center gap-1.5">
-                      <BookOpen className="w-3.5 h-3.5 text-slate-500" />
+                    <div className="flex-1 px-3 py-1.5 bg-slate-50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 rounded-xl text-[11px] font-medium border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-1.5">
+                      <BookOpen className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                       <span>Taller Oficial de Especialidad • Consulta</span>
                     </div>
                   )}
@@ -1447,21 +1447,21 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
       {/* TAB 4: ACREDITACIÓN & CALIFICACIONES */}
       {/* ========================================================================= */}
       {activeTab === 'accreditation' && (
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-50 text-[#DA291C] border border-red-100 uppercase tracking-wider">
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border border-red-100 dark:border-red-900/60 uppercase tracking-wider">
                   Evaluación de Competencias
                 </span>
-                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                   {activeCohort?.groupName || 'Sin Grupo'}
                 </span>
               </div>
-              <h2 className="text-base sm:text-lg font-black text-slate-900">
+              <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
                 Acreditación y Calificaciones: {activeCohort?.courseTitle || 'Cohorte Actual'}
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Ingresa las calificaciones finales (0-100 pts), retroalimentación técnica y dictamen de acreditación institucional.
               </p>
             </div>
@@ -1472,7 +1472,7 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                   <button
                     type="button"
                     onClick={handleAutoFillGrades100}
-                    className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-xs"
+                    className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-xs"
                     title="Asignar 100 puntos automáticamente a todos los técnicos con asistencia completa (>= 80%)"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-amber-500" />
@@ -1503,10 +1503,10 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
             </div>
           </div>
 
-          <div className="overflow-x-auto rounded-2xl border border-slate-200">
+          <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold uppercase text-[10px] tracking-wider">
+                <tr className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase text-[10px] tracking-wider">
                   <th className="py-3 px-3">No.</th>
                   <th className="py-3 px-3">Carnet</th>
                   <th className="py-3 px-4">Técnico / Colaborador</th>
@@ -1518,10 +1518,10 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                   <th className="py-3 px-4 text-center">Dictamen Final</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {!attendanceMatrix || attendanceMatrix.participants.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="py-12 text-center text-slate-500">
+                    <td colSpan={9} className="py-12 text-center text-slate-500 dark:text-slate-400">
                       No hay registros de técnicos disponibles en esta cohorte.
                     </td>
                   </tr>
@@ -1532,22 +1532,22 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                     const isFailed = gradeState.academicStatus === 'failed';
 
                     return (
-                      <tr key={p.card} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="py-3 px-3 font-mono text-slate-500 font-bold">{idx + 1}</td>
-                        <td className="py-3 px-3 font-mono font-bold text-slate-800">#{p.card}</td>
+                      <tr key={p.card} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors">
+                        <td className="py-3 px-3 font-mono text-slate-500 dark:text-slate-400 font-bold">{idx + 1}</td>
+                        <td className="py-3 px-3 font-mono font-bold text-slate-800 dark:text-slate-300">#{p.card}</td>
                         <td className="py-3 px-4">
-                          <div className="font-bold text-slate-900">{p.name}</div>
-                          <div className="text-[11px] text-slate-500">{p.department || 'Planta Externa'}</div>
+                          <div className="font-bold text-slate-900 dark:text-white">{p.name}</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400">{p.department || 'Planta Externa'}</div>
                         </td>
                         <td className="py-3 px-3 text-center">
-                          <span className={`font-mono font-bold ${p.attendancePercentage >= 80 ? 'text-emerald-700' : 'text-slate-700'}`}>
+                          <span className={`font-mono font-bold ${p.attendancePercentage >= 80 ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-300'}`}>
                             {p.attendancePercentage}%
                           </span>
-                          <span className="block text-[10px] text-slate-500">
+                          <span className="block text-[10px] text-slate-500 dark:text-slate-400">
                             {p.attendedDays} / {p.totalDays} d
                           </span>
                         </td>
-                        <td className="py-3 px-3 text-center font-mono font-bold text-slate-800">
+                        <td className="py-3 px-3 text-center font-mono font-bold text-slate-800 dark:text-slate-300">
                           {p.totalHoursEarned}h
                         </td>
                         <td className="py-3 px-3 text-center">
@@ -1572,12 +1572,12 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                                     }
                                   }));
                                 }}
-                                className="w-16 px-2 py-1 text-center font-mono font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white text-xs"
+                                className="w-16 px-2 py-1 text-center font-mono font-bold text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white dark:focus:bg-slate-700 text-xs"
                               />
-                              <span className="text-[10px] font-bold text-slate-500">pts</span>
+                              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">pts</span>
                             </div>
                           ) : (
-                            <span className="font-mono font-bold text-slate-800">
+                            <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
                               {p.score !== null && p.score !== undefined ? `${p.score} pts` : '—'}
                             </span>
                           )}
@@ -1598,10 +1598,10 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                               }}
                               className={`px-2 py-1 rounded-lg text-xs font-bold border focus:outline-none focus:ring-2 focus:ring-[#DA291C] ${
                                 isPassed
-                                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                  ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900/60'
                                   : isFailed
-                                  ? 'bg-rose-50 text-rose-800 border-rose-200'
-                                  : 'bg-amber-50 text-amber-800 border-amber-200'
+                                  ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-200 dark:border-rose-900/60'
+                                  : 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-900/60'
                               }`}
                             >
                               <option value="passed">Aprobado (≥ 70)</option>
@@ -1612,10 +1612,10 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                             <span
                               className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                                 isPassed
-                                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                  ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900/60'
                                   : isFailed
-                                  ? 'bg-rose-50 text-rose-800 border border-rose-200'
-                                  : 'bg-amber-50 text-amber-800 border border-amber-200'
+                                  ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-200 dark:border-rose-900/60'
+                                  : 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-900/60'
                               }`}
                             >
                               {isPassed ? 'Aprobado' : isFailed ? 'Reprobado' : 'Pendiente'}
@@ -1638,28 +1638,28 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                                   }
                                 }));
                               }}
-                              className="w-full px-2.5 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white text-slate-700"
+                              className="w-full px-2.5 py-1 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white dark:focus:bg-slate-700 text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500"
                             />
                           ) : (
-                            <span className="text-slate-500 text-xs italic">
+                            <span className="text-slate-500 dark:text-slate-400 text-xs italic">
                               {p.feedback || '—'}
                             </span>
                           )}
                         </td>
                         <td className="py-3 px-4 text-center">
                           {isPassed ? (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/60">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                               ACREDITADO
                             </span>
                           ) : isFailed ? (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-rose-50 text-rose-700 border border-rose-200">
-                              <XCircle className="w-3.5 h-3.5 text-rose-600" />
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/60">
+                              <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
                               NO ACREDITADO
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-amber-50 text-amber-700 border border-amber-200">
-                              <Clock3 className="w-3.5 h-3.5 text-amber-600" />
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/60">
+                              <Clock3 className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                               PENDIENTE
                             </span>
                           )}

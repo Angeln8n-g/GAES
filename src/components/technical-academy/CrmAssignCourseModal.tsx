@@ -139,15 +139,15 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
       ariaLabel={isReassignment ? 'Reasignar Curso Técnico' : 'Asignar Curso Técnico'}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
     >
-      <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-6 animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-6 animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         
         {/* Modal Header */}
-        <div className="flex items-start justify-between border-b border-slate-100 pb-4">
+        <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
           <div className="flex items-center gap-3">
             <div className={`p-3 rounded-2xl ${
               isReassignment 
-                ? 'bg-amber-50 text-amber-600'
-                : 'bg-red-50 text-[#DA291C]'
+                ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400'
+                : 'bg-red-50 dark:bg-red-950/40 text-[#DA291C]'
             }`}>
               {isReassignment ? (
                 <ArrowRightLeft className="w-6 h-6" />
@@ -157,14 +157,14 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-black text-slate-900">
+                <h2 className="text-xl font-black text-slate-900 dark:text-white">
                   {isReassignment ? 'Reasignar Curso Técnico' : 'Asignar Curso Técnico'}
                 </h2>
-                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-red-100 text-[#DA291C]">
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-red-100 dark:bg-red-950/60 text-[#DA291C]">
                   Super Admin CRM
                 </span>
               </div>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 {isReassignment 
                   ? 'Transfiere al colaborador a un nuevo ciclo o nivel de la Academia Técnica'
                   : 'Enrola colaboradores en un curso técnico y cohorte programada'}
@@ -174,7 +174,7 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 hover:bg-slate-100 rounded-xl text-slate-500 hover:text-slate-600 transition-colors"
+            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -182,20 +182,20 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
 
         {/* Previous Assignment Context Alert */}
         {isReassignment && prevCourseTitle && (
-          <div className="bg-amber-50 border border-amber-200/80 rounded-2xl p-4 text-xs text-amber-900 space-y-2">
-            <div className="flex items-center gap-2 font-bold text-amber-800">
-              <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+          <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-900/50 rounded-2xl p-4 text-xs text-amber-900 dark:text-amber-200 space-y-2">
+            <div className="flex items-center gap-2 font-bold text-amber-800 dark:text-amber-300">
+              <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
               <span>Curso Anterior / Concluido:</span>
-              <span className="font-black text-slate-900">{prevCourseTitle}</span>
+              <span className="font-black text-slate-900 dark:text-white">{prevCourseTitle}</span>
             </div>
-            <label className="flex items-center gap-2 mt-2 pt-2 border-t border-amber-200/60 cursor-pointer select-none">
+            <label className="flex items-center gap-2 mt-2 pt-2 border-t border-amber-200/60 dark:border-amber-900/50 cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={archivePrevious}
                 onChange={(e) => setArchivePrevious(e.target.checked)}
-                className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500 border-amber-300"
+                className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500 border-amber-300 dark:border-amber-700"
               />
-              <span className="text-slate-800 font-semibold">
+              <span className="text-slate-800 dark:text-slate-200 font-semibold">
                 Archivar récord previo en el historial de constancias de RRHH (Recomendado)
               </span>
             </label>
@@ -204,23 +204,23 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
 
         {/* Selected Participants Chips */}
         <div className="space-y-2">
-          <label className="block text-xs font-bold text-slate-700">
+          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
             {targetParticipants.length === 1 
               ? 'Colaborador Objetivo' 
               : `Colaboradores Seleccionados (${targetParticipants.length})`}
           </label>
-          <div className="flex flex-wrap gap-2 max-h-28 overflow-y-auto p-2 bg-slate-50 rounded-2xl border border-slate-200">
+          <div className="flex flex-wrap gap-2 max-h-28 overflow-y-auto p-2 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700">
             {targetParticipants.map(p => (
               <div 
                 key={p.card}
-                className="inline-flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs text-xs"
+                className="inline-flex items-center gap-2 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs text-xs"
               >
-                <div className="w-5 h-5 rounded-full bg-slate-800 text-white text-[10px] font-bold flex items-center justify-center">
+                <div className="w-5 h-5 rounded-full bg-slate-800 dark:bg-slate-700 text-white text-[10px] font-bold flex items-center justify-center">
                   {p.name.charAt(0)}
                 </div>
                 <div className="leading-tight">
-                  <span className="font-bold text-slate-800 block text-[11px]">{p.name}</span>
-                  <span className="text-[10px] text-slate-500 font-mono">Ficha #{p.card}</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-200 block text-[11px]">{p.name}</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">Ficha #{p.card}</span>
                 </div>
               </div>
             ))}
@@ -228,7 +228,7 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
         </div>
 
         {errorMsg && (
-          <div className="p-3.5 bg-red-50 border border-red-200 rounded-2xl text-xs text-red-700 flex items-center gap-2 font-medium">
+          <div className="p-3.5 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 rounded-2xl text-xs text-red-700 dark:text-red-300 flex items-center gap-2 font-medium">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{errorMsg}</span>
           </div>
@@ -237,13 +237,13 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Step 1: Select Course */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-slate-700">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
               1. Seleccionar Curso de la Academia Técnica
             </label>
             <select
               value={selectedCourseId}
               onChange={(e) => handleCourseChange(e.target.value)}
-              className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#DA291C] cursor-pointer"
+              className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#DA291C] cursor-pointer"
             >
               {courses.map(c => (
                 <option key={c.id} value={c.id}>
@@ -256,17 +256,17 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
           {/* Step 2: Select Cohort */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-bold text-slate-700">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
                 2. Seleccionar Cohorte / Horario Programado
               </label>
-              <span className="text-[11px] text-slate-500 font-medium">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                 {availableCohorts.length} cohorte(s) para este curso
               </span>
             </div>
 
             {availableCohorts.length === 0 ? (
-              <div className="p-5 text-center bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-500 space-y-1">
-                <p className="font-bold text-slate-700">No hay cohortes creadas para este curso.</p>
+              <div className="p-5 text-center bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400 space-y-1">
+                <p className="font-bold text-slate-700 dark:text-slate-300">No hay cohortes creadas para este curso.</p>
                 <p>Crea primero una cohorte en la pestaña "Planificador & Rotación" para poder asignar participantes.</p>
               </div>
             ) : (
@@ -283,34 +283,34 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
                       onClick={() => setSelectedCohortId(coh.id)}
                       className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
                         isSelected
-                          ? 'border-[#DA291C] bg-red-50/40 shadow-sm ring-1 ring-[#DA291C]'
-                          : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                          ? 'border-[#DA291C] bg-red-50/40 dark:bg-red-950/30 shadow-sm ring-1 ring-[#DA291C]'
+                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700/50'
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
-                          isSelected ? 'border-[#DA291C] bg-[#DA291C] text-white' : 'border-slate-300 bg-white'
+                          isSelected ? 'border-[#DA291C] bg-[#DA291C] text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
                         }`}>
                           {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
                         </div>
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-xs text-slate-900">
+                            <span className="font-bold text-xs text-slate-900 dark:text-white">
                               {coh.groupName || 'Cohorte General'}
                             </span>
                             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                               isInProgress 
-                                ? 'bg-amber-100 text-amber-800'
+                                ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
                                 : isScheduled 
-                                  ? 'bg-blue-100 text-blue-800'
+                                  ? 'bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300'
                                   : isCompleted 
-                                    ? 'bg-slate-100 text-slate-600'
-                                    : 'bg-red-100 text-red-800'
+                                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                                    : 'bg-red-100 dark:bg-red-950/60 text-red-800 dark:text-red-300'
                             }`}>
                               {isInProgress ? 'En Curso' : isScheduled ? 'Programada' : isCompleted ? 'Concluida' : coh.status}
                             </span>
                           </div>
-                          <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500">
+                          <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400">
                             <span className="flex items-center gap-1">
                               <Calendar className="w-3 h-3 text-slate-400" />
                               {coh.startDate} al {coh.endDate}
@@ -328,10 +328,10 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
                       </div>
 
                       <div className="text-right shrink-0 text-[11px]">
-                        <span className="font-bold text-slate-700 block">
+                        <span className="font-bold text-slate-700 dark:text-slate-300 block">
                           Facilitador:
                         </span>
-                        <span className="text-slate-500 truncate max-w-[120px] block">
+                        <span className="text-slate-500 dark:text-slate-400 truncate max-w-[120px] block">
                           {coh.facilitatorName || 'Por asignar'}
                         </span>
                       </div>
@@ -343,12 +343,12 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
           </div>
 
           {/* Modal Actions */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             >
               Cancelar
             </button>

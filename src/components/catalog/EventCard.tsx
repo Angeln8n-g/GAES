@@ -100,11 +100,11 @@ export const EventCard: React.FC<EventCardProps> = ({
   const durationMetrics = getEventDurationMetrics(event);
 
   return (
-    <div className="bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-xs hover:border-[#DA291C] hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl overflow-hidden shadow-xs hover:border-[#DA291C] dark:hover:border-red-500 hover:shadow-2xl dark:hover:shadow-slate-950/70 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
       
       {/* Event Image & Header Badges */}
       <div>
-        <div className="relative h-48 w-full overflow-hidden bg-slate-100">
+        <div className="relative h-48 w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
           <img
             src={event.imageUrl || "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80"}
             alt={event.title}
@@ -128,13 +128,13 @@ export const EventCard: React.FC<EventCardProps> = ({
               )}
               
               {event.companyId === 'all' || !event.companyId ? (
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/95 text-slate-800 backdrop-blur-md border border-slate-200/80 flex items-center gap-1 shadow-xs">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/95 dark:bg-slate-900/90 text-slate-800 dark:text-slate-200 backdrop-blur-md border border-slate-200/80 dark:border-slate-700 flex items-center gap-1 shadow-xs">
                   <Globe className="w-3 h-3 text-emerald-600" />
                   <span>Todas las Empresas</span>
                 </span>
               ) : comp ? (
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/95 text-slate-800 backdrop-blur-md border border-slate-200/80 flex items-center gap-1 shadow-xs">
-                  <Building2 className="w-3 h-3 text-[#DA291C]" />
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/95 dark:bg-slate-900/90 text-slate-800 dark:text-slate-200 backdrop-blur-md border border-slate-200/80 dark:border-slate-700 flex items-center gap-1 shadow-xs">
+                  <Building2 className="w-3 h-3 text-[#DA291C] dark:text-red-400" />
                   <span>{comp.name.split(' ')[0]}</span>
                 </span>
               ) : null}
@@ -158,8 +158,8 @@ export const EventCard: React.FC<EventCardProps> = ({
 
             <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold backdrop-blur-md flex items-center gap-1 shadow-xs ${
               event.modality === 'Virtual'
-                ? 'bg-white/95 text-cyan-700 border border-cyan-200'
-                : 'bg-white/95 text-emerald-700 border border-emerald-200'
+                ? 'bg-white/95 dark:bg-slate-900/90 text-cyan-700 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800/60'
+                : 'bg-white/95 dark:bg-slate-900/90 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60'
             }`}>
               {event.modality === 'Virtual' ? <Video className="w-3 h-3 text-cyan-600" /> : <MapPin className="w-3 h-3 text-emerald-600" />}
               <span>{event.modality}</span>
@@ -187,7 +187,7 @@ export const EventCard: React.FC<EventCardProps> = ({
         <div className="p-6">
           {/* Duration & Classification Pills */}
           <div className="flex items-center gap-1.5 mb-2.5 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-50 text-amber-900 border border-amber-200/80 shadow-2xs">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60 shadow-2xs">
               <Clock className="w-3 h-3 text-amber-600" />
               <span>{durationMetrics.totalHours} hrs</span>
               <span className="text-amber-400">•</span>
@@ -195,31 +195,31 @@ export const EventCard: React.FC<EventCardProps> = ({
             </span>
 
             {(event.subprogram?.toLowerCase().includes('sustentabilidad') || event.programCategory === 'Capacitacion_seguridad_salud_en_el_trabajo_y_sustentabilidad') && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-2xs">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/60 shadow-2xs">
                 <Leaf className="w-3 h-3 text-emerald-600" />
                 <span>Sustentabilidad</span>
               </span>
             )}
 
             {event.sessionType && (
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                 {event.sessionType}
               </span>
             )}
           </div>
 
-          <h3 className="text-base font-black text-slate-900 group-hover:text-[#DA291C] transition-colors line-clamp-2 mb-2 leading-snug">
+          <h3 className="text-base font-black text-slate-900 dark:text-white group-hover:text-[#DA291C] dark:group-hover:text-red-400 transition-colors line-clamp-2 mb-2 leading-snug">
             {event.title}
           </h3>
-          <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed mb-4 font-normal">
+          <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed mb-4 font-normal">
             {event.description}
           </p>
 
           {/* Tutor Badge if Assigned */}
           {event.ojtEvaluatorName && (
-            <div className="flex items-center gap-2 text-[11px] font-black text-purple-700 bg-purple-50/90 px-3 py-1.5 rounded-2xl border border-purple-200 mb-3.5 shadow-2xs" title="Tutor / Evaluador Responsable">
+            <div className="flex items-center gap-2 text-[11px] font-black text-purple-700 dark:text-purple-300 bg-purple-50/90 dark:bg-purple-950/40 px-3 py-1.5 rounded-2xl border border-purple-200 dark:border-purple-800/60 mb-3.5 shadow-2xs" title="Tutor / Evaluador Responsable">
               <UserCheck className="w-3.5 h-3.5 text-purple-600 shrink-0" />
-              <span>Tutor: <strong className="text-purple-900">{event.ojtEvaluatorName}</strong></span>
+              <span>Tutor: <strong className="text-purple-900 dark:text-purple-200">{event.ojtEvaluatorName}</strong></span>
             </div>
           )}
 
@@ -229,18 +229,18 @@ export const EventCard: React.FC<EventCardProps> = ({
               const isPast = sch.date < todayStr;
               return (
                 <div key={sIdx} className={`flex items-center justify-between text-xs px-3 py-1.5 rounded-2xl border ${
-                  isPast ? 'bg-slate-100/70 border-slate-200 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-700'
+                  isPast ? 'bg-slate-100/70 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500' : 'bg-slate-50 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'
                 }`}>
                   <div className="flex items-center gap-2">
-                    <CalendarIcon className={`w-3.5 h-3.5 shrink-0 ${isPast ? 'text-slate-400' : 'text-[#DA291C]'}`} />
+                    <CalendarIcon className={`w-3.5 h-3.5 shrink-0 ${isPast ? 'text-slate-400' : 'text-[#DA291C] dark:text-red-400'}`} />
                     <span className="font-semibold">{formatDateShort(sch.date)}</span>
                     {sch.date === todayStr && (
-                      <span className="px-1.5 py-0.2 rounded-md bg-red-100 text-[#DA291C] text-[9px] font-black uppercase">
+                      <span className="px-1.5 py-0.2 rounded-md bg-red-100 dark:bg-red-950/60 text-[#DA291C] dark:text-red-400 text-[9px] font-black uppercase">
                         Hoy
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-1 text-[11px] text-slate-500 font-medium">
+                  <div className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                     <Clock className="w-3 h-3 text-slate-400" />
                     <span>{sch.slots.map(s => s.endTime ? `${s.time} - ${s.endTime}` : s.time).join(', ')}</span>
                   </div>
@@ -248,7 +248,7 @@ export const EventCard: React.FC<EventCardProps> = ({
               );
             })}
             {additionalSchedulesCount > 0 && (
-              <p className="text-[10px] text-[#DA291C] text-right font-black">
+              <p className="text-[10px] text-[#DA291C] dark:text-red-400 text-right font-black">
                 +{additionalSchedulesCount} fechas adicionales
               </p>
             )}
@@ -256,13 +256,13 @@ export const EventCard: React.FC<EventCardProps> = ({
 
           {/* Capacity Progress Bar */}
           <div className="space-y-1 pt-1">
-            <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500">
+            <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 dark:text-slate-400">
               <span>Ocupación de cupos</span>
-              <span className={`font-bold ${isSoldOut ? 'text-rose-600' : 'text-slate-800'}`}>
+              <span className={`font-bold ${isSoldOut ? 'text-rose-600 dark:text-rose-400' : 'text-slate-800 dark:text-slate-200'}`}>
                 {totalRegistered} de {totalCapacity} ({percentageFilled}%)
               </span>
             </div>
-            <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+            <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
               <div 
                 className={`h-full ${progressColor} transition-all duration-500 rounded-full`}
                 style={{ width: `${percentageFilled}%` }}
@@ -275,10 +275,10 @@ export const EventCard: React.FC<EventCardProps> = ({
 
       {/* Card Footer: Capacity & Reservation CTA */}
       <div className="p-6 pt-0">
-        <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-xs text-slate-500">
+        <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
             <Users className="w-4 h-4 text-slate-400" />
-            <span className="font-bold text-slate-800">
+            <span className="font-bold text-slate-800 dark:text-slate-200">
               {availableSlots > 0 ? `${availableSlots} disponibles` : 'Sin cupos'}
             </span>
           </div>
@@ -288,24 +288,24 @@ export const EventCard: React.FC<EventCardProps> = ({
             className={`px-4 py-2.5 rounded-2xl text-xs font-black flex items-center gap-2 transition-all cursor-pointer shadow-xs ${
               isUserEnrolled
                 ? isMandatoryAssignment
-                  ? 'bg-rose-50 border border-rose-300 text-rose-700 shadow-rose-100'
-                  : 'bg-emerald-50 border border-emerald-300 text-emerald-700 hover:bg-emerald-100'
+                  ? 'bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 text-rose-700 dark:text-rose-300 shadow-rose-100 dark:shadow-none'
+                  : 'bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50'
                 : isPastEvent
-                ? 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200'
+                ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
                 : isSoldOut
-                ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
+                ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed border border-slate-200 dark:border-slate-700'
                 : 'bg-gradient-to-r from-[#DA291C] to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-md shadow-red-500/25 hover:scale-105 active:scale-95'
             }`}
           >
             {isUserEnrolled ? (
               isMandatoryAssignment ? (
                 <>
-                  <Lock className="w-3.5 h-3.5 text-rose-600" />
+                  <Lock className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
                   <span>Obligatorio</span>
                 </>
               ) : (
                 <>
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                   <span>Inscrito</span>
                 </>
               )

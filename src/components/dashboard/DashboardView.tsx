@@ -615,31 +615,31 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     <div className="space-y-8 pb-16">
       
       {/* Header Banner & Sub-Tabs Navigation (Light Theme & Fully Responsive) */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
         
         {/* Top Header Row */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-1 text-xs font-bold text-[#DA291C]">
+            <div className="flex items-center gap-2 mb-1 text-xs font-bold text-[#DA291C] dark:text-red-400">
               <BarChart3 className="w-4 h-4" />
               <span>Suite Ejecutiva de Business Intelligence</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
               Dashboard & Analítica Estratégica
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-2xl">
               Supervisa el cumplimiento de cronogramas, ocupación, calidad docente y genera reportes oficiales.
             </p>
           </div>
 
           {/* Company Scope Selector */}
           {companies.length > 0 && currentUser?.role === 'Super Administrador' && onSelectCompanyScope ? (
-            <div className="flex items-center gap-2 bg-slate-50 px-3.5 py-2 rounded-2xl border border-slate-200 text-xs shrink-0 self-start lg:self-auto">
-              <Building2 className="w-4 h-4 text-[#DA291C] shrink-0" />
+            <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/80 px-3.5 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs shrink-0 self-start lg:self-auto">
+              <Building2 className="w-4 h-4 text-[#DA291C] dark:text-red-400 shrink-0" />
               <select
                 value={selectedCompanyId}
                 onChange={(e) => onSelectCompanyScope(e.target.value)}
-                className="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
+                className="bg-transparent text-xs font-bold text-slate-800 dark:text-white focus:outline-none cursor-pointer"
               >
                 <option value="all">🏢 Todas las Empresas (Consolidado)</option>
                 {companies.map(c => (
@@ -654,8 +654,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               const compId = currentUser?.companyId || selectedCompanyId || 'emp_kasino';
               const comp = companies.find(c => c.id === compId);
               return (
-                <div className="flex items-center gap-2 bg-slate-50 px-3.5 py-2 rounded-2xl border border-slate-200 text-xs font-bold text-slate-700 shrink-0 self-start lg:self-auto">
-                  <Building2 className="w-4 h-4 text-[#DA291C] shrink-0" />
+                <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/80 px-3.5 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300 shrink-0 self-start lg:self-auto">
+                  <Building2 className="w-4 h-4 text-[#DA291C] dark:text-red-400 shrink-0" />
                   <span>🏢 {comp ? comp.name : 'Claro Dominicana'}</span>
                 </div>
               );
@@ -665,13 +665,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
         {/* Dedicated Full-Width Responsive Sub-Tab Navigation Bar */}
         <div className="w-full overflow-x-auto pb-1 scrollbar-none">
-          <div className="flex items-center bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200 min-w-max gap-1">
+          <div className="flex items-center bg-slate-100/90 dark:bg-slate-800/90 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 min-w-max gap-1">
             <button
               onClick={() => setActiveTab('overview')}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
                 activeTab === 'overview'
                   ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700/70'
               }`}
             >
               <BarChart3 className="w-3.5 h-3.5" />
@@ -683,7 +683,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
                 activeTab === 'compliance'
                   ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700/70'
               }`}
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
@@ -695,7 +695,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
                 activeTab === 'instructors'
                   ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700/70'
               }`}
             >
               <Award className="w-3.5 h-3.5" />
@@ -707,7 +707,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
                 activeTab === 'skills'
                   ? 'bg-purple-600 text-white shadow-md shadow-purple-600/25'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700/70'
               }`}
             >
               <GraduationCap className="w-3.5 h-3.5" />
@@ -724,7 +724,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
                 activeTab === 'demographics'
                   ? 'bg-amber-600 text-white shadow-md shadow-amber-600/25'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700/70'
               }`}
             >
               <Users className="w-3.5 h-3.5" />
@@ -736,7 +736,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
                 activeTab === 'sustainability'
                   ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25'
-                  : 'text-slate-600 hover:text-emerald-700 hover:bg-white'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-white dark:hover:bg-slate-700/70'
               }`}
             >
               <Leaf className="w-3.5 h-3.5" />
@@ -749,7 +749,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
                   activeTab === 'ojt_ttp'
                     ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700/70'
                 }`}
               >
                 <Activity className="w-3.5 h-3.5" />
@@ -762,7 +762,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
                 activeTab === 'reports'
                   ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25'
-                  : 'text-slate-600 hover:text-emerald-700 hover:bg-white'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-white dark:hover:bg-slate-700/70'
               }`}
             >
               <FileSpreadsheet className="w-3.5 h-3.5" />
@@ -783,69 +783,69 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             
             {/* KPI 1: Cupos Totales */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-500">Oferta de Cupos</span>
-                <div className="p-2 rounded-xl bg-red-50 text-[#DA291C]">
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Oferta de Cupos</span>
+                <div className="p-2 rounded-xl bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400">
                   <BookOpen className="w-4 h-4" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-black text-slate-900 mt-2">{totalCapacity}</p>
-              <p className="text-[11px] text-slate-500 mt-1">En {events.length} capacitaciones activas</p>
+              <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-2">{totalCapacity}</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">En {events.length} capacitaciones activas</p>
             </div>
 
             {/* KPI 2: Tasa de Ocupación */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-500">Inscripciones</span>
-                <div className="p-2 rounded-xl bg-cyan-50 text-cyan-700">
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Inscripciones</span>
+                <div className="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 text-cyan-700 dark:text-cyan-400">
                   <Users className="w-4 h-4" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-black text-cyan-700 mt-2">{totalRegistered}</p>
-              <div className="flex items-center gap-1 text-[11px] text-slate-500 mt-1">
-                <span>Ocupación: <strong className="text-slate-800">{occupancyRate}%</strong></span>
+              <p className="text-2xl sm:text-3xl font-black text-cyan-700 dark:text-cyan-400 mt-2">{totalRegistered}</p>
+              <div className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                <span>Ocupación: <strong className="text-slate-800 dark:text-slate-200">{occupancyRate}%</strong></span>
               </div>
             </div>
 
             {/* KPI 3: Asistencia QR & Efectividad */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-500">Asistencia QR</span>
-                <div className="p-2 rounded-xl bg-emerald-50 text-emerald-700">
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Asistencia QR</span>
+                <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400">
                   <UserCheck className="w-4 h-4" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-black text-emerald-700 mt-2">{totalAttended}</p>
-              <div className="flex items-center gap-1 text-[11px] text-slate-500 mt-1">
-                <span>Efectividad: <strong className="text-slate-800">{attendanceRate}%</strong></span>
+              <p className="text-2xl sm:text-3xl font-black text-emerald-700 dark:text-emerald-400 mt-2">{totalAttended}</p>
+              <div className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                <span>Efectividad: <strong className="text-slate-800 dark:text-slate-200">{attendanceRate}%</strong></span>
               </div>
             </div>
 
             {/* KPI 4: Cumplimiento de Cronogramas */}
-            <div className="bg-gradient-to-br from-red-50 to-white border border-red-200 rounded-3xl p-5 shadow-sm">
+            <div className="bg-gradient-to-br from-red-50 to-white dark:from-red-950/30 dark:to-slate-900 border border-red-200 dark:border-red-900/50 rounded-3xl p-5 shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#DA291C]">Cumplimiento Global</span>
-                <div className="p-2 rounded-xl bg-red-100 text-[#DA291C]">
+                <span className="text-xs font-bold text-[#DA291C] dark:text-red-400">Cumplimiento Global</span>
+                <div className="p-2 rounded-xl bg-red-100 dark:bg-red-900/40 text-[#DA291C] dark:text-red-400">
                   <Percent className="w-4 h-4" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-black text-[#DA291C] mt-2">{globalCompliancePct}%</p>
-              <p className="text-[11px] text-slate-600 mt-1">{programs.length} cronogramas asignados</p>
+              <p className="text-2xl sm:text-3xl font-black text-[#DA291C] dark:text-red-400 mt-2">{globalCompliancePct}%</p>
+              <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-1">{programs.length} cronogramas asignados</p>
             </div>
 
             {/* KPI 5: Horas-Hombre & Satisfacción */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-500">Horas Formación</span>
-                <div className="p-2 rounded-xl bg-amber-50 text-amber-700">
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Horas Formación</span>
+                <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400">
                   <Clock className="w-4 h-4" />
                 </div>
               </div>
-              <p className="text-2xl sm:text-3xl font-black text-amber-700 mt-2">{estimatedTrainingHours}h</p>
-              <div className="flex items-center gap-1 text-[11px] text-slate-500 mt-1">
+              <p className="text-2xl sm:text-3xl font-black text-amber-700 dark:text-amber-400 mt-2">{estimatedTrainingHours}h</p>
+              <div className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400 mt-1">
                 <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                <span>CSAT: <strong className="text-slate-800">{avgRatingGlobal}</strong> / 5.0</span>
+                <span>CSAT: <strong className="text-slate-800 dark:text-slate-200">{avgRatingGlobal}</strong> / 5.0</span>
               </div>
             </div>
 
@@ -855,13 +855,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             {/* Categories Breakdown */}
-            <div className="lg:col-span-2 bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
+            <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-[#DA291C]" />
+                <h2 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-[#DA291C] dark:text-red-400" />
                   Rendimiento por Categoría de Capacitación
                 </h2>
-                <span className="text-xs text-slate-500 font-medium">{Object.keys(categoryStats).length} categorías</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{Object.keys(categoryStats).length} categorías</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -870,22 +870,22 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   const attPct = stats.registered > 0 ? Math.round((stats.attended / stats.registered) * 100) : 0;
 
                   return (
-                    <div key={cat} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+                    <div key={cat} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2.5">
                       <div className="flex items-center justify-between text-xs font-bold">
-                        <span className="text-slate-900">{cat}</span>
-                        <span className="text-[#DA291C] font-extrabold">{capPct}% Ocupación</span>
+                        <span className="text-slate-900 dark:text-white">{cat}</span>
+                        <span className="text-[#DA291C] dark:text-red-400 font-extrabold">{capPct}% Ocupación</span>
                       </div>
 
-                      <div className="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
+                      <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
                         <div
-                          className="h-full bg-[#DA291C] rounded-full transition-all duration-500"
+                          className="h-full bg-[#DA291C] dark:bg-red-500 rounded-full transition-all duration-500"
                           style={{ width: `${Math.min(capPct, 100)}%` }}
                         />
                       </div>
 
-                      <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200">
+                      <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-200 dark:border-slate-700">
                         <span>{stats.count} curso(s) • {stats.registered}/{stats.capacity} cupos</span>
-                        <span className="text-emerald-700 font-bold">{stats.attended} asistencias ({attPct}%)</span>
+                        <span className="text-emerald-700 dark:text-emerald-400 font-bold">{stats.attended} asistencias ({attPct}%)</span>
                       </div>
                     </div>
                   );
@@ -894,10 +894,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
 
             {/* Modalities Distribution */}
-            <div className="lg:col-span-1 bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4 flex flex-col justify-between">
+            <div className="lg:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4 flex flex-col justify-between">
               <div>
-                <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2 mb-4">
-                  <Layers className="w-4 h-4 text-[#DA291C]" />
+                <h2 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
+                  <Layers className="w-4 h-4 text-[#DA291C] dark:text-red-400" />
                   Distribución por Modalidad
                 </h2>
 
@@ -907,10 +907,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     return (
                       <div key={mod} className="space-y-1.5">
                         <div className="flex items-center justify-between text-xs">
-                          <span className="font-bold text-slate-800">{mod}</span>
-                          <span className="font-bold text-slate-900">{s.registered} inscritos ({pctOfTotal}%)</span>
+                          <span className="font-bold text-slate-800 dark:text-slate-200">{mod}</span>
+                          <span className="font-bold text-slate-900 dark:text-white">{s.registered} inscritos ({pctOfTotal}%)</span>
                         </div>
-                        <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden border border-slate-200">
+                        <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden border border-slate-200 dark:border-slate-700">
                           <div 
                             className={`h-full rounded-full ${
                               mod === 'Presencial' ? 'bg-emerald-500' : mod === 'Virtual' ? 'bg-[#DA291C]' : 'bg-purple-500'
@@ -918,7 +918,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                             style={{ width: `${pctOfTotal}%` }}
                           />
                         </div>
-                        <div className="flex justify-between text-[10px] text-slate-500">
+                        <div className="flex justify-between text-[10px] text-slate-500 dark:text-slate-400">
                           <span>{s.count} eventos programados</span>
                           <span>{s.attended} confirmados por QR</span>
                         </div>
@@ -928,8 +928,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-red-50/60 border border-red-200 text-xs text-slate-700 flex items-center gap-3">
-                <Sparkles className="w-5 h-5 text-[#DA291C] shrink-0" />
+              <div className="p-4 rounded-2xl bg-red-50/60 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 text-xs text-slate-700 dark:text-slate-300 flex items-center gap-3">
+                <Sparkles className="w-5 h-5 text-[#DA291C] dark:text-red-400 shrink-0" />
                 <p>Las capacitaciones virtuales concentran mayor volumen, mientras que las presenciales logran un 92% de permanencia.</p>
               </div>
             </div>
@@ -942,28 +942,31 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* ==========================================
           TAB 2: CUMPLIMIENTO & CRONOGRAMAS
           ========================================== */}
+      {/* ==========================================
+          TAB 2: CUMPLIMIENTO & CRONOGRAMAS
+          ========================================== */}
       {activeTab === 'compliance' && (
         <div className="space-y-8 animate-in fade-in duration-300">
           
           {/* Header & Program Selector */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <h2 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 Monitoreo de Rutas Formativas & Cohortes
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Evalúa el avance de cada área en sus planes de capacitación asignados.
               </p>
             </div>
 
             {programs.length > 0 && (
               <div className="flex items-center gap-2 self-stretch sm:self-auto">
-                <span className="text-xs font-bold text-slate-600 whitespace-nowrap">Cronograma:</span>
+                <span className="text-xs font-bold text-slate-600 dark:text-slate-300 whitespace-nowrap">Cronograma:</span>
                 <select
                   value={selectedProgramId}
                   onChange={(e) => setSelectedProgramId(e.target.value)}
-                  className="px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-[#DA291C] w-full sm:w-auto"
+                  className="px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C] w-full sm:w-auto cursor-pointer"
                 >
                   {programs.map(p => (
                     <option key={p.id} value={p.id}>
@@ -979,33 +982,33 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="space-y-6">
               
               {/* Program Overview Banner */}
-              <div className="bg-white border border-red-200 rounded-3xl p-6 sm:p-8 shadow-sm">
+              <div className="bg-white dark:bg-slate-900 border border-red-200 dark:border-red-900/40 rounded-3xl p-6 sm:p-8 shadow-sm">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-700 border border-emerald-300">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800">
                         {selectedProgram.status}
                       </span>
-                      <span className="text-xs text-slate-500">
-                        Límite: <strong className="text-slate-800">{formatDateLong(selectedProgram.endDate)}</strong>
+                      <span className="text-xs text-slate-500 dark:text-slate-400">
+                        Límite: <strong className="text-slate-800 dark:text-slate-200">{formatDateLong(selectedProgram.endDate)}</strong>
                       </span>
                     </div>
-                    <h2 className="text-xl font-extrabold text-slate-900">{selectedProgram.title}</h2>
-                    <p className="text-xs text-slate-600 mt-1">{selectedProgram.description}</p>
+                    <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">{selectedProgram.title}</h2>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">{selectedProgram.description}</p>
                   </div>
 
-                  <div className="text-left sm:text-right p-4 rounded-2xl bg-red-50 border border-red-200 shrink-0">
-                    <span className="text-xs text-slate-600 font-bold block">Cumplimiento del Programa</span>
-                    <span className="text-3xl font-black text-[#DA291C]">{selectedProgramCompliance.overallPercentage}%</span>
-                    <span className="text-[11px] text-slate-500 block mt-0.5">
+                  <div className="text-left sm:text-right p-4 rounded-2xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/40 shrink-0">
+                    <span className="text-xs text-slate-600 dark:text-slate-400 font-bold block">Cumplimiento del Programa</span>
+                    <span className="text-3xl font-black text-[#DA291C] dark:text-red-400">{selectedProgramCompliance.overallPercentage}%</span>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-0.5">
                       {selectedProgramCompliance.completedCount} de {selectedProgramCompliance.totalParticipants} colaboradores al 100%
                     </span>
                   </div>
                 </div>
 
                 {/* Groups Progress Bars */}
-                <div className="mt-6 pt-5 border-t border-slate-100 space-y-3">
-                  <span className="text-xs font-bold text-slate-800 block">
+                <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">
                     Avance por Departamento / Grupo Asignado:
                   </span>
 
@@ -1013,18 +1016,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     {selectedProgramCompliance.groupStats.map(g => {
                       const theme = getGroupColorTheme(g.groupColor);
                       return (
-                        <div key={g.groupId} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                        <div key={g.groupId} className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2">
                           <div className="flex items-center justify-between text-xs">
-                            <span className="font-bold text-slate-900 line-clamp-1">{g.groupName}</span>
+                            <span className="font-bold text-slate-900 dark:text-white line-clamp-1">{g.groupName}</span>
                             <span className={`font-extrabold ${theme.text}`}>{g.averagePercentage}%</span>
                           </div>
-                          <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                          <div className="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
                             <div 
                               className={`h-full rounded-full ${theme.dot}`}
                               style={{ width: `${g.averagePercentage}%` }}
                             />
                           </div>
-                          <div className="flex justify-between text-[10px] text-slate-500">
+                          <div className="flex justify-between text-[10px] text-slate-500 dark:text-slate-400">
                             <span>{g.completedMembers}/{g.totalMembers} al 100%</span>
                             <span>{g.totalMembers} miembros</span>
                           </div>
@@ -1037,19 +1040,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
               {/* At-Risk Participants Alert Section */}
               {atRiskParticipants.length > 0 && (
-                <div className="bg-white border border-rose-200 rounded-3xl p-6 shadow-sm space-y-4">
+                <div className="bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-900/40 rounded-3xl p-6 shadow-sm space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-extrabold text-rose-700 flex items-center gap-2">
+                    <h3 className="text-sm font-extrabold text-rose-700 dark:text-rose-400 flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4" />
                       Colaboradores con Cursos Pendientes / En Riesgo de Vencimiento
                     </h3>
-                    <span className="text-xs text-slate-500">Mostrando {atRiskParticipants.length} colaboradores</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">Mostrando {atRiskParticipants.length} colaboradores</span>
                   </div>
 
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs">
                       <thead>
-                        <tr className="border-b border-slate-200 text-slate-600 bg-slate-50">
+                        <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80">
                           <th className="p-3 font-bold">Colaborador</th>
                           <th className="p-3 font-bold">Programa</th>
                           <th className="p-3 font-bold text-center">Avance Actual</th>
@@ -1057,23 +1060,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           <th className="p-3 font-bold text-right">Fecha Límite</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100">
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                         {atRiskParticipants.map((p, idx) => (
-                          <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                          <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                             <td className="p-3">
-                              <div className="font-bold text-slate-900">{p.participantName}</div>
-                              <div className="text-[11px] text-slate-500">{p.participantEmail}</div>
+                              <div className="font-bold text-slate-900 dark:text-white">{p.participantName}</div>
+                              <div className="text-[11px] text-slate-500 dark:text-slate-400">{p.participantEmail}</div>
                             </td>
-                            <td className="p-3 font-medium text-slate-700">{p.programTitle}</td>
+                            <td className="p-3 font-medium text-slate-700 dark:text-slate-300">{p.programTitle}</td>
                             <td className="p-3 text-center">
-                              <span className="font-extrabold text-amber-600">{p.percentage}%</span>
+                              <span className="font-extrabold text-amber-600 dark:text-amber-400">{p.percentage}%</span>
                             </td>
                             <td className="p-3 text-center">
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40">
                                 {p.pendingMandatory} obligatorios
                               </span>
                             </td>
-                            <td className="p-3 text-right font-mono text-slate-700">
+                            <td className="p-3 text-right font-mono text-slate-700 dark:text-slate-300">
                               {p.programEndDate}
                             </td>
                           </tr>
@@ -1086,9 +1089,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
             </div>
           ) : (
-            <div className="p-12 text-center bg-white border border-slate-200 rounded-3xl shadow-sm">
+            <div className="p-12 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm">
               <Calendar className="w-10 h-10 text-slate-400 mx-auto mb-2" />
-              <p className="text-slate-500 text-xs">No hay cronogramas creados aún.</p>
+              <p className="text-slate-500 dark:text-slate-400 text-xs">No hay cronogramas creados aún.</p>
             </div>
           )}
 
@@ -1102,16 +1105,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="space-y-8 animate-in fade-in duration-300">
           
           {/* Header & Course Filter Bar */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 text-xs font-bold text-[#DA291C] mb-1">
-                <Sparkles className="w-4 h-4 text-[#DA291C]" />
+              <div className="flex items-center gap-2 text-xs font-bold text-[#DA291C] dark:text-red-400 mb-1">
+                <Sparkles className="w-4 h-4 text-[#DA291C] dark:text-red-400" />
                 <span>Encuesta de Evaluación de Curso y Facilitador - TEC</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                 Métricas de Calidad y Satisfacción TEC
               </h2>
-              <p className="text-xs text-slate-500 mt-1 max-w-2xl">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-2xl">
                 {TEC_SURVEY_INFO.intro}
               </p>
             </div>
@@ -1121,7 +1124,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <select
                 value={selectedSurveyEventId}
                 onChange={(e) => setSelectedSurveyEventId(e.target.value)}
-                className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-800 focus:outline-none focus:border-[#DA291C] cursor-pointer"
+                className="px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-bold text-slate-800 dark:text-white focus:outline-none focus:border-[#DA291C] cursor-pointer"
               >
                 <option value="all">Todos los Cursos ({events.length})</option>
                 {events.map(evt => (
@@ -1134,9 +1137,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <button
                 type="button"
                 onClick={() => exportInstructorsAndFeedbackReportToExcel(events)}
-                className="px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-2xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="px-4 py-2.5 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 rounded-2xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
               >
-                <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+                <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>Exportar Excel</span>
               </button>
             </div>
@@ -1146,72 +1149,72 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             
             {/* KPI 1: Promedio General TEC */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col justify-between">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col justify-between">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Índice Global TEC</span>
-                <div className="p-2 rounded-xl bg-amber-50 text-amber-700">
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Índice Global TEC</span>
+                <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400">
                   <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
                 </div>
               </div>
               <div className="mt-4">
-                <p className="text-3xl font-black text-slate-900 leading-none">
-                  {tecSurveyMetrics.avgComposite} <span className="text-sm font-semibold text-slate-500">/ 5.0</span>
+                <p className="text-3xl font-black text-slate-900 dark:text-white leading-none">
+                  {tecSurveyMetrics.avgComposite} <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">/ 5.0</span>
                 </p>
-                <p className="text-[11px] text-slate-500 font-medium mt-1">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-1">
                   {tecSurveyMetrics.totalResponses} evaluaciones recibidas
                 </p>
               </div>
             </div>
 
             {/* KPI 2: Evaluación Contenido del Curso */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col justify-between">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col justify-between">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Evaluación Curso</span>
-                <div className="p-2 rounded-xl bg-red-50 text-[#DA291C]">
-                  <BookOpen className="w-4 h-4 text-[#DA291C]" />
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Evaluación Curso</span>
+                <div className="p-2 rounded-xl bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400">
+                  <BookOpen className="w-4 h-4 text-[#DA291C] dark:text-red-400" />
                 </div>
               </div>
               <div className="mt-4">
-                <p className="text-3xl font-black text-[#DA291C] leading-none">
-                  {tecSurveyMetrics.avgCourse} <span className="text-sm font-semibold text-slate-500">/ 5.0</span>
+                <p className="text-3xl font-black text-[#DA291C] dark:text-red-400 leading-none">
+                  {tecSurveyMetrics.avgCourse} <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">/ 5.0</span>
                 </p>
-                <p className="text-[11px] text-slate-500 font-medium mt-1">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-1">
                   8 dimensiones pedagógicas evaluadas
                 </p>
               </div>
             </div>
 
             {/* KPI 3: Evaluación del Facilitador */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col justify-between">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col justify-between">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Evaluación Facilitador</span>
-                <div className="p-2 rounded-xl bg-amber-50 text-amber-800">
-                  <Award className="w-4 h-4 text-amber-600" />
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Evaluación Facilitador</span>
+                <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400">
+                  <Award className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                 </div>
               </div>
               <div className="mt-4">
-                <p className="text-3xl font-black text-amber-700 leading-none">
-                  {tecSurveyMetrics.avgFacilitator} <span className="text-sm font-semibold text-slate-500">/ 5.0</span>
+                <p className="text-3xl font-black text-amber-700 dark:text-amber-400 leading-none">
+                  {tecSurveyMetrics.avgFacilitator} <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">/ 5.0</span>
                 </p>
-                <p className="text-[11px] text-slate-500 font-medium mt-1">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-1">
                   7 competencias docentes evaluadas
                 </p>
               </div>
             </div>
 
             {/* KPI 4: Tasa de Excelencia */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col justify-between">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col justify-between">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Tasa de Excelencia</span>
-                <div className="p-2 rounded-xl bg-emerald-50 text-emerald-700">
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tasa de Excelencia</span>
+                <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400">
                   <CheckCircle2 className="w-4 h-4" />
                 </div>
               </div>
               <div className="mt-4">
-                <p className="text-3xl font-black text-emerald-700 leading-none">
+                <p className="text-3xl font-black text-emerald-700 dark:text-emerald-400 leading-none">
                   {tecSurveyMetrics.excellenceRate}%
                 </p>
-                <p className="text-[11px] text-slate-500 font-medium mt-1">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-1">
                   Calificaciones de 5 estrellas
                 </p>
               </div>
@@ -1223,18 +1226,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             
             {/* PARTE 1: CURSO */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-xl bg-red-50 text-[#DA291C]">
+                  <div className="p-2 rounded-xl bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400">
                     <BookOpen className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-black text-slate-900">Parte 1: Evaluación del Curso</h3>
-                    <p className="text-[11px] text-slate-500 font-medium">8 preguntas de contenidos, recursos y aplicación</p>
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white">Parte 1: Evaluación del Curso</h3>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">8 preguntas de contenidos, recursos y aplicación</p>
                   </div>
                 </div>
-                <span className="px-3 py-1 rounded-xl bg-red-50 text-[#DA291C] border border-red-200 text-xs font-black">
+                <span className="px-3 py-1 rounded-xl bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-900/40 text-xs font-black">
                   {tecSurveyMetrics.avgCourse} ★
                 </span>
               </div>
@@ -1243,20 +1246,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 {COURSE_QUESTIONS.map((q, idx) => {
                   const data = tecSurveyMetrics.courseQuestionsAvg[q.id] || { avg: 5.0, pct: 100 };
                   return (
-                    <div key={q.id} className="space-y-1.5 p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                    <div key={q.id} className="space-y-1.5 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700">
                       <div className="flex items-start justify-between gap-3 text-xs">
-                        <span className="font-bold text-slate-800 leading-snug">
-                          <span className="text-[#DA291C] font-black mr-1">{idx + 1}.</span>
+                        <span className="font-bold text-slate-800 dark:text-slate-200 leading-snug">
+                          <span className="text-[#DA291C] dark:text-red-400 font-black mr-1">{idx + 1}.</span>
                           {q.shortLabel}
                         </span>
-                        <span className="font-black text-slate-900 shrink-0">
-                          {data.avg.toFixed(1)} <span className="text-[10px] text-slate-500 font-normal">/ 5.0</span>
+                        <span className="font-black text-slate-900 dark:text-white shrink-0">
+                          {data.avg.toFixed(1)} <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">/ 5.0</span>
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 line-clamp-1 italic">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 italic">
                         "{q.question}"
                       </p>
-                      <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                      <div className="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
                         <div 
                           className="h-full bg-gradient-to-r from-red-500 to-[#DA291C] rounded-full transition-all duration-500"
                           style={{ width: `${data.pct}%` }}
@@ -1269,18 +1272,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
 
             {/* PARTE 2: FACILITADOR */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-xl bg-amber-50 text-amber-700">
+                  <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400">
                     <Award className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-black text-slate-900">Parte 2: Evaluación del Facilitador</h3>
-                    <p className="text-[11px] text-slate-500 font-medium">7 preguntas de metodología, dominio y claridad</p>
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white">Parte 2: Evaluación del Facilitador</h3>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">7 preguntas de metodología, dominio y claridad</p>
                   </div>
                 </div>
-                <span className="px-3 py-1 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 text-xs font-black">
+                <span className="px-3 py-1 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40 text-xs font-black">
                   {tecSurveyMetrics.avgFacilitator} ★
                 </span>
               </div>
@@ -1289,20 +1292,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 {FACILITATOR_QUESTIONS.map((q, idx) => {
                   const data = tecSurveyMetrics.facilitatorQuestionsAvg[q.id] || { avg: 5.0, pct: 100 };
                   return (
-                    <div key={q.id} className="space-y-1.5 p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                    <div key={q.id} className="space-y-1.5 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700">
                       <div className="flex items-start justify-between gap-3 text-xs">
-                        <span className="font-bold text-slate-800 leading-snug">
-                          <span className="text-amber-600 font-black mr-1">{idx + 1}.</span>
+                        <span className="font-bold text-slate-800 dark:text-slate-200 leading-snug">
+                          <span className="text-amber-600 dark:text-amber-400 font-black mr-1">{idx + 1}.</span>
                           {q.shortLabel}
                         </span>
-                        <span className="font-black text-slate-900 shrink-0">
-                          {data.avg.toFixed(1)} <span className="text-[10px] text-slate-500 font-normal">/ 5.0</span>
+                        <span className="font-black text-slate-900 dark:text-white shrink-0">
+                          {data.avg.toFixed(1)} <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">/ 5.0</span>
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 line-clamp-1 italic">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 italic">
                         "{q.question}"
                       </p>
-                      <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                      <div className="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
                         <div 
                           className="h-full bg-gradient-to-r from-amber-400 to-amber-600 rounded-full transition-all duration-500"
                           style={{ width: `${data.pct}%` }}
@@ -1317,19 +1320,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
           
           {/* Facilitators Table */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                <Award className="w-4 h-4 text-[#DA291C]" />
+              <h2 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <Award className="w-4 h-4 text-[#DA291C] dark:text-red-400" />
                 Matriz de Rendimiento Docente & Satisfacción
               </h2>
-              <span className="text-xs text-slate-500 font-medium">{Object.keys(instructorStats).length} facilitadores evaluados</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{Object.keys(instructorStats).length} facilitadores evaluados</span>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="border-b border-slate-200 text-slate-600 bg-slate-50">
+                  <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80">
                     <th className="p-3.5 font-bold">Facilitador / Instructor</th>
                     <th className="p-3.5 font-bold text-center">Cursos Impartidos</th>
                     <th className="p-3.5 font-bold text-center">Colaboradores Inscritos</th>
@@ -1338,7 +1341,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     <th className="p-3.5 font-bold text-right">Satisfacción (CSAT)</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {Object.entries(instructorStats).map(([inst, s]) => {
                     const avg = s.ratings.length > 0
                       ? (s.ratings.reduce((a, b) => a + b, 0) / s.ratings.length).toFixed(1)
@@ -1346,25 +1349,25 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     const effRate = s.registered > 0 ? Math.round((s.attended / s.registered) * 100) : 0;
 
                     return (
-                      <tr key={inst} className="hover:bg-slate-50 transition-colors">
-                        <td className="p-3.5 font-bold text-slate-900">{inst}</td>
-                        <td className="p-3.5 text-center text-slate-700 font-semibold">{s.events}</td>
-                        <td className="p-3.5 text-center text-cyan-700 font-bold">{s.registered}</td>
-                        <td className="p-3.5 text-center text-emerald-700 font-bold">{s.attended}</td>
+                      <tr key={inst} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                        <td className="p-3.5 font-bold text-slate-900 dark:text-white">{inst}</td>
+                        <td className="p-3.5 text-center text-slate-700 dark:text-slate-300 font-semibold">{s.events}</td>
+                        <td className="p-3.5 text-center text-cyan-700 dark:text-cyan-400 font-bold">{s.registered}</td>
+                        <td className="p-3.5 text-center text-emerald-700 dark:text-emerald-400 font-bold">{s.attended}</td>
                         <td className="p-3.5 text-center">
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-[#DA291C] border border-red-200">
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-900/40">
                             {effRate}%
                           </span>
                         </td>
                         <td className="p-3.5 text-right">
                           {avg !== 'N/A' ? (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 font-extrabold text-xs">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900/40 font-extrabold text-xs">
                               <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                               {avg} / 5.0
-                              <span className="text-[10px] text-amber-700 font-normal">({s.ratings.length})</span>
+                              <span className="text-[10px] text-amber-700 dark:text-amber-400 font-normal">({s.ratings.length})</span>
                             </span>
                           ) : (
-                            <span className="text-slate-500 text-xs italic">Sin valoraciones</span>
+                            <span className="text-slate-500 dark:text-slate-400 text-xs italic">Sin valoraciones</span>
                           )}
                         </td>
                       </tr>
@@ -1377,25 +1380,25 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
           {/* Enriched Feedback Stream */}
           {surveyFilteredFeedbacks.length > 0 && (
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-[#DA291C]" />
+                <h2 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-[#DA291C] dark:text-red-400" />
                   Muro de Comentarios y Evaluaciones TEC
                 </h2>
-                <span className="text-xs text-slate-500 font-medium">
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                   {surveyFilteredFeedbacks.length} opiniones registradas
                 </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {surveyFilteredFeedbacks.map((fb, idx) => (
-                  <div key={idx} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 flex flex-col justify-between hover:border-slate-300 transition-colors">
+                  <div key={idx} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3 flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
                     <div>
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <div>
-                          <span className="text-xs font-bold text-slate-900 line-clamp-1">{fb.eventTitle}</span>
-                          <span className="text-[10px] text-slate-500 block">Facilitador: {fb.instructor}</span>
+                          <span className="text-xs font-bold text-slate-900 dark:text-white line-clamp-1">{fb.eventTitle}</span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400 block">Facilitador: {fb.instructor}</span>
                         </div>
                         <div className="flex items-center gap-0.5 text-amber-500 shrink-0">
                           {Array.from({ length: Math.min(5, Math.max(1, Math.round(fb.rating))) }).map((_, sIdx) => (
@@ -1407,25 +1410,25 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       {/* Subscores badges */}
                       <div className="flex items-center gap-1.5 flex-wrap mb-2">
                         {fb.courseScore && (
-                          <span className="px-2 py-0.5 rounded-lg bg-red-50 text-[#DA291C] border border-red-200 text-[10px] font-black">
+                          <span className="px-2 py-0.5 rounded-lg bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-900/40 text-[10px] font-black">
                             Curso: {Number(fb.courseScore).toFixed(1)}★
                           </span>
                         )}
                         {fb.facilitatorScore && (
-                          <span className="px-2 py-0.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-black">
+                          <span className="px-2 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40 text-[10px] font-black">
                             Facilitador: {Number(fb.facilitatorScore).toFixed(1)}★
                           </span>
                         )}
                       </div>
 
                       {fb.comment ? (
-                        <p className="text-xs text-slate-700 italic leading-relaxed">"{fb.comment}"</p>
+                        <p className="text-xs text-slate-700 dark:text-slate-300 italic leading-relaxed">"{fb.comment}"</p>
                       ) : (
-                        <p className="text-[11px] text-slate-500 italic">Evaluación cuantitativa sin comentario adicional.</p>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 italic">Evaluación cuantitativa sin comentario adicional.</p>
                       )}
                     </div>
                     
-                    <div className="flex items-center justify-between text-[10px] text-slate-500 pt-2 border-t border-slate-200/80">
+                    <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-200/80 dark:border-slate-700/80">
                       <span className="font-semibold">{fb.userName || fb.userEmail}</span>
                       <span>{fb.createdAt}</span>
                     </div>
@@ -1445,16 +1448,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="space-y-6 animate-in fade-in duration-300">
           
           {/* Header Banner */}
-          <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-[#DA291C] shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 flex items-center justify-center text-[#DA291C] dark:text-red-400 shrink-0">
                 <Target className="w-6 h-6" />
               </div>
               <div>
-                <h2 className="text-base font-extrabold text-slate-900">
+                <h2 className="text-base font-extrabold text-slate-900 dark:text-white">
                   Diagnóstico Estratégico de Brechas de Habilidades (Skills Gap)
                 </h2>
-                <p className="text-xs text-slate-600 mt-0.5">
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
                   Identifica las debilidades académicas y operativas detectadas por instructores para enfocar planes de re-capacitación y refuerzo técnico.
                 </p>
               </div>
@@ -1474,58 +1477,58 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
           {/* 4 Global KPI Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
-              <span className="text-xs font-bold text-slate-500">Promedio General Institucional</span>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm">
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Promedio General Institucional</span>
               <div className="flex items-baseline justify-between mt-2">
-                <span className="text-2xl font-black text-blue-700">{skillsGapGlobalMetrics.overallAvg}</span>
-                <span className="text-xs font-bold text-slate-500">Escala 0 - 100</span>
+                <span className="text-2xl font-black text-blue-700 dark:text-blue-400">{skillsGapGlobalMetrics.overallAvg}</span>
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Escala 0 - 100</span>
               </div>
-              <p className="text-[11px] text-slate-500 mt-1">Calculado en cursos con evaluación formal</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Calculado en cursos con evaluación formal</p>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
-              <span className="text-xs font-bold text-slate-500">Total Evaluaciones Realizadas</span>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm">
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Total Evaluaciones Realizadas</span>
               <div className="flex items-baseline justify-between mt-2">
-                <span className="text-2xl font-black text-slate-900">{skillsGapGlobalMetrics.totalEvaluated}</span>
-                <span className="text-xs font-bold text-[#DA291C]">En base de datos</span>
+                <span className="text-2xl font-black text-slate-900 dark:text-white">{skillsGapGlobalMetrics.totalEvaluated}</span>
+                <span className="text-xs font-bold text-[#DA291C] dark:text-red-400">En base de datos</span>
               </div>
-              <p className="text-[11px] text-slate-500 mt-1">Asentadas por facilitadores</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Asentadas por facilitadores</p>
             </div>
 
-            <div className="bg-white border border-emerald-200 rounded-3xl p-5 shadow-sm">
-              <span className="text-xs font-bold text-emerald-700">Capacitaciones Aprobadas</span>
+            <div className="bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-900/40 rounded-3xl p-5 shadow-sm">
+              <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">Capacitaciones Aprobadas</span>
               <div className="flex items-baseline justify-between mt-2">
-                <span className="text-2xl font-black text-emerald-700">{skillsGapGlobalMetrics.totalPassed}</span>
-                <span className="text-xs font-bold text-emerald-700">
+                <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400">{skillsGapGlobalMetrics.totalPassed}</span>
+                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
                   {skillsGapGlobalMetrics.totalEvaluated > 0
                     ? `${((skillsGapGlobalMetrics.totalPassed / skillsGapGlobalMetrics.totalEvaluated) * 100).toFixed(0)}% efectividad`
                     : '100%'}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 mt-1">Superaron la nota mínima aprobatoria</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Superaron la nota mínima aprobatoria</p>
             </div>
 
-            <div className="bg-white border border-rose-200 rounded-3xl p-5 shadow-sm">
-              <span className="text-xs font-bold text-rose-700">Colaboradores con Debilidades</span>
+            <div className="bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-900/40 rounded-3xl p-5 shadow-sm">
+              <span className="text-xs font-bold text-rose-700 dark:text-rose-400">Colaboradores con Debilidades</span>
               <div className="flex items-baseline justify-between mt-2">
-                <span className="text-2xl font-black text-rose-700">{skillsGapGlobalMetrics.totalMembersNeedingRetraining}</span>
-                <span className="text-xs font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
+                <span className="text-2xl font-black text-rose-700 dark:text-rose-400">{skillsGapGlobalMetrics.totalMembersNeedingRetraining}</span>
+                <span className="text-xs font-bold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/50 px-2 py-0.5 rounded-full border border-rose-200 dark:border-rose-800">
                   🚨 Requieren Refuerzo
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 mt-1">Identificados con debilidades o reprobados</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Identificados con debilidades o reprobados</p>
             </div>
           </div>
 
           {/* Ranking de Brechas de Habilidades */}
           {skillsGapGlobalMetrics.topGaps.length > 0 && (
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                  <ShieldAlert className="w-4 h-4 text-rose-600" />
+                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <ShieldAlert className="w-4 h-4 text-rose-600 dark:text-rose-400" />
                   <span>Ranking de Temas & Competencias con Mayor Dificultad</span>
                 </h3>
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-slate-500 dark:text-slate-400">
                   {skillsGapGlobalMetrics.topGaps.length} competencias con observaciones
                 </span>
               </div>
@@ -1534,15 +1537,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 {skillsGapGlobalMetrics.topGaps.map(gap => (
                   <div 
                     key={gap.skill}
-                    className="p-4 rounded-2xl bg-rose-50/60 border border-rose-200 flex items-center justify-between gap-3 shadow-sm"
+                    className="p-4 rounded-2xl bg-rose-50/60 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40 flex items-center justify-between gap-3 shadow-sm"
                   >
                     <div className="space-y-0.5">
-                      <p className="text-xs font-bold text-rose-900">{gap.skill}</p>
-                      <p className="text-[11px] text-slate-600">
+                      <p className="text-xs font-bold text-rose-900 dark:text-rose-200">{gap.skill}</p>
+                      <p className="text-[11px] text-slate-600 dark:text-slate-400">
                         {gap.participantsCount} {gap.participantsCount === 1 ? 'colaborador con debilidad' : 'colaboradores con debilidad'}
                       </p>
                     </div>
-                    <span className="px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-black rounded-xl border border-rose-300">
+                    <span className="px-2.5 py-1 bg-rose-100 dark:bg-rose-900/50 text-rose-800 dark:text-rose-200 text-xs font-black rounded-xl border border-rose-300 dark:border-rose-800">
                       {gap.count} {gap.count === 1 ? 'caso' : 'casos'}
                     </span>
                   </div>
@@ -1552,13 +1555,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           )}
 
           {/* Buscador y Matriz de Colaboradores */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <div>
-                <h3 className="text-sm font-extrabold text-slate-900">
+                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
                   Matriz de Calificaciones por Colaborador
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   Consulta el desempeño individual y el diagnóstico pedagógico de cada colaborador.
                 </p>
               </div>
@@ -1570,7 +1573,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   value={skillsSearchQuery}
                   onChange={(e) => setSkillsSearchQuery(e.target.value)}
                   placeholder="Buscar por nombre, tarjeta, departamento o debilidad..."
-                  className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-purple-600"
+                  className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-purple-600"
                 />
               </div>
             </div>
@@ -1578,7 +1581,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-200 text-slate-600 font-bold bg-slate-50">
+                  <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold bg-slate-50 dark:bg-slate-800/80">
                     <th className="p-3.5">Colaborador</th>
                     <th className="p-3.5">Departamento</th>
                     <th className="p-3.5 text-center">Promedio</th>
@@ -1587,7 +1590,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     <th className="p-3.5 text-center">Estado</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {Object.values(skillsGapGlobalMetrics.participantMap)
                     .filter(item => {
                       const q = skillsSearchQuery.toLowerCase();
@@ -1604,57 +1607,57 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       const hasGaps = item.gaps.size > 0 || item.needsRetraining;
 
                       return (
-                        <tr key={p.card} className="hover:bg-slate-50 transition-colors">
+                        <tr key={p.card} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                           <td className="p-3.5">
-                            <p className="font-bold text-slate-900">{p.name}</p>
-                            <p className="text-[11px] text-slate-500">Tarj: #{p.card} • {p.email}</p>
+                            <p className="font-bold text-slate-900 dark:text-white">{p.name}</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400">Tarj: #{p.card} • {p.email}</p>
                           </td>
-                          <td className="p-3.5 text-slate-700">
+                          <td className="p-3.5 text-slate-700 dark:text-slate-300">
                             {p.department || 'General'}
                           </td>
                           <td className="p-3.5 text-center">
                             {item.grades.length > 0 ? (
                               <span className={`px-2 py-0.5 rounded-lg text-xs font-black ${
-                                item.avgScore >= 70 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'
+                                item.avgScore >= 70 ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800'
                               }`}>
                                 {item.avgScore} pts
                               </span>
                             ) : (
-                              <span className="text-slate-500 italic text-[11px]">Sin notas</span>
+                              <span className="text-slate-500 dark:text-slate-400 italic text-[11px]">Sin notas</span>
                             )}
                           </td>
-                          <td className="p-3.5 text-center text-slate-700 font-semibold">
+                          <td className="p-3.5 text-center text-slate-700 dark:text-slate-300 font-semibold">
                             {item.grades.length > 0 ? (
                               <span>{item.passedCount} aprob. / {item.failedCount} reprob.</span>
                             ) : (
-                              <span className="text-slate-500">-</span>
+                              <span className="text-slate-500 dark:text-slate-400">-</span>
                             )}
                           </td>
                           <td className="p-3.5">
                             {item.gaps.size > 0 ? (
                               <div className="flex flex-wrap gap-1">
                                 {Array.from(item.gaps).map(skill => (
-                                  <span key={skill} className="px-2 py-0.5 bg-rose-50 text-rose-700 text-[10px] font-bold rounded-md border border-rose-200">
+                                  <span key={skill} className="px-2 py-0.5 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 text-[10px] font-bold rounded-md border border-rose-200 dark:border-rose-800">
                                     {skill}
                                   </span>
                                 ))}
                               </div>
                             ) : (
-                              <span className="text-slate-500 italic text-[11px]">Sin debilidades señaladas</span>
+                              <span className="text-slate-500 dark:text-slate-400 italic text-[11px]">Sin debilidades señaladas</span>
                             )}
                           </td>
                           <td className="p-3.5 text-center">
                             {hasGaps ? (
-                              <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-rose-50 text-rose-700 border border-rose-200 inline-flex items-center gap-1">
-                                <ShieldAlert className="w-3 h-3 text-rose-600" />
+                              <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800 inline-flex items-center gap-1">
+                                <ShieldAlert className="w-3 h-3 text-rose-600 dark:text-rose-400" />
                                 Requiere Refuerzo
                               </span>
                             ) : item.grades.length > 0 ? (
-                              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
                                 OK / Aprobado
                               </span>
                             ) : (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-100 text-slate-600">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
                                 Pendiente
                               </span>
                             )}
@@ -1702,13 +1705,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {activeTab === 'reports' && (
         <div className="space-y-6 animate-in fade-in duration-300">
           
-          <div className="bg-emerald-50 border border-emerald-200 rounded-3xl p-6 sm:p-8 shadow-sm flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0">
+          <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 rounded-3xl p-6 sm:p-8 shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-emerald-700 dark:text-emerald-300 shrink-0">
               <FileSpreadsheet className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-base font-extrabold text-emerald-950">Centro de Exportación de Reportes Oficiales</h2>
-              <p className="text-xs text-emerald-800 mt-0.5">
+              <h2 className="text-base font-extrabold text-emerald-950 dark:text-emerald-200">Centro de Exportación de Reportes Oficiales</h2>
+              <p className="text-xs text-emerald-800 dark:text-emerald-300 mt-0.5">
                 Genera con un solo clic libros de Excel (.xlsx) estructurados y formateados para comités ejecutivos, auditorías de RRHH y cumplimiento laboral.
               </p>
             </div>
@@ -1717,23 +1720,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             
             {/* Report 0: Sustentabilidad y Taxonomía Formativa */}
-            <div className="bg-white border border-emerald-300 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-emerald-600 hover:shadow-md transition-all group bg-gradient-to-b from-emerald-50/30 to-white">
+            <div className="bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-800/80 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-emerald-600 dark:hover:border-emerald-500 hover:shadow-md transition-all group bg-gradient-to-b from-emerald-50/30 to-white dark:from-emerald-950/20 dark:to-slate-900">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-2xl bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-700">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-100 dark:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-emerald-700 dark:text-emerald-300">
                     <Leaf className="w-5 h-5" />
                   </div>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
                     ESG & Sustentable
                   </span>
                 </div>
-                <h3 className="text-base font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
                   Reporte de Sustentabilidad & Capacitaciones
                 </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                   Matriz oficial de 11 dimensiones requerida para programas corporativos: Tipo de sesión, Tipo de entrenamiento, Formato, Modalidad, Programa, Subprograma, Fechas, Horas y Suplidor.
                 </p>
-                <div className="text-[11px] text-slate-500 space-y-1">
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
                   <div>• Hoja 1: Matriz de 11 Dimensiones + Horas-Hombre</div>
                   <div>• Hoja 2: Resumen Consolidado por Programas</div>
                   <div>• Clasificación de impacto ambiental y ESG</div>
@@ -1753,18 +1756,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
 
             {/* Report 1: Consolidado Global */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-[#DA291C] hover:shadow-md transition-all group">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-[#DA291C] hover:shadow-md transition-all group">
               <div className="space-y-3">
-                <div className="w-10 h-10 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-[#DA291C]">
+                <div className="w-10 h-10 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 flex items-center justify-center text-[#DA291C] dark:text-red-400">
                   <BarChart3 className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-extrabold text-slate-900 group-hover:text-[#DA291C] transition-colors">
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-[#DA291C] dark:group-hover:text-red-400 transition-colors">
                   Informe Ejecutivo Consolidado
                 </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                   Libro multicapa con resumen ejecutivo, indicadores de ocupación, horas-hombre, distribución por categorías y rendimiento por facilitador.
                 </p>
-                <div className="text-[11px] text-slate-500 space-y-1">
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
                   <div>• Hoja 1: Resumen Ejecutivo & KPIs</div>
                   <div>• Hoja 2: Detalle por Capacitación</div>
                   <div>• Hoja 3: Análisis por Categorías</div>
@@ -1785,18 +1788,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
 
             {/* Report 2: Auditoría de Asistencias */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-emerald-500 hover:shadow-md transition-all group">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-emerald-500 hover:shadow-md transition-all group">
               <div className="space-y-3">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 flex items-center justify-center text-emerald-700 dark:text-emerald-400">
                   <UserCheck className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
                   Libro Oficial de Asistencias & Auditoría
                 </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                   Registro detallado de cada participante, número de cédula, carnet, curso, fecha, horario, facilitador y verificación de asistencia QR para auditorías laborales.
                 </p>
-                <div className="text-[11px] text-slate-500 space-y-1">
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
                   <div>• Incluye {totalRegistered} registros individuales</div>
                   <div>• Estado de verificación QR por participante</div>
                   <div>• Filtros por modalidad y fecha</div>
@@ -1816,18 +1819,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
 
             {/* Report 3: Matriz de Cumplimiento de Cronogramas */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-[#DA291C] hover:shadow-md transition-all group">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-[#DA291C] hover:shadow-md transition-all group">
               <div className="space-y-3">
-                <div className="w-10 h-10 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-[#DA291C]">
+                <div className="w-10 h-10 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 flex items-center justify-center text-[#DA291C] dark:text-red-400">
                   <CheckCircle2 className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-extrabold text-slate-900 group-hover:text-[#DA291C] transition-colors">
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-[#DA291C] dark:group-hover:text-red-400 transition-colors">
                   Matriz de Cumplimiento de Cronogramas
                 </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                   Matriz completa del programa formativo seleccionado con desglose por colaborador, porcentajes de aprobación y resumen consolidado por grupos.
                 </p>
-                <div className="text-[11px] text-slate-500 space-y-1">
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
                   <div>• Hoja 1: Cumplimiento Colaboradores</div>
                   <div>• Hoja 2: Resumen por Grupos y Áreas</div>
                   <div>• Indicador curso por curso (Asistió/Pendiente)</div>
@@ -1852,18 +1855,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
 
             {/* Report 4: Encuestas y Calidad Docente */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-amber-500 hover:shadow-md transition-all group">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-amber-500 hover:shadow-md transition-all group">
               <div className="space-y-3">
-                <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700">
+                <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 flex items-center justify-center text-amber-700 dark:text-amber-400">
                   <Award className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-extrabold text-slate-900 group-hover:text-amber-700 transition-colors">
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors">
                   Reporte de Calidad Docente y Encuestas
                 </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                   Histórico de todas las evaluaciones enviadas por los colaboradores con puntuación en estrellas (1 a 5), comentarios cualitativos y facilitador evaluado.
                 </p>
-                <div className="text-[11px] text-slate-500 space-y-1">
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
                   <div>• Incluye {allFeedbacks.length} evaluaciones recibidas</div>
                   <div>• Comentarios y sugerencias de colaboradores</div>
                   <div>• Desglose por facilitador y taller</div>
@@ -1883,18 +1886,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
 
             {/* Report 5: Grupos e Integrantes */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-cyan-500 hover:shadow-md transition-all group">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-cyan-500 hover:shadow-md transition-all group">
               <div className="space-y-3">
-                <div className="w-10 h-10 rounded-2xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-700">
+                <div className="w-10 h-10 rounded-2xl bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-900/50 flex items-center justify-center text-cyan-700 dark:text-cyan-400">
                   <Layers className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-extrabold text-slate-900 group-hover:text-cyan-700 transition-colors">
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-cyan-700 dark:group-hover:text-cyan-400 transition-colors">
                   Padrón Segmentado por Grupos & Áreas
                 </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                   Catálogo de grupos formativos con el listado de cada uno de sus integrantes, número de tarjeta, cédula y correo corporativo asignado.
                 </p>
-                <div className="text-[11px] text-slate-500 space-y-1">
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
                   <div>• {groups.length} grupos configurados</div>
                   <div>• {participants.length} colaboradores en padrón</div>
                   <div>• Formato tabular listo para re-importación</div>
@@ -1914,18 +1917,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
 
             {/* Report 6: Brechas de Habilidades & Detección de Debilidades (Skills Gap) */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-purple-500 hover:shadow-md transition-all group">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-purple-500 hover:shadow-md transition-all group">
               <div className="space-y-3">
-                <div className="w-10 h-10 rounded-2xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-700">
+                <div className="w-10 h-10 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-900/50 flex items-center justify-center text-purple-700 dark:text-purple-400">
                   <Target className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-extrabold text-slate-900 group-hover:text-purple-700 transition-colors">
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-purple-700 dark:group-hover:text-purple-400 transition-colors">
                   Diagnóstico de Brechas & Debilidades (Skills Gap)
                 </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                   Informe integral con las notas de cada capacitación evaluada, lista de debilidades técnicas detectadas por facilitadores y colaboradores prioritarios para re-capacitación.
                 </p>
-                <div className="text-[11px] text-slate-500 space-y-1">
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
                   <div>• Hoja 1: Matriz Global de Calificaciones</div>
                   <div>• Hoja 2: Plan Prioritario de Re-capacitación</div>
                   <div>• Resumen por competencias y debilidades</div>

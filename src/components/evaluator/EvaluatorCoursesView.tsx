@@ -210,34 +210,34 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
     <div className="space-y-6 animate-in fade-in duration-200 pb-12">
       
       {/* Encabezado Principal */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-xs relative overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 shadow-xs relative overflow-hidden">
         <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-red-500/10 via-rose-500/5 to-transparent rounded-full -mr-20 -mt-20 pointer-events-none" />
         
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
           <div>
-            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#DA291C] mb-2">
-              <span className="p-1 rounded-md bg-red-100/70 text-[#DA291C]">
+            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#DA291C] dark:text-[#FF6659] mb-2">
+              <span className="p-1 rounded-md bg-red-100/70 dark:bg-red-950/40 text-[#DA291C] dark:text-[#FF6659]">
                 <GraduationCap className="w-4 h-4" />
               </span>
               <span>Portal de Facilitación & Tutoría</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
               Cursos Asignados & Calificación Modular
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-2xl">
               Gestiona el pase de lista presencial mediante proyección QR en pantalla de sala, registra asistencia manual y califica el progreso modular continuo de los participantes.
             </p>
           </div>
 
           {currentUser && (
-            <div className="flex items-center gap-3 bg-slate-50 border border-slate-200/80 px-4 py-3 rounded-2xl shrink-0">
+            <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 px-4 py-3 rounded-2xl shrink-0">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#DA291C] to-red-600 flex items-center justify-center text-white font-black shadow-sm text-sm">
                 {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'E'}
               </div>
               <div>
-                <p className="text-xs font-bold text-slate-900">{currentUser.name}</p>
-                <p className="text-[11px] text-slate-500 font-medium">{currentUser.email}</p>
-                <span className="inline-block mt-0.5 px-2 py-0.2 rounded-full text-[9px] font-black bg-purple-50 text-purple-700 border border-purple-200">
+                <p className="text-xs font-bold text-slate-900 dark:text-white">{currentUser.name}</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{currentUser.email}</p>
+                <span className="inline-block mt-0.5 px-2 py-0.2 rounded-full text-[9px] font-black bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
                   {currentUser.role}
                 </span>
               </div>
@@ -246,43 +246,43 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
         </div>
 
         {/* Tarjetas de Métricas de Resumen */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-6 pt-6 border-t border-slate-100">
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70">
-            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Cursos Asignados</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/80">
+            <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Cursos Asignados</p>
             <div className="flex items-baseline gap-1.5 mt-1">
-              <span className="text-2xl font-black text-slate-900">{metrics.totalCourses}</span>
-              <span className="text-xs font-semibold text-slate-500">capacitaciones</span>
+              <span className="text-2xl font-black text-slate-900 dark:text-white">{metrics.totalCourses}</span>
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">capacitaciones</span>
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70">
-            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Con Estructura Modular</p>
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/80">
+            <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Con Estructura Modular</p>
             <div className="flex items-baseline gap-1.5 mt-1">
-              <span className="text-2xl font-black text-[#DA291C]">{metrics.totalModular}</span>
-              <span className="text-xs font-semibold text-slate-500">con submódulos</span>
+              <span className="text-2xl font-black text-[#DA291C] dark:text-[#FF6659]">{metrics.totalModular}</span>
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">con submódulos</span>
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70">
-            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Participantes Inscritos</p>
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/80">
+            <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Participantes Inscritos</p>
             <div className="flex items-baseline gap-1.5 mt-1">
-              <span className="text-2xl font-black text-slate-900">{metrics.totalEnrolled}</span>
-              <span className="text-xs font-semibold text-slate-500">colaboradores</span>
+              <span className="text-2xl font-black text-slate-900 dark:text-white">{metrics.totalEnrolled}</span>
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">colaboradores</span>
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70">
-            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Tasa de Asistencia</p>
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/80">
+            <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Tasa de Asistencia</p>
             <div className="flex items-baseline gap-1.5 mt-1">
-              <span className="text-2xl font-black text-emerald-600">{metrics.attendanceRate}%</span>
-              <span className="text-xs font-semibold text-slate-500">({metrics.totalAttended} presentes)</span>
+              <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{metrics.attendanceRate}%</span>
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">({metrics.totalAttended} presentes)</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Barra de Búsqueda y Filtros */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3 sm:p-4 rounded-2xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
         <div className="relative flex-1">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
@@ -290,17 +290,17 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
             placeholder="Buscar por curso, temática, categoría o modalidad..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
+            className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
           />
         </div>
 
-        <div className="flex items-center gap-1.5 bg-slate-100/80 p-1 rounded-xl border border-slate-200/70 shrink-0 overflow-x-auto">
+        <div className="flex items-center gap-1.5 bg-slate-100/80 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/70 dark:border-slate-700 shrink-0 overflow-x-auto">
           <button
             onClick={() => setFilterType('all')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
               filterType === 'all'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             Todos ({metrics.totalCourses})
@@ -310,8 +310,8 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
               onClick={() => setFilterType('technical')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
                 filterType === 'technical'
-                  ? 'bg-white text-[#DA291C] shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-[#DA291C] dark:text-[#FF6659] shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <Sparkles className="w-3 h-3 text-amber-500" />
@@ -322,19 +322,19 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
             onClick={() => setFilterType('modular')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
               filterType === 'modular'
-                ? 'bg-white text-[#DA291C] shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white dark:bg-slate-700 text-[#DA291C] dark:text-[#FF6659] shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <Layers className="w-3 h-3 text-[#DA291C]" />
+            <Layers className="w-3 h-3 text-[#DA291C] dark:text-[#FF6659]" />
             <span>Modulares ({metrics.totalModular})</span>
           </button>
           <button
             onClick={() => setFilterType('standard')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
               filterType === 'standard'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             Estándar ({assignedEvents.length - metrics.totalModular})
@@ -355,66 +355,66 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
             return (
               <div 
                 key={`tech-${cohort.id}`}
-                className="bg-white rounded-3xl border border-amber-200/90 shadow-xs hover:shadow-md transition-all p-5 sm:p-6 flex flex-col justify-between group"
+                className="bg-white dark:bg-slate-900 rounded-3xl border border-amber-200/90 dark:border-amber-800/50 shadow-xs hover:shadow-md transition-all p-5 sm:p-6 flex flex-col justify-between group"
               >
                 <div>
                   {/* Badges superiores */}
                   <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-50 text-amber-800 border border-amber-300 flex items-center gap-1">
-                        <Sparkles className="w-3 h-3 text-amber-600" />
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800 flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-amber-600 dark:text-amber-400" />
                         Academia Técnica
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1">
-                        <MapPin className="w-3 h-3 text-slate-500" />
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center gap-1">
+                        <MapPin className="w-3 h-3 text-slate-500 dark:text-slate-400" />
                         {cohort.location || 'Taller Principal'}
                       </span>
                       <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black flex items-center gap-1 border ${
                         isToday
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                          ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800'
                           : isFuture
-                            ? 'bg-blue-50 text-blue-700 border-blue-200'
-                            : 'bg-slate-100 text-slate-600 border-slate-200'
+                            ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
                       }`}>
                         <Calendar className="w-3 h-3" />
                         <span>{isToday ? 'En Curso Hoy' : isFuture ? 'Próxima Cohorte' : 'Concluida'}</span>
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
                         {cohort.groupName || 'Grupo General'}
                       </span>
                     </div>
 
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
                       PIN: {cohort.dailyPin || '2026'}
                     </span>
                   </div>
 
                   {/* Título y Categoría */}
-                  <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-[#DA291C] transition-colors line-clamp-1">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white group-hover:text-[#DA291C] dark:group-hover:text-[#FF6659] transition-colors line-clamp-1">
                     {cohort.courseTitle}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed">
                     Especialidad: <strong>{cohort.courseCategory}</strong> • Horario: <strong>{cohort.dailyTime}</strong> ({cohort.dailyHours}h/día, {cohort.durationDays} días)
                   </p>
 
                   {/* Detalles de fechas y participantes */}
-                  <div className="mt-4 p-3 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-2">
-                    <div className="flex items-center justify-between text-xs text-slate-600">
+                  <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 space-y-2">
+                    <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
                       <span className="flex items-center gap-1.5 font-medium">
                         <Calendar className="w-3.5 h-3.5 text-slate-400" />
                         <span>Fechas de Cohorte:</span>
                       </span>
-                      <span className="font-bold text-slate-900">
+                      <span className="font-bold text-slate-900 dark:text-white">
                         {cohort.startDate} al {cohort.endDate}
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between text-xs text-slate-600">
+                    <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
                       <span className="flex items-center gap-1.5 font-medium">
                         <Users className="w-3.5 h-3.5 text-slate-400" />
                         <span>Técnicos Matriculados:</span>
                       </span>
-                      <span className="font-bold text-slate-900">
+                      <span className="font-bold text-slate-900 dark:text-white">
                         {cohort.enrolledCount || 0} de {cohort.capacity || 20} cupos
                       </span>
                     </div>
@@ -422,9 +422,9 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
                 </div>
 
                 {/* Acciones principales de la tarjeta */}
-                <div className="mt-5 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] text-slate-500">
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400">
                       Facilitador: <strong>{cohort.facilitatorName}</strong>
                     </span>
                   </div>
@@ -434,7 +434,7 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
                     <button
                       onClick={() => setIsDirectProjectorCohort(cohort)}
                       title="Proyectar código QR y PIN en sala para que los técnicos marquen"
-                      className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs hover:shadow"
+                      className="px-3 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs hover:shadow"
                     >
                       <QrCode className="w-4 h-4 text-amber-400" />
                       <span>Proyectar PIN</span>
@@ -482,73 +482,73 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
             return (
               <div 
                 key={event.id}
-                className="bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all p-5 sm:p-6 flex flex-col justify-between group"
+                className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-xs hover:shadow-md transition-all p-5 sm:p-6 flex flex-col justify-between group"
               >
                 <div>
                   {/* Badges superiores */}
                   <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-red-50 text-[#DA291C] border border-red-200">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-[#FF6659] border border-red-200 dark:border-red-900/60">
                         {event.category}
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1">
-                        {event.modality === 'Presencial' ? <MapPin className="w-3 h-3 text-slate-500" /> : <Video className="w-3 h-3 text-slate-500" />}
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center gap-1">
+                        {event.modality === 'Presencial' ? <MapPin className="w-3 h-3 text-slate-500 dark:text-slate-400" /> : <Video className="w-3 h-3 text-slate-500 dark:text-slate-400" />}
                         {event.modality}
                       </span>
                       {eventDate && (
                         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black flex items-center gap-1 border ${
                           isFuture
-                            ? 'bg-blue-50 text-blue-700 border-blue-200'
+                            ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800'
                             : isToday
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                              : 'bg-amber-50 text-amber-800 border-amber-200'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+                              : 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400 border-amber-200 dark:border-amber-800'
                         }`}>
                           <Calendar className="w-3 h-3" />
                           <span>{isFuture ? 'Por Impartir' : isToday ? 'En Curso Hoy' : 'Fecha Pasada'}</span>
                         </span>
                       )}
                       {hasModules ? (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-purple-50 text-purple-700 border border-purple-200 flex items-center gap-1">
-                          <Layers className="w-3 h-3 text-purple-600" />
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 flex items-center gap-1">
+                          <Layers className="w-3 h-3 text-purple-600 dark:text-purple-400" />
                           <span>{modulesCount} Módulos Definidos</span>
                         </span>
                       ) : (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-50 text-slate-500 border border-slate-200">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
                           Evaluación General
                         </span>
                       )}
                     </div>
 
-                    <span className="text-[11px] font-bold text-slate-500">
+                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
                       ID: {event.id}
                     </span>
                   </div>
 
                   {/* Título y Descripción */}
-                  <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-[#DA291C] transition-colors line-clamp-1">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white group-hover:text-[#DA291C] dark:group-hover:text-[#FF6659] transition-colors line-clamp-1">
                     {event.title}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed">
                     {event.description}
                   </p>
 
                   {/* Detalle de Módulos (si aplica) */}
                   {hasModules && (
-                    <div className="mt-3.5 p-3 rounded-2xl bg-purple-50/50 border border-purple-100 space-y-1.5">
-                      <div className="flex items-center justify-between text-[11px] font-bold text-purple-900">
+                    <div className="mt-3.5 p-3 rounded-2xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/50 space-y-1.5">
+                      <div className="flex items-center justify-between text-[11px] font-bold text-purple-900 dark:text-purple-300">
                         <span className="flex items-center gap-1.5">
-                          <Layers className="w-3.5 h-3.5 text-purple-600" />
+                          <Layers className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
                           <span>Módulos de Calificación Continua (Promedio Equitativo)</span>
                         </span>
-                        <span className="text-[10px] text-purple-600 font-semibold">{modulesCount} módulos</span>
+                        <span className="text-[10px] text-purple-600 dark:text-purple-400 font-semibold">{modulesCount} módulos</span>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
                         {event.modules?.map((m, mIdx) => (
-                          <div key={m.id || mIdx} className="px-2.5 py-1.5 rounded-xl bg-white/80 border border-purple-100 text-[11px] flex items-center justify-between">
-                            <span className="font-semibold text-slate-700 truncate max-w-[160px]">
+                          <div key={m.id || mIdx} className="px-2.5 py-1.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-purple-100 dark:border-purple-800/60 text-[11px] flex items-center justify-between">
+                            <span className="font-semibold text-slate-700 dark:text-slate-200 truncate max-w-[160px]">
                               {mIdx + 1}. {m.title}
                             </span>
-                            <span className="text-[10px] font-bold text-purple-700 shrink-0">
+                            <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 shrink-0">
                               Mín {m.passingScore}/{m.maxScore} pts
                             </span>
                           </div>
@@ -558,14 +558,14 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
                   )}
 
                   {/* Fechas y Horarios */}
-                  <div className="mt-4 grid grid-cols-2 gap-2 text-xs text-slate-600">
-                    <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                  <div className="mt-4 grid grid-cols-2 gap-2 text-xs text-slate-600 dark:text-slate-400">
+                    <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700">
                       <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                       <span className="font-medium truncate">
                         {event.schedule?.[0]?.date || 'Por programar'}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                    <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700">
                       <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                       <span className="font-medium truncate">
                         {event.schedule?.[0]?.slots?.[0]?.time || 'Horario flexible'}
@@ -574,25 +574,25 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
                   </div>
 
                   {/* Métricas de Asistencia y Evaluaciones */}
-                  <div className="mt-4 p-3 rounded-2xl bg-slate-50 border border-slate-200/70 space-y-2">
+                  <div className="mt-4 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/80 space-y-2">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-bold text-slate-700 flex items-center gap-1.5">
-                        <Users className="w-3.5 h-3.5 text-slate-500" />
+                      <span className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                        <Users className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                         <span>Asistencia Confirmada:</span>
                       </span>
-                      <span className="font-black text-slate-900">
+                      <span className="font-black text-slate-900 dark:text-white">
                         {courseAttended} de {courseEnrolled} ({attendancePercent}%)
                       </span>
                     </div>
 
-                    <div className="w-full bg-slate-200/80 rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-slate-200/80 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
                       <div 
                         className="bg-gradient-to-r from-red-500 to-[#DA291C] h-2 rounded-full transition-all duration-500"
                         style={{ width: `${attendancePercent}%` }}
                       />
                     </div>
 
-                    <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-1">
                       <span>{gradesCount} registros en libro de notas</span>
                       {event.instructor && (
                         <span className="truncate max-w-[170px]">Instructor: <strong>{event.instructor}</strong></span>
@@ -602,14 +602,14 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
                 </div>
 
                 {/* Acciones principales de la tarjeta */}
-                <div className="mt-5 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleExportGrades(event)}
                       title="Exportar calificaciones a Excel"
-                      className="p-2.5 rounded-xl text-slate-600 hover:text-emerald-800 hover:bg-slate-100 border border-slate-200 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5"
+                      className="p-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:text-emerald-800 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5"
                     >
-                      <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+                      <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                       <span className="hidden sm:inline">Excel</span>
                     </button>
 
@@ -622,9 +622,9 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
                           setDeleteAssignmentMode('unassign_evaluator');
                         }}
                         title="Eliminar asignación de curso (Super Admin - Antes o después de la fecha)"
-                        className="p-2.5 rounded-xl text-rose-600 hover:text-rose-700 hover:bg-rose-50 border border-rose-200 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5"
+                        className="p-2.5 rounded-xl text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5"
                       >
-                        <Trash2 className="w-4 h-4 text-rose-600" />
+                        <Trash2 className="w-4 h-4 text-rose-600 dark:text-rose-400" />
                         <span className="hidden sm:inline">Eliminar Asignación</span>
                       </button>
                     )}
@@ -635,7 +635,7 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
                     <button
                       onClick={() => handleOpenManager(event, true)}
                       title="Proyectar código QR para escaneo de participantes en el salón"
-                      className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs hover:shadow"
+                      className="px-3 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs hover:shadow"
                     >
                       <QrCode className="w-4 h-4 text-red-400" />
                       <span>Proyectar QR</span>
@@ -658,15 +658,15 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
         </div>
       ) : (
         /* Estado vacío */
-        <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-red-50 text-[#DA291C] mx-auto flex items-center justify-center">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-12 text-center space-y-4">
+          <div className="w-16 h-16 rounded-2xl bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-[#FF6659] mx-auto flex items-center justify-center">
             <BookOpen className="w-8 h-8" />
           </div>
           <div className="max-w-md mx-auto space-y-2">
-            <h2 className="text-lg font-black text-slate-900">
+            <h2 className="text-lg font-black text-slate-900 dark:text-white">
               No se encontraron cursos asignados
             </h2>
-            <p className="text-xs sm:text-sm text-slate-500">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
               {searchQuery 
                 ? `No hay cursos asignados que coincidan con "${searchQuery}". Intenta ajustar el término de búsqueda.`
                 : 'Actualmente no tienes cursos o talleres asignados bajo tu usuario como Evaluador o facilitador.'}
@@ -711,21 +711,21 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
       {/* Modal de Eliminación de Asignación de Curso para Super Admin */}
       {courseToDeleteAssignment && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-5 animate-in fade-in zoom-in-95">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-5 animate-in fade-in zoom-in-95">
             <div className="flex items-start gap-4">
-              <div className="p-3 rounded-2xl bg-rose-50 text-rose-600 shrink-0">
+              <div className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 shrink-0">
                 <Trash2 className="w-6 h-6" />
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-black text-slate-900">
+                  <h2 className="text-lg font-black text-slate-900 dark:text-white">
                     Eliminar Asignación de Curso
                   </h2>
-                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300">
                     Super Admin
                   </span>
                 </div>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   Control exclusivo para gestionar o retirar este curso asignado antes o después de la fecha en que se debe impartir.
                 </p>
               </div>
@@ -747,30 +747,30 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
               });
 
               return (
-                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2 text-xs">
+                <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2 text-xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-500 font-semibold">Curso:</span>
-                    <span className="font-black text-slate-900 truncate max-w-[240px]">
+                    <span className="text-slate-500 dark:text-slate-400 font-semibold">Curso:</span>
+                    <span className="font-black text-slate-900 dark:text-white truncate max-w-[240px]">
                       {courseToDeleteAssignment.title}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-500 font-semibold">Tutor / Facilitador:</span>
-                    <span className="font-bold text-slate-800">
+                    <span className="text-slate-500 dark:text-slate-400 font-semibold">Tutor / Facilitador:</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200">
                       {courseToDeleteAssignment.ojtEvaluatorName || courseToDeleteAssignment.instructor || 'Por Asignar'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-500 font-semibold">Fecha Programada:</span>
+                    <span className="text-slate-500 dark:text-slate-400 font-semibold">Fecha Programada:</span>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-slate-700 font-bold">{eventDate || 'Sin fecha fija'}</span>
+                      <span className="font-mono text-slate-700 dark:text-slate-300 font-bold">{eventDate || 'Sin fecha fija'}</span>
                       {eventDate && (
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                           isFuture
-                            ? 'bg-blue-100 text-blue-800'
+                            ? 'bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300'
                             : isToday
-                              ? 'bg-emerald-100 text-emerald-800'
-                              : 'bg-amber-100 text-amber-800'
+                              ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300'
+                              : 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
                         }`}>
                           {isFuture ? '📅 Por Impartir' : isToday ? '🟢 Hoy' : '⏱️ Fecha Pasada'}
                         </span>
@@ -778,8 +778,8 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-500 font-semibold">Colaboradores Inscritos:</span>
-                    <span className="font-bold text-slate-900">{totalEnrolled} participantes</span>
+                    <span className="text-slate-500 dark:text-slate-400 font-semibold">Colaboradores Inscritos:</span>
+                    <span className="font-bold text-slate-900 dark:text-white">{totalEnrolled} participantes</span>
                   </div>
                 </div>
               );
@@ -787,7 +787,7 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
 
             {/* Opciones de Acción */}
             <div className="space-y-3">
-              <label className="block text-xs font-bold text-slate-700">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
                 Selecciona cómo deseas proceder con la eliminación:
               </label>
 
@@ -796,20 +796,20 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
                 onClick={() => setDeleteAssignmentMode('unassign_evaluator')}
                 className={`p-3.5 rounded-2xl border transition-all cursor-pointer space-y-1 ${
                   deleteAssignmentMode === 'unassign_evaluator'
-                    ? 'border-amber-500 bg-amber-50/40 ring-1 ring-amber-500'
-                    : 'border-slate-200 bg-white hover:border-slate-300'
+                    ? 'border-amber-500 bg-amber-50/40 dark:bg-amber-950/20 ring-1 ring-amber-500'
+                    : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 hover:border-slate-300 dark:hover:border-slate-600'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 font-bold text-xs text-slate-900">
-                    <CheckCircle2 className={`w-4 h-4 ${deleteAssignmentMode === 'unassign_evaluator' ? 'text-amber-600' : 'text-slate-400'}`} />
+                  <div className="flex items-center gap-2 font-bold text-xs text-slate-900 dark:text-white">
+                    <CheckCircle2 className={`w-4 h-4 ${deleteAssignmentMode === 'unassign_evaluator' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400'}`} />
                     <span>Desasignar Tutor / Evaluador</span>
                   </div>
-                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300">
                     Recomendado
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500 pl-6">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 pl-6">
                   Quita la asignación de tutoría de este curso. El evento permanece en el catálogo general y no se borran inscripciones ni asistencias, pero deja de figurar como curso asignado a este tutor.
                 </p>
               </div>
@@ -819,32 +819,32 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
                 onClick={() => setDeleteAssignmentMode('delete_event')}
                 className={`p-3.5 rounded-2xl border transition-all cursor-pointer space-y-1 ${
                   deleteAssignmentMode === 'delete_event'
-                    ? 'border-rose-500 bg-rose-50/40 ring-1 ring-rose-500'
-                    : 'border-slate-200 bg-white hover:border-slate-300'
+                    ? 'border-rose-500 bg-rose-50/40 dark:bg-rose-950/20 ring-1 ring-rose-500'
+                    : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 hover:border-slate-300 dark:hover:border-slate-600'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 font-bold text-xs text-slate-900">
-                    <Trash2 className={`w-4 h-4 ${deleteAssignmentMode === 'delete_event' ? 'text-rose-600' : 'text-slate-400'}`} />
+                  <div className="flex items-center gap-2 font-bold text-xs text-slate-900 dark:text-white">
+                    <Trash2 className={`w-4 h-4 ${deleteAssignmentMode === 'delete_event' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400'}`} />
                     <span>Eliminar Curso / Evento Definitivamente</span>
                   </div>
-                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300">
                     Purga Total
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500 pl-6">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 pl-6">
                   Elimina permanentemente el evento, sus horarios, inscripciones y calificaciones de la base de datos.
                 </p>
               </div>
             </div>
 
             {/* Modal Actions */}
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setCourseToDeleteAssignment(null)}
                 disabled={isProcessingDeleteAssignment}
-                className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 Cancelar
               </button>

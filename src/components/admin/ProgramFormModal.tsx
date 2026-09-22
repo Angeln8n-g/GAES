@@ -182,19 +182,19 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
       ariaLabel={program ? 'Editar Cronograma de Capacitación' : 'Crear Nuevo Cronograma de Capacitación'}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
         
         {/* Modal Header */}
-        <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-850">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-[#DA291C]">
+            <div className="w-10 h-10 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 flex items-center justify-center text-[#DA291C] dark:text-red-400">
               <Calendar className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-black text-slate-900">
+              <h2 className="text-base font-black text-slate-900 dark:text-white">
                 {program ? 'Editar Cronograma de Capacitación' : 'Crear Nuevo Cronograma de Capacitación'}
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Estructura rutas formativas con plazos y cursos obligatorios para tus grupos.
               </p>
             </div>
@@ -202,7 +202,7 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -213,12 +213,12 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
           
           {/* General Information */}
           <div className="space-y-4">
-            <h3 className="text-xs font-black text-[#DA291C] uppercase tracking-wider flex items-center gap-1.5">
+            <h3 className="text-xs font-black text-[#DA291C] dark:text-red-400 uppercase tracking-wider flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" /> 1. Datos Generales del Programa
             </h3>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Título del Cronograma / Programa Formativo *
               </label>
               <input
@@ -226,13 +226,13 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="ej. Plan de Innovación y Habilidades Digitales 2026"
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Descripción / Objetivos de Aprendizaje
               </label>
               <textarea
@@ -240,7 +240,7 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Explica qué competencias desarrollará el participante y la importancia del programa..."
                 rows={2}
-                className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
               />
             </div>
 
@@ -248,14 +248,14 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
               {companies.length > 0 && (
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Empresa
                   </label>
                   {isSuperAdmin ? (
                     <select
                       value={companyId}
                       onChange={(e) => setCompanyId(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800 font-bold focus:outline-none focus:border-[#DA291C]"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 font-bold focus:outline-none focus:border-[#DA291C]"
                     >
                       {companies.map(c => (
                         <option key={c.id} value={c.id}>
@@ -264,7 +264,7 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
                       ))}
                     </select>
                   ) : (
-                    <div className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-bold truncate">
+                    <div className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-700 dark:text-slate-300 font-bold truncate">
                       🏢 {companies.find(c => c.id === companyId)?.name || 'Empresa asignada'}
                     </div>
                   )}
@@ -272,39 +272,39 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
               )}
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Fecha de Inicio *
                 </label>
                 <input
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                  className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Fecha Límite de Cumplimiento *
                 </label>
                 <input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                  className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Estado del Programa
                 </label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value as any)}
-                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                  className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
                 >
                   <option value="active">Activo (Vigente)</option>
                   <option value="draft">Borrador (Oculto)</option>
@@ -314,13 +314,13 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Metodología Formativa
                 </label>
                 <select
                   value={learningFramework}
                   onChange={(e) => setLearningFramework(e.target.value as any)}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:border-[#DA291C]"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#DA291C]"
                 >
                   <option value="standard">📚 Estándar (Cursos Regulares)</option>
                   <option value="70_20_10">⚡ Modelo 70-20-10 & Shadowing en Campo</option>
@@ -330,19 +330,19 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
           </div>
 
           {/* Target Groups Assignment */}
-          <div className="pt-4 border-t border-slate-200 space-y-3">
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-black text-[#DA291C] uppercase tracking-wider flex items-center gap-1.5">
+              <h3 className="text-xs font-black text-[#DA291C] dark:text-red-400 uppercase tracking-wider flex items-center gap-1.5">
                 <Users className="w-3.5 h-3.5" /> 2. Grupos Asignados ({selectedGroupIds.size} seleccionados)
               </h3>
-              <span className="text-[11px] text-slate-500">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">
                 Los colaboradores de estos grupos tendrán asignada esta ruta formativa.
               </span>
             </div>
 
             {groups.length === 0 ? (
-              <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-800 flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
+              <div className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-2xl text-xs text-amber-800 dark:text-amber-300 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
                 <span>No hay grupos creados todavía. Ve a la pestaña "Grupos" para crearlos.</span>
               </div>
             ) : (
@@ -356,21 +356,21 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
                       onClick={() => toggleGroup(group.id)}
                       className={`p-3.5 rounded-2xl border cursor-pointer transition-all flex items-center justify-between ${
                         isChecked 
-                          ? `bg-red-50/70 border-red-200 ring-1 ring-[#DA291C]/30` 
-                          : 'bg-slate-50/60 border-slate-200 hover:border-slate-300'
+                          ? `bg-red-50/70 dark:bg-red-950/40 border-red-200 dark:border-red-900/60 ring-1 ring-[#DA291C]/30` 
+                          : 'bg-slate-50/60 dark:bg-slate-850 border-slate-200 dark:border-slate-750 hover:border-slate-300 dark:hover:border-slate-600'
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <div className={`w-5 h-5 rounded-lg border flex items-center justify-center transition-colors ${
-                          isChecked ? 'bg-[#DA291C] border-[#DA291C] text-white' : 'border-slate-300 bg-white'
+                          isChecked ? 'bg-[#DA291C] border-[#DA291C] text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
                         }`}>
                           {isChecked && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-slate-900">{group.name}</span>
+                            <span className="text-xs font-bold text-slate-900 dark:text-white">{group.name}</span>
                           </div>
-                          <span className="text-[11px] text-slate-500">
+                          <span className="text-[11px] text-slate-500 dark:text-slate-400">
                             {group.memberCards.length} colaboradores ({group.department || 'Sin área'})
                           </span>
                         </div>
@@ -383,12 +383,12 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
           </div>
 
           {/* Courses Selection */}
-          <div className="pt-4 border-t border-slate-200 space-y-3">
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-black text-[#DA291C] uppercase tracking-wider flex items-center gap-1.5">
+              <h3 className="text-xs font-black text-[#DA291C] dark:text-red-400 uppercase tracking-wider flex items-center gap-1.5">
                 <BookOpen className="w-3.5 h-3.5" /> 3. Capacitaciones Incluidas ({selectedEvents.size} seleccionadas)
               </h3>
-              <span className="text-[11px] text-slate-500">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">
                 Marca los eventos y define si son obligatorios para aprobar el cronograma.
               </span>
             </div>
@@ -405,28 +405,28 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
                     onClick={() => toggleEvent(event.id)}
                     className={`p-4 rounded-2xl border cursor-pointer transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                       isSelected 
-                        ? 'bg-red-50/50 border-[#DA291C]/30 ring-1 ring-red-500/20' 
-                        : 'bg-slate-50/60 border-slate-200 hover:border-slate-300'
+                        ? 'bg-red-50/50 dark:bg-red-950/40 border-[#DA291C]/30 dark:border-red-900/60 ring-1 ring-red-500/20' 
+                        : 'bg-slate-50/60 dark:bg-slate-850 border-slate-200 dark:border-slate-750 hover:border-slate-300 dark:hover:border-slate-600'
                     }`}
                   >
                     <div className="flex items-start gap-3">
                       <div className={`w-5 h-5 mt-0.5 rounded-lg border flex items-center justify-center shrink-0 transition-colors ${
-                        isSelected ? 'bg-[#DA291C] border-[#DA291C] text-white' : 'border-slate-300 bg-white'
+                        isSelected ? 'bg-[#DA291C] border-[#DA291C] text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
                       }`}>
                         {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                       </div>
 
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-xs font-bold text-slate-900">{event.title}</span>
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                          <span className="text-xs font-bold text-slate-900 dark:text-white">{event.title}</span>
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                             {event.category}
                           </span>
-                          <span className="text-[10px] text-[#DA291C] font-bold">
+                          <span className="text-[10px] text-[#DA291C] dark:text-red-400 font-bold">
                             {event.modality}
                           </span>
                         </div>
-                        <p className="text-[11px] text-slate-500 mt-1 line-clamp-1">
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">
                           Instructor: {event.instructor} • {event.schedule.length} fechas disponibles
                         </p>
                       </div>
@@ -448,7 +448,7 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
                                 setSelectedEvents(nextMap);
                               }
                             }}
-                            className="px-2.5 py-1.5 rounded-xl bg-white border border-slate-300 text-[11px] font-bold text-slate-800 focus:outline-none"
+                            className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-[11px] font-bold text-slate-800 dark:text-slate-200 focus:outline-none"
                           >
                             <option value="field_practice_70">🛠️ 70% Práctica en Campo</option>
                             <option value="shadowing_coaching_20">👥 20% Shadowing & Acompañamiento</option>
@@ -461,8 +461,8 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
                           onClick={(e) => toggleEventMandatory(event.id, e)}
                           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                             isMandatory
-                              ? 'bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100'
-                              : 'bg-white text-slate-600 border border-slate-300 hover:bg-slate-50'
+                              ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700 hover:bg-amber-100 dark:hover:bg-amber-900/50'
+                              : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
                           }`}
                         >
                           <Star className={`w-3.5 h-3.5 ${isMandatory ? 'fill-amber-500 text-amber-500' : ''}`} />
@@ -477,11 +477,11 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
           </div>
 
           {/* Submit Actions */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-bold transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition-colors cursor-pointer"
             >
               Cancelar
             </button>

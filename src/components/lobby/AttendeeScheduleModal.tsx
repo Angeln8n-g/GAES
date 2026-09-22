@@ -69,7 +69,7 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-900/80 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200"
     >
       <div 
-        className="relative w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-auto flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-5xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-auto flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Ribbon Claro */}
@@ -142,24 +142,24 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
           {/* CASO 1: CÉDULA NO ENCONTRADA */}
           {!found && (
             <div className="py-12 text-center space-y-4 max-w-md mx-auto">
-              <div className="w-16 h-16 rounded-3xl bg-rose-100 text-rose-600 flex items-center justify-center mx-auto border border-rose-200 shadow-sm">
+              <div className="w-16 h-16 rounded-3xl bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto border border-rose-200 dark:border-rose-900/50 shadow-sm">
                 <AlertCircle className="w-9 h-9" />
               </div>
-              <h3 className="text-lg font-black text-slate-900">
+              <h3 className="text-lg font-black text-slate-900 dark:text-white">
                 Cédula No Encontrada en el Sistema
               </h3>
-              <p className="text-xs text-slate-600 leading-relaxed font-medium">
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
                 No pudimos encontrar ningún colaborador o participante registrado con la cédula <strong>"{displayCedula}"</strong>.
               </p>
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-700 text-left space-y-1.5">
-                <p className="font-bold text-slate-900 flex items-center gap-1.5">
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 text-left space-y-1.5">
+                <p className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                   <Building2 className="w-3.5 h-3.5 text-[#DA291C]" />
                   ¿Qué puedes hacer?
                 </p>
-                <p className="text-slate-500 text-[11px]">
+                <p className="text-slate-500 dark:text-slate-400 text-[11px]">
                   1. Verifica si ingresaste los 11 dígitos correctamente.
                 </p>
-                <p className="text-slate-500 text-[11px]">
+                <p className="text-slate-500 dark:text-slate-400 text-[11px]">
                   2. Acércate al mostrador de recepción de Aprendizaje & Desarrollo para asistencia presencial inmediata.
                 </p>
               </div>
@@ -176,18 +176,18 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
           {/* CASO 2: COLABORADOR ENCONTRADO PERO SIN EVENTOS AGENDADOS */}
           {found && sessions.length === 0 && (
             <div className="py-10 text-center space-y-4 max-w-lg mx-auto">
-              <div className="w-16 h-16 rounded-3xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto border border-amber-200 shadow-sm">
+              <div className="w-16 h-16 rounded-3xl bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 flex items-center justify-center mx-auto border border-amber-200 dark:border-amber-900/50 shadow-sm">
                 <BookOpen className="w-8 h-8" />
               </div>
-              <h3 className="text-lg font-black text-slate-900">
+              <h3 className="text-lg font-black text-slate-900 dark:text-white">
                 Usuario Registrado, sin Cursos Agendados
               </h3>
-              <p className="text-xs text-slate-600 leading-relaxed font-medium">
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
                 Hola <strong>{displayName}</strong>, tu perfil se encuentra activo en el padrón corporativo, pero actualmente <strong>no tienes ninguna sesión agendada</strong> para hoy ni en fechas próximas.
               </p>
-              <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-200 text-xs text-amber-900 text-left space-y-1">
+              <div className="p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 text-xs text-amber-900 dark:text-amber-300 text-left space-y-1">
                 <p className="font-bold">¿Esperabas un curso hoy?</p>
-                <p className="text-[11px] text-amber-800 leading-relaxed">
+                <p className="text-[11px] text-amber-800 dark:text-amber-400 leading-relaxed">
                   Por favor consulta con el facilitador de la sala o con tu líder de área para que registre tu inscripción en el sistema.
                 </p>
               </div>
@@ -212,27 +212,27 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
             <div className="space-y-6 animate-in fade-in duration-300">
               
               {/* Barra de Filtros y Notificación de Sesiones de Hoy */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                  <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
                     Tus Capacitaciones ({filteredSessions.length})
                   </span>
                   {todaySessionsCount > 0 && (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-red-100 text-[#DA291C] border border-red-200 animate-pulse">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-red-100 dark:bg-red-950/50 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-900/50 animate-pulse">
                       ★ {todaySessionsCount} {todaySessionsCount === 1 ? 'SESIÓN HOY' : 'SESIONES HOY'}
                     </span>
                   )}
                 </div>
 
                 {/* Filtros rápidos */}
-                <div className="flex items-center gap-1.5 text-xs bg-slate-100 p-1 rounded-xl">
+                <div className="flex items-center gap-1.5 text-xs bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
                   <button
                     type="button"
                     onClick={() => setFilterType('all')}
                     className={`px-3 py-1 rounded-lg font-bold transition-all ${
                       filterType === 'all' 
-                        ? 'bg-white text-slate-900 shadow-xs' 
-                        : 'text-slate-600 hover:text-slate-900'
+                        ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs' 
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     Todos ({sessions.length})
@@ -244,7 +244,7 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
                       className={`px-3 py-1 rounded-lg font-bold transition-all ${
                         filterType === 'today' 
                           ? 'bg-[#DA291C] text-white shadow-xs' 
-                          : 'text-slate-600 hover:text-slate-900'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                       }`}
                     >
                       Hoy ({todaySessionsCount})
@@ -255,8 +255,8 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
                     onClick={() => setFilterType('upcoming')}
                     className={`px-3 py-1 rounded-lg font-bold transition-all ${
                       filterType === 'upcoming' 
-                        ? 'bg-white text-slate-900 shadow-xs' 
-                        : 'text-slate-600 hover:text-slate-900'
+                        ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs' 
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     Próximos
@@ -274,12 +274,12 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
                   return (
                     <div 
                       key={`${sessionKey}-${idx}`}
-                      className={`bg-white border rounded-3xl p-5 shadow-sm transition-all flex flex-col justify-between hover:shadow-md ${
+                      className={`bg-white dark:bg-slate-800/90 border rounded-3xl p-5 shadow-sm transition-all flex flex-col justify-between hover:shadow-md ${
                         isToday 
-                          ? 'border-red-300 ring-2 ring-red-500/20 bg-gradient-to-b from-red-50/20 to-white' 
+                          ? 'border-red-300 dark:border-red-800/80 ring-2 ring-red-500/20 bg-gradient-to-b from-red-50/20 to-white dark:from-red-950/20 dark:to-slate-800/90' 
                           : hasAttended 
-                          ? 'border-emerald-200 bg-emerald-50/20' 
-                          : 'border-slate-200 hover:border-slate-300'
+                          ? 'border-emerald-200 dark:border-emerald-800/60 bg-emerald-50/20 dark:bg-emerald-950/20' 
+                          : 'border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600'
                       }`}
                     >
                       <div className="space-y-3">
@@ -287,17 +287,17 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
                         {/* Status Badges Header */}
                         <div className="flex items-center justify-between gap-2 flex-wrap">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-[#DA291C] border border-red-200">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-900/50">
                               {event.category}
                             </span>
                             {session.isRecurrent && (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-900 text-white">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-900 dark:bg-slate-700 text-white">
                                 Recurrente • Taller
                               </span>
                             )}
                             {isMandatory && (
-                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-100 text-red-800 border border-red-300 flex items-center gap-1">
-                                <Lock className="w-2.5 h-2.5 text-red-600" />
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-100 dark:bg-red-950/60 text-red-800 dark:text-red-300 border border-red-300 dark:border-red-800 flex items-center gap-1">
+                                <Lock className="w-2.5 h-2.5 text-red-600 dark:text-red-400" />
                                 Obligatorio
                               </span>
                             )}
@@ -305,8 +305,8 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
 
                           {/* Attendance Confirmation Badge */}
                           {hasAttended ? (
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                               Asistió
                             </span>
                           ) : isToday ? (
@@ -314,49 +314,49 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
                               ¡Es Hoy!
                             </span>
                           ) : (
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600">
                               Agendado
                             </span>
                           )}
                         </div>
 
                         {/* Event Title */}
-                        <h4 className="text-sm font-black text-slate-900 leading-snug line-clamp-2">
+                        <h4 className="text-sm font-black text-slate-900 dark:text-white leading-snug line-clamp-2">
                           {event.title}
                         </h4>
 
                         {/* Event Details */}
-                        <div className="space-y-1.5 text-xs text-slate-600 font-medium">
+                        <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-400 font-medium">
                           <div className="flex items-center gap-2">
-                            <User className="w-3.5 h-3.5 text-[#DA291C] shrink-0" />
-                            <span className="line-clamp-1">Facilitador: <strong className="text-slate-800">{event.instructor}</strong></span>
+                            <User className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400 shrink-0" />
+                            <span className="line-clamp-1">Facilitador: <strong className="text-slate-800 dark:text-slate-200">{event.instructor}</strong></span>
                           </div>
 
                           <div className="flex items-center gap-2">
-                            <Calendar className="w-3.5 h-3.5 text-[#DA291C] shrink-0" />
-                            <span className={isToday ? 'font-bold text-[#DA291C]' : ''}>
+                            <Calendar className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400 shrink-0" />
+                            <span className={isToday ? 'font-bold text-[#DA291C] dark:text-red-400' : ''}>
                               {formatDateLong(schedule.date)}
                             </span>
                           </div>
 
                           <div className="flex items-center gap-2">
-                            <Clock className="w-3.5 h-3.5 text-[#DA291C] shrink-0" />
-                            <span>Horario: <strong className="text-slate-900">{slot.time}{slot.endTime ? ` - ${slot.endTime}` : ''}</strong></span>
+                            <Clock className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400 shrink-0" />
+                            <span>Horario: <strong className="text-slate-900 dark:text-white">{slot.time}{slot.endTime ? ` - ${slot.endTime}` : ''}</strong></span>
                           </div>
 
                           <div className="flex items-center gap-2">
-                            <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                            <span>Duración: <strong className="text-amber-900 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">{metrics.totalHours} hrs ({metrics.totalDays} {metrics.totalDays === 1 ? 'día' : 'días'})</strong></span>
+                            <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                            <span>Duración: <strong className="text-amber-900 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md border border-amber-200 dark:border-amber-900/50">{metrics.totalHours} hrs ({metrics.totalDays} {metrics.totalDays === 1 ? 'día' : 'días'})</strong></span>
                           </div>
 
                           <div className="flex items-center gap-2">
                             {event.modality === 'Virtual' ? (
-                              <Video className="w-3.5 h-3.5 text-cyan-600 shrink-0" />
+                              <Video className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400 shrink-0" />
                             ) : (
-                              <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                              <MapPin className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                             )}
                             <span className="line-clamp-1">
-                              Sala: <strong className="text-slate-900">{event.location || (event.modality === 'Virtual' ? 'Microsoft Teams' : 'Sala Claro')}</strong>
+                              Sala: <strong className="text-slate-900 dark:text-white">{event.location || (event.modality === 'Virtual' ? 'Microsoft Teams' : 'Sala Claro')}</strong>
                             </span>
                           </div>
                         </div>
@@ -364,11 +364,11 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
                       </div>
 
                       {/* Card Action Footer: Solo Pase QR / Estado Informativo (Sin auto-confirmación) */}
-                      <div className="pt-4 border-t border-slate-100 space-y-2 mt-4">
+                      <div className="pt-4 border-t border-slate-100 dark:border-slate-700/80 space-y-2 mt-4">
                         {hasAttended ? (
                           <div className="space-y-2">
-                            <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold text-center flex items-center justify-center gap-1.5">
-                              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                            <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 text-xs font-bold text-center flex items-center justify-center gap-1.5">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                               <span>Asistencia Confirmada por Facilitador</span>
                             </div>
 
@@ -376,9 +376,9 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
                               <button
                                 type="button"
                                 onClick={() => setSelectedPassSession(session)}
-                                className="flex-1 py-2 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                                className="flex-1 py-2 px-3 rounded-xl bg-slate-50 dark:bg-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                               >
-                                <QrCode className="w-3.5 h-3.5 text-slate-600" />
+                                <QrCode className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
                                 <span>Ver Pase QR</span>
                               </button>
 
@@ -391,10 +391,10 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
                                 if (alreadyEvaluated) {
                                   return (
                                     <span 
-                                      className="py-2 px-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold flex items-center gap-1 shrink-0 shadow-2xs"
+                                      className="py-2 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-bold flex items-center gap-1 shrink-0 shadow-2xs"
                                       title="Encuesta de satisfacción completada (1 sola respuesta permitida)"
                                     >
-                                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                                       <span>✓ Evaluado ({alreadyEvaluated.rating}★)</span>
                                     </span>
                                   );
@@ -407,7 +407,7 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
                                       onClose();
                                       onOpenTecEvaluation(event);
                                     }}
-                                    className="py-2 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                                    className="py-2 px-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-800 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0"
                                     title="Completar Encuesta de Evaluación TEC"
                                   >
                                     <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
@@ -422,13 +422,13 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
                             <button
                               type="button"
                               onClick={() => setSelectedPassSession(session)}
-                              className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 hover:from-black hover:to-slate-900 text-white text-xs font-black flex items-center justify-center gap-2 shadow-md shadow-slate-900/15 transition-all cursor-pointer active:scale-95"
+                              className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 hover:from-black hover:to-slate-900 dark:from-red-600 dark:to-red-700 dark:hover:from-red-700 dark:hover:to-red-800 text-white text-xs font-black flex items-center justify-center gap-2 shadow-md shadow-slate-900/15 transition-all cursor-pointer active:scale-95"
                               title="Ver código QR de acceso para presentar al instructor en la puerta"
                             >
-                              <QrCode className="w-4 h-4 text-amber-400" />
+                              <QrCode className="w-4 h-4 text-amber-400 dark:text-white" />
                               <span>Ver Pase QR de Acceso</span>
                             </button>
-                            <p className="text-[10px] text-center text-slate-400 font-medium">
+                            <p className="text-[10px] text-center text-slate-400 dark:text-slate-500 font-medium">
                               Presenta este código QR al instructor en la puerta de la sala para registrar tu asistencia.
                             </p>
                           </div>
@@ -446,16 +446,16 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 sm:p-5 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 shrink-0">
-          <div className="flex items-center gap-2 text-xs text-slate-500">
-            <ShieldCheck className="w-4 h-4 text-[#DA291C]" />
+        <div className="p-4 sm:p-5 bg-slate-50 dark:bg-slate-800/90 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 shrink-0">
+          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+            <ShieldCheck className="w-4 h-4 text-[#DA291C] dark:text-red-400" />
             <span>Sistema de Acompañamiento y Recepción - Claro Dominicana</span>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+            className="px-5 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-colors cursor-pointer"
           >
             Cerrar Lobby
           </button>
@@ -472,16 +472,16 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
       >
         {selectedPassSession && (
           <div 
-            className="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center space-y-4 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-150"
+            className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center space-y-4 shadow-2xl border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <span className="text-xs font-black text-[#DA291C] uppercase tracking-wider">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <span className="text-xs font-black text-[#DA291C] dark:text-red-400 uppercase tracking-wider">
                 Pase de Entrada Claro
               </span>
               <button 
                 onClick={() => setSelectedPassSession(null)}
-                className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -498,13 +498,13 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
             </div>
 
             <div>
-              <h4 className="text-sm font-black text-slate-900 leading-snug">
+              <h4 className="text-sm font-black text-slate-900 dark:text-white leading-snug">
                 {selectedPassSession.event.title}
               </h4>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 {formatDateLong(selectedPassSession.schedule.date)} • {selectedPassSession.slot.time}
               </p>
-              <p className="text-[11px] text-[#DA291C] font-bold mt-1.5">
+              <p className="text-[11px] text-[#DA291C] dark:text-red-400 font-bold mt-1.5">
                 {displayName} ({displayCedula || displayCard})
               </p>
             </div>
@@ -513,16 +513,16 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
             <div className="flex items-center gap-2 pt-2">
               <button
                 onClick={() => downloadIcsFile(selectedPassSession.event, selectedPassSession.schedule.date, selectedPassSession.slot.time)}
-                className="flex-1 py-2 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center justify-center gap-1.5 border border-slate-200 transition-colors"
+                className="flex-1 py-2 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 border border-slate-200 dark:border-slate-700 transition-colors"
               >
-                <Download className="w-3.5 h-3.5 text-[#DA291C]" />
+                <Download className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
                 <span>.ICS</span>
               </button>
               <a
                 href={getGoogleCalendarUrl(selectedPassSession.event, selectedPassSession.schedule.date, selectedPassSession.slot.time)}
                 target="_blank"
                 rel="noreferrer"
-                className="flex-1 py-2 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-[#DA291C] text-xs font-bold flex items-center justify-center gap-1.5 border border-red-200 transition-colors"
+                className="flex-1 py-2 px-3 rounded-xl bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/60 text-[#DA291C] dark:text-red-400 text-xs font-bold flex items-center justify-center gap-1.5 border border-red-200 dark:border-red-900/50 transition-colors"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
                 <span>Google</span>
@@ -531,7 +531,7 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
 
             <button
               onClick={() => setSelectedPassSession(null)}
-              className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer"
+              className="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition-colors cursor-pointer"
             >
               Listo
             </button>

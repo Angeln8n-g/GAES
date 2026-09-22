@@ -122,7 +122,7 @@ export const ReceptionLobbySection: React.FC<ReceptionLobbySectionProps> = ({
                 placeholder="000-0000000-0 (o carnet / cédula física)"
                 maxLength={13}
                 autoComplete="off"
-                className="w-full pl-12 pr-10 py-4 bg-white/10 hover:bg-white/15 focus:bg-white text-white focus:text-slate-900 placeholder:text-slate-400 focus:placeholder:text-slate-400 rounded-2xl sm:rounded-3xl border border-white/20 focus:border-[#DA291C] focus:ring-4 focus:ring-red-500/20 text-base sm:text-lg font-bold tracking-wide transition-all outline-none backdrop-blur-md"
+                className="w-full pl-12 pr-10 py-4 bg-white/10 hover:bg-white/15 focus:bg-white dark:focus:bg-slate-900 text-white focus:text-slate-900 dark:focus:text-white placeholder:text-slate-400 focus:placeholder:text-slate-400 dark:focus:placeholder:text-slate-500 rounded-2xl sm:rounded-3xl border border-white/20 focus:border-[#DA291C] dark:focus:border-red-500 focus:ring-4 focus:ring-red-500/20 text-base sm:text-lg font-bold tracking-wide transition-all outline-none backdrop-blur-md"
               />
               {cedulaInput && (
                 <button

@@ -108,7 +108,7 @@ export const ProgramsManager: React.FC<ProgramsManagerProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar cronogramas por título o descripción..."
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-2xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] shadow-xs"
+              className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] shadow-xs"
             />
           </div>
 
@@ -116,7 +116,7 @@ export const ProgramsManager: React.FC<ProgramsManagerProps> = ({
             <select
               value={selectedCompanyFilter}
               onChange={(e) => setSelectedCompanyFilter(e.target.value)}
-              className="px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs text-slate-800 font-bold focus:outline-none focus:border-[#DA291C]"
+              className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs text-slate-800 dark:text-slate-200 font-bold focus:outline-none focus:border-[#DA291C]"
             >
               <option value="all">🏢 Todas las Empresas</option>
               {companies.map(c => (
@@ -128,7 +128,7 @@ export const ProgramsManager: React.FC<ProgramsManagerProps> = ({
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#DA291C]"
+            className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#DA291C]"
           >
             <option value="all">Todos los estados</option>
             <option value="active">Activos</option>
@@ -151,10 +151,10 @@ export const ProgramsManager: React.FC<ProgramsManagerProps> = ({
 
       {/* Programs List */}
       {filteredPrograms.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center shadow-sm">
           <Calendar className="w-12 h-12 text-slate-400 mx-auto mb-3 animate-pulse" />
-          <h3 className="text-base font-black text-slate-800">No se encontraron cronogramas</h3>
-          <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
+          <h3 className="text-base font-black text-slate-800 dark:text-white">No se encontraron cronogramas</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1">
             Crea tu primer cronograma de capacitaciones para estructurar programas obligatorios dirigidos a grupos de colaboradores.
           </p>
           <button
@@ -179,7 +179,7 @@ export const ProgramsManager: React.FC<ProgramsManagerProps> = ({
             return (
               <div
                 key={prog.id}
-                className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-slate-300 hover:shadow transition-all group"
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 hover:shadow transition-all group"
               >
                 <div>
                   
@@ -189,38 +189,38 @@ export const ProgramsManager: React.FC<ProgramsManagerProps> = ({
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase border ${
                         prog.status === 'active' 
                           ? isExpired 
-                            ? 'bg-rose-50 text-rose-700 border-rose-200' 
-                            : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-slate-100 text-slate-600 border border-slate-200'
+                            ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800' 
+                            : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
                       }`}>
                         {prog.status === 'active' ? (isExpired ? 'Vencido' : 'Activo') : prog.status}
                       </span>
 
                       {comp && (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1">
-                          <Building2 className="w-3 h-3 text-[#DA291C]" />
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center gap-1">
+                          <Building2 className="w-3 h-3 text-[#DA291C] dark:text-red-400" />
                           {comp.name}
                         </span>
                       )}
                     </div>
 
-                    <span className="text-[11px] text-slate-500 font-medium flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-[#DA291C]" />
-                      Límite: <strong className="text-slate-800">{formatDateLong(prog.endDate)}</strong>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
+                      Límite: <strong className="text-slate-800 dark:text-slate-200">{formatDateLong(prog.endDate)}</strong>
                     </span>
                   </div>
 
                   {/* Title & Description */}
-                  <h3 className="text-lg font-black text-slate-900 group-hover:text-[#DA291C] transition-colors">
+                  <h3 className="text-lg font-black text-slate-900 dark:text-white group-hover:text-[#DA291C] dark:group-hover:text-red-400 transition-colors">
                     {prog.title}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-1.5 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 line-clamp-2 leading-relaxed">
                     {prog.description || 'Sin descripción especificada.'}
                   </p>
 
                   {/* Target Groups Chips */}
                   <div className="mt-4 flex items-center gap-1.5 flex-wrap">
-                    <span className="text-[11px] font-bold text-slate-500 mr-1 flex items-center gap-1">
+                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mr-1 flex items-center gap-1">
                       <Users className="w-3.5 h-3.5 text-slate-400" /> Grupos:
                     </span>
                     {targetGroups.length > 0 ? (
@@ -236,31 +236,31 @@ export const ProgramsManager: React.FC<ProgramsManagerProps> = ({
                         );
                       })
                     ) : (
-                      <span className="text-[11px] text-slate-500 italic">Sin grupos asignados</span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 italic">Sin grupos asignados</span>
                     )}
                   </div>
 
                   {/* Courses Preview */}
-                  <div className="mt-3 flex items-center gap-3 text-xs text-slate-500">
+                  <div className="mt-3 flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
                     <span className="flex items-center gap-1">
-                      <BookOpen className="w-3.5 h-3.5 text-[#DA291C]" />
-                      <strong className="text-slate-900 font-bold">{prog.eventItems.length}</strong> capacitaciones ({mandatoryCount} obligatorias{optionalCount > 0 ? `, ${optionalCount} opcionales` : ''})
+                      <BookOpen className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
+                      <strong className="text-slate-900 dark:text-white font-bold">{prog.eventItems.length}</strong> capacitaciones ({mandatoryCount} obligatorias{optionalCount > 0 ? `, ${optionalCount} opcionales` : ''})
                     </span>
                   </div>
 
                   {/* Compliance Progress Bar Card */}
-                  <div className="mt-5 p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                  <div className="mt-5 p-4 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 space-y-2">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-bold text-slate-700 flex items-center gap-1.5">
-                        <BarChart3 className="w-3.5 h-3.5 text-[#DA291C]" />
+                      <span className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                        <BarChart3 className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
                         Cumplimiento de los Participantes
                       </span>
-                      <span className="font-black text-[#DA291C] text-sm">
+                      <span className="font-black text-[#DA291C] dark:text-red-400 text-sm">
                         {compliance.overallPercentage}%
                       </span>
                     </div>
 
-                    <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                    <div className="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
                       <div 
                         className={`h-full rounded-full transition-all duration-500 ${
                           compliance.overallPercentage === 100 ? 'bg-emerald-600' : 'bg-[#DA291C]'
@@ -269,12 +269,12 @@ export const ProgramsManager: React.FC<ProgramsManagerProps> = ({
                       />
                     </div>
 
-                    <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 font-medium">
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-1 font-medium">
                       <span>
-                        <strong className="text-emerald-700">{compliance.completedCount}</strong> completados de {compliance.totalParticipants}
+                        <strong className="text-emerald-700 dark:text-emerald-400">{compliance.completedCount}</strong> completados de {compliance.totalParticipants}
                       </span>
                       <span>
-                        <strong className="text-amber-700">{compliance.inProgressCount}</strong> en curso • <strong className="text-rose-700">{compliance.overdueCount}</strong> atrasados
+                        <strong className="text-amber-700 dark:text-amber-400">{compliance.inProgressCount}</strong> en curso • <strong className="text-rose-700 dark:text-rose-400">{compliance.overdueCount}</strong> atrasados
                       </span>
                     </div>
                   </div>
@@ -282,10 +282,10 @@ export const ProgramsManager: React.FC<ProgramsManagerProps> = ({
                 </div>
 
                 {/* Footer Action Buttons */}
-                <div className="flex items-center justify-between gap-2 mt-6 pt-4 border-t border-slate-100">
+                <div className="flex items-center justify-between gap-2 mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
                   <button
                     onClick={() => setTrackerProgram(prog)}
-                    className="px-4 py-2 bg-red-50 hover:bg-red-100 text-[#DA291C] border border-red-200 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-xs"
+                    className="px-4 py-2 bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/50 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-900/50 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-xs"
                   >
                     <BarChart3 className="w-4 h-4" />
                     <span>Ver Matriz de Cumplimiento</span>
@@ -294,7 +294,7 @@ export const ProgramsManager: React.FC<ProgramsManagerProps> = ({
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => handleOpenEdit(prog)}
-                      className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+                      className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                       title="Editar cronograma"
                     >
                       <Edit3 className="w-4 h-4" />
@@ -302,7 +302,7 @@ export const ProgramsManager: React.FC<ProgramsManagerProps> = ({
 
                     <button
                       onClick={() => handleDelete(prog)}
-                      className="p-2 rounded-xl text-rose-600 hover:text-rose-800 hover:bg-rose-50 transition-colors cursor-pointer"
+                      className="p-2 rounded-xl text-rose-600 hover:text-rose-800 dark:text-rose-400 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
                       title="Eliminar cronograma"
                     >
                       <Trash2 className="w-4 h-4" />

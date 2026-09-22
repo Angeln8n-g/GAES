@@ -351,80 +351,80 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
           onClick={() => { setSelectedStatusFilter("all"); setSelectedRoleFilter("all"); setSelectedCompanyFilter("all"); }}
           className={`p-4 rounded-3xl border cursor-pointer transition-all ${
             selectedStatusFilter === "all" && selectedRoleFilter === "all"
-              ? "bg-red-50/80 border-[#DA291C] shadow-sm"
-              : "bg-white border-slate-200 hover:border-slate-300 shadow-xs"
+              ? "bg-red-50/80 dark:bg-red-950/40 border-[#DA291C] shadow-sm"
+              : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-xs"
           }`}
         >
-          <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
+          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-bold">
             <span>Total Cuentas</span>
             <UsersIcon className="w-4 h-4 text-[#DA291C]" />
           </div>
-          <p className="text-2xl font-black text-slate-900 mt-1.5">{stats.total}</p>
-          <p className="text-[10px] text-slate-500 mt-0.5 font-medium">Usuarios con acceso</p>
+          <p className="text-2xl font-black text-slate-900 dark:text-white mt-1.5">{stats.total}</p>
+          <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Usuarios con acceso</p>
         </div>
 
         <div 
           onClick={() => setSelectedStatusFilter("contratado")}
           className={`p-4 rounded-3xl border cursor-pointer transition-all ${
             selectedStatusFilter === "contratado"
-              ? "bg-emerald-50 border-emerald-500 shadow-sm"
-              : "bg-white border-slate-200 hover:border-slate-300 shadow-xs"
+              ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 shadow-sm"
+              : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-xs"
           }`}
         >
-          <div className="flex items-center justify-between text-xs text-emerald-700 font-bold">
+          <div className="flex items-center justify-between text-xs text-emerald-700 dark:text-emerald-400 font-bold">
             <span>Contratados</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           </div>
-          <p className="text-2xl font-black text-emerald-700 mt-1.5">{stats.contratados}</p>
-          <p className="text-[10px] text-emerald-600 mt-0.5">Acceso activo</p>
+          <p className="text-2xl font-black text-emerald-700 dark:text-emerald-400 mt-1.5">{stats.contratados}</p>
+          <p className="text-[10px] text-emerald-600 dark:text-emerald-500 mt-0.5">Acceso activo</p>
         </div>
 
         <div 
           onClick={() => setSelectedStatusFilter("en_proceso")}
           className={`p-4 rounded-3xl border cursor-pointer transition-all ${
             selectedStatusFilter === "en_proceso"
-              ? "bg-amber-50 border-amber-500 shadow-sm"
-              : "bg-white border-slate-200 hover:border-slate-300 shadow-xs"
+              ? "bg-amber-50 dark:bg-amber-950/40 border-amber-500 shadow-sm"
+              : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-xs"
           }`}
         >
-          <div className="flex items-center justify-between text-xs text-amber-700 font-bold">
+          <div className="flex items-center justify-between text-xs text-amber-700 dark:text-amber-400 font-bold">
             <span>En Proceso</span>
-            <Clock className="w-4 h-4 text-amber-600" />
+            <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
           </div>
-          <p className="text-2xl font-black text-amber-700 mt-1.5">{stats.enProceso}</p>
-          <p className="text-[10px] text-amber-600 mt-0.5">Inducción</p>
+          <p className="text-2xl font-black text-amber-700 dark:text-amber-400 mt-1.5">{stats.enProceso}</p>
+          <p className="text-[10px] text-amber-600 dark:text-amber-500 mt-0.5">Inducción</p>
         </div>
 
         <div 
           onClick={() => setSelectedRoleFilter("Líder de Área / Supervisor")}
           className={`p-4 rounded-3xl border cursor-pointer transition-all ${
             selectedRoleFilter === "Líder de Área / Supervisor"
-              ? "bg-blue-50 border-blue-500 shadow-sm"
-              : "bg-white border-slate-200 hover:border-slate-300 shadow-xs"
+              ? "bg-blue-50 dark:bg-blue-950/40 border-blue-500 shadow-sm"
+              : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-xs"
           }`}
         >
-          <div className="flex items-center justify-between text-xs text-blue-700 font-bold">
+          <div className="flex items-center justify-between text-xs text-blue-700 dark:text-blue-400 font-bold">
             <span>Líderes / Sup.</span>
-            <ShieldCheck className="w-4 h-4 text-blue-600" />
+            <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" />
           </div>
-          <p className="text-2xl font-black text-blue-700 mt-1.5">{stats.supervisores}</p>
-          <p className="text-[10px] text-blue-600 mt-0.5">Mandos con equipo</p>
+          <p className="text-2xl font-black text-blue-700 dark:text-blue-400 mt-1.5">{stats.supervisores}</p>
+          <p className="text-[10px] text-blue-600 dark:text-blue-500 mt-0.5">Mandos con equipo</p>
         </div>
 
         <div 
           onClick={() => setSelectedStatusFilter("inactivo")}
           className={`p-4 rounded-3xl border cursor-pointer transition-all ${
             selectedStatusFilter === "inactivo"
-              ? "bg-rose-50 border-rose-500 shadow-sm"
-              : "bg-white border-slate-200 hover:border-slate-300 shadow-xs"
+              ? "bg-rose-50 dark:bg-rose-950/40 border-rose-500 shadow-sm"
+              : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-xs"
           }`}
         >
-          <div className="flex items-center justify-between text-xs text-rose-700 font-bold">
+          <div className="flex items-center justify-between text-xs text-rose-700 dark:text-rose-400 font-bold">
             <span>Inactivos</span>
-            <UserX className="w-4 h-4 text-rose-600" />
+            <UserX className="w-4 h-4 text-rose-600 dark:text-rose-400" />
           </div>
-          <p className="text-2xl font-black text-rose-700 mt-1.5">{stats.inactivos}</p>
-          <p className="text-[10px] text-rose-600 mt-0.5">Acceso bloqueado</p>
+          <p className="text-2xl font-black text-rose-700 dark:text-rose-400 mt-1.5">{stats.inactivos}</p>
+          <p className="text-[10px] text-rose-600 dark:text-rose-500 mt-0.5">Acceso bloqueado</p>
         </div>
       </div>
 
@@ -442,7 +442,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar por nombre, correo, cédula, empresa o rol..."
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-2xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] shadow-xs"
+              className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] shadow-xs"
             />
           </div>
 
@@ -454,7 +454,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                 aria-label="Filtrar usuarios por empresa"
                 value={selectedCompanyFilter}
                 onChange={(e) => setSelectedCompanyFilter(e.target.value)}
-                className="px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs text-slate-800 font-bold focus:outline-none focus:border-[#DA291C]"
+                className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs text-slate-800 dark:text-slate-200 font-bold focus:outline-none focus:border-[#DA291C]"
               >
                 <option value="all">🏢 Todas las Empresas</option>
                 {companies.map(c => (
@@ -469,7 +469,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
               aria-label="Filtrar usuarios por estado laboral"
               value={selectedStatusFilter}
               onChange={(e) => setSelectedStatusFilter(e.target.value)}
-              className="px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#DA291C]"
+              className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#DA291C]"
             >
               <option value="all">📋 Todos los Estados</option>
               <option value="contratado">🟢 Contratados (Activos)</option>
@@ -483,7 +483,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
               aria-label="Filtrar usuarios por rol"
               value={selectedRoleFilter}
               onChange={(e) => setSelectedRoleFilter(e.target.value)}
-              className="px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#DA291C]"
+              className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#DA291C]"
             >
               <option value="all">🛡️ Todos los Roles</option>
               {isSuperAdmin && (
@@ -502,7 +502,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
           <button
             type="button"
             onClick={() => setIsBulkUsersModalOpen(true)}
-            className="px-3.5 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold flex items-center gap-1.5 border border-slate-300 shadow-xs transition-colors cursor-pointer"
+            className="px-3.5 py-2.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 border border-slate-300 dark:border-slate-700 shadow-xs transition-colors cursor-pointer"
           >
             <Upload className="w-3.5 h-3.5 text-[#DA291C]" />
             <span>Carga Masiva</span>
@@ -511,9 +511,9 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
           <button
             type="button"
             onClick={() => exportUsersToExcel(users)}
-            className="px-3.5 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold flex items-center gap-1.5 border border-slate-300 shadow-xs transition-colors cursor-pointer"
+            className="px-3.5 py-2.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 border border-slate-300 dark:border-slate-700 shadow-xs transition-colors cursor-pointer"
           >
-            <Download className="w-3.5 h-3.5 text-slate-500" />
+            <Download className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
             <span>Exportar Usuarios</span>
           </button>
 
@@ -531,85 +531,85 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
 
       {/* Formulario Crear Usuario */}
       {isAddingUser && (
-        <form onSubmit={handleAddUser} className="bg-slate-50 border border-slate-200 rounded-3xl p-5 space-y-4 animate-in slide-in-from-top-3 duration-200 shadow-sm">
-          <div className="flex items-center gap-2 text-xs font-black text-slate-900">
+        <form onSubmit={handleAddUser} className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-3xl p-5 space-y-4 animate-in slide-in-from-top-3 duration-200 shadow-sm">
+          <div className="flex items-center gap-2 text-xs font-black text-slate-900 dark:text-white">
             <Sparkles className="w-3.5 h-3.5 text-[#DA291C]" />
             <span>Crear Nueva Cuenta de Acceso</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-8 gap-3">
             <div className="lg:col-span-2">
-              <label className="block text-[11px] font-bold text-slate-700 mb-1">Nombre Completo *</label>
+              <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Nombre Completo *</label>
               <input
                 type="text"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="ej. Juan Carlos Pérez"
-                className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-700 mb-1">Cédula</label>
+              <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Cédula</label>
               <input
                 type="text"
                 value={newCedula}
                 onChange={(e) => setNewCedula(formatCedula(e.target.value))}
                 placeholder="ej. 402-2196163-1"
                 maxLength={13}
-                className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-mono focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-[#DA291C]"
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-700 mb-1">Correo Corporativo *</label>
+              <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Correo Corporativo *</label>
               <input
                 type="email"
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
                 placeholder="ej. juan.perez@empresa.com"
-                className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-700 mb-1">Empresa</label>
+              <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Empresa</label>
               {isSuperAdmin ? (
                 <select
                   value={newCompanyId}
                   onChange={(e) => setNewCompanyId(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
                 >
                   {companies.map(c => (
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </select>
               ) : (
-                <div className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs text-slate-700 font-semibold truncate">
+                <div className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-700 dark:text-slate-300 font-semibold truncate">
                   🏢 {companiesMap.get(newCompanyId)?.name || 'Empresa asignada'}
                 </div>
               )}
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-700 mb-1">Departamento</label>
+              <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Departamento</label>
               <input
                 type="text"
                 value={newDepartment}
                 onChange={(e) => setNewDepartment(e.target.value)}
                 placeholder="ej. Tecnología"
-                className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-700 mb-1">Rol *</label>
+              <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Rol *</label>
               <select
                 value={newRole}
                 onChange={(e) => setNewRole(e.target.value as UserRole)}
-                className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
               >
                 <option value="Colaborador (User)">Colaborador (User)</option>
                 <option value="Evaluador / Tutor">Evaluador / Tutor</option>
@@ -622,11 +622,11 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-700 mb-1">Estado Laboral</label>
+              <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Estado Laboral</label>
               <select
                 value={newEmploymentStatus}
                 onChange={(e) => setNewEmploymentStatus(e.target.value as EmploymentStatus)}
-                className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
               >
                 <option value="contratado">🟢 Contratado</option>
                 <option value="en_proceso">🟡 En Proceso</option>
@@ -639,7 +639,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
             <button
               type="button"
               onClick={() => setIsAddingUser(false)}
-              className="px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 cursor-pointer"
+              className="px-3 py-1.5 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
             >
               Cancelar
             </button>
@@ -654,18 +654,18 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
       )}
 
       {/* Users Table (Light Theme) */}
-      <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
-        <div className="table-scroll-hint">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
+        <div className="table-scroll-hint dark:border-slate-800 dark:text-slate-400">
           <span className="flex items-center gap-1.5">
             <ArrowRightLeft className="w-3.5 h-3.5 text-[#DA291C]" />
             Desliza horizontalmente para ver todas las columnas
           </span>
-          <span className="font-mono text-slate-400">8 columnas</span>
+          <span className="font-mono text-slate-400 dark:text-slate-500">8 columnas</span>
         </div>
         <div className="table-responsive-container">
           <table className="w-full text-left text-xs min-w-[920px]">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50 text-slate-600">
+              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400">
                 <th className="p-4 font-bold">Usuario</th>
                 <th className="p-4 font-bold">Cédula</th>
                 <th className="p-4 font-bold">Empresa</th>
@@ -676,25 +676,25 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                 <th className="p-4 font-bold text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {filteredUsers.length > 0 ? (
                 filteredUsers.map(u => {
                   const uStatus = u.employmentStatus || "contratado";
                   const uComp = companiesMap.get(u.companyId || "emp_kasino");
 
                   return (
-                    <tr key={u.id} className="hover:bg-slate-50/80 transition-colors">
+                    <tr key={u.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
                       <td className="p-4">
                         <button
                           type="button"
                           onClick={() => handleOpenUserProfile(u)}
                           className="flex items-center gap-2.5 text-left group cursor-pointer"
                         >
-                          <div className="w-8 h-8 rounded-xl bg-red-50 text-[#DA291C] border border-red-200 flex items-center justify-center font-bold text-xs shrink-0">
+                          <div className="w-8 h-8 rounded-xl bg-red-50 dark:bg-red-950/40 text-[#DA291C] border border-red-200 dark:border-red-900/50 flex items-center justify-center font-bold text-xs shrink-0">
                             {u.name.charAt(0)}
                           </div>
                           <div>
-                            <span className="font-bold text-slate-900 group-hover:text-[#DA291C] transition-colors flex items-center gap-1.5">
+                            <span className="font-bold text-slate-900 dark:text-white group-hover:text-[#DA291C] transition-colors flex items-center gap-1.5">
                               <span>{u.name}</span>
                               <Eye className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                             </span>
@@ -704,11 +704,11 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
 
                       <td className="p-4">
                         {u.cedula ? (
-                          <span className="font-mono text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200">
+                          <span className="font-mono text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-lg border border-slate-200 dark:border-slate-700">
                             {u.cedula}
                           </span>
                         ) : (
-                          <span className="text-slate-500 italic text-[11px]">No asignada</span>
+                          <span className="text-slate-500 dark:text-slate-400 italic text-[11px]">No asignada</span>
                         )}
                       </td>
 
@@ -718,42 +718,42 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                           <select
                             value={u.companyId || "emp_kasino"}
                             onChange={(e) => handleChangeCompany(u.id, e.target.value)}
-                            className="px-2 py-1 rounded-xl text-[11px] font-bold bg-white border border-slate-300 text-slate-800 focus:outline-none focus:border-[#DA291C]"
+                            className="px-2 py-1 rounded-xl text-[11px] font-bold bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#DA291C]"
                           >
                             {companies.map(c => (
                               <option key={c.id} value={c.id}>🏢 {c.name}</option>
                             ))}
                           </select>
                         ) : (
-                          <span className="px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                          <span className="px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                             🏢 {uComp?.name || 'Kasino 21 Corporativo'}
                           </span>
                         )}
                       </td>
 
-                      <td className="p-4 text-slate-700">
+                      <td className="p-4 text-slate-700 dark:text-slate-300">
                         {u.department ? (
-                          <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 text-[11px] font-semibold">
+                          <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold">
                             {u.department}
                           </span>
                         ) : (
-                          <span className="text-slate-500 text-[11px]">—</span>
+                          <span className="text-slate-500 dark:text-slate-400 text-[11px]">—</span>
                         )}
                       </td>
 
-                      <td className="p-4 text-slate-500 font-mono text-[11px]">{u.email}</td>
+                      <td className="p-4 text-slate-500 dark:text-slate-400 font-mono text-[11px]">{u.email}</td>
 
                       {/* Estado Laboral */}
                       <td className="p-4">
                         <select
                           value={uStatus}
                           onChange={(e) => handleChangeStatus(u.id, e.target.value as EmploymentStatus)}
-                          className={`px-2.5 py-1 rounded-xl text-[11px] font-bold bg-white border ${
+                          className={`px-2.5 py-1 rounded-xl text-[11px] font-bold bg-white dark:bg-slate-800 border ${
                             uStatus === "contratado"
-                              ? "text-emerald-700 border-emerald-300"
+                              ? "text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800"
                               : uStatus === "en_proceso"
-                              ? "text-amber-700 border-amber-300"
-                              : "text-rose-700 border-rose-300"
+                              ? "text-amber-700 dark:text-amber-400 border-amber-300 dark:border-amber-800"
+                              : "text-rose-700 dark:text-rose-400 border-rose-300 dark:border-rose-800"
                           }`}
                         >
                           <option value="contratado">🟢 Contratado</option>
@@ -767,16 +767,16 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                         <select
                           value={u.role === "Evaluador / Tutor OJT" ? "Evaluador / Tutor" : u.role}
                           onChange={(e) => handleChangeRole(u.id, e.target.value as UserRole)}
-                          className={`px-3 py-1 rounded-xl text-xs font-bold bg-white border border-slate-300 ${
+                          className={`px-3 py-1 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 ${
                             u.role === "Super Administrador"
-                              ? "text-amber-700"
+                              ? "text-amber-700 dark:text-amber-400"
                               : u.role === "Administrador / Editor"
                               ? "text-[#DA291C]"
                               : u.role === "Evaluador / Tutor" || u.role === "Evaluador / Tutor OJT"
-                              ? "text-indigo-700"
+                              ? "text-indigo-700 dark:text-indigo-400"
                               : u.role === "Líder de Área / Supervisor"
-                              ? "text-emerald-700"
-                              : "text-slate-700"
+                              ? "text-emerald-700 dark:text-emerald-400"
+                              : "text-slate-700 dark:text-slate-300"
                           }`}
                         >
                           {isSuperAdmin && (
@@ -794,7 +794,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => handleOpenUserProfile(u)}
-                            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 text-slate-600 hover:text-red-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center"
+                            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 text-slate-600 dark:text-slate-400 hover:text-red-700 dark:hover:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center"
                             title="Ver Ficha 360°"
                           >
                             <Eye className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
@@ -803,17 +803,17 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                           {(u.role === "Líder de Área / Supervisor" || u.role === "Super Administrador") && (
                             <button
                               onClick={() => setSelectedSupervisorForAssignment(u)}
-                              className="px-2.5 py-1.5 min-h-[36px] sm:min-h-0 touch-target-44 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-[11px] font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                              className="px-2.5 py-1.5 min-h-[36px] sm:min-h-0 touch-target-44 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                               title="Gestionar equipo asignado a este supervisor"
                             >
-                              <UsersIcon className="w-3.5 h-3.5 text-emerald-600" />
+                              <UsersIcon className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                               <span>Equipo ({u.assignedMemberCards?.length || participants.filter(p => p.supervisorId === u.id).length})</span>
                             </button>
                           )}
 
                           <button
                             onClick={() => setSelectedUserForEdit(u)}
-                            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 text-slate-600 hover:text-blue-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center"
+                            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 text-slate-600 dark:text-slate-400 hover:text-blue-700 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center"
                             title="Editar usuario"
                             aria-label={`Editar usuario ${u.name}`}
                           >
@@ -825,7 +825,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                               setSelectedUserForPassword(u);
                               setNewPasswordInput("");
                             }}
-                            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 text-slate-600 hover:text-amber-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center"
+                            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 text-slate-600 dark:text-slate-400 hover:text-amber-700 dark:hover:text-amber-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center"
                             title="Cambiar contraseña"
                             aria-label={`Cambiar contraseña de ${u.name}`}
                           >
@@ -835,7 +835,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                           {u.id !== currentUser?.id && (
                             <button
                               onClick={() => handleDeleteUser(u.id)}
-                              className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center"
+                              className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center"
                               title="Eliminar usuario"
                               aria-label={`Eliminar usuario ${u.name}`}
                             >
@@ -849,9 +849,9 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                 })
               ) : (
                 <tr>
-                  <td colSpan={8} className="p-12 text-center text-slate-500">
-                    <p className="text-sm font-bold text-slate-800">No se encontraron usuarios</p>
-                    <p className="text-xs text-slate-500 mt-1">Prueba ajustando los filtros de búsqueda o empresa.</p>
+                  <td colSpan={8} className="p-12 text-center text-slate-500 dark:text-slate-400">
+                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200">No se encontraron usuarios</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Prueba ajustando los filtros de búsqueda o empresa.</p>
                   </td>
                 </tr>
               )}
@@ -859,7 +859,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
           </table>
         </div>
 
-        <div className="p-4 border-t border-slate-200 text-xs text-slate-500 flex justify-between bg-slate-50">
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 flex justify-between bg-slate-50 dark:bg-slate-800/80">
           <span>Mostrando {filteredUsers.length} de {users.length} usuarios registrados</span>
           <span>{stats.contratados} contratados • {stats.enProceso} en proceso • {stats.supervisores} líderes</span>
         </div>
@@ -868,18 +868,18 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
       {/* Change Password Modal */}
       {selectedUserForPassword && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 dark:bg-black/70 backdrop-blur-sm animate-in fade-in duration-200"
           role="dialog"
           aria-modal="true"
           aria-labelledby="change-password-modal-title"
         >
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center gap-2.5 text-amber-600">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center gap-2.5 text-amber-600 dark:text-amber-400">
               <KeyRound className="w-5 h-5" aria-hidden="true" />
-              <h2 id="change-password-modal-title" className="text-base font-black text-slate-900">Cambiar Contraseña</h2>
+              <h2 id="change-password-modal-title" className="text-base font-black text-slate-900 dark:text-white">Cambiar Contraseña</h2>
             </div>
-            <p className="text-xs text-slate-500">
-              Ingresa la nueva contraseña para <strong className="text-slate-800">{selectedUserForPassword.name}</strong> ({selectedUserForPassword.email}).
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Ingresa la nueva contraseña para <strong className="text-slate-800 dark:text-slate-200">{selectedUserForPassword.name}</strong> ({selectedUserForPassword.email}).
             </p>
 
             <form onSubmit={handleChangePasswordSubmit} className="space-y-4">
@@ -891,7 +891,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                   value={newPasswordInput}
                   onChange={(e) => setNewPasswordInput(e.target.value)}
                   placeholder="Nueva contraseña..."
-                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                  className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
                   required
                 />
               </div>
@@ -899,7 +899,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                 <button
                   type="button"
                   onClick={() => setSelectedUserForPassword(null)}
-                  className="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer"
+                  className="flex-1 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold cursor-pointer"
                 >
                   Cancelar
                 </button>

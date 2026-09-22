@@ -189,7 +189,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
     <div className="space-y-8 pb-16">
       
       {/* Header Banner (Light Theme & Fully Responsive) */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
         
         {/* Top Header Row */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -198,22 +198,22 @@ export const AdminView: React.FC<AdminViewProps> = ({
               <Sliders className="w-4 h-4" />
               <span>Panel de Control Administrativo</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
               Administración del Sistema
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-2xl">
               Crea cursos, cronogramas grupales, gestiona cupos, importa padrones y audita el cumplimiento.
             </p>
           </div>
 
           {/* Company Scope Selector */}
           {companies.length > 0 && isSuperAdmin && onSelectCompanyScope && (
-            <div className="flex items-center gap-2 bg-slate-50 px-3.5 py-2 rounded-2xl border border-slate-200 text-xs shrink-0 self-start lg:self-auto shadow-2xs">
+            <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs shrink-0 self-start lg:self-auto shadow-2xs">
               <Building2 className="w-4 h-4 text-[#DA291C] shrink-0" />
               <select
                 value={selectedCompanyId}
                 onChange={(e) => onSelectCompanyScope(e.target.value)}
-                className="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
+                className="bg-transparent text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer"
               >
                 <option value="all">🏢 Todas las Empresas</option>
                 {companies.map(c => (
@@ -227,22 +227,22 @@ export const AdminView: React.FC<AdminViewProps> = ({
         </div>
 
         {/* Executive Summary Metrics Ribbon */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-slate-100">
-          <div className="bg-slate-50/80 rounded-2xl p-3 border border-slate-200/70">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Capacitaciones</span>
-            <span className="text-xl font-black text-slate-900 mt-0.5 block">{scopedEvents.length}</span>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <div className="bg-slate-50/80 dark:bg-slate-800/60 rounded-2xl p-3 border border-slate-200/70 dark:border-slate-800">
+            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Capacitaciones</span>
+            <span className="text-xl font-black text-slate-900 dark:text-white mt-0.5 block">{scopedEvents.length}</span>
           </div>
-          <div className="bg-slate-50/80 rounded-2xl p-3 border border-slate-200/70">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Colaboradores</span>
-            <span className="text-xl font-black text-slate-900 mt-0.5 block">{scopedParticipants.length}</span>
+          <div className="bg-slate-50/80 dark:bg-slate-800/60 rounded-2xl p-3 border border-slate-200/70 dark:border-slate-800">
+            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Colaboradores</span>
+            <span className="text-xl font-black text-slate-900 dark:text-white mt-0.5 block">{scopedParticipants.length}</span>
           </div>
-          <div className="bg-slate-50/80 rounded-2xl p-3 border border-slate-200/70">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Cronogramas</span>
-            <span className="text-xl font-black text-slate-900 mt-0.5 block">{scopedPrograms.length}</span>
+          <div className="bg-slate-50/80 dark:bg-slate-800/60 rounded-2xl p-3 border border-slate-200/70 dark:border-slate-800">
+            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Cronogramas</span>
+            <span className="text-xl font-black text-slate-900 dark:text-white mt-0.5 block">{scopedPrograms.length}</span>
           </div>
-          <div className="bg-slate-50/80 rounded-2xl p-3 border border-slate-200/70">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Áreas / Grupos</span>
-            <span className="text-xl font-black text-slate-900 mt-0.5 block">{scopedGroups.length}</span>
+          <div className="bg-slate-50/80 dark:bg-slate-800/60 rounded-2xl p-3 border border-slate-200/70 dark:border-slate-800">
+            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Áreas / Grupos</span>
+            <span className="text-xl font-black text-slate-900 dark:text-white mt-0.5 block">{scopedGroups.length}</span>
           </div>
         </div>
 
@@ -251,7 +251,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
           <div 
             role="tablist" 
             aria-label="Secciones del Panel de Control" 
-            className="flex items-center bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200 min-w-max gap-1"
+            className="flex items-center bg-slate-100/90 dark:bg-slate-800/90 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 min-w-max gap-1"
           >
             <button
               role="tab"
@@ -260,13 +260,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
               className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
                 adminTab === 'events'
                   ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700'
               }`}
             >
               <BookOpen className="w-4 h-4 shrink-0" />
               <span>Capacitaciones</span>
               <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-bold leading-none ${
-                adminTab === 'events' ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-600'
+                adminTab === 'events' ? 'bg-white/25 text-white' : 'bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
               }`}>
                 {scopedEvents.length}
               </span>
@@ -279,13 +279,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
               className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
                 adminTab === 'programs'
                   ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700'
               }`}
             >
               <Calendar className="w-4 h-4 shrink-0" />
               <span>Cronogramas</span>
               <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-bold leading-none ${
-                adminTab === 'programs' ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-600'
+                adminTab === 'programs' ? 'bg-white/25 text-white' : 'bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
               }`}>
                 {scopedPrograms.length}
               </span>
@@ -298,13 +298,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
               className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
                 adminTab === 'groups'
                   ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700'
               }`}
             >
               <Layers className="w-4 h-4 shrink-0" />
               <span>Grupos & Áreas</span>
               <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-bold leading-none ${
-                adminTab === 'groups' ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-600'
+                adminTab === 'groups' ? 'bg-white/25 text-white' : 'bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
               }`}>
                 {scopedGroups.length}
               </span>
@@ -317,13 +317,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
               className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
                 adminTab === 'participants'
                   ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700'
               }`}
             >
               <Users className="w-4 h-4 shrink-0" />
               <span>Padrón</span>
               <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-bold leading-none ${
-                adminTab === 'participants' ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-600'
+                adminTab === 'participants' ? 'bg-white/25 text-white' : 'bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
               }`}>
                 {scopedParticipants.length}
               </span>
@@ -337,13 +337,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
                 className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
                   adminTab === 'users'
                     ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700'
                 }`}
               >
                 <ShieldCheck className="w-4 h-4 shrink-0" />
                 <span>Usuarios</span>
                 <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-bold leading-none ${
-                  adminTab === 'users' ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-600'
+                  adminTab === 'users' ? 'bg-white/25 text-white' : 'bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
                 }`}>
                   {scopedUsers.length}
                 </span>
@@ -358,13 +358,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
                 className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
                   adminTab === 'ojt'
                     ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700'
                 }`}
               >
                 <Activity className="w-4 h-4 shrink-0" />
                 <span>Acompañamiento & Campo</span>
                 <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-bold leading-none ${
-                  adminTab === 'ojt' ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-600'
+                  adminTab === 'ojt' ? 'bg-white/25 text-white' : 'bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
                 }`}>
                   {scopedChecklists.length}
                 </span>
@@ -379,13 +379,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
                 className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
                   adminTab === 'companies'
                     ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700'
                 }`}
               >
                 <Building2 className="w-4 h-4 shrink-0" />
                 <span>Empresas</span>
                 <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-bold leading-none ${
-                  adminTab === 'companies' ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-600'
+                  adminTab === 'companies' ? 'bg-white/25 text-white' : 'bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
                 }`}>
                   {companies.length}
                 </span>
@@ -400,10 +400,10 @@ export const AdminView: React.FC<AdminViewProps> = ({
                 className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
                   adminTab === 'letters'
                     ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700'
                 }`}
               >
-                <Award className={`w-4 h-4 shrink-0 ${adminTab === 'letters' ? 'text-white' : 'text-slate-500'}`} />
+                <Award className={`w-4 h-4 shrink-0 ${adminTab === 'letters' ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`} />
                 <span>Cartas & Constancias</span>
               </button>
             )}
@@ -416,13 +416,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
                 className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
                   adminTab === 'external-trainings'
                     ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700'
                 }`}
               >
-                <GraduationCap className={`w-4 h-4 shrink-0 ${adminTab === 'external-trainings' ? 'text-white' : 'text-slate-500'}`} />
+                <GraduationCap className={`w-4 h-4 shrink-0 ${adminTab === 'external-trainings' ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`} />
                 <span>Capacitaciones Externas</span>
                 <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-bold leading-none ${
-                  adminTab === 'external-trainings' ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-600'
+                  adminTab === 'external-trainings' ? 'bg-white/25 text-white' : 'bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
                 }`}>
                   {scopedExternalTrainings.length}
                 </span>
@@ -437,10 +437,10 @@ export const AdminView: React.FC<AdminViewProps> = ({
                 className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
                   adminTab === 'settings'
                     ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700'
                 }`}
               >
-                <Sliders className={`w-4 h-4 shrink-0 ${adminTab === 'settings' ? 'text-white' : 'text-slate-500'}`} />
+                <Sliders className={`w-4 h-4 shrink-0 ${adminTab === 'settings' ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`} />
                 <span>Configuración</span>
               </button>
             )}
@@ -453,10 +453,10 @@ export const AdminView: React.FC<AdminViewProps> = ({
                 className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
                   adminTab === 'backups'
                     ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700'
                 }`}
               >
-                <Database className={`w-4 h-4 shrink-0 ${adminTab === 'backups' ? 'text-white' : 'text-slate-500'}`} />
+                <Database className={`w-4 h-4 shrink-0 ${adminTab === 'backups' ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`} />
                 <span>Base de Datos & Respaldos</span>
               </button>
             )}

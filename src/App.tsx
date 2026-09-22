@@ -80,8 +80,8 @@ const getSafeStoredUser = (): UserAccount | null => {
 // Componente visual de carga para vistas con code-splitting
 const ViewLoadingFallback: React.FC = () => (
   <div className="flex flex-col items-center justify-center py-28 space-y-3.5 animate-in fade-in duration-200">
-    <div className="w-9 h-9 border-3 border-slate-200 border-t-[#DA291C] rounded-full animate-spin shadow-xs"></div>
-    <p className="text-xs font-bold text-slate-600">Cargando módulo...</p>
+    <div className="w-9 h-9 border-3 border-slate-200 dark:border-slate-800 border-t-[#DA291C] dark:border-t-red-500 rounded-full animate-spin shadow-xs"></div>
+    <p className="text-xs font-bold text-slate-600 dark:text-slate-400">Cargando módulo...</p>
   </div>
 );
 

@@ -232,7 +232,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
       ariaLabel={`Perfil de Formación - ${currentUser.name}`}
       className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
     >
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-2xl w-full overflow-hidden flex flex-col max-h-[92vh]" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 max-w-2xl w-full overflow-hidden flex flex-col max-h-[92vh]" onClick={(e) => e.stopPropagation()}>
         
         {/* Header con gradiente institucional */}
         <div className="bg-gradient-to-r from-[#DA291C] via-red-600 to-[#0F172A] p-5 sm:p-6 text-white relative">
@@ -298,14 +298,14 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
         {/* Sub-tab Navigation (Ficha vs Capacitaciones Externas) */}
         {!isMandatory && (
-          <div className="flex border-b border-slate-200 bg-slate-50/80 px-5 pt-2 gap-2 text-xs font-bold">
+          <div className="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-850/80 px-5 pt-2 gap-2 text-xs font-bold">
             <button
               type="button"
               onClick={() => setActiveTab('demographics')}
               className={`pb-2.5 px-3 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
                 activeTab === 'demographics'
-                  ? 'border-[#DA291C] text-[#DA291C]'
-                  : 'border-transparent text-slate-500 hover:text-slate-800'
+                  ? 'border-[#DA291C] text-[#DA291C] dark:text-red-400'
+                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
             >
               <User className="w-3.5 h-3.5" />
@@ -316,13 +316,13 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
               onClick={() => setActiveTab('trainings')}
               className={`pb-2.5 px-3 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
                 activeTab === 'trainings'
-                  ? 'border-[#DA291C] text-[#DA291C]'
-                  : 'border-transparent text-slate-500 hover:text-slate-800'
+                  ? 'border-[#DA291C] text-[#DA291C] dark:text-red-400'
+                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
             >
-              <GraduationCap className="w-3.5 h-3.5 text-blue-600" />
+              <GraduationCap className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
               <span>Capacitaciones Externas</span>
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-blue-100 text-blue-800 font-black">
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 font-black">
                 {userExternalTrainings.length}
               </span>
             </button>
@@ -334,24 +334,24 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
           <form onSubmit={handleSubmit} className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-6">
             
             {/* Identidad del Colaborador (solo lectura o confirmación) */}
-            <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 flex items-center justify-between flex-wrap gap-2 text-xs">
+            <div className="bg-slate-50 dark:bg-slate-850 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between flex-wrap gap-2 text-xs">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-[#DA291C] text-white flex items-center justify-center font-bold text-xs shadow-xs">
                 {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
               </div>
               <div>
-                <p className="font-bold text-slate-800">{currentUser.name}</p>
-                <p className="text-[11px] text-slate-500 font-mono">{currentUser.email}</p>
+                <p className="font-bold text-slate-800 dark:text-slate-200">{currentUser.name}</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{currentUser.email}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               {currentUser.cedula && (
-                <span className="text-slate-600 font-mono font-medium">
+                <span className="text-slate-600 dark:text-slate-300 font-mono font-medium">
                   Cédula: <strong>{currentUser.cedula}</strong>
                 </span>
               )}
               {participant?.card && (
-                <span className="text-[#DA291C] font-mono font-bold">
+                <span className="text-[#DA291C] dark:text-red-400 font-mono font-bold">
                   Tarj: #{participant.card}
                 </span>
               )}
@@ -359,23 +359,23 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
           </div>
 
           {errorMessage && (
-            <div role="alert" aria-live="assertive" className="p-3.5 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2 animate-in fade-in">
-              <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
+            <div role="alert" aria-live="assertive" className="p-3.5 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-xs text-red-700 dark:text-red-300 flex items-center gap-2 animate-in fade-in">
+              <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
               <span>{errorMessage}</span>
             </div>
           )}
 
           {/* SECCIÓN 1: DATOS PERSONALES & CONTACTO */}
           <div className="space-y-3">
-            <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
-              <User className="w-3.5 h-3.5 text-[#DA291C]" />
+            <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 dark:border-slate-800 pb-1.5">
+              <User className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
               1. Información Personal & Contacto
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               {/* Fecha de Nacimiento */}
               <div>
-                <label htmlFor="profile-birthdate" className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="profile-birthdate" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Fecha de Nacimiento <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -386,20 +386,20 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                     value={birthDate}
                     onChange={(e) => setBirthDate(e.target.value)}
                     max={new Date().toISOString().split('T')[0]}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 font-medium"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 dark:text-slate-200 font-medium bg-white dark:bg-slate-800"
                   />
                 </div>
                 {calculatedAge !== null && (
-                  <p className="text-[11px] text-slate-500 mt-1 font-medium flex items-center gap-1">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 font-medium flex items-center gap-1">
                     <Sparkles className="w-3 h-3 text-amber-500" />
-                    Edad calculada: <strong className="text-slate-700">{calculatedAge} años</strong>
+                    Edad calculada: <strong className="text-slate-700 dark:text-slate-300">{calculatedAge} años</strong>
                   </p>
                 )}
               </div>
 
               {/* Teléfono / WhatsApp */}
               <div>
-                <label htmlFor="profile-phone" className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="profile-phone" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Teléfono / WhatsApp <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -411,21 +411,21 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                     placeholder="Ej. (809) 555-0123"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 font-medium"
+                    className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 dark:text-slate-200 font-medium bg-white dark:bg-slate-800"
                   />
                 </div>
               </div>
 
               {/* Género */}
               <div>
-                <label htmlFor="profile-gender" className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="profile-gender" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Género
                 </label>
                 <select
                   id="profile-gender"
                   value={gender}
                   onChange={(e) => setGender(e.target.value as Gender)}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 font-medium bg-white"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 dark:text-slate-200 font-medium bg-white dark:bg-slate-800"
                 >
                   <option value="Masculino">Masculino</option>
                   <option value="Femenino">Femenino</option>
@@ -436,7 +436,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
               {/* Dirección actual */}
               <div className="sm:col-span-2">
-                <label htmlFor="profile-address" className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="profile-address" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Dirección de Residencia Actual <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -448,7 +448,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                     placeholder="Sector, calle o municipio (Ej. Bella Vista, Santo Domingo D.N.)"
                     value={currentAddress}
                     onChange={(e) => setCurrentAddress(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 font-medium"
+                    className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 dark:text-slate-200 font-medium bg-white dark:bg-slate-800"
                   />
                 </div>
               </div>
@@ -457,7 +457,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
           {/* SECCIÓN 2: PERFIL ACADÉMICO & PROFESIONAL */}
           <div className="space-y-3 pt-2">
-            <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
+            <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 dark:border-slate-800 pb-1.5">
               <GraduationCap className="w-3.5 h-3.5 text-amber-500" />
               2. Perfil Académico & Formación
             </h3>
@@ -465,14 +465,14 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               {/* Grado / Nivel de Estudio */}
               <div>
-                <label htmlFor="profile-education-level" className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="profile-education-level" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Nivel de Estudio Alcanzado <span className="text-red-500">*</span>
                 </label>
                 <select
                   id="profile-education-level"
                   value={educationLevel}
                   onChange={(e) => setEducationLevel(e.target.value as EducationLevel)}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 font-medium bg-white"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 dark:text-slate-200 font-medium bg-white dark:bg-slate-800"
                 >
                   {EDUCATION_LEVEL_OPTIONS.map(opt => (
                     <option key={opt.value} value={opt.value}>
@@ -480,14 +480,14 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                     </option>
                   ))}
                 </select>
-                <p className="text-[10px] text-slate-500 mt-1">
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
                   {EDUCATION_LEVEL_OPTIONS.find(o => o.value === educationLevel)?.desc}
                 </p>
               </div>
 
               {/* Título o Profesión */}
               <div>
-                <label htmlFor="profile-profession-title" className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="profile-profession-title" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Título / Profesión Obtenida
                 </label>
                 <div className="relative">
@@ -498,20 +498,20 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                     placeholder="Ej. Bachiller, Ing. Sistemas, Lic. Administración, Técnico..."
                     value={professionTitle}
                     onChange={(e) => setProfessionTitle(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 font-medium"
+                    className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 dark:text-slate-200 font-medium bg-white dark:bg-slate-800"
                   />
                 </div>
               </div>
             </div>
 
             {/* Switch: ¿Estudias actualmente? */}
-            <div className="bg-amber-50/50 border border-amber-200/80 rounded-2xl p-3.5 mt-2">
+            <div className="bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-900/40 rounded-2xl p-3.5 mt-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <School className="w-4 h-4 text-amber-600" />
+                  <School className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                   <div>
-                    <span className="text-xs font-bold text-slate-800 block">¿Estudias actualmente?</span>
-                    <span className="text-[11px] text-slate-500">¿Estás cursando alguna carrera, curso técnico o diplomado?</span>
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">¿Estudias actualmente?</span>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400">¿Estás cursando alguna carrera, curso técnico o diplomado?</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -520,8 +520,8 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                     onClick={() => setIsCurrentlyStudying(false)}
                     className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       !isCurrentlyStudying 
-                        ? 'bg-slate-800 text-white shadow-xs' 
-                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                        ? 'bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 shadow-xs' 
+                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
                     }`}
                   >
                     No
@@ -532,7 +532,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                     className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       isCurrentlyStudying 
                         ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25' 
-                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
                     }`}
                   >
                     Sí, estudio
@@ -542,9 +542,9 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
               {/* Campos condicionales si estudia actualmente */}
               {isCurrentlyStudying && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 mt-3 border-t border-amber-200/60 animate-in fade-in">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 mt-3 border-t border-amber-200/60 dark:border-amber-900/40 animate-in fade-in">
                   <div>
-                    <label htmlFor="profile-study-field" className="block text-[11px] font-bold text-slate-700 mb-1">
+                    <label htmlFor="profile-study-field" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
                       ¿Qué estudias actualmente? <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -554,11 +554,11 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                       placeholder="Ej. Ing. en Ciberseguridad, Técnico en Redes..."
                       value={currentStudyField}
                       onChange={(e) => setCurrentStudyField(e.target.value)}
-                      className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] bg-white text-slate-800 font-medium"
+                      className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium"
                     />
                   </div>
                   <div>
-                    <label htmlFor="profile-institution-name" className="block text-[11px] font-bold text-slate-700 mb-1">
+                    <label htmlFor="profile-institution-name" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
                       Institución / Universidad
                     </label>
                     <input
@@ -567,7 +567,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                       placeholder="Ej. UASD, INTEC, ITLA, INFOTEP, PUCMM..."
                       value={institutionName}
                       onChange={(e) => setInstitutionName(e.target.value)}
-                      className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] bg-white text-slate-800 font-medium"
+                      className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium"
                     />
                   </div>
                 </div>
@@ -577,15 +577,15 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
           {/* SECCIÓN 3: OPORTUNIDADES DE MEJORA & INTERESES FORMATIVOS */}
           <div className="space-y-3 pt-2">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
-              <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1.5">
+              <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
                 3. Intereses de Desarrollo & Oportunidades de Mejora
               </h3>
-              <span className="text-[10px] text-slate-500 font-medium">Selecciona al menos 1</span>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Selecciona al menos 1</span>
             </div>
 
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">
               ¿En qué competencias te gustaría capacitarte para impulsar tu crecimiento en la empresa?
             </p>
 
@@ -599,8 +599,8 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                     onClick={() => toggleInterest(item)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                       isSelected
-                        ? 'bg-slate-900 text-white shadow-xs scale-[1.02]'
-                        : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
+                        ? 'bg-slate-900 dark:bg-[#DA291C] text-white shadow-xs scale-[1.02]'
+                        : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
                     }`}
                   >
                     <span>{item}</span>
@@ -619,13 +619,13 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                 value={customInterest}
                 onChange={(e) => setCustomInterest(e.target.value)}
                 onKeyDown={handleAddCustomInterest}
-                className="flex-1 px-3 py-1.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 font-medium"
+                className="flex-1 px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 dark:text-slate-200 font-medium bg-white dark:bg-slate-800"
               />
               <button
                 type="button"
                 onClick={handleAddCustomInterest}
                 aria-label="Agregar interés formativo personalizado"
-                className="px-3 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold cursor-pointer transition-colors"
+                className="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 text-xs font-bold cursor-pointer transition-colors"
               >
                 Agregar
               </button>
@@ -633,17 +633,17 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
           </div>
 
           {/* Footer Actions */}
-          <div className="pt-4 border-t border-slate-200 flex items-center justify-between gap-3">
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
             {!isMandatory ? (
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-colors"
+                className="px-4 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
               >
                 Cancelar
               </button>
             ) : (
-              <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+              <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
                 <Lock className="w-3.5 h-3.5 text-amber-500" />
                 <span>Completa la ficha para continuar al portal</span>
               </div>
@@ -675,28 +675,28 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
         {activeTab === 'trainings' && (
           <div className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-4">
             {/* Header del resumen externo */}
-            <div className="bg-blue-50/60 border border-blue-100 p-4 rounded-2xl flex items-center justify-between flex-wrap gap-3">
+            <div className="bg-blue-50/60 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 p-4 rounded-2xl flex items-center justify-between flex-wrap gap-3">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-xs shrink-0">
                   <Award className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                  <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
                     Certificaciones & Cursos Externos
                   </h3>
-                  <p className="text-[11px] text-slate-600">
+                  <p className="text-[11px] text-slate-600 dark:text-slate-300">
                     Formación realizada con entidades externas y homologada en el programa de sustentabilidad.
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-4 text-xs">
                 <div className="text-right">
-                  <span className="text-[10px] font-bold text-slate-500 block uppercase">Cursos</span>
-                  <span className="text-base font-black text-slate-900">{userExternalTrainings.length}</span>
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block uppercase">Cursos</span>
+                  <span className="text-base font-black text-slate-900 dark:text-white">{userExternalTrainings.length}</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] font-bold text-slate-500 block uppercase">Horas Totales</span>
-                  <span className="text-base font-black text-blue-700">
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block uppercase">Horas Totales</span>
+                  <span className="text-base font-black text-blue-700 dark:text-blue-400">
                     {userExternalTrainings.reduce((acc, t) => acc + (Number(t.totalHours) || 0), 0)} hrs
                   </span>
                 </div>
@@ -705,68 +705,68 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
             {/* Listado de cursos externos */}
             {userExternalTrainings.length === 0 ? (
-              <div className="p-10 text-center space-y-2.5 border border-dashed border-slate-200 rounded-2xl bg-slate-50/50">
-                <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+              <div className="p-10 text-center space-y-2.5 border border-dashed border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50/50 dark:bg-slate-850/50">
+                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-300 flex items-center justify-center mx-auto">
                   <GraduationCap className="w-5 h-5" />
                 </div>
-                <p className="text-xs font-bold text-slate-700">Sin capacitaciones externas registradas</p>
-                <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
-                  Cuando la administración registre cursos, diplomados o certificaciones externas que hayas completado, aparecerán aquí con la leyenda <span className="font-bold text-blue-700">"Externa"</span> y sus horas acreditadas.
+                <p className="text-xs font-bold text-slate-700 dark:text-slate-200">Sin capacitaciones externas registradas</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                  Cuando la administración registre cursos, diplomados o certificaciones externas que hayas completado, aparecerán aquí con la leyenda <span className="font-bold text-blue-700 dark:text-blue-400">"Externa"</span> y sus horas acreditadas.
                 </p>
               </div>
             ) : (
               <div className="space-y-3">
                 {userExternalTrainings.map(t => (
-                  <div key={t.id} className="p-4 rounded-2xl border border-slate-200 bg-white hover:border-blue-200 transition-all shadow-xs space-y-2.5">
+                  <div key={t.id} className="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-blue-200 dark:hover:border-blue-600 transition-all shadow-xs space-y-2.5">
                     <div className="flex items-start justify-between gap-3 flex-wrap">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-wider">
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 uppercase tracking-wider">
                             Externa
                           </span>
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                             {getProgramShortName(t.programCategory)}
                           </span>
-                          <span className="text-[10px] font-bold text-slate-500">
+                          <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
                             {t.trainingFormat} • {t.modality}
                           </span>
                         </div>
-                        <h4 className="text-sm font-bold text-slate-900">{t.title}</h4>
+                        <h4 className="text-sm font-bold text-slate-900 dark:text-white">{t.title}</h4>
                       </div>
 
                       <div className="text-right shrink-0">
-                        <span className="inline-flex items-center gap-1 text-xs font-black text-slate-900 bg-slate-100 px-2.5 py-1 rounded-xl">
-                          <Clock className="w-3.5 h-3.5 text-[#DA291C]" />
+                        <span className="inline-flex items-center gap-1 text-xs font-black text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-700 px-2.5 py-1 rounded-xl">
+                          <Clock className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
                           {t.totalHours} hrs
                         </span>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-600 pt-1 border-t border-slate-100">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-600 dark:text-slate-300 pt-1 border-t border-slate-100 dark:border-slate-700/60">
                       <div className="flex items-center gap-1.5">
                         <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                        <span>Suplidor: <strong className="text-slate-800">{t.supplier}</strong></span>
+                        <span>Suplidor: <strong className="text-slate-800 dark:text-slate-200">{t.supplier}</strong></span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                         <span>Fechas: {formatDateShort(t.startDate)} → {formatDateShort(t.endDate)}</span>
                       </div>
                       {t.subprogram && (
-                        <div className="sm:col-span-2 text-slate-500">
-                          Subprograma: <strong className="text-slate-700">{t.subprogram}</strong>
+                        <div className="sm:col-span-2 text-slate-500 dark:text-slate-400">
+                          Subprograma: <strong className="text-slate-700 dark:text-slate-300">{t.subprogram}</strong>
                         </div>
                       )}
                       {t.description && (
-                        <div className="sm:col-span-2 text-slate-500 italic bg-slate-50 p-2 rounded-lg text-[10px]">
+                        <div className="sm:col-span-2 text-slate-500 dark:text-slate-400 italic bg-slate-50 dark:bg-slate-850 p-2 rounded-lg text-[10px]">
                           "{t.description}"
                         </div>
                       )}
                     </div>
 
                     {(isSafeHttpUrl(t.credentialUrl) || t.certificateNumber) && (
-                      <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
+                      <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-700/60 text-[11px]">
                         {t.certificateNumber && (
-                          <span className="text-slate-500 font-mono text-[10px]">
+                          <span className="text-slate-500 dark:text-slate-400 font-mono text-[10px]">
                             Folio: {t.certificateNumber}
                           </span>
                         )}
@@ -775,7 +775,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                             href={t.credentialUrl!}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-800 font-bold inline-flex items-center gap-1 cursor-pointer ml-auto"
+                            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-bold inline-flex items-center gap-1 cursor-pointer ml-auto"
                           >
                             <ExternalLink className="w-3 h-3" /> Ver Certificado Oficial
                           </a>
@@ -788,11 +788,11 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
             )}
 
             {/* Botón de cierre en pestaña de capacitaciones */}
-            <div className="pt-3 border-t border-slate-200 flex justify-end">
+            <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-colors"
+                className="px-5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition-colors"
               >
                 Cerrar
               </button>

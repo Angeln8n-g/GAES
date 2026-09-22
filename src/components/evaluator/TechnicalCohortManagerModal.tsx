@@ -300,7 +300,7 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
       ariaLabel={`Academia Técnica - ${cohort.courseTitle || 'Cohorte'}`}
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="bg-white w-full max-w-5xl rounded-3xl shadow-2xl border border-slate-200 flex flex-col max-h-[92vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 w-full max-w-5xl rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[92vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
         
         {/* Cabecera del Modal */}
         <div className="p-5 sm:p-6 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 shrink-0">
@@ -381,7 +381,7 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
         </div>
 
         {/* Pestañas de Navegación del Modal */}
-        <div className="flex items-center justify-between px-5 sm:px-6 pt-4 border-b border-slate-200 bg-slate-50 shrink-0">
+        <div className="flex items-center justify-between px-5 sm:px-6 pt-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 shrink-0">
           <div className="flex items-center gap-2" role="tablist">
             <button
               type="button"
@@ -391,13 +391,13 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
               className={`pb-3 px-3 min-h-[44px] text-xs font-black transition-all flex items-center gap-2 border-b-2 cursor-pointer ${
                 activeTab === 'attendance'
                   ? 'border-claro text-claro'
-                  : 'border-transparent text-slate-600 hover:text-slate-900'
+                  : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>Matriz de Asistencia Diaria</span>
               {matrix && (
-                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-black bg-slate-200 text-slate-800">
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-black bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
                   {matrix.participants.length}
                 </span>
               )}
@@ -411,7 +411,7 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
               className={`pb-3 px-3 min-h-[44px] text-xs font-black transition-all flex items-center gap-2 border-b-2 cursor-pointer ${
                 activeTab === 'grades'
                   ? 'border-claro text-claro'
-                  : 'border-transparent text-slate-600 hover:text-slate-900'
+                  : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               <Award className="w-4 h-4" />
@@ -427,7 +427,7 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
               placeholder="Buscar colaborador o carnet..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8 pr-3 py-1 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-red-500 w-52"
+              className="pl-8 pr-3 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-red-500 w-52"
             />
           </div>
         </div>
@@ -437,13 +437,13 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
           {isLoading ? (
             <div className="py-16 text-center space-y-3">
               <RefreshCw className="w-8 h-8 text-[#DA291C] animate-spin mx-auto" />
-              <p className="text-xs font-bold text-slate-500">Cargando datos de la cohorte técnica...</p>
+              <p className="text-xs font-bold text-slate-500 dark:text-slate-400">Cargando datos de la cohorte técnica...</p>
             </div>
           ) : !matrix || matrix.participants.length === 0 ? (
-            <div className="py-16 text-center space-y-3 bg-slate-50 rounded-2xl border border-slate-200">
-              <Users className="w-10 h-10 text-slate-300 mx-auto" />
-              <h3 className="text-sm font-bold text-slate-800">No hay participantes matriculados en esta cohorte</h3>
-              <p className="text-xs text-slate-500 max-w-md mx-auto">
+            <div className="py-16 text-center space-y-3 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-800">
+              <Users className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
+              <h3 className="text-sm font-bold text-slate-800 dark:text-white">No hay participantes matriculados en esta cohorte</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
                 El Super Administrador aún no ha asignado participantes a esta cohorte desde el panel de Academia Técnica.
               </p>
             </div>
@@ -454,9 +454,9 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
             <div className="space-y-5">
               
               {/* Selector de Fechas de Sesión */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800/40 p-3 rounded-2xl border border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-                  <span className="text-[11px] font-bold text-slate-500 uppercase mr-1 shrink-0">Sesión:</span>
+                  <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase mr-1 shrink-0">Sesión:</span>
                   {matrix.sessionDates.map((dateStr, idx) => {
                     const isSelected = dateStr === selectedDate;
                     const isToday = dateStr === new Date().toISOString().slice(0, 10);
@@ -466,8 +466,8 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
                         onClick={() => setSelectedDate(dateStr)}
                         className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1 ${
                           isSelected
-                            ? 'bg-slate-900 text-white shadow-xs'
-                            : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200/80'
+                            ? 'bg-slate-900 dark:bg-slate-700 text-white shadow-xs'
+                            : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700'
                         }`}
                       >
                         <span>Día {idx + 1} ({dateStr})</span>
@@ -484,31 +484,31 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
                   <button
                     onClick={() => handleBulkAttendance('present')}
                     disabled={isSavingAttendance}
-                    className="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                    className="px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
                   >
-                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                     <span>Todos Presentes</span>
                   </button>
 
                   <button
                     onClick={() => handleBulkAttendance('absent')}
                     disabled={isSavingAttendance}
-                    className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                    className="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
                   >
-                    <X className="w-3.5 h-3.5 text-rose-600" />
+                    <X className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
                     <span>Todos Ausentes</span>
                   </button>
                 </div>
               </div>
 
               {/* Listado de Participantes para la Fecha Seleccionada */}
-              <div className="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-xs">
-                <div className="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs font-bold text-slate-600">
+              <div className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden bg-white dark:bg-slate-900 shadow-xs">
+                <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-300">
                   <span>Colaborador ({filteredParticipants.length})</span>
                   <span>Asistencia para: {selectedDate}</span>
                 </div>
 
-                <div className="divide-y divide-slate-100">
+                <div className="divide-y divide-slate-100 dark:divide-slate-800">
                   {filteredParticipants.map(participant => {
                     const dayData = participant.attendanceByDate?.[selectedDate];
                     const currentStatus = dayData?.status;
@@ -517,24 +517,24 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
                     return (
                       <div 
                         key={participant.card}
-                        className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/70 transition-colors"
+                        className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors"
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-slate-800 to-slate-700 text-white font-black text-xs flex items-center justify-center shrink-0">
                             {participant.name ? participant.name.charAt(0).toUpperCase() : 'T'}
                           </div>
                           <div>
-                            <p className="text-xs font-bold text-slate-900">{participant.name}</p>
-                            <div className="flex items-center gap-2 text-[11px] text-slate-500 mt-0.5">
+                            <p className="text-xs font-bold text-slate-900 dark:text-white">{participant.name}</p>
+                            <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                               <span>Carnet: <strong>{participant.card}</strong></span>
                               <span>•</span>
-                              <span className="text-emerald-700 font-semibold">
+                              <span className="text-emerald-700 dark:text-emerald-400 font-semibold">
                                 {participant.attendedDays || 0}/{matrix.sessionDates.length} asistidas ({participant.attendancePercentage || 0}%)
                               </span>
                               {method && (
                                 <>
                                   <span>•</span>
-                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
                                     Vía {method === 'pin' ? 'PIN Sala' : method === 'qr_scan' ? 'QR' : 'Manual'}
                                   </span>
                                 </>
@@ -551,7 +551,7 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
                             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
                               currentStatus === 'present'
                                 ? 'bg-emerald-600 text-white shadow-xs'
-                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                             }`}
                           >
                             <Check className="w-3.5 h-3.5" />
@@ -564,7 +564,7 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
                             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
                               currentStatus === 'late'
                                 ? 'bg-amber-500 text-white shadow-xs'
-                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                             }`}
                           >
                             <Clock3 className="w-3.5 h-3.5" />
@@ -577,7 +577,7 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
                             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
                               currentStatus === 'absent'
                                 ? 'bg-rose-600 text-white shadow-xs'
-                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                             }`}
                           >
                             <X className="w-3.5 h-3.5" />
@@ -590,7 +590,7 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
                             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
                               currentStatus === 'excused'
                                 ? 'bg-blue-600 text-white shadow-xs'
-                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                             }`}
                           >
                             <span>Justificado</span>
@@ -610,12 +610,12 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
             <div className="space-y-5">
               
               {/* Banner Informativo y Acciones de Calificación */}
-              <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-start gap-3">
-                  <Award className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
-                  <div className="text-xs text-amber-900">
+                  <Award className="w-5 h-5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
+                  <div className="text-xs text-amber-900 dark:text-amber-300">
                     <p className="font-bold">Criterio Institucional de Aprobación</p>
-                    <p className="text-amber-800 mt-0.5">
+                    <p className="text-amber-800 dark:text-amber-400 mt-0.5">
                       Calificación mínima aprobatoria: <strong>70 pts</strong> y asistencia mínima de <strong>80%</strong>.
                     </p>
                   </div>
@@ -625,9 +625,9 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
                   <button
                     type="button"
                     onClick={handleAutoFillGrades100}
-                    className="px-3 py-1.5 rounded-xl bg-white text-amber-900 hover:bg-amber-100/70 border border-amber-300 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+                    className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 text-amber-900 dark:text-amber-300 hover:bg-amber-100/70 dark:hover:bg-amber-950/50 border border-amber-300 dark:border-amber-700 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                    <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                     <span>Auto 100 (≥80% asist.)</span>
                   </button>
 
@@ -644,10 +644,10 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
               </div>
 
               {/* Tabla de Calificaciones */}
-              <div className="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-xs">
+              <div className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden bg-white dark:bg-slate-900 shadow-xs">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold">
+                    <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 font-bold">
                       <tr>
                         <th className="p-3.5">Colaborador / Carnet</th>
                         <th className="p-3.5 text-center">Asistencia</th>
@@ -656,22 +656,22 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
                         <th className="p-3.5">Observaciones & Feedback</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                       {filteredParticipants.map(participant => {
                         const currentGrade = gradesMap[participant.card] || { score: '', academicStatus: 'pending', feedback: '' };
 
                         return (
-                          <tr key={participant.card} className="hover:bg-slate-50/70 transition-colors">
+                          <tr key={participant.card} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors">
                             <td className="p-3.5">
-                              <p className="font-bold text-slate-900">{participant.name}</p>
-                              <p className="text-[11px] text-slate-500 font-mono mt-0.5">{participant.card}</p>
+                              <p className="font-bold text-slate-900 dark:text-white">{participant.name}</p>
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">{participant.card}</p>
                             </td>
 
                             <td className="p-3.5 text-center">
                               <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
                                 participant.attendancePercentage >= 80
-                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                  : 'bg-rose-50 text-rose-700 border border-rose-200'
+                                  ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
+                                  : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800'
                               }`}>
                                 {participant.attendedDays || 0}/{matrix.sessionDates.length} ({participant.attendancePercentage || 0}%)
                               </span>
@@ -695,7 +695,7 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
                                     }
                                   }));
                                 }}
-                                className="w-20 px-2 py-1.5 text-center font-bold text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500"
+                                className="w-20 px-2 py-1.5 text-center font-bold text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500"
                               />
                             </td>
 
@@ -714,10 +714,10 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
                                 }}
                                 className={`px-2.5 py-1 text-xs font-bold rounded-lg border focus:outline-none ${
                                   currentGrade.academicStatus === 'passed'
-                                    ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
                                     : currentGrade.academicStatus === 'failed'
-                                    ? 'bg-rose-50 text-rose-800 border-rose-300'
-                                    : 'bg-slate-50 text-slate-700 border-slate-200'
+                                    ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-700'
+                                    : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                                 }`}
                               >
                                 <option value="passed">Aprobado</option>
@@ -741,7 +741,7 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
                                     }
                                   }));
                                 }}
-                                className="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-red-500"
+                                className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-red-500"
                               />
                             </td>
                           </tr>
@@ -757,7 +757,7 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
         </div>
 
         {/* Footer del Modal */}
-        <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 shrink-0">
+        <div className="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 shrink-0">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
             <span>Sincronización en tiempo real activa vía WebSockets</span>
@@ -765,7 +765,7 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
 
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold transition-all cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold transition-all cursor-pointer"
           >
             Cerrar Ventana
           </button>

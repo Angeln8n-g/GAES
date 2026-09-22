@@ -268,17 +268,17 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
   if (!event || !slot) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center p-4">
-        <div className="bg-white border border-slate-200 rounded-3xl p-8 max-w-md w-full text-center shadow-xl space-y-4">
-          <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto border border-amber-200">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 max-w-md w-full text-center shadow-xl space-y-4">
+          <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto border border-amber-200 dark:border-amber-800/60">
             <AlertTriangle className="w-6 h-6" />
           </div>
-          <h1 className="text-base font-black text-slate-900">Sesión no encontrada</h1>
-          <p className="text-xs text-slate-500">
+          <h1 className="text-base font-black text-slate-900 dark:text-white">Sesión no encontrada</h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             El enlace de asistencia no corresponde a ningún evento u horario activo.
           </p>
           <button
             onClick={onNavigateHome}
-            className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer"
+            className="w-full py-2.5 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-bold transition-colors cursor-pointer"
           >
             Volver al Inicio
           </button>
@@ -289,7 +289,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
 
   return (
     <div className="min-h-[85vh] py-8 px-4 flex items-center justify-center">
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
         
         {/* Banner Superior */}
         <div className="relative h-32 bg-slate-900 overflow-hidden">
@@ -324,44 +324,44 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
         <div className="p-6 space-y-6">
 
           {/* Tarjeta de Información del Evento y Horario */}
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
-            <div className="flex items-center gap-2 text-xs text-slate-700">
-              <CalendarIcon className="w-4 h-4 text-[#DA291C] shrink-0" />
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2.5">
+            <div className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300">
+              <CalendarIcon className="w-4 h-4 text-[#DA291C] dark:text-[#FF6659] shrink-0" />
               <span className="font-bold">{formatDateLong(dateStr)}</span>
             </div>
-            <div className="flex items-center gap-2 text-xs text-slate-700">
-              <Clock className="w-4 h-4 text-[#DA291C] shrink-0" />
+            <div className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300">
+              <Clock className="w-4 h-4 text-[#DA291C] dark:text-[#FF6659] shrink-0" />
               <span className="font-bold">
                 {timeStr}{slot.endTime ? ` - ${slot.endTime}` : ''}
               </span>
             </div>
-            <div className="flex items-center gap-2 text-xs text-slate-700">
-              <MapPin className="w-4 h-4 text-[#DA291C] shrink-0" />
-              <span className="font-medium text-slate-600">{event.location}</span>
+            <div className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300">
+              <MapPin className="w-4 h-4 text-[#DA291C] dark:text-[#FF6659] shrink-0" />
+              <span className="font-medium text-slate-600 dark:text-slate-400">{event.location}</span>
             </div>
           </div>
 
           {/* ESTADOS DE ASISTENCIA (Entrada vs Salida) */}
           {isAttendanceCompleted ? (
             /* CASO 1: ASISTENCIA COMPLETA (Entrada + Salida Verificadas) */
-            <div className="p-5 rounded-2xl bg-emerald-50 border-2 border-emerald-300 text-center space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-xs">
+            <div className="p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border-2 border-emerald-300 dark:border-emerald-700 text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-xs">
                 <CheckCircle2 className="w-7 h-7" />
               </div>
               <div>
-                <h2 className="text-sm font-black text-emerald-950">
+                <h2 className="text-sm font-black text-emerald-950 dark:text-emerald-200">
                   ¡Asistencia Completa Verificada!
                 </h2>
-                <p className="text-xs text-emerald-700 font-medium mt-0.5">
+                <p className="text-xs text-emerald-700 dark:text-emerald-300 font-medium mt-0.5">
                   Has cumplido con el registro de Entrada y Salida para esta capacitación.
                 </p>
               </div>
               <div className="flex items-center justify-center gap-2 pt-1">
-                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-200/80 text-emerald-900 flex items-center gap-1">
+                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-200/80 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200 flex items-center gap-1">
                   <LogIn className="w-3 h-3" />
                   <span>Entrada Registrada</span>
                 </span>
-                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-200/80 text-emerald-900 flex items-center gap-1">
+                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-200/80 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200 flex items-center gap-1">
                   <LogOut className="w-3 h-3" />
                   <span>Salida Registrada</span>
                 </span>
@@ -369,17 +369,17 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
             </div>
           ) : isCheckedIn && !isCheckedOut ? (
             /* CASO 2: ASISTENCIA EN CURSO (Solo Entrada) */
-            <div className="p-5 rounded-2xl bg-amber-50/80 border-2 border-amber-300 space-y-3">
+            <div className="p-5 rounded-2xl bg-amber-50/80 dark:bg-amber-950/30 border-2 border-amber-300 dark:border-amber-700 space-y-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs font-black text-amber-900">
-                  <Clock className="w-4 h-4 text-amber-700" />
+                <div className="flex items-center gap-2 text-xs font-black text-amber-900 dark:text-amber-200">
+                  <Clock className="w-4 h-4 text-amber-700 dark:text-amber-400" />
                   <span>Asistencia en Curso (Entrada Registrada)</span>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-900">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-200 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200">
                   Pendiente Salida
                 </span>
               </div>
-              <p className="text-xs text-amber-800 font-medium leading-relaxed">
+              <p className="text-xs text-amber-800 dark:text-amber-300 font-medium leading-relaxed">
                 Tu ingreso a la sesión está verificado. Para completar tu participación y desbloquear la <strong>Evaluación del Curso y Facilitador</strong>, debes registrar tu Salida.
               </p>
               <button
@@ -394,12 +394,12 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
             </div>
           ) : (
             /* CASO 3: SIN ASISTENCIA AÚN */
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
               <div className="text-center space-y-1">
-                <p className="text-xs font-bold text-slate-800">
+                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
                   Registra tu presencia en este evento:
                 </p>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
                   Selecciona si estás ingresando (Entrada) o retirándote (Salida)
                 </p>
               </div>
@@ -442,10 +442,10 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
           {statusMessage && (
             <div className={`p-4 rounded-2xl text-xs font-medium border flex items-start gap-2.5 ${
               statusMessage.type === 'success'
-                ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
                 : statusMessage.type === 'error'
-                ? 'bg-rose-50 border-rose-200 text-rose-900'
-                : 'bg-cyan-50 border-cyan-200 text-cyan-900'
+                ? 'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-200'
+                : 'bg-cyan-50 dark:bg-cyan-950/30 border-cyan-200 dark:border-cyan-800 text-cyan-900 dark:text-cyan-200'
             }`}>
               {statusMessage.type === 'success' ? (
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
@@ -463,34 +463,34 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
             <button
               type="button"
               onClick={() => setShowPinForm(!showPinForm)}
-              className="text-xs text-[#DA291C] hover:underline font-bold flex items-center gap-1 mx-auto cursor-pointer"
+              className="text-xs text-[#DA291C] dark:text-[#FF6659] hover:underline font-bold flex items-center gap-1 mx-auto cursor-pointer"
             >
               <KeyRound className="w-3.5 h-3.5" />
               <span>{showPinForm ? 'Ocultar código PIN' : '¿Tienes un código PIN de aula? Ingrésalo aquí'}</span>
             </button>
 
             {showPinForm && (
-              <form onSubmit={handlePinSubmit} className="mt-3 p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+              <form onSubmit={handlePinSubmit} className="mt-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-800">Validar con PIN Diario</span>
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Validar con PIN Diario</span>
                   <div className="flex items-center gap-2">
-                    <label className="text-[11px] font-bold text-slate-600 flex items-center gap-1 cursor-pointer">
+                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1 cursor-pointer">
                       <input
                         type="radio"
                         name="pinAction"
                         checked={selectedActionType === 'checkin'}
                         onChange={() => setSelectedActionType('checkin')}
-                        className="text-[#DA291C]"
+                        className="text-[#DA291C] dark:text-[#FF6659]"
                       />
                       <span>Entrada</span>
                     </label>
-                    <label className="text-[11px] font-bold text-slate-600 flex items-center gap-1 cursor-pointer">
+                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1 cursor-pointer">
                       <input
                         type="radio"
                         name="pinAction"
                         checked={selectedActionType === 'checkout'}
                         onChange={() => setSelectedActionType('checkout')}
-                        className="text-[#DA291C]"
+                        className="text-[#DA291C] dark:text-[#FF6659]"
                       />
                       <span>Salida</span>
                     </label>
@@ -504,12 +504,12 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
                     value={dailyPinInput}
                     onChange={(e) => setDailyPinInput(e.target.value)}
                     placeholder="PIN de 4 dígitos (ej: 8421)"
-                    className="flex-1 px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-mono font-bold text-center tracking-wider text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                    className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-mono font-bold text-center tracking-wider text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] dark:focus:border-[#FF6659]"
                   />
                   <button
                     type="submit"
                     disabled={isProcessing || !dailyPinInput.trim()}
-                    className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                    className="px-4 py-2 bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 dark:hover:bg-slate-600 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
                   >
                     Validar
                   </button>
@@ -520,30 +520,30 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
 
           {/* Encuesta Oficial TEC (Curso & Facilitador) */}
           {currentUser && (
-            <div className="p-5 rounded-2xl bg-gradient-to-r from-red-50 via-amber-50/40 to-red-50 border border-red-200 space-y-3">
+            <div className="p-5 rounded-2xl bg-gradient-to-r from-red-50 via-amber-50/40 to-red-50 dark:from-red-950/30 dark:via-amber-950/20 dark:to-red-950/30 border border-red-200 dark:border-red-900/60 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black text-[#DA291C] uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-[#DA291C]" />
+                <span className="text-xs font-black text-[#DA291C] dark:text-[#FF6659] uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-[#DA291C] dark:text-[#FF6659]" />
                   Evaluación de Curso y Facilitador - TEC
                 </span>
-                <span className="text-[10px] text-amber-800 font-black px-2 py-0.5 rounded-md bg-amber-200/80">
+                <span className="text-[10px] text-amber-800 dark:text-amber-300 font-black px-2 py-0.5 rounded-md bg-amber-200/80 dark:bg-amber-950/60">
                   Estándar TEC
                 </span>
               </div>
-              <p className="text-xs text-slate-600 font-medium leading-relaxed">
+              <p className="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
                 Esta evaluación nos permite conocer la calidad pedagógica del curso y la excelencia del facilitador.
               </p>
 
               {existingFeedback ? (
                 /* Encuesta ya completada: Modo solo consulta */
-                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 flex flex-col sm:flex-row items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                     <div>
-                      <p className="text-xs font-bold text-emerald-900">
+                      <p className="text-xs font-bold text-emerald-900 dark:text-emerald-200">
                         ✓ Ya has completado la encuesta de satisfacción ({existingFeedback.rating}★).
                       </p>
-                      <p className="text-[11px] text-emerald-700">
+                      <p className="text-[11px] text-emerald-700 dark:text-emerald-300">
                         Tu retroalimentación ya fue registrada y no admite modificaciones adicionales.
                       </p>
                     </div>
@@ -576,12 +576,12 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
                   <button
                     type="button"
                     disabled
-                    className="w-full py-3 bg-slate-200 text-slate-400 text-xs font-bold rounded-xl flex items-center justify-center gap-2 cursor-not-allowed border border-slate-300/50"
+                    className="w-full py-3 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 text-xs font-bold rounded-xl flex items-center justify-center gap-2 cursor-not-allowed border border-slate-300/50 dark:border-slate-700"
                   >
                     <Lock className="w-4 h-4" />
                     <span>Evaluación Bloqueada (Requiere Registro de Salida)</span>
                   </button>
-                  <p className="text-[10px] text-center text-slate-500 font-medium">
+                  <p className="text-[10px] text-center text-slate-500 dark:text-slate-400 font-medium">
                     Solo los participantes con asistencia completa (entrada y salida) pueden responder la encuesta.
                   </p>
                 </div>
@@ -590,38 +590,38 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
           )}
 
           {/* Formulario de Asistencia Manual para Supervisores o Delegados */}
-          <div className="pt-2 border-t border-slate-200">
+          <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
             <button
               type="button"
               onClick={() => setShowManualForm(!showManualForm)}
-              className="text-xs text-slate-500 hover:text-slate-800 font-bold flex items-center gap-1 mx-auto cursor-pointer"
+              className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-bold flex items-center gap-1 mx-auto cursor-pointer"
             >
               <User className="w-3.5 h-3.5" />
               <span>{showManualForm ? 'Ocultar registro de otro colaborador' : 'Registrar a otro colaborador'}</span>
             </button>
 
             {showManualForm && (
-              <form onSubmit={handleManualCheckIn} className="mt-3 p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+              <form onSubmit={handleManualCheckIn} className="mt-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-800">Registro para otro colaborador</span>
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Registro para otro colaborador</span>
                   <div className="flex items-center gap-2">
-                    <label className="text-[11px] font-bold text-slate-600 flex items-center gap-1 cursor-pointer">
+                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1 cursor-pointer">
                       <input
                         type="radio"
                         name="manualAction"
                         checked={selectedActionType === 'checkin'}
                         onChange={() => setSelectedActionType('checkin')}
-                        className="text-[#DA291C]"
+                        className="text-[#DA291C] dark:text-[#FF6659]"
                       />
                       <span>Entrada</span>
                     </label>
-                    <label className="text-[11px] font-bold text-slate-600 flex items-center gap-1 cursor-pointer">
+                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1 cursor-pointer">
                       <input
                         type="radio"
                         name="manualAction"
                         checked={selectedActionType === 'checkout'}
                         onChange={() => setSelectedActionType('checkout')}
-                        className="text-[#DA291C]"
+                        className="text-[#DA291C] dark:text-[#FF6659]"
                       />
                       <span>Salida</span>
                     </label>
@@ -634,12 +634,12 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
                     value={manualCardInput}
                     onChange={(e) => setManualCardInput(e.target.value)}
                     placeholder="Tarjeta o correo del colaborador..."
-                    className="flex-1 px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                    className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] dark:focus:border-[#FF6659]"
                   />
                   <button
                     type="submit"
                     disabled={isProcessing || !manualCardInput.trim()}
-                    className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                    className="px-4 py-2 bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 dark:hover:bg-slate-600 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
                   >
                     Confirmar
                   </button>

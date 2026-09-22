@@ -355,6 +355,14 @@
   outline-offset: 2px;
 }
 
+/* Compatibilidad de opciones en selects nativos para modo oscuro */
+.dark select option,
+[data-theme="dark"] select option {
+  background-color: #1e293b;
+  color: #f8fafc;
+}
+
+
 /* ============================================================
    WCAG 2.5.5 / 2.5.8: Target Size - Mínimo 44x44px en interfaces táctiles
    ============================================================ */

@@ -128,9 +128,9 @@ export const ReassignCohortModal: React.FC<ReassignCohortModalProps> = ({
       ariaLabel="Reasignar Cohorte Técnica"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-slate-900 text-white">
+        <div className="flex items-center justify-between px-6 py-4 bg-slate-900 text-white border-b border-slate-800">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-red-600 text-white shadow-md shadow-red-600/20">
               <ArrowRightLeft className="w-5 h-5" />
@@ -155,9 +155,9 @@ export const ReassignCohortModal: React.FC<ReassignCohortModalProps> = ({
         </div>
 
         {/* Current cohort snapshot */}
-        <div className="bg-slate-50 px-6 py-3 border-b border-slate-200 text-xs">
-          <div className="font-bold text-slate-800">{cohort.courseTitle}</div>
-          <div className="flex items-center gap-3 text-slate-500 mt-1 text-[11px]">
+        <div className="bg-slate-50 dark:bg-slate-800/60 px-6 py-3 border-b border-slate-200 dark:border-slate-800 text-xs">
+          <div className="font-bold text-slate-800 dark:text-white">{cohort.courseTitle}</div>
+          <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400 mt-1 text-[11px]">
             <span className="flex items-center gap-1">
               <Calendar className="w-3.5 h-3.5 text-slate-400" />
               {cohort.startDate} al {cohort.endDate}
@@ -173,7 +173,7 @@ export const ReassignCohortModal: React.FC<ReassignCohortModalProps> = ({
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {errorMsg && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2">
+            <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 text-xs rounded-xl flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{errorMsg}</span>
             </div>
@@ -181,14 +181,14 @@ export const ReassignCohortModal: React.FC<ReassignCohortModalProps> = ({
 
           {/* 1. Facilitador */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
               <UserCheck className="w-3.5 h-3.5 text-red-600" />
               Facilitador / Instructor
             </label>
             <select
               value={selectedFacilitatorId}
               onChange={handleFacilitatorSelect}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-slate-800 bg-white"
+              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-slate-800 dark:text-white bg-white dark:bg-slate-800"
             >
               <option value="">-- Sin Facilitador Asignado --</option>
               {eligibleFacilitators.map(f => (
@@ -206,7 +206,7 @@ export const ReassignCohortModal: React.FC<ReassignCohortModalProps> = ({
                   placeholder="Nombre del facilitador"
                   value={customFacilitatorName}
                   onChange={(e) => setCustomFacilitatorName(e.target.value)}
-                  className="px-3 py-1.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 text-slate-800"
+                  className="px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 text-slate-800 dark:text-white bg-white dark:bg-slate-800"
                   required
                 />
                 <input
@@ -214,7 +214,7 @@ export const ReassignCohortModal: React.FC<ReassignCohortModalProps> = ({
                   placeholder="Correo electrónico"
                   value={customFacilitatorEmail}
                   onChange={(e) => setCustomFacilitatorEmail(e.target.value)}
-                  className="px-3 py-1.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 text-slate-800"
+                  className="px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 text-slate-800 dark:text-white bg-white dark:bg-slate-800"
                 />
               </div>
             )}
@@ -222,14 +222,14 @@ export const ReassignCohortModal: React.FC<ReassignCohortModalProps> = ({
 
           {/* 2. Grupo Técnico */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5 text-red-600" />
               Grupo Técnico Semanal
             </label>
             <select
               value={selectedGroupId}
               onChange={(e) => setSelectedGroupId(e.target.value)}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-slate-800 bg-white"
+              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-slate-800 dark:text-white bg-white dark:bg-slate-800"
             >
               <option value="">-- Sin Grupo Específico (Inscripción Abierta) --</option>
               {groups.map(g => (
@@ -242,7 +242,7 @@ export const ReassignCohortModal: React.FC<ReassignCohortModalProps> = ({
 
           {/* 3. Rotación de miembros */}
           {selectedGroupId && (
-            <label className="flex items-start gap-2.5 p-3 rounded-2xl bg-amber-50/60 border border-amber-200/80 cursor-pointer">
+            <label className="flex items-start gap-2.5 p-3 rounded-2xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/50 cursor-pointer">
               <input
                 type="checkbox"
                 checked={rotateGroupMembers}
@@ -250,11 +250,11 @@ export const ReassignCohortModal: React.FC<ReassignCohortModalProps> = ({
                 className="mt-0.5 rounded text-red-600 focus:ring-red-500"
               />
               <div className="text-xs">
-                <span className="font-bold text-amber-900 block flex items-center gap-1">
-                  <RotateCw className="w-3.5 h-3.5 text-amber-700" />
+                <span className="font-bold text-amber-900 dark:text-amber-300 block flex items-center gap-1">
+                  <RotateCw className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
                   Auto-enrolar técnicos del nuevo grupo
                 </span>
-                <span className="text-amber-700 text-[11px] block mt-0.5">
+                <span className="text-amber-700 dark:text-amber-400 text-[11px] block mt-0.5">
                   Reemplaza el listado de técnicos matriculados en esta cohorte por los miembros vigentes del grupo seleccionado.
                 </span>
               </div>
@@ -263,8 +263,8 @@ export const ReassignCohortModal: React.FC<ReassignCohortModalProps> = ({
 
           {/* 4. Notas / Justificación */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5 text-slate-500" />
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
               Observaciones / Justificación de Cambio
             </label>
             <textarea
@@ -272,16 +272,16 @@ export const ReassignCohortModal: React.FC<ReassignCohortModalProps> = ({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Ej. Rotación de turno técnico por disponibilidad de cuadrilla..."
-              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-slate-800 resize-none"
+              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-slate-800 dark:text-white bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 resize-none"
             />
           </div>
 
           {/* Actions */}
-          <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+          <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
+              className="px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
             >
               Cancelar
             </button>

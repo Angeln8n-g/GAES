@@ -80,7 +80,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ onExplore }) => {
     <div 
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="relative w-full rounded-3xl overflow-hidden shadow-2xl border border-slate-200/80 bg-slate-950 group select-none"
+      className="relative w-full rounded-3xl overflow-hidden shadow-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-950 group select-none"
     >
       
       {/* Background Image with Cinematic Gradient Overlays */}

@@ -580,22 +580,22 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
       ariaLabel={isEditing ? 'Editar Capacitación' : 'Crear Nueva Capacitación'}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
-        <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/60">
           <div>
-            <h2 className="text-lg font-black text-slate-900">
+            <h2 className="text-lg font-black text-slate-900 dark:text-white">
               {isEditing ? 'Editar Capacitación' : 'Crear Nueva Capacitación'}
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Configura los detalles del curso, modalidad, enlaces de evaluación y horarios.
             </p>
           </div>
           <button
             onClick={onClose}
             aria-label="Cerrar modal de evento"
-            className="p-2 sm:p-1.5 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer inline-flex items-center justify-center"
+            className="p-2 sm:p-1.5 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer inline-flex items-center justify-center"
           >
             <X className="w-5 h-5" />
           </button>
@@ -605,63 +605,63 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-6 flex-1">
           
           {error && (
-            <div role="alert" aria-live="assertive" className="p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
+            <div role="alert" aria-live="assertive" className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
               <span>{error}</span>
             </div>
           )}
 
           {/* 1. General Information */}
           <div className="space-y-4">
-            <h3 className="text-xs font-black text-[#DA291C] uppercase tracking-wider">
+            <h3 className="text-xs font-black text-[#DA291C] dark:text-red-400 uppercase tracking-wider">
               1. Información General del Evento
             </h3>
 
             <div>
-              <label htmlFor="event-form-title" className="block text-xs font-bold text-slate-700 mb-1">Título de la Capacitación *</label>
+              <label htmlFor="event-form-title" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Título de la Capacitación *</label>
               <input
                 id="event-form-title"
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="ej. Taller de Liderazgo y Trabajo en Equipo"
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="event-form-description" className="block text-xs font-bold text-slate-700 mb-1">Descripción y Objetivos</label>
+              <label htmlFor="event-form-description" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Descripción y Objetivos</label>
               <textarea
                 id="event-form-description"
                 rows={3}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Detalla los temas a cubrir, requisitos previos y lo que aprenderán los colaboradores..."
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
               />
             </div>
 
             {/* Empresa / Alcance de la Capacitación */}
             {companies.length > 0 && (
-              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
+              <div className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
-                    <label className="block text-xs font-bold text-slate-800">
+                    <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
                       Alcance y Visibilidad por Empresa
                     </label>
-                    <p className="text-[11px] text-slate-500">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
                       Determina si la capacitación estará abierta para toda la organización o solo empresas específicas.
                     </p>
                   </div>
                   {companyScope === 'all' ? (
-                    <span className="px-3 py-1 rounded-full text-[11px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1.5 shadow-xs">
-                      <Globe className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="px-3 py-1 rounded-full text-[11px] font-extrabold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex items-center gap-1.5 shadow-xs">
+                      <Globe className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                       Visible para Todas las Empresas
                     </span>
                   ) : (
-                    <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-1.5 shadow-xs">
-                      <Building2 className="w-3.5 h-3.5 text-amber-600" />
+                    <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800 flex items-center gap-1.5 shadow-xs">
+                      <Building2 className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                       {selectedCompanyIds.length} {selectedCompanyIds.length === 1 ? 'empresa seleccionada' : 'empresas seleccionadas'}
                     </span>
                   )}
@@ -670,17 +670,17 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 {isSuperAdmin ? (
                   <div className="space-y-3">
                     {/* Selector Segmentado */}
-                    <div className="grid grid-cols-2 gap-2 bg-slate-200/80 p-1 rounded-xl">
+                    <div className="grid grid-cols-2 gap-2 bg-slate-200/80 dark:bg-slate-800 p-1 rounded-xl">
                       <button
                         type="button"
                         onClick={() => setCompanyScope('all')}
                         className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                           companyScope === 'all'
-                            ? 'bg-white text-slate-900 shadow-sm'
-                            : 'text-slate-600 hover:text-slate-900'
+                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
-                        <Globe className={`w-4 h-4 ${companyScope === 'all' ? 'text-emerald-600' : 'text-slate-400'}`} />
+                        <Globe className={`w-4 h-4 ${companyScope === 'all' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`} />
                         <span>Todas las Empresas (Global)</span>
                       </button>
                       <button
@@ -688,25 +688,25 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                         onClick={() => setCompanyScope('specific')}
                         className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                           companyScope === 'specific'
-                            ? 'bg-white text-slate-900 shadow-sm'
-                            : 'text-slate-600 hover:text-slate-900'
+                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
-                        <Building2 className={`w-4 h-4 ${companyScope === 'specific' ? 'text-[#DA291C]' : 'text-slate-400'}`} />
+                        <Building2 className={`w-4 h-4 ${companyScope === 'specific' ? 'text-[#DA291C] dark:text-red-400' : 'text-slate-400'}`} />
                         <span>Empresas Específicas</span>
                       </button>
                     </div>
 
                     {/* Desglose de selección de empresas */}
                     {companyScope === 'specific' && (
-                      <div className="pt-2 border-t border-slate-200 space-y-2 animate-in fade-in duration-150">
-                        <div className="flex items-center justify-between text-[11px] text-slate-600 font-medium">
+                      <div className="pt-2 border-t border-slate-200 dark:border-slate-700 space-y-2 animate-in fade-in duration-150">
+                        <div className="flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-400 font-medium">
                           <span>Marca las empresas autorizadas para ver e inscribirse:</span>
                           <div className="flex items-center gap-2">
                             <button
                               type="button"
                               onClick={() => setSelectedCompanyIds(companies.map(c => c.id))}
-                              className="text-[#DA291C] hover:underline font-bold cursor-pointer"
+                              className="text-[#DA291C] dark:text-red-400 hover:underline font-bold cursor-pointer"
                             >
                               Seleccionar todas
                             </button>
@@ -714,7 +714,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                             <button
                               type="button"
                               onClick={() => setSelectedCompanyIds([])}
-                              className="text-slate-500 hover:underline cursor-pointer"
+                              className="text-slate-500 dark:text-slate-400 hover:underline cursor-pointer"
                             >
                               Desmarcar todas
                             </button>
@@ -729,8 +729,8 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                                 key={comp.id}
                                 className={`flex items-center gap-2.5 p-2.5 rounded-xl border transition-all cursor-pointer text-xs ${
                                   isChecked
-                                    ? 'bg-red-50/80 border-red-300 text-slate-900 font-bold shadow-xs'
-                                    : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
+                                    ? 'bg-red-50/80 dark:bg-red-950/40 border-red-300 dark:border-red-800 text-slate-900 dark:text-white font-bold shadow-xs'
+                                    : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
                                 }`}
                               >
                                 <input
@@ -745,14 +745,14 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                                   }}
                                   className="rounded border-slate-300 text-[#DA291C] focus:ring-0 cursor-pointer"
                                 />
-                                <Building2 className={`w-3.5 h-3.5 shrink-0 ${isChecked ? 'text-[#DA291C]' : 'text-slate-400'}`} />
+                                <Building2 className={`w-3.5 h-3.5 shrink-0 ${isChecked ? 'text-[#DA291C] dark:text-red-400' : 'text-slate-400'}`} />
                                 <span className="truncate">{comp.name}</span>
                               </label>
                             );
                           })}
                         </div>
                         {selectedCompanyIds.length === 0 && (
-                          <p className="text-[11px] text-rose-600 font-semibold mt-1">
+                          <p className="text-[11px] text-rose-600 dark:text-rose-400 font-semibold mt-1">
                             ⚠️ Debes seleccionar al menos una empresa específica para continuar.
                           </p>
                         )}
@@ -760,8 +760,8 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                     )}
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-800 bg-white p-2.5 rounded-xl border border-slate-200">
-                    <Building2 className="w-4 h-4 text-[#DA291C]" />
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <Building2 className="w-4 h-4 text-[#DA291C] dark:text-red-400" />
                     <span>{companies.find(c => c.id === currentUser?.companyId)?.name || 'Tu Empresa asignada'}</span>
                   </div>
                 )}
@@ -769,25 +769,25 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
             )}
 
             {/* Alineación al Programa de Sustentabilidad & Clasificación Formativa */}
-            <div className="bg-emerald-50/50 border border-emerald-200/80 rounded-2xl p-4 space-y-3.5">
+            <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-800/40 rounded-2xl p-4 space-y-3.5">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-xs">
                     <Leaf className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-black text-slate-900">
+                    <h4 className="text-xs font-black text-slate-900 dark:text-white">
                       Programa de Sustentabilidad & Clasificación Formativa
                     </h4>
-                    <p className="text-[11px] text-slate-500">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
                       Alineación con los estándares ESG, taxonomía corporativa y catálogo de programas.
                     </p>
                   </div>
                 </div>
 
                 {isSustainabilityProgram(programCategory, subprogram) && (
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1 shadow-2xs">
-                    <Leaf className="w-3 h-3 text-emerald-600" />
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex items-center gap-1 shadow-2xs">
+                    <Leaf className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                     <span>Alineado a Sustentabilidad</span>
                   </span>
                 )}
@@ -796,14 +796,14 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
               {/* Selectores Jerárquicos: Programa y Subprograma */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
                 <div>
-                  <label htmlFor="event-form-program-category" className="block text-xs font-bold text-slate-700 mb-1">
+                  <label htmlFor="event-form-program-category" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Programa Corporativo *
                   </label>
                   <select
                     id="event-form-program-category"
                     value={programCategory}
                     onChange={(e) => handleProgramCategoryChange(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:border-emerald-600"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-semibold focus:outline-none focus:border-emerald-600"
                     required
                   >
                     {SUSTAINABILITY_PROGRAMS.map(prog => (
@@ -815,14 +815,14 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 </div>
 
                 <div>
-                  <label htmlFor="event-form-subprogram" className="block text-xs font-bold text-slate-700 mb-1">
+                  <label htmlFor="event-form-subprogram" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Subprograma (Dependiente) *
                   </label>
                   <select
                     id="event-form-subprogram"
                     value={subprogram}
                     onChange={(e) => setSubprogram(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:border-emerald-600"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-semibold focus:outline-none focus:border-emerald-600"
                     required
                   >
                     {getSubprogramsForProgram(programCategory).map(sub => (
@@ -837,14 +837,14 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
               {/* Fila 2: Tipo de Sesión, Tipo de Entrenamiento, Formato de Capacitación */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                 <div>
-                  <label htmlFor="event-form-session-type" className="block text-xs font-bold text-slate-700 mb-1">
+                  <label htmlFor="event-form-session-type" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Tipo de Sesión *
                   </label>
                   <select
                     id="event-form-session-type"
                     value={sessionType}
                     onChange={(e) => setSessionType(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-emerald-600"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-600"
                   >
                     {SESSION_TYPES.map(st => (
                       <option key={st} value={st}>{st}</option>
@@ -853,14 +853,14 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 </div>
 
                 <div>
-                  <label htmlFor="event-form-training-type" className="block text-xs font-bold text-slate-700 mb-1">
+                  <label htmlFor="event-form-training-type" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Tipo de Entrenamiento *
                   </label>
                   <select
                     id="event-form-training-type"
                     value={trainingType}
                     onChange={(e) => setTrainingType(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-emerald-600"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-600"
                   >
                     {TRAINING_TYPES.map(tt => (
                       <option key={tt} value={tt}>{tt}</option>
@@ -869,7 +869,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 </div>
 
                 <div>
-                  <label htmlFor="event-form-training-format" className="block text-xs font-bold text-slate-700 mb-1">
+                  <label htmlFor="event-form-training-format" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Formato de Capacitación *
                   </label>
                   <select
@@ -879,7 +879,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                       setTrainingFormat(e.target.value);
                       setCategory(e.target.value);
                     }}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-emerald-600"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-600"
                   >
                     {TRAINING_FORMATS.map(tf => (
                       <option key={tf} value={tf}>{tf}</option>
@@ -891,12 +891,12 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
               {/* Fila 3: Modalidad, Suplidor, Fechas Desde / Hasta */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                 <div>
-                  <label htmlFor="event-form-modality" className="block text-xs font-bold text-slate-700 mb-1">Modalidad *</label>
+                  <label htmlFor="event-form-modality" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Modalidad *</label>
                   <select
                     id="event-form-modality"
                     value={modality === 'Híbrida' ? 'Mixta' : modality}
                     onChange={(e) => setModality(e.target.value as EventModality)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-emerald-600"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-600"
                   >
                     <option value="Virtual">Virtual</option>
                     <option value="Presencial">Presencial</option>
@@ -905,7 +905,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 </div>
 
                 <div>
-                  <label htmlFor="event-form-supplier" className="block text-xs font-bold text-slate-700 mb-1">Suplidor / Proveedor *</label>
+                  <label htmlFor="event-form-supplier" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Suplidor / Proveedor *</label>
                   <input
                     id="event-form-supplier"
                     type="text"
@@ -913,7 +913,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                     value={supplier}
                     onChange={(e) => setSupplier(e.target.value)}
                     placeholder="ej. Claro"
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-emerald-600 font-medium"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-600 font-medium"
                     required
                   />
                   <datalist id="supplier-options-list">
@@ -924,24 +924,24 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 </div>
 
                 <div>
-                  <label htmlFor="event-form-start-date" className="block text-xs font-bold text-slate-700 mb-1">Fecha Desde</label>
+                  <label htmlFor="event-form-start-date" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Fecha Desde</label>
                   <input
                     id="event-form-start-date"
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-emerald-600"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-600"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="event-form-end-date" className="block text-xs font-bold text-slate-700 mb-1">Fecha Hasta</label>
+                  <label htmlFor="event-form-end-date" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Fecha Hasta</label>
                   <input
                     id="event-form-end-date"
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-emerald-600"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-600"
                   />
                 </div>
               </div>
@@ -950,38 +950,38 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
             {/* Instructor / Facilitador */}
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <label htmlFor="event-form-instructor" className="block text-xs font-bold text-slate-700 mb-1">Instructor / Facilitador Principal *</label>
+                <label htmlFor="event-form-instructor" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Instructor / Facilitador Principal *</label>
                 <input
                   id="event-form-instructor"
                   type="text"
                   value={instructor}
                   onChange={(e) => setInstructor(e.target.value)}
                   placeholder="ej. Ing. Juan Pérez / Especialista Institucional"
-                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                  className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                   required
                 />
               </div>
             </div>
 
             {/* Asignación de Tutor / Evaluador */}
-            <div className="bg-indigo-50/50 border border-indigo-200/80 p-4 rounded-2xl space-y-2">
+            <div className="bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/80 dark:border-indigo-800/40 p-4 rounded-2xl space-y-2">
               <div className="flex items-center justify-between">
-                <label htmlFor="event-form-ojt-evaluator" className="block text-xs font-black text-slate-800 flex items-center gap-1.5">
-                  <UserCheck className="w-4 h-4 text-indigo-700" />
+                <label htmlFor="event-form-ojt-evaluator" className="block text-xs font-black text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                  <UserCheck className="w-4 h-4 text-indigo-700 dark:text-indigo-400" />
                   <span>Tutor / Evaluador Responsable (Acompañamiento en Campo)</span>
                 </label>
-                <span className="text-[10px] text-indigo-700 bg-indigo-100/70 font-bold px-2 py-0.5 rounded-full border border-indigo-300">
+                <span className="text-[10px] text-indigo-700 dark:text-indigo-300 bg-indigo-100/70 dark:bg-indigo-950/60 font-bold px-2 py-0.5 rounded-full border border-indigo-300 dark:border-indigo-800">
                   Bitácoras & Calibración
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
                 Selecciona al evaluador de campo encargado de auditar el puesto de trabajo, First-Time Fix y mesas de calibración para esta capacitación.
               </p>
               <select
                 id="event-form-ojt-evaluator"
                 value={ojtEvaluatorId}
                 onChange={(e) => setOjtEvaluatorId(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-semibold focus:outline-none focus:border-[#DA291C]"
               >
                 <option value="">— Sin tutor asignado (Formación general o solo docente de aula) —</option>
                 {users.filter(u => u.role === 'Evaluador / Tutor' || u.role === 'Evaluador / Tutor OJT').length > 0 && (
@@ -1007,19 +1007,19 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="event-form-location" className="block text-xs font-bold text-slate-700 mb-1">Ubicación o Enlace</label>
+                <label htmlFor="event-form-location" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Ubicación o Enlace</label>
                 <input
                   id="event-form-location"
                   type="text"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   placeholder={modality === 'Virtual' ? 'Enlace de Microsoft Teams' : 'Sala de Juntas B (Piso 3)'}
-                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                  className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                 />
               </div>
 
               <div>
-                <label htmlFor="event-form-survey-url" className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="event-form-survey-url" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Enlace de Encuesta / Evaluación (Forms)
                 </label>
                 <input
@@ -1028,23 +1028,23 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                   value={surveyUrl}
                   onChange={(e) => setSurveyUrl(e.target.value)}
                   placeholder="https://forms.office.com/r/ejemplo-evaluacion"
-                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                  className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="event-form-image-url" className="block text-xs font-bold text-slate-700 mb-1">URL de Imagen de Portada</label>
+              <label htmlFor="event-form-image-url" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">URL de Imagen de Portada</label>
               <input
                 id="event-form-image-url"
                 type="url"
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
                 placeholder="https://images.unsplash.com/..."
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] mb-2"
+                className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] mb-2"
               />
               <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                <span className="text-[10px] text-slate-500 font-semibold whitespace-nowrap">Presets:</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold whitespace-nowrap">Presets:</span>
                 {SAMPLE_IMAGES.map((img, i) => (
                   <img
                     key={i}
@@ -1054,7 +1054,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                     decoding="async"
                     onClick={() => setImageUrl(img)}
                     className={`w-10 h-8 rounded-lg object-cover cursor-pointer border-2 transition-all ${
-                      imageUrl === img ? 'border-[#DA291C] scale-105 shadow-sm' : 'border-slate-200 opacity-70 hover:opacity-100'
+                      imageUrl === img ? 'border-[#DA291C] scale-105 shadow-sm' : 'border-slate-200 dark:border-slate-700 opacity-70 hover:opacity-100'
                     }`}
                   />
                 ))}
@@ -1063,26 +1063,26 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
           </div>
 
           {/* 2. Evaluation & Skills Gap Scheme */}
-          <div className="space-y-4 pt-4 border-t border-slate-200">
+          <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-black text-[#DA291C] uppercase tracking-wider flex items-center gap-1.5">
-                <GraduationCap className="w-4 h-4 text-[#DA291C]" />
+              <h3 className="text-xs font-black text-[#DA291C] dark:text-red-400 uppercase tracking-wider flex items-center gap-1.5">
+                <GraduationCap className="w-4 h-4 text-[#DA291C] dark:text-red-400" />
                 2. Esquema de Evaluación & Detección de Debilidades
               </h3>
-              <span className="text-[11px] text-slate-500 font-medium">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                 Determina si los participantes recibirán calificación formal
               </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Tipo de Calificación / Evaluación *
                 </label>
                 <select
                   value={evaluationType}
                   onChange={(e) => setEvaluationType(e.target.value as EvaluationType)}
-                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#DA291C] font-bold"
+                  className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C] font-bold"
                 >
                   <option value="attendance_only">📝 Solo Asistencia (Sin nota ni examen)</option>
                   <option value="score_100">🎯 Calificación Numérica (Escala 0 - 100 Puntos)</option>
@@ -1093,7 +1093,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
 
               {evaluationType !== 'attendance_only' && (
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     {evaluationType === 'scale_1_5' ? 'Puntaje Mínimo de Aprobación (1-5)' : 'Nota Mínima Aprobatoria (0-100) *'}
                   </label>
                   <div className="relative">
@@ -1104,10 +1104,10 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                       step={evaluationType === 'scale_1_5' ? 0.5 : 1}
                       value={passingScore}
                       onChange={(e) => setPassingScore(Number(e.target.value))}
-                      className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold focus:outline-none focus:border-[#DA291C]"
+                      className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-bold focus:outline-none focus:border-[#DA291C]"
                       required
                     />
-                    <span className="absolute right-3 top-2.5 text-xs text-[#DA291C] font-bold">
+                    <span className="absolute right-3 top-2.5 text-xs text-[#DA291C] dark:text-red-400 font-bold">
                       {evaluationType === 'scale_1_5' ? 'pts' : 'pts mín.'}
                     </span>
                   </div>
@@ -1117,18 +1117,18 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
 
             {/* Skills & Competencies Evaluated */}
             {evaluationType !== 'attendance_only' && (
-              <div className="p-4 rounded-2xl bg-red-50/50 border border-red-200/60 space-y-3">
+              <div className="p-4 rounded-2xl bg-red-50/50 dark:bg-red-950/20 border border-red-200/60 dark:border-red-800/40 space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                      <Target className="w-3.5 h-3.5 text-[#DA291C]" />
+                    <label className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                      <Target className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
                       Competencias y Temas Clave Evaluados
                     </label>
-                    <p className="text-[11px] text-slate-500">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
                       Al calificar a cada participante, el evaluador podrá señalar si mostró debilidad en estas áreas.
                     </p>
                   </div>
-                  <span className="text-[10px] bg-red-100 text-[#DA291C] px-2 py-0.5 rounded-full font-bold">
+                  <span className="text-[10px] bg-red-100 dark:bg-red-950/60 text-[#DA291C] dark:text-red-400 px-2 py-0.5 rounded-full font-bold">
                     {skillsEvaluated.length} {skillsEvaluated.length === 1 ? 'competencia' : 'competencias'}
                   </span>
                 </div>
@@ -1138,7 +1138,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                   {skillsEvaluated.map((skill) => (
                     <span
                       key={skill}
-                      className="px-2.5 py-1 rounded-xl bg-white border border-slate-200 text-slate-800 text-xs font-bold flex items-center gap-1.5 shadow-xs group"
+                      className="px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 shadow-xs group"
                     >
                       <span>{skill}</span>
                       <button
@@ -1151,7 +1151,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                     </span>
                   ))}
                   {skillsEvaluated.length === 0 && (
-                    <span className="text-[11px] text-slate-500 italic py-1 font-medium">
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 italic py-1 font-medium">
                       No hay competencias añadidas aún. Agrega temas o habilidades específicas.
                     </span>
                   )}
@@ -1170,7 +1170,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                       }
                     }}
                     placeholder="ej. Procedimientos de Seguridad, Manejo de Objeciones, Cálculos..."
-                    className="flex-1 px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                    className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                   />
                   <button
                     type="button"
@@ -1184,7 +1184,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
 
                 {/* Suggestions */}
                 <div className="flex items-center gap-1.5 flex-wrap pt-1">
-                  <span className="text-[10px] text-slate-500 font-bold">Sugerencias rápidas:</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">Sugerencias rápidas:</span>
                   {[
                     "Seguridad Operacional",
                     "Atención al Cliente",
@@ -1200,8 +1200,8 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                       onClick={() => handleAddSkill(sug)}
                       className={`text-[10px] px-2 py-0.5 rounded-lg border transition-all cursor-pointer ${
                         skillsEvaluated.includes(sug)
-                          ? 'opacity-40 border-transparent bg-slate-100 text-slate-400'
-                          : 'border-slate-200 bg-white text-slate-600 hover:text-[#DA291C] hover:border-red-300'
+                          ? 'opacity-40 border-transparent bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'
+                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-[#DA291C] dark:hover:text-red-400 hover:border-red-300 dark:hover:border-red-700'
                       }`}
                     >
                       + {sug}
@@ -1213,19 +1213,19 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
           </div>
 
           {/* 3. Módulos de la Capacitación (Evaluación Continua) */}
-          <div className="space-y-4 pt-4 border-t border-slate-200">
+          <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xs font-black text-[#DA291C] uppercase tracking-wider flex items-center gap-1.5">
-                  <Layers className="w-4 h-4 text-[#DA291C]" />
+                <h3 className="text-xs font-black text-[#DA291C] dark:text-red-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <Layers className="w-4 h-4 text-[#DA291C] dark:text-red-400" />
                   3. Estructura de Módulos & Calificación Continua
                 </h3>
-                <p className="text-[11px] text-slate-500 mt-0.5">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                   Divide el evento en etapas o módulos para que el tutor asiente calificaciones progresivas.
                 </p>
               </div>
 
-              <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer select-none bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 hover:border-slate-300 transition-colors">
+              <label className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
                 <input
                   type="checkbox"
                   checked={enableModules}
@@ -1242,12 +1242,12 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
             </div>
 
             {enableModules && (
-              <div className="space-y-3.5 bg-slate-50/70 border border-slate-200 p-4 rounded-2xl">
+              <div className="space-y-3.5 bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl">
                 {/* Information Callout */}
-                <div className="p-3 bg-red-50/60 rounded-xl border border-red-200/80 text-[11px] text-slate-700 flex items-start gap-2">
-                  <Target className="w-4 h-4 text-[#DA291C] shrink-0 mt-0.5" />
+                <div className="p-3 bg-red-50/60 dark:bg-red-950/30 rounded-xl border border-red-200/80 dark:border-red-900/40 text-[11px] text-slate-700 dark:text-slate-300 flex items-start gap-2">
+                  <Target className="w-4 h-4 text-[#DA291C] dark:text-red-400 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-[#DA291C]">Evaluación Modular: </span>
+                    <span className="font-bold text-[#DA291C] dark:text-red-400">Evaluación Modular: </span>
                     El evaluador podrá asentar notas módulo a módulo según avancen los colaboradores. Cada módulo tiene peso equitativo y la nota final del curso será el promedio de los módulos completados.
                   </div>
                 </div>
@@ -1255,25 +1255,25 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 {/* Preset Buttons */}
                 <div className="flex flex-wrap items-center justify-between gap-2 pb-1">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-[10px] text-slate-500 font-bold">Plantillas rápidas:</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">Plantillas rápidas:</span>
                     <button
                       type="button"
                       onClick={() => handleApplyModulePreset(2)}
-                      className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-red-300 text-slate-700 hover:text-[#DA291C] text-[11px] font-bold shadow-2xs transition-colors cursor-pointer"
+                      className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-red-300 dark:hover:border-red-700 text-slate-700 dark:text-slate-300 hover:text-[#DA291C] dark:hover:text-red-400 text-[11px] font-bold shadow-2xs transition-colors cursor-pointer"
                     >
                       2 Módulos
                     </button>
                     <button
                       type="button"
                       onClick={() => handleApplyModulePreset(3)}
-                      className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-red-300 text-slate-700 hover:text-[#DA291C] text-[11px] font-bold shadow-2xs transition-colors cursor-pointer"
+                      className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-red-300 dark:hover:border-red-700 text-slate-700 dark:text-slate-300 hover:text-[#DA291C] dark:hover:text-red-400 text-[11px] font-bold shadow-2xs transition-colors cursor-pointer"
                     >
                       3 Módulos
                     </button>
                     <button
                       type="button"
                       onClick={() => handleApplyModulePreset(4)}
-                      className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-red-300 text-slate-700 hover:text-[#DA291C] text-[11px] font-bold shadow-2xs transition-colors cursor-pointer"
+                      className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-red-300 dark:hover:border-red-700 text-slate-700 dark:text-slate-300 hover:text-[#DA291C] dark:hover:text-red-400 text-[11px] font-bold shadow-2xs transition-colors cursor-pointer"
                     >
                       4 Módulos
                     </button>
@@ -1282,7 +1282,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                   <button
                     type="button"
                     onClick={() => handleAddModule()}
-                    className="px-3 py-1.5 rounded-xl bg-white hover:bg-red-50 text-[#DA291C] border border-red-200 text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-950/30 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-800 text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Agregar Módulo</span>
@@ -1295,15 +1295,15 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                     {modules.map((mod, idx) => (
                       <div
                         key={mod.id}
-                        className="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-xs space-y-3 relative hover:border-slate-300 transition-colors"
+                        className="bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 shadow-xs space-y-3 relative hover:border-slate-300 dark:hover:border-slate-600 transition-colors"
                       >
                         {/* Module Header Bar */}
-                        <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
+                        <div className="flex items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-700/60 pb-2">
                           <div className="flex items-center gap-2">
                             <span className="w-5 h-5 rounded-lg bg-[#DA291C] text-white text-[10px] font-black flex items-center justify-center">
                               {idx + 1}
                             </span>
-                            <span className="text-xs font-bold text-slate-800">
+                            <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                               Módulo {idx + 1}
                             </span>
                           </div>
@@ -1312,7 +1312,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                             type="button"
                             onClick={() => handleRemoveModule(mod.id)}
                             aria-label={`Eliminar módulo ${idx + 1}`}
-                            className="p-1 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer rounded-lg hover:bg-slate-50"
+                            className="p-1 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700"
                             title="Eliminar módulo"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -1322,7 +1322,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                         {/* Title and Scoring Inputs */}
                         <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                           <div className="sm:col-span-6">
-                            <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                            <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
                               Nombre del Módulo *
                             </label>
                             <input
@@ -1330,13 +1330,13 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                               value={mod.title}
                               onChange={(e) => handleUpdateModule(mod.id, 'title', e.target.value)}
                               placeholder={`ej. Módulo ${idx + 1}: Fundamentos y Procedimientos`}
-                              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 font-medium focus:outline-none focus:border-[#DA291C]"
+                              className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 font-medium focus:outline-none focus:border-[#DA291C]"
                               required
                             />
                           </div>
 
                           <div className="sm:col-span-3">
-                            <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                            <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
                               Nota Mínima (pts) *
                             </label>
                             <input
@@ -1345,13 +1345,13 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                               max={mod.maxScore || 100}
                               value={mod.passingScore ?? 70}
                               onChange={(e) => handleUpdateModule(mod.id, 'passingScore', Number(e.target.value))}
-                              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold text-center focus:outline-none focus:border-[#DA291C]"
+                              className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-bold text-center focus:outline-none focus:border-[#DA291C]"
                               required
                             />
                           </div>
 
                           <div className="sm:col-span-3">
-                            <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                            <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
                               Puntaje Máximo *
                             </label>
                             <input
@@ -1360,7 +1360,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                               max={1000}
                               value={mod.maxScore ?? 100}
                               onChange={(e) => handleUpdateModule(mod.id, 'maxScore', Number(e.target.value))}
-                              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold text-center focus:outline-none focus:border-[#DA291C]"
+                              className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-bold text-center focus:outline-none focus:border-[#DA291C]"
                               required
                             />
                           </div>
@@ -1373,14 +1373,14 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                             value={mod.description || ''}
                             onChange={(e) => handleUpdateModule(mod.id, 'description', e.target.value)}
                             placeholder="Descripción u objetivos del módulo (opcional)..."
-                            className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                            className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-700 dark:text-slate-300 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                           />
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-6 text-slate-500 text-xs bg-white rounded-2xl border border-dashed border-slate-300 font-medium">
+                  <div className="text-center py-6 text-slate-500 dark:text-slate-400 text-xs bg-white dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 font-medium">
                     No has agregado módulos aún. Haz clic en "Agregar Módulo" o selecciona una plantilla rápida.
                   </div>
                 )}
@@ -1389,36 +1389,36 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
           </div>
 
           {/* 4. Calendario y Programación Dinámica de Horarios (Slots) */}
-          <div className="space-y-4 pt-4 border-t border-slate-200">
+          <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-800">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <h3 className="text-xs font-black text-[#DA291C] uppercase tracking-wider flex items-center gap-1.5">
-                  <CalendarDays className="w-4 h-4 text-[#DA291C]" />
+                <h3 className="text-xs font-black text-[#DA291C] dark:text-red-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <CalendarDays className="w-4 h-4 text-[#DA291C] dark:text-red-400" />
                   <span>4. Calendario y Horarios Dinámicos (Slots)</span>
                 </h3>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
                   Selecciona días en el calendario interactivo, define horarios con presets rápidos y administra los turnos de asistencia.
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-bold px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full border border-slate-200">
+                <span className="text-[11px] font-bold px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-full border border-slate-200 dark:border-slate-700">
                   {schedule.reduce((acc, s) => acc + s.slots.length, 0)} turnos en {schedule.length} {schedule.length === 1 ? 'fecha' : 'fechas'}
                 </span>
               </div>
             </div>
 
             {/* Duración Oficial del Programa y Métricas de Coherencia */}
-            <div className="bg-gradient-to-r from-red-50/70 via-slate-50 to-white border border-red-200/80 rounded-2xl p-4 space-y-3">
+            <div className="bg-gradient-to-r from-red-50/70 via-slate-50 to-white dark:from-red-950/20 dark:via-slate-900 dark:to-slate-800 border border-red-200/80 dark:border-red-900/40 rounded-2xl p-4 space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-xl bg-[#DA291C] text-white flex items-center justify-center shadow-xs">
                     <Hourglass className="w-4 h-4" />
                   </div>
                   <div>
-                    <label className="block text-xs font-black text-slate-900">
+                    <label className="block text-xs font-black text-slate-900 dark:text-white">
                       Duración Oficial del Programa
                     </label>
-                    <p className="text-[11px] text-slate-500">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
                       Horas lectivas totales de la capacitación. Se mostrará a los colaboradores al inscribirse y en el terminal Kiosco.
                     </p>
                   </div>
@@ -1427,7 +1427,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setTotalHours(Math.round(scheduledTotalHours * 10) / 10)}
-                  className="text-[11px] font-bold text-[#DA291C] hover:underline flex items-center gap-1 cursor-pointer bg-red-50 px-2.5 py-1 rounded-lg border border-red-200"
+                  className="text-[11px] font-bold text-[#DA291C] dark:text-red-400 hover:underline flex items-center gap-1 cursor-pointer bg-red-50 dark:bg-red-950/50 px-2.5 py-1 rounded-lg border border-red-200 dark:border-red-800"
                   title="Calcular duración sumando los turnos agendados en el calendario"
                 >
                   <RotateCcw className="w-3 h-3" />
@@ -1444,14 +1444,14 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                     value={totalHours || ''}
                     onChange={(e) => setTotalHours(Math.max(0, Number(e.target.value)))}
                     placeholder={`${Math.round(scheduledTotalHours * 10) / 10 || 8}`}
-                    className="w-24 px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-black text-slate-900 focus:outline-none focus:border-[#DA291C] text-center shadow-2xs"
+                    className="w-24 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-black text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C] text-center shadow-2xs"
                   />
-                  <span className="text-xs font-bold text-slate-700">Horas Lectivas</span>
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Horas Lectivas</span>
                 </div>
 
                 {/* Presets rápidos de duración total */}
                 <div className="flex flex-wrap gap-1.5 items-center">
-                  <span className="text-[10px] text-slate-500 font-bold mr-1">Presets comunes:</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold mr-1">Presets comunes:</span>
                   {[4, 8, 16, 20, 40].map(h => (
                     <button
                       key={h}
@@ -1459,8 +1459,8 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                       onClick={() => setTotalHours(h)}
                       className={`px-2.5 py-1 rounded-xl text-[11px] font-bold border transition-all cursor-pointer ${
                         totalHours === h
-                          ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
-                          : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
+                          ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100 shadow-xs'
+                          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700'
                       }`}
                     >
                       {h} hrs
@@ -1470,7 +1470,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
               </div>
 
               {/* Barra de coherencia entre horas oficiales y turnos programados */}
-              <div className="pt-2 border-t border-slate-200/70 flex flex-wrap items-center justify-between text-[11px] text-slate-600 gap-2">
+              <div className="pt-2 border-t border-slate-200/70 dark:border-slate-700 flex flex-wrap items-center justify-between text-[11px] text-slate-600 dark:text-slate-400 gap-2">
                 <div className="flex items-center gap-3">
                   <span>📅 <strong>{schedule.length}</strong> {schedule.length === 1 ? 'día programado' : 'días programados'}</span>
                   <span>•</span>
@@ -1479,18 +1479,18 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
 
                 {totalHours > 0 ? (
                   scheduledTotalHours >= totalHours ? (
-                    <span className="text-emerald-700 font-bold flex items-center gap-1 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                      <Check className="w-3 h-3 text-emerald-600" />
+                    <span className="text-emerald-700 dark:text-emerald-300 font-bold flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                      <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                       Turnos cubren las {totalHours} hrs del programa
                     </span>
                   ) : (
-                    <span className="text-amber-700 font-bold flex items-center gap-1 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
-                      <Clock className="w-3 h-3 text-amber-600" />
+                    <span className="text-amber-700 dark:text-amber-300 font-bold flex items-center gap-1 bg-amber-50 dark:bg-amber-950/50 px-2.5 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
+                      <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" />
                       Faltan {Math.round((totalHours - scheduledTotalHours) * 10) / 10} hrs por agendar en el calendario
                     </span>
                   )
                 ) : (
-                  <span className="text-slate-500 italic">
+                  <span className="text-slate-500 dark:text-slate-400 italic">
                     (Se tomará la suma de horarios: {Math.round(scheduledTotalHours * 10) / 10} hrs)
                   </span>
                 )}
@@ -1498,28 +1498,28 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
             </div>
 
             {/* Widget de Calendario Mensual Interactivo */}
-            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs">
               
               {/* Calendario Header */}
-              <div className="p-3 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+              <div className="p-3 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={prevMonth}
                     aria-label="Mes Anterior"
-                    className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
+                    className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
                     title="Mes Anterior"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
-                  <span className="text-xs font-black text-slate-900 capitalize min-w-[140px] text-center">
+                  <span className="text-xs font-black text-slate-900 dark:text-white capitalize min-w-[140px] text-center">
                     {monthName} {calYear}
                   </span>
                   <button
                     type="button"
                     onClick={nextMonth}
                     aria-label="Mes Siguiente"
-                    className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
+                    className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
                     title="Mes Siguiente"
                   >
                     <ChevronRight className="w-4 h-4" />
@@ -1527,7 +1527,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                   <button
                     type="button"
                     onClick={goToToday}
-                    className="px-2.5 py-1 text-[11px] font-bold rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 transition-colors cursor-pointer"
+                    className="px-2.5 py-1 text-[11px] font-bold rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
                   >
                     Hoy
                   </button>
@@ -1546,7 +1546,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                     className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all cursor-pointer ${
                       !batchMode 
                         ? 'bg-[#DA291C] text-white shadow-xs' 
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }`}
                   >
                     Fecha Única
@@ -1557,7 +1557,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                     className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all cursor-pointer ${
                       batchMode 
                         ? 'bg-[#DA291C] text-white shadow-xs' 
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }`}
                   >
                     Selección Múltiple ({selectedDates.length})
@@ -1566,7 +1566,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                     <button
                       type="button"
                       onClick={selectAllWeekdays}
-                      className="px-2 py-1 text-[10px] font-bold text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-lg transition-colors cursor-pointer"
+                      className="px-2 py-1 text-[10px] font-bold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/50 hover:bg-sky-100 dark:hover:bg-sky-900/50 border border-sky-200 dark:border-sky-800 rounded-lg transition-colors cursor-pointer"
                       title="Seleccionar de Lunes a Viernes de este mes"
                     >
                       + Lun a Vie
@@ -1576,7 +1576,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setSelectedDates([])}
-                      className="px-2 py-1 text-[10px] font-semibold text-slate-500 hover:text-slate-700 transition-colors cursor-pointer"
+                      className="px-2 py-1 text-[10px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer"
                     >
                       Limpiar
                     </button>
@@ -1585,25 +1585,25 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
               </div>
 
               {/* Días de la semana */}
-              <div className="grid grid-cols-7 border-b border-slate-100 bg-slate-50/50 text-center py-2 text-[11px] font-bold text-slate-500">
+              <div className="grid grid-cols-7 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-center py-2 text-[11px] font-bold text-slate-500 dark:text-slate-400">
                 <span>Lun</span>
                 <span>Mar</span>
                 <span>Mié</span>
                 <span>Jue</span>
                 <span>Vie</span>
-                <span className="text-amber-600">Sáb</span>
-                <span className="text-rose-600">Dom</span>
+                <span className="text-amber-600 dark:text-amber-400">Sáb</span>
+                <span className="text-rose-600 dark:text-rose-400">Dom</span>
               </div>
 
               {/* Celdas del mes */}
-              <div className="grid grid-cols-7 gap-1 p-2 bg-slate-50/30">
+              <div className="grid grid-cols-7 gap-1 p-2 bg-slate-50/30 dark:bg-slate-900/40">
                 {/* Días de mes anterior */}
                 {Array.from({ length: firstDayOfWeek }).map((_, i) => {
                   const dayNum = daysInPrevMonth - firstDayOfWeek + i + 1;
                   return (
                     <div
                       key={`prev-${i}`}
-                      className="h-12 sm:h-14 p-1 rounded-xl bg-slate-100/50 text-slate-300 text-xs flex flex-col items-center justify-start select-none opacity-40"
+                      className="h-12 sm:h-14 p-1 rounded-xl bg-slate-100/50 dark:bg-slate-800/30 text-slate-300 dark:text-slate-600 text-xs flex flex-col items-center justify-start select-none opacity-40"
                     >
                       <span>{dayNum}</span>
                     </div>
@@ -1634,10 +1634,10 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                         isSelected
                           ? 'bg-[#DA291C] text-white border-[#DA291C] font-bold shadow-xs'
                           : isToday
-                          ? 'bg-amber-50/80 border-amber-300 text-slate-900 font-bold hover:border-amber-400'
+                          ? 'bg-amber-50/80 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-slate-900 dark:text-amber-200 font-bold hover:border-amber-400'
                           : slotCount > 0
-                          ? 'bg-white border-red-200 text-slate-900 font-semibold hover:border-red-400'
-                          : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-slate-300'
+                          ? 'bg-white dark:bg-slate-800 border-red-200 dark:border-red-900/60 text-slate-900 dark:text-white font-semibold hover:border-red-400'
+                          : 'bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                       }`}
                     >
                       <div className="flex items-center justify-between w-full px-1">
@@ -1645,7 +1645,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                           {dayNum}
                         </span>
                         {isToday && !isSelected && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 ring-2 ring-amber-200" title="Hoy" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 ring-2 ring-amber-200 dark:ring-amber-900" title="Hoy" />
                         )}
                       </div>
 
@@ -1655,7 +1655,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                           className={`text-[9px] px-1.5 py-0.5 rounded-md font-extrabold tracking-tight truncate max-w-full ${
                             isSelected
                               ? 'bg-white text-[#DA291C]'
-                              : 'bg-red-50 text-[#DA291C] border border-red-200'
+                              : 'bg-red-50 dark:bg-red-950/60 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-800'
                           }`}
                         >
                           {slotCount} {slotCount === 1 ? 'turno' : 'turnos'}
@@ -1667,7 +1667,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
               </div>
 
               {/* Pie informativo del calendario */}
-              <div className="p-2.5 bg-slate-50 border-t border-slate-100 flex flex-wrap items-center justify-between text-[11px] text-slate-500 px-3">
+              <div className="p-2.5 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 px-3">
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#DA291C]" />
@@ -1678,15 +1678,15 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                     <span>Hoy</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-md bg-red-100 border border-red-300" />
+                    <span className="w-2.5 h-2.5 rounded-md bg-red-100 dark:bg-red-950 border border-red-300 dark:border-red-800" />
                     <span>Con turnos agendados</span>
                   </div>
                 </div>
                 <div>
                   {selectedDates.length === 0 ? (
-                    <span className="text-rose-600 font-semibold">⚠️ Haz clic en un día del calendario para seleccionarlo</span>
+                    <span className="text-rose-600 dark:text-rose-400 font-semibold">⚠️ Haz clic en un día del calendario para seleccionarlo</span>
                   ) : (
-                    <span className="font-semibold text-slate-700">
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">
                       📅 {selectedDates.length === 1 ? formatDateLong(selectedDates[0]) : `${selectedDates.length} fechas marcadas`}
                     </span>
                   )}
@@ -1696,20 +1696,20 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
             </div>
 
             {/* Sub-formulario Dinámico de Horario */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <Clock className="w-4 h-4 text-[#DA291C]" />
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-[#DA291C] dark:text-red-400" />
                   <span>Programar Turno en {selectedDates.length === 0 ? 'fecha seleccionada' : selectedDates.length === 1 ? selectedDates[0] : `${selectedDates.length} Fechas`}</span>
                 </span>
-                <span className="text-[10px] text-slate-500">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400">
                   Generación automática de códigos PIN de 4 dígitos para Check-in y Check-out
                 </span>
               </div>
 
               {/* Presets Rápidos de Horarios */}
               <div>
-                <label className="block text-[11px] font-bold text-slate-600 mb-1.5">
+                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">
                   ⚡ Presets Rápidos de Horario (Haz clic para autocompletar):
                 </label>
                 <div className="flex flex-wrap gap-1.5">
@@ -1728,7 +1728,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                         className={`px-2.5 py-1 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                           isActive
                             ? 'bg-[#DA291C] text-white border-[#DA291C] shadow-xs'
-                            : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
+                            : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700'
                         }`}
                       >
                         <span>{preset.label}</span>
@@ -1740,13 +1740,13 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
               </div>
 
               {/* Selector Dinámico de Duración de Sesión */}
-              <div className="bg-white p-3 rounded-xl border border-slate-200/80 space-y-1.5">
+              <div className="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
-                    <Hourglass className="w-3.5 h-3.5 text-[#DA291C]" />
+                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <Hourglass className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
                     <span>Duración de la Sesión (Calcula automáticamente la Hora Fin):</span>
                   </label>
-                  <span className="text-[11px] font-black text-[#DA291C] bg-red-50 px-2 py-0.5 rounded-lg border border-red-200">
+                  <span className="text-[11px] font-black text-[#DA291C] dark:text-red-400 bg-red-50 dark:bg-red-950/50 px-2 py-0.5 rounded-lg border border-red-200 dark:border-red-800">
                     {sessionDuration} hr{sessionDuration > 1 ? 's' : ''} / sesión
                   </span>
                 </div>
@@ -1759,7 +1759,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                       className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
                         sessionDuration === d
                           ? 'bg-[#DA291C] text-white border-[#DA291C] shadow-xs'
-                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
+                          : 'bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:border-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600'
                       }`}
                     >
                       {d} {d === 1 ? 'hora' : 'horas'}
@@ -1772,8 +1772,8 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end pt-1">
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="block text-[11px] font-bold text-slate-600">Hora Inicio *</label>
-                    <span className="text-[10px] text-slate-500 font-medium">ej. 09:00 AM</span>
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400">Hora Inicio *</label>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">ej. 09:00 AM</span>
                   </div>
                   <input
                     type="text"
@@ -1781,7 +1781,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                     value={tempTime}
                     onChange={(e) => handleStartTimeChange(e.target.value)}
                     placeholder="ej. 09:00 AM"
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
                   />
                   <datalist id="hours-list">
                     {SUGGESTED_HOURS.map(h => (
@@ -1792,8 +1792,8 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
 
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="block text-[11px] font-bold text-slate-600">Hora Fin (Calculada) *</label>
-                    <span className="text-[10px] text-emerald-600 font-semibold">+{sessionDuration}h</span>
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400">Hora Fin (Calculada) *</label>
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">+{sessionDuration}h</span>
                   </div>
                   <input
                     type="text"
@@ -1801,7 +1801,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                     value={tempEndTime}
                     onChange={(e) => handleEndTimeChange(e.target.value)}
                     placeholder="ej. 11:00 AM"
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
                   />
                   <datalist id="hours-list-end">
                     {SUGGESTED_HOURS.map(h => (
@@ -1812,7 +1812,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
 
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="block text-[11px] font-bold text-slate-600">Cupo Máximo</label>
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400">Cupo Máximo</label>
                     <div className="flex gap-1">
                       {[15, 25, 40, 60].map(cap => (
                         <button
@@ -1821,8 +1821,8 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                           onClick={() => setTempCapacity(cap)}
                           className={`text-[10px] px-1.5 py-0.2 rounded font-bold transition-colors cursor-pointer ${
                             tempCapacity === cap
-                              ? 'bg-slate-800 text-white'
-                              : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+                              ? 'bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900'
+                              : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
                           }`}
                         >
                           {cap}
@@ -1835,7 +1835,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                     min="1"
                     value={tempCapacity}
                     onChange={(e) => setTempCapacity(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold focus:outline-none focus:border-[#DA291C]"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-bold focus:outline-none focus:border-[#DA291C]"
                   />
                 </div>
 
@@ -1858,15 +1858,15 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
             {/* Lista de Turnos Agendados */}
             <div className="space-y-3 pt-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   <span>Turnos y Fechas Programadas ({schedule.length} fechas / {schedule.reduce((acc, s) => acc + s.slots.length, 0)} turnos)</span>
                 </span>
                 {schedule.length > 0 && (
                   <button
                     type="button"
                     onClick={() => setSchedule([])}
-                    className="text-[11px] text-rose-600 hover:underline font-semibold cursor-pointer"
+                    className="text-[11px] text-rose-600 dark:text-rose-400 hover:underline font-semibold cursor-pointer"
                   >
                     Vaciar todos los horarios
                   </button>
@@ -1874,7 +1874,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
               </div>
 
               {schedule.length === 0 ? (
-                <div className="text-center py-6 text-slate-500 text-xs bg-slate-50 rounded-2xl border border-dashed border-slate-300">
+                <div className="text-center py-6 text-slate-500 dark:text-slate-400 text-xs bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
                   No hay fechas u horarios programados. Selecciona días en el calendario superior y añade turnos.
                 </div>
               ) : (
@@ -1886,20 +1886,20 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                         key={sch.date}
                         className={`p-3.5 rounded-2xl border transition-all ${
                           isDateActive
-                            ? 'bg-red-50/50 border-red-200 ring-1 ring-red-200'
-                            : 'bg-slate-50 border-slate-200'
+                            ? 'bg-red-50/50 dark:bg-red-950/30 border-red-200 dark:border-red-800 ring-1 ring-red-200 dark:ring-red-900'
+                            : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700'
                         }`}
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <div className="text-xs font-bold text-slate-900 flex items-center gap-2">
-                            <CalendarIcon className="w-3.5 h-3.5 text-[#DA291C]" />
+                          <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <CalendarIcon className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
                             <span>{formatDateLong(sch.date)}</span>
                             {sch.endDate && sch.endDate !== sch.date && (
-                              <span className="text-[10px] text-slate-500 font-normal">
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">
                                 (hasta {formatDateLong(sch.endDate)})
                               </span>
                             )}
-                            <span className="text-[10px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full font-bold">
+                            <span className="text-[10px] bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-full font-bold">
                               {sch.slots.length} {sch.slots.length === 1 ? 'turno' : 'turnos'}
                             </span>
                           </div>
@@ -1911,7 +1911,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                                 setBatchMode(false);
                                 setSelectedDates([sch.date]);
                               }}
-                              className="text-[11px] text-[#DA291C] hover:underline font-semibold cursor-pointer"
+                              className="text-[11px] text-[#DA291C] dark:text-red-400 hover:underline font-semibold cursor-pointer"
                             >
                               Seleccionar día
                             </button>
@@ -1934,22 +1934,22 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                             return (
                               <div
                                 key={sl.time}
-                                className="px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs flex items-center justify-between gap-2 text-slate-700 shadow-xs"
+                                className="px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs flex items-center justify-between gap-2 text-slate-700 dark:text-slate-300 shadow-xs"
                               >
                                 <div className="space-y-0.5">
-                                  <div className="flex items-center gap-1.5 font-bold text-slate-900">
-                                    <Clock className="w-3.5 h-3.5 text-[#DA291C]" />
+                                  <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white">
+                                    <Clock className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
                                     <span>{sl.time}{sl.endTime ? ` - ${sl.endTime}` : ''}</span>
                                     {duration && (
-                                      <span className="text-[10px] font-normal px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">
+                                      <span className="text-[10px] font-normal px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
                                         {duration}
                                       </span>
                                     )}
                                   </div>
-                                  <div className="flex items-center gap-2 text-[10px] text-slate-500">
-                                    <span className="font-semibold text-slate-700">Cap: {sl.capacity}</span>
+                                  <div className="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400">
+                                    <span className="font-semibold text-slate-700 dark:text-slate-300">Cap: {sl.capacity}</span>
                                     {(sl.checkinCode || sl.checkoutCode) && (
-                                      <span className="font-mono bg-slate-100 px-1.5 py-0.2 rounded text-slate-600">
+                                      <span className="font-mono bg-slate-100 dark:bg-slate-700 px-1.5 py-0.2 rounded text-slate-600 dark:text-slate-300">
                                         In: {sl.checkinCode} • Out: {sl.checkoutCode}
                                       </span>
                                     )}
@@ -1960,7 +1960,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                                   type="button"
                                   onClick={() => handleRemoveSlot(sch.date, sl.time)}
                                   aria-label={`Eliminar turno ${sl.time} del ${sch.date}`}
-                                  className="text-slate-400 hover:text-rose-600 transition-colors p-1 cursor-pointer rounded-lg hover:bg-slate-100"
+                                  className="text-slate-400 hover:text-rose-600 transition-colors p-1 cursor-pointer rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700"
                                   title="Eliminar este turno"
                                 >
                                   <X className="w-3.5 h-3.5" />
@@ -1978,57 +1978,57 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
           </div>
 
           {/* 5. Notification Settings */}
-          <div className="space-y-3 pt-4 border-t border-slate-200">
-            <h3 className="text-xs font-black text-[#DA291C] uppercase tracking-wider">
+          <div className="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+            <h3 className="text-xs font-black text-[#DA291C] dark:text-red-400 uppercase tracking-wider">
               5. Configuración de Recordatorios Automáticos
             </h3>
             
             <div className="flex items-center gap-6">
-              <label className="flex items-center gap-2 text-xs text-slate-700 font-semibold cursor-pointer">
+              <label className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 font-semibold cursor-pointer">
                 <input
                   type="checkbox"
                   checked={sendEmail}
                   onChange={(e) => setSendEmail(e.target.checked)}
                   className="rounded border-slate-300 text-[#DA291C] focus:ring-0 cursor-pointer"
                 />
-                <Mail className="w-3.5 h-3.5 text-[#DA291C]" />
+                <Mail className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
                 <span>Enviar por Correo (Email)</span>
               </label>
 
-              <label className="flex items-center gap-2 text-xs text-slate-700 font-semibold cursor-pointer">
+              <label className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 font-semibold cursor-pointer">
                 <input
                   type="checkbox"
                   checked={sendTeams}
                   onChange={(e) => setSendTeams(e.target.checked)}
                   className="rounded border-slate-300 text-[#DA291C] focus:ring-0 cursor-pointer"
                 />
-                <Bell className="w-3.5 h-3.5 text-cyan-600" />
+                <Bell className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
                 <span>Enviar por Microsoft Teams</span>
               </label>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Plantilla del Mensaje de Recordatorio
               </label>
               <textarea
                 rows={2}
                 value={customMessage}
                 onChange={(e) => setCustomMessage(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
               />
-              <p className="text-[10px] text-slate-500 mt-1">
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
                 Variables disponibles: <code>[EVENT_TITLE]</code>, <code>[INSTRUCTOR]</code>, <code>[SURVEY_LINK]</code>
               </p>
             </div>
           </div>
 
           {/* Submit Footer */}
-          <div className="pt-4 border-t border-slate-200 flex items-center justify-end gap-3">
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+              className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors cursor-pointer"
             >
               Cancelar
             </button>

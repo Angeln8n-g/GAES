@@ -215,7 +215,7 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar por grupo, área o descripción..."
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-2xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] shadow-xs"
+              className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] shadow-xs"
             />
           </div>
 
@@ -223,7 +223,7 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
             <select
               value={selectedCompanyFilter}
               onChange={(e) => setSelectedCompanyFilter(e.target.value)}
-              className="px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs text-slate-800 font-bold focus:outline-none focus:border-[#DA291C]"
+              className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs text-slate-800 dark:text-slate-200 font-bold focus:outline-none focus:border-[#DA291C]"
             >
               <option value="all">🏢 Todas las Empresas</option>
               {companies.map(c => (
@@ -238,9 +238,9 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
           <button
             type="button"
             onClick={() => exportGroupsToExcel(groups, participants)}
-            className="px-3.5 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold flex items-center gap-1.5 border border-slate-300 shadow-xs transition-colors cursor-pointer"
+            className="px-3.5 py-2.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 border border-slate-300 dark:border-slate-700 shadow-xs transition-colors cursor-pointer"
           >
-            <Download className="w-3.5 h-3.5 text-slate-500" />
+            <Download className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
             <span>Exportar Grupos</span>
           </button>
 
@@ -258,10 +258,10 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
 
       {/* Groups Grid */}
       {filteredGroups.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center shadow-sm">
           <Layers className="w-12 h-12 text-slate-400 mx-auto mb-3 animate-pulse" />
-          <h3 className="text-base font-black text-slate-800">No se encontraron grupos</h3>
-          <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
+          <h3 className="text-base font-black text-slate-800 dark:text-white">No se encontraron grupos</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1">
             Crea grupos de colaboradores por departamento o proyecto para asignarles cronogramas de capacitación dirigidos.
           </p>
           <button
@@ -280,7 +280,7 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
             return (
               <div 
                 key={group.id}
-                className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-slate-300 hover:shadow transition-all group"
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 hover:shadow transition-all group"
               >
                 <div>
                   {/* Badge & Department */}
@@ -291,28 +291,28 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
                         {group.department || 'Sin Área Definida'}
                       </span>
                       {comp && (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1">
-                          <Building2 className="w-2.5 h-2.5 text-[#DA291C]" />
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center gap-1">
+                          <Building2 className="w-2.5 h-2.5 text-[#DA291C] dark:text-red-400" />
                           {comp.name}
                         </span>
                       )}
                     </div>
-                    <span className="text-[11px] text-slate-500 flex items-center gap-1 font-semibold">
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1 font-semibold">
                       <Users className="w-3.5 h-3.5 text-slate-400" />
                       {group.memberCards.length} colaboradores
                     </span>
                   </div>
 
                   {/* Title & Description */}
-                  <h3 className="text-base font-black text-slate-900 group-hover:text-[#DA291C] transition-colors">
+                  <h3 className="text-base font-black text-slate-900 dark:text-white group-hover:text-[#DA291C] dark:group-hover:text-red-400 transition-colors">
                     {group.name}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-2 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2 leading-relaxed">
                     {group.description || 'Sin descripción adicional.'}
                   </p>
 
                   {/* Member Preview Avatars */}
-                  <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+                  <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                     <div className="flex -space-x-2 overflow-hidden">
                       {group.memberCards.slice(0, 5).map(card => {
                         const p = participants.find(part => part.card === card);
@@ -321,29 +321,29 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
                           <div
                             key={card}
                             title={p?.name || `Tarjeta ${card}`}
-                            className="w-7 h-7 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-700 shadow-xs"
+                            className="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-white dark:border-slate-900 flex items-center justify-center text-[10px] font-bold text-slate-700 dark:text-slate-300 shadow-xs"
                           >
                             {initial}
                           </div>
                         );
                       })}
                       {group.memberCards.length > 5 && (
-                        <div className="w-7 h-7 rounded-full bg-red-50 border-2 border-white flex items-center justify-center text-[10px] font-bold text-[#DA291C]">
+                        <div className="w-7 h-7 rounded-full bg-red-50 dark:bg-red-950/40 border-2 border-white dark:border-slate-900 flex items-center justify-center text-[10px] font-bold text-[#DA291C] dark:text-red-400">
                           +{group.memberCards.length - 5}
                         </div>
                       )}
                       {group.memberCards.length === 0 && (
-                        <span className="text-[11px] text-slate-500 italic">Sin integrantes asignados</span>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400 italic">Sin integrantes asignados</span>
                       )}
                     </div>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-end gap-2 mt-5 pt-3 border-t border-slate-100">
+                <div className="flex items-center justify-end gap-2 mt-5 pt-3 border-t border-slate-100 dark:border-slate-800">
                   <button
                     onClick={() => handleOpenEdit(group)}
-                    className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center gap-1.5 text-xs font-bold cursor-pointer"
+                    className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1.5 text-xs font-bold cursor-pointer"
                     title="Editar grupo e integrantes"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
@@ -352,7 +352,7 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
 
                   <button
                     onClick={() => handleDelete(group)}
-                    className="p-2 rounded-xl text-rose-600 hover:text-rose-800 hover:bg-rose-50 transition-colors cursor-pointer"
+                    className="p-2 rounded-xl text-rose-600 hover:text-rose-800 dark:text-rose-400 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
                     title="Eliminar grupo"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -367,19 +367,19 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
       {/* Create / Edit Group Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
             
             {/* Modal Header */}
-            <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+            <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-850">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-[#DA291C]">
+                <div className="w-10 h-10 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 flex items-center justify-center text-[#DA291C] dark:text-red-400">
                   <Layers className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-base font-black text-slate-900">
+                  <h2 className="text-base font-black text-slate-900 dark:text-white">
                     {editingGroup ? 'Editar Grupo de Participantes' : 'Crear Nuevo Grupo / Cohorte'}
                   </h2>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     Segmenta a los colaboradores para asignar cronogramas formativos personalizados.
                   </p>
                 </div>
@@ -387,7 +387,7 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
 
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors cursor-pointer"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -398,7 +398,7 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
               
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Nombre del Grupo *
                   </label>
                   <input
@@ -406,13 +406,13 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="ej. Departamento de TI & Sistemas"
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Departamento / Área
                   </label>
                   <input
@@ -420,20 +420,20 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
                     value={formData.department}
                     onChange={(e) => setFormData({ ...formData, department: e.target.value })}
                     placeholder="ej. Tecnología, Ventas, Operaciones..."
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                   />
                 </div>
 
                 {companies.length > 0 && (
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                       Empresa
                     </label>
                     {isSuperAdmin ? (
                       <select
                         value={formData.companyId}
                         onChange={(e) => setFormData({ ...formData, companyId: e.target.value })}
-                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800 font-bold focus:outline-none focus:border-[#DA291C]"
+                        className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 font-bold focus:outline-none focus:border-[#DA291C]"
                       >
                         {companies.map(c => (
                           <option key={c.id} value={c.id}>
@@ -442,7 +442,7 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
                         ))}
                       </select>
                     ) : (
-                      <div className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-bold truncate">
+                      <div className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-700 dark:text-slate-300 font-bold truncate">
                         🏢 {companies.find(c => c.id === formData.companyId)?.name || 'Empresa asignada'}
                       </div>
                     )}
@@ -451,7 +451,7 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Descripción o Propósito
                 </label>
                 <textarea
@@ -459,13 +459,13 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Describe el perfil o propósito formativo de este grupo..."
                   rows={2}
-                  className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                  className="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                 />
               </div>
 
               {/* Color Selector */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-2">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">
                   Color Distintivo
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -479,7 +479,7 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
                         className={`px-3 py-1.5 rounded-xl text-xs font-bold border flex items-center gap-1.5 transition-all cursor-pointer ${
                           isSelected 
                             ? `${color.bg} ${color.text} ${color.border} ring-2 ring-[#DA291C]/50` 
-                            : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                            : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                         }`}
                       >
                         <span className={`w-2 h-2 rounded-full ${color.dot}`} />
@@ -492,14 +492,14 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
               </div>
 
               {/* Members Selection Section */}
-              <div className="pt-3 border-t border-slate-200">
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-800">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3">
                   <div>
-                    <h3 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                      <Users className="w-3.5 h-3.5 text-[#DA291C]" />
+                    <h3 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
                       Asignar Colaboradores al Grupo ({formData.memberCards.size} seleccionados)
                     </h3>
-                    <p className="text-[11px] text-slate-500">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
                       Selecciona los integrantes del padrón que formarán parte de este grupo.
                     </p>
                   </div>
@@ -507,7 +507,7 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
                   <button
                     type="button"
                     onClick={() => toggleSelectAllFiltered(filteredParticipants.map(p => p.card))}
-                    className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-[11px] font-bold transition-colors cursor-pointer"
+                    className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 text-[11px] font-bold transition-colors cursor-pointer"
                   >
                     {filteredParticipants.every(p => formData.memberCards.has(p.card)) && filteredParticipants.length > 0
                       ? 'Deseleccionar Visibles'
@@ -523,14 +523,14 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
                     value={memberSearch}
                     onChange={(e) => setMemberSearch(e.target.value)}
                     placeholder="Filtrar colaboradores por nombre, carnet o correo..."
-                    className="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                    className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                   />
                 </div>
 
                 {/* Participants Scroll List */}
-                <div className="max-h-60 overflow-y-auto rounded-2xl border border-slate-200 bg-slate-50/50 divide-y divide-slate-100">
+                <div className="max-h-60 overflow-y-auto rounded-2xl border border-slate-200 dark:border-slate-750 bg-slate-50/50 dark:bg-slate-850 divide-y divide-slate-100 dark:divide-slate-800">
                   {filteredParticipants.length === 0 ? (
-                    <div className="p-6 text-center text-xs text-slate-500">
+                    <div className="p-6 text-center text-xs text-slate-500 dark:text-slate-400">
                       No se encontraron colaboradores coincidentes.
                     </div>
                   ) : (
@@ -541,28 +541,30 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
                           key={p.card}
                           onClick={() => toggleMember(p.card)}
                           className={`p-3 flex items-center justify-between cursor-pointer transition-colors ${
-                            isChecked ? 'bg-red-50/80 hover:bg-red-100/80' : 'hover:bg-slate-100/60'
+                            isChecked 
+                              ? 'bg-red-50/80 dark:bg-red-950/40 hover:bg-red-100/80 dark:hover:bg-red-900/50' 
+                              : 'hover:bg-slate-100/60 dark:hover:bg-slate-800/60'
                           }`}
                         >
                           <div className="flex items-center gap-3">
                             <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                              isChecked ? 'bg-[#DA291C] border-[#DA291C] text-white' : 'border-slate-300 bg-white'
+                              isChecked ? 'bg-[#DA291C] border-[#DA291C] text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
                             }`}>
                               {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
-                                <span className="text-xs font-bold text-slate-900">{p.name}</span>
-                                <span className="text-[10px] font-mono font-bold text-slate-700 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200">
+                                <span className="text-xs font-bold text-slate-900 dark:text-white">{p.name}</span>
+                                <span className="text-[10px] font-mono font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.2 rounded border border-slate-200 dark:border-slate-700">
                                   ID: #{p.card}
                                 </span>
                               </div>
-                              <p className="text-[11px] text-slate-500">{p.email}</p>
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400">{p.email}</p>
                             </div>
                           </div>
 
                           {p.cedula && (
-                            <span className="text-[10px] text-slate-500 font-mono hidden sm:inline">
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono hidden sm:inline">
                               {p.cedula}
                             </span>
                           )}
@@ -574,18 +576,18 @@ export const GroupsManager: React.FC<GroupsManagerProps> = ({
               </div>
 
               {/* Submit Actions */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-bold transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition-colors cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 rounded-xl bg-[#DA291C] hover:bg-red-700 text-white text-xs font-extrabold shadow-md shadow-red-500/25 transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl bg-[#DA291C] hover:bg-red-700 text-white text-xs font-extrabold shadow-md shadow-red-500/25 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <CheckCircle2 className="w-4 h-4" />
                   <span>{isSubmitting ? 'Guardando...' : editingGroup ? 'Actualizar Grupo' : 'Crear Grupo'}</span>

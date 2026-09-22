@@ -379,13 +379,13 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
 
         {/* COLUMNA IZQUIERDA: Directorio y Buscador de Colaboradores (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xs space-y-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
                 <User className="w-4 h-4 text-[#DA291C]" />
                 <span>Directorio de Colaboradores</span>
               </h2>
-              <span className="text-xs font-bold text-slate-500">
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
                 {filteredParticipants.length} de {participants.length}
               </span>
             </div>
@@ -400,13 +400,13 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Buscar por nombre, cédula, cargo..."
-                className="w-full pl-9.5 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-[#DA291C] font-medium transition-all"
+                className="w-full pl-9.5 pr-4 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-[#DA291C] font-medium transition-all"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
                   aria-label="Limpiar búsqueda de colaboradores"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 font-bold"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold"
                 >
                   ✕
                 </button>
@@ -421,7 +421,7 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                   id="formal-letters-company-filter"
                   value={selectedCompanyFilter}
                   onChange={(e) => setSelectedCompanyFilter(e.target.value)}
-                  className="w-full text-xs font-bold bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-700 focus:outline-none focus:border-[#DA291C] cursor-pointer"
+                  className="w-full text-xs font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1.5 text-slate-700 dark:text-slate-200 focus:outline-none focus:border-[#DA291C] cursor-pointer"
                 >
                   <option value="all">🏢 Todas las Empresas</option>
                   {companies.map(c => (
@@ -432,14 +432,14 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                 </select>
               </div>
 
-              <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-xl text-[11px] font-bold">
+              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl text-[11px] font-bold">
                 <button
                   type="button"
                   onClick={() => setAttendanceFilter('all')}
                   className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
                     attendanceFilter === 'all'
-                      ? 'bg-white text-slate-900 shadow-xs font-black'
-                      : 'text-slate-500 hover:text-slate-800'
+                      ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs font-black'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
                   title="Mostrar todos los colaboradores"
                 >
@@ -451,7 +451,7 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                   className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
                     attendanceFilter === 'with-attendance'
                       ? 'bg-emerald-600 text-white shadow-xs font-black'
-                      : 'text-slate-500 hover:text-slate-800'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
                   title="Mostrar únicamente quienes tengan capacitaciones asistidas"
                 >
@@ -461,7 +461,7 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
             </div>
 
             {/* Lista Scrollable de Colaboradores */}
-            <div className="divide-y divide-slate-100 max-h-[520px] overflow-y-auto pr-1">
+            <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-[520px] overflow-y-auto pr-1">
               {filteredParticipants.length > 0 ? (
                 filteredParticipants.map(p => {
                   const isSelected = p.card === selectedParticipantCard;
@@ -474,25 +474,25 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                       onClick={() => setSelectedParticipantCard(p.card)}
                       className={`p-3 rounded-2xl transition-all cursor-pointer flex items-center justify-between gap-3 my-1 ${
                         isSelected
-                          ? 'bg-red-50/80 border border-red-200 shadow-xs'
-                          : 'hover:bg-slate-50 border border-transparent'
+                          ? 'bg-red-50/80 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 shadow-xs'
+                          : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 border border-transparent'
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <div className={`w-9 h-9 rounded-2xl flex items-center justify-center font-black text-xs shrink-0 ${
                           isSelected
                             ? 'bg-[#DA291C] text-white shadow-sm shadow-red-500/30'
-                            : 'bg-slate-100 text-slate-700'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                         }`}>
                           {p.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-xs font-black text-slate-900 truncate">
+                          <p className="text-xs font-black text-slate-900 dark:text-white truncate">
                             {p.name}
                           </p>
-                          <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-slate-500 mt-0.5">
+                          <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
                             {p.cedula && (
-                              <span className="font-mono font-bold text-slate-700">
+                              <span className="font-mono font-bold text-slate-700 dark:text-slate-300">
                                 {p.cedula}
                               </span>
                             )}
@@ -508,24 +508,24 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                         <div className="text-right">
                           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black ${
                             stats && stats.attendedCount > 0
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                              : 'bg-slate-100 text-slate-500'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                           }`}>
                             {stats ? stats.attendedCount : 0} cursos ({stats ? stats.totalHours : 0}h)
                           </span>
                         </div>
                         <ChevronRight className={`w-4 h-4 transition-transform ${
-                          isSelected ? 'text-[#DA291C] translate-x-0.5' : 'text-slate-300'
+                          isSelected ? 'text-[#DA291C] translate-x-0.5' : 'text-slate-300 dark:text-slate-600'
                         }`} />
                       </div>
                     </div>
                   );
                 })
               ) : (
-                <div className="py-12 text-center text-slate-500">
+                <div className="py-12 text-center text-slate-500 dark:text-slate-400">
                   <User className="w-8 h-8 mx-auto mb-2 opacity-40 text-slate-400" />
-                  <p className="text-xs font-bold text-slate-700">No se encontraron colaboradores</p>
-                  <p className="text-[11px] text-slate-500 mt-1">Prueba ajustando los criterios de búsqueda o filtros.</p>
+                  <p className="text-xs font-bold text-slate-700 dark:text-slate-300">No se encontraron colaboradores</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Prueba ajustando los criterios de búsqueda o filtros.</p>
                 </div>
               )}
             </div>
@@ -537,23 +537,23 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
           {activeParticipant && activeStats ? (
             <div className="space-y-4">
               {/* Tarjeta de Identificación del Colaborador Seleccionado */}
-              <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-xs relative overflow-hidden">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xs relative overflow-hidden">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
                   <div className="flex items-center gap-3.5">
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-slate-900 to-slate-800 text-white flex items-center justify-center font-black text-lg shadow-md">
                       {activeParticipant.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h2 className="text-base sm:text-lg font-black text-slate-900">
+                        <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
                           {activeParticipant.name}
                         </h2>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-100 text-slate-700 border border-slate-200">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                           {linkedUserAccount?.role || 'Colaborador (User)'}
                         </span>
                       </div>
-                      <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 mt-1">
-                        <span className="flex items-center gap-1 font-mono font-bold text-slate-700">
+                      <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mt-1">
+                        <span className="flex items-center gap-1 font-mono font-bold text-slate-700 dark:text-slate-300">
                           <CreditCard className="w-3.5 h-3.5 text-slate-400" />
                           Cédula: {activeParticipant.cedula || 'No registrada'}
                         </span>
@@ -565,7 +565,7 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                         {activeParticipant.department && (
                           <>
                             <span>•</span>
-                            <span className="text-slate-600 font-medium">
+                            <span className="text-slate-600 dark:text-slate-400 font-medium">
                               {activeParticipant.department}
                             </span>
                           </>
@@ -580,10 +580,10 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                       type="button"
                       onClick={handleGenerateLetterAllAttended}
                       disabled={activeStats.attendedCount === 0}
-                      className="flex-1 sm:flex-initial px-3.5 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-black transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 active:scale-95"
+                      className="flex-1 sm:flex-initial px-3.5 py-2 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-black transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 active:scale-95"
                       title="Generar carta con todas las capacitaciones a las que asistió"
                     >
-                      <FileText className="w-4 h-4 text-slate-700" />
+                      <FileText className="w-4 h-4 text-slate-700 dark:text-slate-300" />
                       <span>Todo Asistido ({activeStats.attendedCount})</span>
                     </button>
 
@@ -602,34 +602,34 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
 
                 {/* Métricas Rápidas del Colaborador */}
                 <div className="grid grid-cols-4 gap-2 pt-4 text-center">
-                  <div className="bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
-                    <p className="text-lg font-black text-emerald-600">{activeStats.attendedCount}</p>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase mt-0.5">Asistidos</p>
+                  <div className="bg-slate-50 dark:bg-slate-800/80 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800">
+                    <p className="text-lg font-black text-emerald-600 dark:text-emerald-400">{activeStats.attendedCount}</p>
+                    <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mt-0.5">Asistidos</p>
                   </div>
-                  <div className="bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
+                  <div className="bg-slate-50 dark:bg-slate-800/80 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800">
                     <p className="text-lg font-black text-[#DA291C]">{activeStats.totalHours} hrs</p>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase mt-0.5">Horas Formativas</p>
+                    <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mt-0.5">Horas Formativas</p>
                   </div>
-                  <div className="bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
-                    <p className="text-lg font-black text-indigo-600">{activeStats.avgScore} <span className="text-[10px] font-medium text-slate-500">pts</span></p>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase mt-0.5">Promedio Notas</p>
+                  <div className="bg-slate-50 dark:bg-slate-800/80 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800">
+                    <p className="text-lg font-black text-indigo-600 dark:text-indigo-400">{activeStats.avgScore} <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">pts</span></p>
+                    <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mt-0.5">Promedio Notas</p>
                   </div>
-                  <div className="bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
-                    <p className="text-lg font-black text-blue-600">{activeStats.records.length}</p>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase mt-0.5">Total Registros</p>
+                  <div className="bg-slate-50 dark:bg-slate-800/80 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800">
+                    <p className="text-lg font-black text-blue-600 dark:text-blue-400">{activeStats.records.length}</p>
+                    <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mt-0.5">Total Registros</p>
                   </div>
                 </div>
               </div>
 
               {/* Selector y Tabla de Cursos a Certificar */}
-              <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xs space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
                   <div>
-                    <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                    <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
                       <Sparkles className="w-4 h-4 text-amber-500" />
                       <span>Capacitaciones Disponibles para Certificación</span>
                     </h3>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                       Marca o desmarca los cursos que deseas que aparezcan desglosados en el cuerpo de la carta.
                     </p>
                   </div>
@@ -639,18 +639,18 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                     <button
                       type="button"
                       onClick={() => handleSelectAll(true)}
-                      className="px-2.5 py-1 text-[11px] font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
+                      className="px-2.5 py-1 text-[11px] font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors cursor-pointer"
                     >
                       Marcar Todos
                     </button>
                     <button
                       type="button"
                       onClick={() => handleSelectAll(false)}
-                      className="px-2.5 py-1 text-[11px] font-bold text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
+                      className="px-2.5 py-1 text-[11px] font-bold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors cursor-pointer"
                     >
                       Desmarcar
                     </button>
-                    <span className="text-xs font-black text-slate-900 pl-1">
+                    <span className="text-xs font-black text-slate-900 dark:text-white pl-1">
                       {selectedRecordsForLetter.length} sel. ({selectedHoursTotal}h)
                     </span>
                   </div>
@@ -667,8 +667,8 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                           onClick={() => toggleRecordSelection(rec.id)}
                           className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
                             isChecked
-                              ? 'bg-amber-50/40 border-amber-300 shadow-xs'
-                              : 'bg-white border-slate-200/80 hover:bg-slate-50'
+                              ? 'bg-amber-50/40 dark:bg-amber-950/20 border-amber-300 dark:border-amber-700/60 shadow-xs'
+                              : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                           }`}
                         >
                           <div className="flex items-center gap-3 min-w-0">
@@ -679,43 +679,43 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                                 toggleRecordSelection(rec.id);
                               }}
                               aria-label={isChecked ? `Deseleccionar curso ${rec.title}` : `Seleccionar curso ${rec.title}`}
-                              className="text-slate-400 hover:text-slate-600 cursor-pointer shrink-0"
+                              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer shrink-0"
                             >
                               {isChecked ? (
                                 <CheckSquare className="w-5 h-5 text-[#DA291C]" aria-hidden="true" />
                               ) : (
-                                <Square className="w-5 h-5 text-slate-300" aria-hidden="true" />
+                                <Square className="w-5 h-5 text-slate-300 dark:text-slate-600" aria-hidden="true" />
                               )}
                             </button>
 
                             <div className="min-w-0">
                               <div className="flex flex-wrap items-center gap-1.5 mb-1">
                                 {rec.isExternal && (
-                                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-blue-100 text-blue-800 border border-blue-200 uppercase tracking-wider">
+                                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-blue-100 dark:bg-blue-950/40 text-blue-800 dark:text-blue-400 border border-blue-200 dark:border-blue-800 uppercase tracking-wider">
                                     Externa
                                   </span>
                                 )}
                                 {rec.isRecurrent && (
-                                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-purple-100 text-purple-800 border border-purple-200 uppercase tracking-wider">
+                                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-purple-100 dark:bg-purple-950/40 text-purple-800 dark:text-purple-400 border border-purple-200 dark:border-purple-800 uppercase tracking-wider">
                                     Academia
                                   </span>
                                 )}
-                                <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-red-50 text-[#DA291C] border border-red-200">
+                                <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-red-50 dark:bg-red-950/40 text-[#DA291C] border border-red-200 dark:border-red-900/50">
                                   {rec.category}
                                 </span>
-                                <span className="text-[10px] font-bold text-slate-500">
+                                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
                                   {rec.modality}
                                 </span>
                                 {rec.supplier && (
-                                  <span className="text-[10px] font-bold text-slate-600">
+                                  <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400">
                                     • {rec.supplier}
                                   </span>
                                 )}
                               </div>
-                              <p className="text-xs font-black text-slate-900 truncate">
+                              <p className="text-xs font-black text-slate-900 dark:text-white truncate">
                                 {rec.title}
                               </p>
-                              <div className="flex items-center gap-2 text-[10px] text-slate-500 font-medium mt-0.5">
+                              <div className="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                                 <span className="flex items-center gap-1">
                                   <Calendar className="w-3 h-3 text-slate-400" />
                                   {formatDateShort(rec.date)} {rec.time}
@@ -728,25 +728,25 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
 
                           <div className="flex items-center gap-3 shrink-0">
                             <div className="text-right">
-                              <span className="text-xs font-black text-slate-900 block">
+                              <span className="text-xs font-black text-slate-900 dark:text-white block">
                                 {rec.hours} hrs
                               </span>
                               {rec.isRecurrent ? (
                                 rec.academicStatus === 'passed' ? (
-                                  <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                  <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
                                     <CheckCircle2 className="w-3 h-3" /> Acreditado ({rec.attendancePercentage || 0}%)
                                   </span>
                                 ) : (
-                                  <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
+                                  <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/40 px-2 py-0.5 rounded-full border border-purple-200 dark:border-purple-800">
                                     <Clock className="w-3 h-3" /> {rec.attendancePercentage || 0}% Asist.
                                   </span>
                                 )
                               ) : rec.hasAttended ? (
-                                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
                                   <CheckCircle2 className="w-3 h-3" /> Asistió
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+                                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-800">
                                   <Clock className="w-3 h-3" /> Agendado
                                 </span>
                               )}
@@ -758,7 +758,7 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                                 e.stopPropagation();
                                 handleGenerateSingleCourse(rec);
                               }}
-                              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-bold transition-colors cursor-pointer"
+                              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-xs font-bold transition-colors cursor-pointer"
                               title="Emitir constancia solo para este curso"
                               aria-label={`Emitir constancia para ${rec.title}`}
                             >
@@ -769,10 +769,10 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                       );
                     })
                   ) : (
-                    <div className="py-12 text-center text-slate-500 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                    <div className="py-12 text-center text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
                       <FileText className="w-8 h-8 mx-auto mb-2 opacity-30 text-slate-400" />
-                      <p className="text-xs font-bold text-slate-700">Sin capacitaciones registradas</p>
-                      <p className="text-[11px] text-slate-500 mt-1 max-w-sm mx-auto">
+                      <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Sin capacitaciones registradas</p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
                         Este colaborador aún no ha sido inscrito en capacitaciones de la plataforma.
                       </p>
                     </div>
@@ -780,9 +780,9 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
                 </div>
 
                 {/* Resumen de Emisión Inferior */}
-                <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-                  <div className="text-xs text-slate-500 font-medium">
-                    Capacitaciones seleccionadas para la constancia: <strong className="text-slate-900 font-black">{selectedRecordsForLetter.length}</strong> ({selectedHoursTotal} horas académicas calculadas)
+                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    Capacitaciones seleccionadas para la constancia: <strong className="text-slate-900 dark:text-white font-black">{selectedRecordsForLetter.length}</strong> ({selectedHoursTotal} horas académicas calculadas)
                   </div>
                   <button
                     type="button"
@@ -797,10 +797,10 @@ export const FormalLettersManager: React.FC<FormalLettersManagerProps> = ({
               </div>
             </div>
           ) : (
-            <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center shadow-xs">
-              <User className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <h2 className="text-base font-black text-slate-800">Selecciona un Colaborador</h2>
-              <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center shadow-xs">
+              <User className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+              <h2 className="text-base font-black text-slate-800 dark:text-slate-200">Selecciona un Colaborador</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
                 Elige un colaborador del directorio de la izquierda para visualizar su historial de capacitaciones, horas acumuladas y emitir cartas formales personalizadas.
               </p>
             </div>

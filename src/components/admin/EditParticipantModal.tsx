@@ -142,29 +142,29 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
       ariaLabel="Editar Colaborador"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
-        <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-850">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-[#DA291C] font-black">
+            <div className="w-10 h-10 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 flex items-center justify-center text-[#DA291C] dark:text-red-400 font-black">
               {participant.name.charAt(0)}
             </div>
             <div>
-              <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
+              <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
                 <span>Editar Colaborador</span>
-                <span className="font-mono text-xs px-2 py-0.5 rounded-lg bg-red-50 text-[#DA291C] border border-red-200">
+                <span className="font-mono text-xs px-2 py-0.5 rounded-lg bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-900/50">
                   #{participant.card}
                 </span>
               </h2>
-              <p className="text-xs text-slate-500">Actualizar información laboral, jerarquía y estado de contratación</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Actualizar información laboral, jerarquía y estado de contratación</p>
             </div>
           </div>
 
           <button
             onClick={onClose}
             aria-label="Cerrar ventana de edición de colaborador"
-            className="p-2 sm:p-1.5 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 touch-target-44 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-200 transition-colors cursor-pointer inline-flex items-center justify-center"
+            className="p-2 sm:p-1.5 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 touch-target-44 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-white rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer inline-flex items-center justify-center"
           >
             <X className="w-5 h-5" aria-hidden="true" />
           </button>
@@ -174,8 +174,8 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-5 flex-1 custom-scrollbar">
           
           {/* Estado Laboral / Contratación */}
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-            <span id="edit-participant-status-label" className="block text-xs font-bold text-slate-700">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 space-y-3">
+            <span id="edit-participant-status-label" className="block text-xs font-bold text-slate-700 dark:text-slate-300">
               Estado Laboral & Proceso de Contratación *
             </span>
             
@@ -187,16 +187,16 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                 onClick={() => { setEmploymentStatus('contratado'); setIsActive(true); }}
                 className={`p-3 rounded-2xl border text-left flex items-start gap-2.5 transition-all cursor-pointer ${
                   employmentStatus === 'contratado'
-                    ? 'bg-emerald-50 border-emerald-500 text-emerald-950 shadow-xs'
-                    : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-950 dark:text-emerald-200 shadow-xs'
+                    : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
                 }`}
               >
-                <div className={`p-1.5 rounded-xl mt-0.5 ${employmentStatus === 'contratado' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                <div className={`p-1.5 rounded-xl mt-0.5 ${employmentStatus === 'contratado' ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500'}`}>
                   <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-emerald-900">Contratado</p>
-                  <p className={`text-[10px] mt-0.5 leading-tight ${employmentStatus === 'contratado' ? 'text-emerald-800/80' : 'text-slate-500'}`}>Colaborador formal y activo</p>
+                  <p className="text-xs font-bold text-emerald-900 dark:text-emerald-300">Contratado</p>
+                  <p className={`text-[10px] mt-0.5 leading-tight ${employmentStatus === 'contratado' ? 'text-emerald-800/80 dark:text-emerald-400/80' : 'text-slate-500 dark:text-slate-400'}`}>Colaborador formal y activo</p>
                 </div>
               </button>
 
@@ -207,16 +207,16 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                 onClick={() => { setEmploymentStatus('en_proceso'); setIsActive(true); }}
                 className={`p-3 rounded-2xl border text-left flex items-start gap-2.5 transition-all cursor-pointer ${
                   employmentStatus === 'en_proceso'
-                    ? 'bg-amber-50 border-amber-500 text-amber-950 shadow-xs'
-                    : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
+                    ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-500 text-amber-950 dark:text-amber-200 shadow-xs'
+                    : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
                 }`}
               >
-                <div className={`p-1.5 rounded-xl mt-0.5 ${employmentStatus === 'en_proceso' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                <div className={`p-1.5 rounded-xl mt-0.5 ${employmentStatus === 'en_proceso' ? 'bg-amber-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500'}`}>
                   <Clock className="w-3.5 h-3.5" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-amber-900">En Proceso</p>
-                  <p className={`text-[10px] mt-0.5 leading-tight ${employmentStatus === 'en_proceso' ? 'text-amber-800/80' : 'text-slate-500'}`}>En inducción o contratación</p>
+                  <p className="text-xs font-bold text-amber-900 dark:text-amber-300">En Proceso</p>
+                  <p className={`text-[10px] mt-0.5 leading-tight ${employmentStatus === 'en_proceso' ? 'text-amber-800/80 dark:text-amber-400/80' : 'text-slate-500 dark:text-slate-400'}`}>En inducción o contratación</p>
                 </div>
               </button>
 
@@ -227,16 +227,16 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                 onClick={() => { setEmploymentStatus('inactivo'); setIsActive(false); }}
                 className={`p-3 rounded-2xl border text-left flex items-start gap-2.5 transition-all cursor-pointer ${
                   employmentStatus === 'inactivo'
-                    ? 'bg-rose-50 border-rose-500 text-rose-950 shadow-xs'
-                    : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
+                    ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-500 text-rose-950 dark:text-rose-200 shadow-xs'
+                    : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
                 }`}
               >
-                <div className={`p-1.5 rounded-xl mt-0.5 ${employmentStatus === 'inactivo' ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                <div className={`p-1.5 rounded-xl mt-0.5 ${employmentStatus === 'inactivo' ? 'bg-rose-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500'}`}>
                   <UserX className="w-3.5 h-3.5" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-rose-900">Inactivo / Baja</p>
-                  <p className={`text-[10px] mt-0.5 leading-tight ${employmentStatus === 'inactivo' ? 'text-rose-800/80' : 'text-slate-500'}`}>Desvinculado o pausado</p>
+                  <p className="text-xs font-bold text-rose-900 dark:text-rose-300">Inactivo / Baja</p>
+                  <p className={`text-[10px] mt-0.5 leading-tight ${employmentStatus === 'inactivo' ? 'text-rose-800/80 dark:text-rose-400/80' : 'text-slate-500 dark:text-slate-400'}`}>Desvinculado o pausado</p>
                 </div>
               </button>
             </div>
@@ -245,7 +245,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
           {/* Datos Personales y de Identidad */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="edit-participant-name" className="block text-xs font-bold text-slate-700 mb-1.5">
+              <label htmlFor="edit-participant-name" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                 Nombre Completo *
               </label>
               <input
@@ -254,13 +254,13 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="ej. MARÍA GONZÁLEZ"
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold uppercase focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-bold uppercase focus:outline-none focus:border-[#DA291C]"
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="edit-participant-cedula" className="block text-xs font-bold text-slate-700 mb-1.5">
+              <label htmlFor="edit-participant-cedula" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                 Cédula (11 dígitos)
               </label>
               <input
@@ -270,12 +270,12 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                 onChange={(e) => setCedula(formatCedula(e.target.value))}
                 placeholder="ej. 402-2196163-1"
                 maxLength={13}
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-mono font-bold focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-mono font-bold focus:outline-none focus:border-[#DA291C]"
               />
             </div>
 
             <div>
-              <label htmlFor="edit-participant-email" className="block text-xs font-bold text-slate-700 mb-1.5">
+              <label htmlFor="edit-participant-email" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                 Correo Electrónico Corporativo *
               </label>
               <input
@@ -284,13 +284,13 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="ej. maria.gonzalez@empresa.com"
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="edit-participant-department" className="block text-xs font-bold text-slate-700 mb-1.5">
+              <label htmlFor="edit-participant-department" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                 Departamento / Área
               </label>
               <input
@@ -299,7 +299,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
                 placeholder="ej. Tecnología"
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
               />
             </div>
           </div>
@@ -307,7 +307,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
           {/* Empresa Asignada */}
           {companies.length > 0 && (
             <div>
-              <label htmlFor="edit-participant-company" className="block text-xs font-bold text-slate-700 mb-1.5">
+              <label htmlFor="edit-participant-company" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                 Empresa / Entidad Corporativa *
               </label>
               {isSuperAdmin ? (
@@ -315,7 +315,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                   id="edit-participant-company"
                   value={companyId}
                   onChange={(e) => setCompanyId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#DA291C]"
+                  className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-semibold focus:outline-none focus:border-[#DA291C]"
                 >
                   {companies.map(c => (
                     <option key={c.id} value={c.id}>
@@ -324,7 +324,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                   ))}
                 </select>
               ) : (
-                <div className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-bold truncate">
+                <div className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-700 dark:text-slate-300 font-bold truncate">
                   🏢 {companies.find(c => c.id === companyId)?.name || 'Empresa asignada'}
                 </div>
               )}
@@ -333,14 +333,14 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
 
           {/* Supervisor Asignado */}
           <div>
-            <label htmlFor="edit-participant-supervisor" className="block text-xs font-bold text-slate-700 mb-1.5">
+            <label htmlFor="edit-participant-supervisor" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
               Supervisor / Líder de Área Asignado
             </label>
             <select
               id="edit-participant-supervisor"
               value={supervisorId}
               onChange={(e) => setSupervisorId(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#DA291C]"
+              className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-semibold focus:outline-none focus:border-[#DA291C]"
             >
               <option value="">(Sin Supervisor Asignado)</option>
               {supervisors.map(s => (
@@ -352,21 +352,21 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
           </div>
 
           {/* Ficha Académica & Sociodemográfica */}
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3.5">
-            <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 space-y-3.5">
+            <h3 className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
               🎓 Ficha Académica & Sociodemográfica
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label htmlFor="edit-participant-education-level" className="block text-[11px] font-bold text-slate-700 mb-1">
+                <label htmlFor="edit-participant-education-level" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Nivel de Estudio
                 </label>
                 <select
                   id="edit-participant-education-level"
                   value={educationLevel}
                   onChange={(e) => setEducationLevel(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-[#DA291C]"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-white font-medium focus:outline-none focus:border-[#DA291C]"
                 >
                   <option value="Secundaria / Bachiller">Secundaria / Bachiller</option>
                   <option value="Técnico / Tecnólogo">Técnico / Tecnólogo</option>
@@ -380,7 +380,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
               </div>
 
               <div>
-                <label htmlFor="edit-participant-profession-title" className="block text-[11px] font-bold text-slate-700 mb-1">
+                <label htmlFor="edit-participant-profession-title" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Título / Profesión
                 </label>
                 <input
@@ -389,12 +389,12 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                   value={professionTitle}
                   onChange={(e) => setProfessionTitle(e.target.value)}
                   placeholder="ej. Lic. en Contabilidad"
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-[#DA291C]"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-white font-medium focus:outline-none focus:border-[#DA291C]"
                 />
               </div>
 
               <div>
-                <label htmlFor="edit-participant-birthdate" className="block text-[11px] font-bold text-slate-700 mb-1">
+                <label htmlFor="edit-participant-birthdate" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Fecha de Nacimiento
                 </label>
                 <input
@@ -402,12 +402,12 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                   type="date"
                   value={birthDate}
                   onChange={(e) => setBirthDate(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-[#DA291C]"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-white font-medium focus:outline-none focus:border-[#DA291C]"
                 />
               </div>
 
               <div>
-                <label htmlFor="edit-participant-phone" className="block text-[11px] font-bold text-slate-700 mb-1">
+                <label htmlFor="edit-participant-phone" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Teléfono / WhatsApp
                 </label>
                 <input
@@ -416,12 +416,12 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="ej. (809) 555-1234"
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-[#DA291C]"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-white font-medium focus:outline-none focus:border-[#DA291C]"
                 />
               </div>
 
               <div className="sm:col-span-2">
-                <label htmlFor="edit-participant-address" className="block text-[11px] font-bold text-slate-700 mb-1">
+                <label htmlFor="edit-participant-address" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Dirección / Sector
                 </label>
                 <input
@@ -430,20 +430,20 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                   value={currentAddress}
                   onChange={(e) => setCurrentAddress(e.target.value)}
                   placeholder="ej. Ensanche Naco, Santo Domingo"
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-[#DA291C]"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-white font-medium focus:outline-none focus:border-[#DA291C]"
                 />
               </div>
 
               {/* ¿Estudia actualmente? */}
-              <div className="sm:col-span-2 pt-1 border-t border-slate-200/80">
+              <div className="sm:col-span-2 pt-1 border-t border-slate-200/80 dark:border-slate-700/80">
                 <div className="flex items-center justify-between">
-                  <span id="edit-participant-studying-label" className="text-xs font-bold text-slate-700">¿Estudia actualmente?</span>
+                  <span id="edit-participant-studying-label" className="text-xs font-bold text-slate-700 dark:text-slate-300">¿Estudia actualmente?</span>
                   <div role="group" aria-labelledby="edit-participant-studying-label" className="flex items-center gap-2">
                     <button
                       type="button"
                       aria-pressed={!isCurrentlyStudying}
                       onClick={() => setIsCurrentlyStudying(false)}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-bold ${!isCurrentlyStudying ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-700'}`}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold cursor-pointer ${!isCurrentlyStudying ? 'bg-slate-800 dark:bg-slate-700 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'}`}
                     >
                       No
                     </button>
@@ -451,7 +451,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                       type="button"
                       aria-pressed={isCurrentlyStudying}
                       onClick={() => setIsCurrentlyStudying(true)}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-bold ${isCurrentlyStudying ? 'bg-[#DA291C] text-white' : 'bg-slate-200 text-slate-700'}`}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold cursor-pointer ${isCurrentlyStudying ? 'bg-[#DA291C] text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'}`}
                     >
                       Sí
                     </button>
@@ -459,7 +459,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                 </div>
 
                 {isCurrentlyStudying && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 pt-2 border-t border-slate-200/60">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
                     <div>
                       <label htmlFor="edit-participant-study-field" className="sr-only">Carrera o curso que estudia</label>
                       <input
@@ -468,7 +468,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                         value={currentStudyField}
                         onChange={(e) => setCurrentStudyField(e.target.value)}
                         placeholder="Carrera / Curso que estudia"
-                        className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-800"
+                        className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-white"
                       />
                     </div>
                     <div>
@@ -479,7 +479,7 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
                         value={institutionName}
                         onChange={(e) => setInstitutionName(e.target.value)}
                         placeholder="Universidad / Instituto"
-                        className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-800"
+                        className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-white"
                       />
                     </div>
                   </div>
@@ -489,21 +489,21 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
           </div>
 
           {/* Rol del Usuario Vinculado */}
-          <div className="p-4 rounded-2xl bg-red-50/50 border border-red-200 space-y-2">
+          <div className="p-4 rounded-2xl bg-red-50/50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 space-y-2">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-[#DA291C]" aria-hidden="true" />
-              <label htmlFor="edit-participant-user-role" className="block text-xs font-bold text-slate-900">
+              <ShieldCheck className="w-4 h-4 text-[#DA291C] dark:text-red-400" aria-hidden="true" />
+              <label htmlFor="edit-participant-user-role" className="block text-xs font-bold text-slate-900 dark:text-white">
                 Rol de Acceso al Sistema
               </label>
             </div>
-            <p className="text-[11px] text-slate-600">
+            <p className="text-[11px] text-slate-600 dark:text-slate-400">
               Define los privilegios de inicio de sesión y módulos accesibles para este colaborador.
             </p>
             <select
               id="edit-participant-user-role"
               value={userRole === 'Evaluador / Tutor OJT' ? 'Evaluador / Tutor' : userRole}
               onChange={(e) => setUserRole(e.target.value as UserRole)}
-              className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold focus:outline-none focus:border-[#DA291C]"
+              className="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-bold focus:outline-none focus:border-[#DA291C]"
             >
               <option value="Colaborador (User)">Colaborador (User) - Reservar y consultar cursos</option>
               <option value="Evaluador / Tutor">Evaluador / Tutor - Bitácoras de campo y calibración</option>
@@ -518,11 +518,11 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
         </form>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-2.5">
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 flex items-center justify-end gap-2.5">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 rounded-xl hover:bg-slate-200 transition-colors cursor-pointer"
+            className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             Cancelar
           </button>

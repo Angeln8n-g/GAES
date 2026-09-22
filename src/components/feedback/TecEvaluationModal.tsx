@@ -133,7 +133,7 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/70 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200"
     >
       <div 
-        className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-auto flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-3xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-auto flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Ribbon Claro */}
@@ -161,7 +161,7 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
             )}
           </div>
 
-          <h2 className="text-lg sm:text-xl font-black leading-tight">
+          <h2 className="text-lg sm:text-xl font-black leading-tight text-white">
             {TEC_SURVEY_INFO.title}
           </h2>
           
@@ -177,7 +177,7 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
               <button
                 type="button"
                 onClick={() => setStep('course')}
-                className={`py-1.5 px-2 rounded-xl text-center font-bold flex items-center justify-center gap-1.5 transition-all ${
+                className={`py-1.5 px-2 rounded-xl text-center font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                   step === 'course' 
                     ? 'bg-white text-[#DA291C] shadow-md' 
                     : 'bg-white/10 hover:bg-white/20 text-white/90'
@@ -191,7 +191,7 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
               <button
                 type="button"
                 onClick={() => setStep('facilitator')}
-                className={`py-1.5 px-2 rounded-xl text-center font-bold flex items-center justify-center gap-1.5 transition-all ${
+                className={`py-1.5 px-2 rounded-xl text-center font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                   step === 'facilitator' 
                     ? 'bg-white text-[#DA291C] shadow-md' 
                     : 'bg-white/10 hover:bg-white/20 text-white/90'
@@ -205,7 +205,7 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
               <button
                 type="button"
                 onClick={() => setStep('comments')}
-                className={`py-1.5 px-2 rounded-xl text-center font-bold flex items-center justify-center gap-1.5 transition-all ${
+                className={`py-1.5 px-2 rounded-xl text-center font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                   step === 'comments' 
                     ? 'bg-white text-[#DA291C] shadow-md' 
                     : 'bg-white/10 hover:bg-white/20 text-white/90'
@@ -224,14 +224,14 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
 
           {/* Banner de Solo Lectura si ya fue respondida */}
           {isReadOnly && (
-            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+            <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200">
+                <div className="w-9 h-9 rounded-2xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0 border border-emerald-200 dark:border-emerald-700">
                   <CheckCircle2 className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="font-black text-emerald-950 text-sm">Encuesta Completada (1 Sola Respuesta Permitida)</span>
-                  <p className="text-[11px] text-emerald-800 mt-0.5">
+                  <span className="font-black text-emerald-950 dark:text-emerald-100 text-sm">Encuesta Completada (1 Sola Respuesta Permitida)</span>
+                  <p className="text-[11px] text-emerald-800 dark:text-emerald-300 mt-0.5">
                     Tu evaluación ya fue registrada y procesada para los indicadores de calidad. Las calificaciones se muestran en modo consulta y no pueden ser alteradas.
                   </p>
                 </div>
@@ -245,13 +245,13 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
           {/* ===================== PASO 1: CURSO ===================== */}
           {step === 'course' && (
             <div className="space-y-5 animate-in fade-in duration-200">
-              <div className="p-4 rounded-2xl bg-red-50/50 border border-red-200 text-xs space-y-1">
-                <p className="font-bold text-[#DA291C] flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-[#DA291C]" />
+              <div className="p-4 rounded-2xl bg-red-50/50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 text-xs space-y-1">
+                <p className="font-bold text-[#DA291C] dark:text-red-400 flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-[#DA291C] dark:text-red-400" />
                   Parte 1: Evaluación del Entrenamiento (Curso)
                 </p>
-                <p className="text-slate-600 font-medium">
-                  Evalúa cada aspecto de acuerdo con la escala: <strong>1 = No aceptable</strong> hasta <strong>5 = Excelente</strong>.
+                <p className="text-slate-600 dark:text-slate-300 font-medium">
+                  Evalúa cada aspecto de acuerdo con la escala: <strong className="text-slate-900 dark:text-white">1 = No aceptable</strong> hasta <strong className="text-slate-900 dark:text-white">5 = Excelente</strong>.
                 </p>
               </div>
 
@@ -261,14 +261,14 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
                   return (
                     <div 
                       key={q.id}
-                      className="p-4 rounded-2xl border border-slate-200 hover:border-slate-300 bg-slate-50/60 transition-all space-y-3"
+                      className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-slate-50/60 dark:bg-slate-850/60 transition-all space-y-3"
                     >
                       <div className="flex items-start justify-between gap-3">
-                        <span className="text-xs font-bold text-slate-800 leading-snug">
-                          <span className="text-[#DA291C] font-black mr-1.5">{idx + 1}.</span>
+                        <span className="text-xs font-bold text-slate-800 dark:text-slate-200 leading-snug">
+                          <span className="text-[#DA291C] dark:text-red-400 font-black mr-1.5">{idx + 1}.</span>
                           {q.question}
                         </span>
-                        <span className="shrink-0 px-2 py-0.5 rounded-lg bg-white border border-slate-200 text-[11px] font-black text-[#DA291C]">
+                        <span className="shrink-0 px-2 py-0.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-black text-[#DA291C] dark:text-red-400">
                           {currentVal} / 5
                         </span>
                       </div>
@@ -288,12 +288,12 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
                               } ${
                                 isSelected
                                   ? 'bg-[#DA291C] text-white border-[#DA291C] shadow-md shadow-red-500/25 scale-[1.02]'
-                                  : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
+                                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-750'
                               }`}
                             >
                               <span className="text-sm sm:text-base font-black leading-none">{scale.value}★</span>
                               <span className={`text-[9px] sm:text-[10px] leading-tight text-center line-clamp-1 font-semibold ${
-                                isSelected ? 'text-red-100' : 'text-slate-500'
+                                isSelected ? 'text-red-100' : 'text-slate-500 dark:text-slate-400'
                               }`}>
                                 {scale.shortLabel}
                               </span>
@@ -311,13 +311,13 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
           {/* ===================== PASO 2: FACILITADOR ===================== */}
           {step === 'facilitator' && (
             <div className="space-y-5 animate-in fade-in duration-200">
-              <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-200 text-xs space-y-1">
-                <p className="font-bold text-amber-900 flex items-center gap-1.5">
-                  <Award className="w-4 h-4 text-amber-700" />
+              <div className="p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 text-xs space-y-1">
+                <p className="font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+                  <Award className="w-4 h-4 text-amber-700 dark:text-amber-400" />
                   Parte 2: Evaluación del Facilitador / Instructor
                 </p>
-                <p className="text-slate-600 font-medium">
-                  Evalúa el dominio, claridad pedagógica y acompañamiento brindado por: <strong>{event.instructor}</strong>.
+                <p className="text-slate-600 dark:text-slate-300 font-medium">
+                  Evalúa el dominio, claridad pedagógica y acompañamiento brindado por: <strong className="text-slate-900 dark:text-white">{event.instructor}</strong>.
                 </p>
               </div>
 
@@ -327,14 +327,14 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
                   return (
                     <div 
                       key={q.id}
-                      className="p-4 rounded-2xl border border-slate-200 hover:border-slate-300 bg-slate-50/60 transition-all space-y-3"
+                      className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-slate-50/60 dark:bg-slate-850/60 transition-all space-y-3"
                     >
                       <div className="flex items-start justify-between gap-3">
-                        <span className="text-xs font-bold text-slate-800 leading-snug">
-                          <span className="text-amber-600 font-black mr-1.5">{idx + 1}.</span>
+                        <span className="text-xs font-bold text-slate-800 dark:text-slate-200 leading-snug">
+                          <span className="text-amber-600 dark:text-amber-400 font-black mr-1.5">{idx + 1}.</span>
                           {q.question}
                         </span>
-                        <span className="shrink-0 px-2 py-0.5 rounded-lg bg-white border border-slate-200 text-[11px] font-black text-amber-600">
+                        <span className="shrink-0 px-2 py-0.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-black text-amber-600 dark:text-amber-400">
                           {currentVal} / 5
                         </span>
                       </div>
@@ -354,12 +354,12 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
                               } ${
                                 isSelected
                                   ? 'bg-amber-500 text-amber-950 border-amber-500 shadow-md shadow-amber-500/25 scale-[1.02]'
-                                  : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
+                                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-750'
                               }`}
                             >
                               <span className="text-sm sm:text-base font-black leading-none">{scale.value}★</span>
                               <span className={`text-[9px] sm:text-[10px] leading-tight text-center line-clamp-1 font-semibold ${
-                                isSelected ? 'text-slate-900' : 'text-slate-500'
+                                isSelected ? 'text-slate-900' : 'text-slate-500 dark:text-slate-400'
                               }`}>
                                 {scale.shortLabel}
                               </span>
@@ -380,28 +380,28 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
               
               {/* Score Summary Box */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-center">
-                  <span className="text-[11px] font-bold text-[#DA291C] uppercase block mb-1">Evaluación Curso</span>
-                  <span className="text-2xl font-black text-slate-900">{courseScore.toFixed(2)}</span>
-                  <span className="text-xs text-slate-500 block">de 5.0 ★</span>
+                <div className="p-4 rounded-2xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/40 text-center">
+                  <span className="text-[11px] font-bold text-[#DA291C] dark:text-red-400 uppercase block mb-1">Evaluación Curso</span>
+                  <span className="text-2xl font-black text-slate-900 dark:text-white">{courseScore.toFixed(2)}</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 block">de 5.0 ★</span>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-center">
-                  <span className="text-[11px] font-bold text-amber-700 uppercase block mb-1">Evaluación Facilitador</span>
-                  <span className="text-2xl font-black text-slate-900">{facilitatorScore.toFixed(2)}</span>
-                  <span className="text-xs text-slate-500 block">de 5.0 ★</span>
+                <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 text-center">
+                  <span className="text-[11px] font-bold text-amber-700 dark:text-amber-400 uppercase block mb-1">Evaluación Facilitador</span>
+                  <span className="text-2xl font-black text-slate-900 dark:text-white">{facilitatorScore.toFixed(2)}</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 block">de 5.0 ★</span>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-center">
-                  <span className="text-[11px] font-bold text-emerald-700 uppercase block mb-1">Puntaje Global TEC</span>
-                  <span className="text-2xl font-black text-emerald-800">{compositeRating.toFixed(2)}</span>
-                  <span className="text-xs text-emerald-600 block">de 5.0 ★</span>
+                <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40 text-center">
+                  <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 uppercase block mb-1">Puntaje Global TEC</span>
+                  <span className="text-2xl font-black text-emerald-800 dark:text-emerald-300">{compositeRating.toFixed(2)}</span>
+                  <span className="text-xs text-emerald-600 dark:text-emerald-400 block">de 5.0 ★</span>
                 </div>
               </div>
 
               {/* Open Feedback Textarea */}
               <div className="space-y-2">
-                <label className="block text-xs font-black text-slate-800 uppercase tracking-wider">
+                <label className="block text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider">
                   Comentarios, sugerencias y oportunidades de mejora (Opcional):
                 </label>
                 <textarea
@@ -411,25 +411,25 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
                   disabled={isReadOnly}
                   onChange={(e) => setComment(e.target.value)}
                   placeholder={isReadOnly ? "Sin comentarios registrados." : "¿Qué te pareció el contenido, la dinámica o qué sugerencias tienes para próximas sesiones? Tu opinión nos ayuda a mejorar continuamente..."}
-                  className={`w-full p-4 rounded-2xl border border-slate-300 text-xs text-slate-900 resize-none ${
+                  className={`w-full p-4 rounded-2xl border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white resize-none ${
                     isReadOnly 
-                      ? 'bg-slate-100 text-slate-600 cursor-not-allowed border-slate-200' 
-                      : 'placeholder-slate-400 focus:outline-none focus:border-[#DA291C] focus:ring-2 focus:ring-red-100'
+                      ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 cursor-not-allowed border-slate-200 dark:border-slate-700' 
+                      : 'bg-white dark:bg-slate-800 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] focus:ring-2 focus:ring-red-100 dark:focus:ring-red-950/50'
                   }`}
                 />
               </div>
 
               {/* Forms Link Note */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3 text-xs">
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 text-xs">
                 <div className="space-y-0.5">
-                  <p className="font-bold text-slate-800">Formulario Oficial Microsoft Forms</p>
-                  <p className="text-slate-500 text-[11px]">Si prefieres responderlo externamente en la nube de Microsoft 365:</p>
+                  <p className="font-bold text-slate-800 dark:text-slate-200">Formulario Oficial Microsoft Forms</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-[11px]">Si prefieres responderlo externamente en la nube de Microsoft 365:</p>
                 </div>
                 <a
                   href={TEC_SURVEY_INFO.formUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="px-3 py-2 rounded-xl bg-white border border-slate-300 hover:border-slate-400 text-slate-700 font-bold flex items-center gap-1.5 shrink-0 transition-colors"
+                  className="px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600 text-slate-700 dark:text-slate-200 font-bold flex items-center gap-1.5 shrink-0 transition-colors"
                 >
                   <span>Abrir Forms</span>
                   <ExternalLink className="w-3.5 h-3.5" />
@@ -442,21 +442,21 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
           {/* ===================== ESTADO DE ÉXITO ===================== */}
           {step === 'success' && (
             <div className="py-10 text-center space-y-4 animate-in zoom-in-95 duration-200">
-              <div className="w-16 h-16 rounded-3xl bg-emerald-100 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/10">
+              <div className="w-16 h-16 rounded-3xl bg-emerald-100 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/10">
                 <CheckCircle2 className="w-9 h-9" />
               </div>
 
-              <h3 className="text-xl font-black text-slate-900">
+              <h3 className="text-xl font-black text-slate-900 dark:text-white">
                 ¡Evaluación Registrada con Éxito!
               </h3>
 
-              <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed font-medium">
+              <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto leading-relaxed font-medium">
                 Agradecemos sinceramente tu tiempo. Tus valoraciones han sido integradas al reporte de calidad y métricas de desempeño de Claro Aprendizaje & Desarrollo.
               </p>
 
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 max-w-sm mx-auto text-xs space-y-1">
-                <p className="font-bold text-slate-800">Puntaje TEC Asignado: <strong>{compositeRating.toFixed(1)} / 5.0 ★</strong></p>
-                <p className="text-slate-500 text-[11px]">Curso: {courseScore.toFixed(1)} ★ | Facilitador: {facilitatorScore.toFixed(1)} ★</p>
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 max-w-sm mx-auto text-xs space-y-1">
+                <p className="font-bold text-slate-800 dark:text-slate-200">Puntaje TEC Asignado: <strong className="text-slate-900 dark:text-white">{compositeRating.toFixed(1)} / 5.0 ★</strong></p>
+                <p className="text-slate-500 dark:text-slate-400 text-[11px]">Curso: {courseScore.toFixed(1)} ★ | Facilitador: {facilitatorScore.toFixed(1)} ★</p>
               </div>
 
               <button
@@ -473,12 +473,12 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
 
         {/* Modal Footer Navigation */}
         {step !== 'success' && (
-          <div className="p-4 sm:p-5 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3 shrink-0">
+          <div className="p-4 sm:p-5 bg-slate-50 dark:bg-slate-850 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shrink-0">
             {step === 'course' ? (
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-xl text-slate-500 hover:text-slate-800 text-xs font-bold transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 text-xs font-bold transition-colors cursor-pointer"
               >
                 {isReadOnly ? 'Cerrar' : 'Cancelar'}
               </button>
@@ -486,7 +486,7 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
               <button
                 type="button"
                 onClick={() => setStep(step === 'comments' ? 'facilitator' : 'course')}
-                className="px-4 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Anterior</span>
@@ -506,7 +506,7 @@ export const TecEvaluationModal: React.FC<TecEvaluationModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold flex items-center gap-2 shadow-md transition-all cursor-pointer"
+                className="px-6 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-xs font-bold flex items-center gap-2 shadow-md transition-all cursor-pointer"
               >
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Cerrar Consulta (Encuesta ya enviada)</span>

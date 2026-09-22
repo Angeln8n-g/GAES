@@ -324,7 +324,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/75 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200"
     >
       <div 
-        className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-auto flex flex-col animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-auto flex flex-col animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Ribbon */}
@@ -349,7 +349,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
             </span>
           </div>
 
-          <h2 className="text-lg font-black leading-tight">
+          <h2 className="text-lg font-black leading-tight text-white">
             Escanear QR de Asistencia
           </h2>
           <p className="text-xs text-red-100 mt-1 font-medium">
@@ -363,40 +363,40 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
           {/* ESTADO: ASISTENCIA DETECTADA Y CONFIRMADA */}
           {detectedSession ? (
             <div className="space-y-4 py-2 animate-in zoom-in-95 duration-200">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-100 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto shadow-md">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-md">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
 
               <div className="text-center space-y-1">
-                <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-300">
+                <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
                   {attendanceConfirmed ? '✓ Asistencia Confirmada' : 'Validando...'}
                 </span>
-                <h3 className="text-base font-black text-slate-900 mt-2">
+                <h3 className="text-base font-black text-slate-900 dark:text-white mt-2">
                   {detectedSession.event?.title || 'Capacitación Claro'}
                 </h3>
-                <p className="text-xs text-slate-500 font-medium">
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                   {currentUser.name} ({currentUser.email})
                 </p>
               </div>
 
               {/* Event Details snippet */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-2">
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 space-y-2">
                 {detectedSession.event?.instructor && (
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-500">Facilitador:</span>
-                    <strong className="text-slate-900">{detectedSession.event.instructor}</strong>
+                    <span className="text-slate-500 dark:text-slate-400">Facilitador:</span>
+                    <strong className="text-slate-900 dark:text-white">{detectedSession.event.instructor}</strong>
                   </div>
                 )}
                 {detectedSession.date && (
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-500">Fecha de Sesión:</span>
-                    <strong className="text-slate-900">{formatDateLong(detectedSession.date)}</strong>
+                    <span className="text-slate-500 dark:text-slate-400">Fecha de Sesión:</span>
+                    <strong className="text-slate-900 dark:text-white">{formatDateLong(detectedSession.date)}</strong>
                   </div>
                 )}
                 {detectedSession.time && (
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-500">Horario:</span>
-                    <strong className="text-[#DA291C]">{detectedSession.time}</strong>
+                    <span className="text-slate-500 dark:text-slate-400">Horario:</span>
+                    <strong className="text-[#DA291C] dark:text-red-400">{detectedSession.time}</strong>
                   </div>
                 )}
               </div>
@@ -409,17 +409,17 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
 
                 if (existingFeedback) {
                   return (
-                    <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2.5">
+                    <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 space-y-2.5">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-xs font-bold text-emerald-800">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <div className="flex items-center gap-2 text-xs font-bold text-emerald-800 dark:text-emerald-300">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                           <span>Encuesta de Calidad Completada</span>
                         </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-900">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-200 dark:bg-emerald-900 text-emerald-900 dark:text-emerald-200">
                           {existingFeedback.rating} ★
                         </span>
                       </div>
-                      <p className="text-[11px] text-emerald-700 font-medium leading-relaxed">
+                      <p className="text-[11px] text-emerald-700 dark:text-emerald-300 font-medium leading-relaxed">
                         Tu asistencia y evaluación de calidad para este evento ya fueron registradas previamente. ¡Muchas gracias!
                       </p>
                       <button
@@ -441,12 +441,12 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
 
                 if (detectedSession.type === 'checkin') {
                   return (
-                    <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2">
-                      <div className="flex items-center gap-2 text-xs font-bold text-emerald-800">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 space-y-2">
+                      <div className="flex items-center gap-2 text-xs font-bold text-emerald-800 dark:text-emerald-300">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                         <span>Entrada Registrada (Inicio de Sesión)</span>
                       </div>
-                      <p className="text-[11px] text-emerald-700 font-medium leading-relaxed">
+                      <p className="text-[11px] text-emerald-700 dark:text-emerald-300 font-medium leading-relaxed">
                         Tu asistencia de ingreso ha sido confirmada exitosamente. Para acceder a la encuesta de satisfacción y evaluación del facilitador, recuerda registrar tu Salida al terminar el evento.
                       </p>
                     </div>
@@ -454,12 +454,12 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
                 }
 
                 return (
-                  <div className="p-4 rounded-2xl bg-red-50 border border-red-200 space-y-3">
-                    <div className="flex items-center gap-2 text-xs font-bold text-[#DA291C]">
-                      <Sparkles className="w-4 h-4 text-[#DA291C]" />
+                  <div className="p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 space-y-3">
+                    <div className="flex items-center gap-2 text-xs font-bold text-[#DA291C] dark:text-red-400">
+                      <Sparkles className="w-4 h-4 text-[#DA291C] dark:text-red-400" />
                       <span>Evaluación de Calidad TEC</span>
                     </div>
-                    <p className="text-[11px] text-slate-600 font-medium leading-relaxed">
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
                       ¡Asistencia Completa Verificada! Ya confirmaste tu entrada y salida. Ahora por favor califica al curso y al facilitador para asegurar los estándares de excelencia.
                     </p>
                     <button
@@ -485,7 +485,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
                   stopScannerSafe();
                   onClose();
                 }}
-                className="w-full py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+                className="w-full py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors cursor-pointer"
               >
                 Cerrar Ventana
               </button>
@@ -509,8 +509,8 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
 
               {/* Mensaje de error si la cámara falla */}
               {scannerError && (
-                <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-start gap-2.5">
-                  <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-xs text-rose-800 dark:text-rose-300 flex items-start gap-2.5">
+                  <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
                   <p className="font-medium leading-relaxed">{scannerError}</p>
                 </div>
               )}
@@ -521,9 +521,9 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
                   <button
                     type="button"
                     onClick={handleSwitchCamera}
-                    className="flex-1 py-2.5 px-3 min-h-[44px] rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    className="flex-1 py-2.5 px-3 min-h-[44px] rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                   >
-                    <RotateCw className="w-3.5 h-3.5 text-slate-600" />
+                    <RotateCw className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
                     <span>Cambiar Cámara</span>
                   </button>
                 )}
@@ -539,15 +539,15 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex-1 py-2.5 px-3 min-h-[44px] rounded-xl bg-red-50 hover:bg-red-100 text-[#DA291C] border border-red-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  className="flex-1 py-2.5 px-3 min-h-[44px] rounded-xl bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/50 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-800/60 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                 >
-                  <Upload className="w-3.5 h-3.5 text-[#DA291C]" />
+                  <Upload className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
                   <span>Subir Foto de QR</span>
                 </button>
               </div>
 
               <div className="text-center pt-2">
-                <p className="text-[11px] text-slate-600 font-medium">
+                <p className="text-[11px] text-slate-600 dark:text-slate-400 font-medium">
                   También puedes escanear con la cámara nativa de tu teléfono si estás desde el móvil.
                 </p>
               </div>

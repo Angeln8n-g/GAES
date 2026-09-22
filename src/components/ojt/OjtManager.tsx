@@ -113,54 +113,54 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
   return (
     <div className="space-y-6">
       
-      {/* Top Stat Cards (Light Theme) */}
+      {/* Top Stat Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-        <div className="bg-white border border-slate-200 p-4 rounded-3xl space-y-1 shadow-sm">
-          <div className="flex items-center justify-between text-[#DA291C]">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-3xl space-y-1 shadow-sm">
+          <div className="flex items-center justify-between text-[#DA291C] dark:text-rose-400">
             <span className="text-[11px] font-black uppercase tracking-wider">Bitácoras Totales</span>
             <Activity className="w-4 h-4" />
           </div>
-          <p className="text-2xl font-black text-slate-900">{total}</p>
-          <p className="text-[10px] text-slate-500 font-medium">Acompañamientos registrados</p>
+          <p className="text-2xl font-black text-slate-900 dark:text-white">{total}</p>
+          <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Acompañamientos registrados</p>
         </div>
 
-        <div className="bg-white border border-slate-200 p-4 rounded-3xl space-y-1 shadow-sm">
-          <div className="flex items-center justify-between text-emerald-700">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-3xl space-y-1 shadow-sm">
+          <div className="flex items-center justify-between text-emerald-700 dark:text-emerald-400">
             <span className="text-[11px] font-black uppercase tracking-wider">Promedio en Campo</span>
-            <Award className="w-4 h-4 text-emerald-600" />
+            <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           </div>
-          <p className="text-2xl font-black text-emerald-700">{avgScore}<span className="text-xs text-slate-500 font-medium">/100</span></p>
-          <p className="text-[10px] text-emerald-600">{complianceRate}% conforme a estándar</p>
+          <p className="text-2xl font-black text-emerald-700 dark:text-emerald-400">{avgScore}<span className="text-xs text-slate-500 dark:text-slate-400 font-medium">/100</span></p>
+          <p className="text-[10px] text-emerald-600 dark:text-emerald-400">{complianceRate}% conforme a estándar</p>
         </div>
 
-        <div className="bg-white border border-slate-200 p-4 rounded-3xl space-y-1 shadow-sm">
-          <div className="flex items-center justify-between text-cyan-700">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-3xl space-y-1 shadow-sm">
+          <div className="flex items-center justify-between text-cyan-700 dark:text-cyan-400">
             <span className="text-[11px] font-black uppercase tracking-wider">First-Time Fix</span>
-            <Wrench className="w-4 h-4 text-cyan-600" />
+            <Wrench className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
           </div>
-          <p className="text-2xl font-black text-cyan-700">{ftfRate}%</p>
-          <p className="text-[10px] text-cyan-600">Sin retrabajos en 1er intento</p>
+          <p className="text-2xl font-black text-cyan-700 dark:text-cyan-400">{ftfRate}%</p>
+          <p className="text-[10px] text-cyan-600 dark:text-cyan-400">Sin retrabajos en 1er intento</p>
         </div>
 
-        <div className="bg-white border border-slate-200 p-4 rounded-3xl space-y-1 shadow-sm">
-          <div className="flex items-center justify-between text-amber-700">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-3xl space-y-1 shadow-sm">
+          <div className="flex items-center justify-between text-amber-700 dark:text-amber-400">
             <span className="text-[11px] font-black uppercase tracking-wider">Mesas Calibración</span>
-            <Scale className="w-4 h-4 text-amber-600" />
+            <Scale className="w-4 h-4 text-amber-600 dark:text-amber-400" />
           </div>
-          <p className="text-2xl font-black text-amber-700">{calibrations.length}</p>
-          <p className="text-[10px] text-amber-600">Alineaciones Ops-Capacitación</p>
+          <p className="text-2xl font-black text-amber-700 dark:text-amber-400">{calibrations.length}</p>
+          <p className="text-[10px] text-amber-600 dark:text-amber-400">Alineaciones Ops-Capacitación</p>
         </div>
       </div>
 
       {/* Sub-tabs Navigation */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
-        <div className="flex items-center bg-slate-100 p-1.5 rounded-2xl border border-slate-200 min-w-max gap-1">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
+        <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 min-w-max gap-1">
           <button
             onClick={() => setActiveSubTab('checklists')}
             className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               activeSubTab === 'checklists'
                 ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700'
             }`}
           >
             <Activity className="w-4 h-4" />
@@ -172,7 +172,7 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
             className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               activeSubTab === 'calibrations'
                 ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700'
             }`}
           >
             <Scale className="w-4 h-4" />
@@ -184,7 +184,7 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
             className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               activeSubTab === 'reports'
                 ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700'
             }`}
           >
             <BarChart3 className="w-4 h-4" />
@@ -199,10 +199,10 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
               <button
                 type="button"
                 onClick={handleExportChecklists}
-                className="px-3.5 py-2 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center gap-1.5 border border-emerald-200 transition-all shadow-xs cursor-pointer"
+                className="px-3.5 py-2 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 text-xs font-bold flex items-center gap-1.5 border border-emerald-200 dark:border-emerald-900/50 transition-all shadow-xs cursor-pointer"
                 title="Descargar todas las bitácoras en Excel"
               >
-                <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+                <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Exportar Bitácoras (Excel)</span>
               </button>
 
@@ -225,10 +225,10 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
               <button
                 type="button"
                 onClick={handleExportCalibrations}
-                className="px-3.5 py-2 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center gap-1.5 border border-emerald-200 transition-all shadow-xs cursor-pointer"
+                className="px-3.5 py-2 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 text-xs font-bold flex items-center gap-1.5 border border-emerald-200 dark:border-emerald-900/50 transition-all shadow-xs cursor-pointer"
                 title="Descargar mesas de calibración en Excel"
               >
-                <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+                <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Exportar Calibraciones (Excel)</span>
               </button>
 
@@ -248,17 +248,17 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
               <button
                 type="button"
                 onClick={handleExportChecklists}
-                className="px-3 py-2 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center gap-1.5 border border-emerald-200 transition-all cursor-pointer"
+                className="px-3 py-2 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 text-xs font-bold flex items-center gap-1.5 border border-emerald-200 dark:border-emerald-900/50 transition-all cursor-pointer"
               >
-                <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+                <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>Excel Bitácoras</span>
               </button>
               <button
                 type="button"
                 onClick={handleExportCalibrations}
-                className="px-3 py-2 rounded-2xl bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold flex items-center gap-1.5 border border-amber-200 transition-all cursor-pointer"
+                className="px-3 py-2 rounded-2xl bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 text-xs font-bold flex items-center gap-1.5 border border-amber-200 dark:border-amber-900/50 transition-all cursor-pointer"
               >
-                <Scale className="w-3.5 h-3.5 text-amber-600" />
+                <Scale className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                 <span>Excel Calibración</span>
               </button>
             </div>
@@ -278,14 +278,14 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Buscar por colaborador, tarjeta, supervisor o departamento..."
-                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-2xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] shadow-xs"
+                className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] shadow-xs"
               />
             </div>
 
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#DA291C]"
+              className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#DA291C]"
             >
               <option value="all">Todos los diagnósticos</option>
               <option value="compliant">🟢 Conforme ({compliantCount})</option>
@@ -296,7 +296,7 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#DA291C]"
+              className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#DA291C]"
             >
               <option value="all">Todos los tipos de observación</option>
               <option value="daily_observation">Acompañamiento Diario</option>
@@ -308,10 +308,10 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
 
           {/* Checklists Table */}
           {filteredChecklists.length === 0 ? (
-            <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center space-y-3 shadow-sm">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center space-y-3 shadow-sm">
               <Activity className="w-12 h-12 text-slate-400 mx-auto animate-pulse" />
-              <h3 className="text-base font-black text-slate-800">No hay bitácoras registradas</h3>
-              <p className="text-xs text-slate-500 max-w-md mx-auto">
+              <h3 className="text-base font-black text-slate-800 dark:text-slate-200">No hay bitácoras registradas</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
                 Registra acompañamientos diarios o auditorías cruzadas para medir el desempeño real en campo y acelerar la curva de aprendizaje.
               </p>
               <button
@@ -326,11 +326,11 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
               </button>
             </div>
           ) : (
-            <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="border-b border-slate-200 text-[11px] font-bold text-slate-600 uppercase tracking-wider bg-slate-50">
+                    <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider bg-slate-50 dark:bg-slate-800/80">
                       <th className="p-4">Colaborador</th>
                       <th className="p-4">Fecha & Tipo</th>
                       <th className="p-4">Evaluador / Tutor</th>
@@ -341,29 +341,29 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
                       <th className="p-4 text-right">Acciones</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {filteredChecklists.map(c => {
                       const part = participants.find(p => p.card === c.participantCard);
                       return (
-                        <tr key={c.id} className="hover:bg-slate-50/80 transition-colors">
+                        <tr key={c.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
                           
                           {/* Colaborador */}
                           <td className="p-4">
                             <div>
-                              <p className="font-bold text-slate-900 text-xs">{c.participantName || c.participantCard}</p>
-                              <p className="text-[11px] text-slate-500 font-mono">
+                              <p className="font-bold text-slate-900 dark:text-white text-xs">{c.participantName || c.participantCard}</p>
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                                 ID: #{c.participantCard} • {c.department || 'Sin Depto'}
                               </p>
                               {(part?.isCurrentlyStudying || part?.educationLevel) && (
                                 <div className="flex flex-wrap items-center gap-1 mt-1">
                                   {part.educationLevel && (
-                                    <span className="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                    <span className="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                                       {part.educationLevel}
                                     </span>
                                   )}
                                   {part.isCurrentlyStudying && (
                                     <span 
-                                      className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200" 
+                                      className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9px] font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/50" 
                                       title={`Estudia: ${part.currentStudyField || ''} en ${part.institutionName || ''}`}
                                     >
                                       🎓 Estudia: {part.currentStudyField || 'En curso'}
@@ -376,8 +376,8 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
 
                           {/* Fecha & Tipo */}
                           <td className="p-4">
-                            <p className="font-bold text-slate-700">{c.date}</p>
-                            <span className="text-[10px] font-bold text-[#DA291C] bg-red-50 px-2 py-0.5 rounded-md border border-red-200">
+                            <p className="font-bold text-slate-700 dark:text-slate-300">{c.date}</p>
+                            <span className="text-[10px] font-bold text-[#DA291C] dark:text-rose-400 bg-red-50 dark:bg-red-950/40 px-2 py-0.5 rounded-md border border-red-200 dark:border-red-900/50">
                               {c.observationType === 'daily_observation' ? 'Diario' :
                                c.observationType === 'weekly_evaluation' ? 'Semanal' :
                                c.observationType === 'cross_audit' ? 'Auditoría Cruzada' : 'Check 60D'}
@@ -385,9 +385,9 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
                           </td>
 
                           {/* Evaluador */}
-                          <td className="p-4 text-slate-700">
+                          <td className="p-4 text-slate-700 dark:text-slate-300">
                             <div className="flex items-center gap-1.5 font-semibold">
-                              <UserCheck className="w-3.5 h-3.5 text-[#DA291C] shrink-0" />
+                              <UserCheck className="w-3.5 h-3.5 text-[#DA291C] dark:text-rose-400 shrink-0" />
                               <span>{c.evaluatorName}</span>
                             </div>
                           </td>
@@ -396,12 +396,12 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
                           <td className="p-4">
                             <div className="flex items-center gap-2">
                               <span className={`px-2 py-0.5 rounded-md font-bold text-[10px] ${
-                                c.safetyProtocolPass ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'
+                                c.safetyProtocolPass ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50' : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50'
                               }`} title="Protocolo de Seguridad EPP">
                                 EPP: {c.safetyProtocolPass ? '✓' : '✗'}
                               </span>
                               <span className={`px-2 py-0.5 rounded-md font-bold text-[10px] ${
-                                c.firstTimeFixPass ? 'bg-cyan-50 text-cyan-700 border border-cyan-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
+                                c.firstTimeFixPass ? 'bg-cyan-50 dark:bg-cyan-950/40 text-cyan-700 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-900/50' : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50'
                               }`} title="Calidad en Primer Intento">
                                 FTF: {c.firstTimeFixPass ? '✓' : '✗'}
                               </span>
@@ -411,20 +411,20 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
                           {/* Puntaje */}
                           <td className="p-4">
                             <span className={`font-mono font-black text-sm ${
-                              c.overallScore >= 85 ? 'text-emerald-700' :
-                              c.overallScore >= 70 ? 'text-amber-700' : 'text-rose-700'
+                              c.overallScore >= 85 ? 'text-emerald-700 dark:text-emerald-400' :
+                              c.overallScore >= 70 ? 'text-amber-700 dark:text-amber-400' : 'text-rose-700 dark:text-rose-400'
                             }`}>
                               {c.overallScore}
                             </span>
-                            <span className="text-slate-500 text-[10px] font-medium"> /100</span>
+                            <span className="text-slate-500 dark:text-slate-400 text-[10px] font-medium"> /100</span>
                           </td>
 
                           {/* Diagnóstico */}
                           <td className="p-4">
                             <span className={`px-2.5 py-1 rounded-xl text-[11px] font-bold border ${
-                              c.operationalStatus === 'compliant' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                              c.operationalStatus === 'needs_coaching' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                              'bg-rose-50 text-rose-700 border-rose-200'
+                              c.operationalStatus === 'compliant' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50' :
+                              c.operationalStatus === 'needs_coaching' ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-900/50' :
+                              'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-900/50'
                             }`}>
                               {c.operationalStatus === 'compliant' ? '🟢 Conforme' :
                                c.operationalStatus === 'needs_coaching' ? '🟡 Requiere Coaching' :
@@ -433,7 +433,7 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
                           </td>
 
                           {/* Plan de Acción */}
-                          <td className="p-4 max-w-xs truncate text-slate-500">
+                          <td className="p-4 max-w-xs truncate text-slate-500 dark:text-slate-400">
                             {c.immediateActionPlan || c.notes || '—'}
                           </td>
 
@@ -445,7 +445,7 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
                                   setEditingChecklist(c);
                                   setIsChecklistModalOpen(true);
                                 }}
-                                className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                                className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
                                 title="Editar bitácora"
                               >
                                 <ChevronRight className="w-4 h-4" />
@@ -457,7 +457,7 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
                                     onShowToast('Bitácora eliminada', 'El registro ha sido removido.', 'info');
                                   }
                                 }}
-                                className="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                className="p-1.5 text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors cursor-pointer"
                                 title="Eliminar"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -472,7 +472,7 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
                 </table>
               </div>
 
-              <div className="p-4 border-t border-slate-200 text-xs text-slate-500 flex justify-between bg-slate-50">
+              <div className="p-4 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 flex justify-between bg-slate-50 dark:bg-slate-800/50">
                 <span>Mostrando {filteredChecklists.length} de {checklists.length} bitácoras</span>
                 <span>{compliantCount} conformes • {coachingCount} en coaching • {criticalCount} brechas críticas</span>
               </div>
@@ -485,10 +485,10 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
       {activeSubTab === 'calibrations' && (
         <div className="space-y-4">
           {calibrations.length === 0 ? (
-            <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center space-y-3 shadow-sm">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center space-y-3 shadow-sm">
               <Scale className="w-12 h-12 text-amber-500 mx-auto animate-pulse" />
-              <h3 className="text-base font-black text-slate-800">No hay mesas de calibración registradas</h3>
-              <p className="text-xs text-slate-500 max-w-md mx-auto">
+              <h3 className="text-base font-black text-slate-800 dark:text-slate-200">No hay mesas de calibración registradas</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
                 Las mesas de calibración permiten alinear el criterio entre Capacitación (aula) y Operaciones (campo) para evitar dispersión y falsos aprobados.
               </p>
               <button
@@ -502,46 +502,46 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {calibrations.map((cal) => (
-                <div key={cal.id} className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-3 hover:border-amber-400/80 transition-all">
+                <div key={cal.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-3 hover:border-amber-400/80 dark:hover:border-amber-500/80 transition-all">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="flex items-center gap-2 text-xs font-bold text-amber-700 mb-0.5">
+                      <div className="flex items-center gap-2 text-xs font-bold text-amber-700 dark:text-amber-400 mb-0.5">
                         <Scale className="w-3.5 h-3.5" />
                         <span>{cal.date} • {cal.conductedBy}</span>
                       </div>
-                      <h4 className="text-sm font-black text-slate-900">{cal.title}</h4>
-                      <p className="text-[11px] text-slate-500 mt-0.5">
+                      <h4 className="text-sm font-black text-slate-900 dark:text-white">{cal.title}</h4>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                         {cal.participantsReviewed} colaboradores auditados
                       </p>
                     </div>
 
-                    <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 shrink-0">
+                    <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900/50 shrink-0">
                       Gap: {cal.varianceGapPct}%
                     </span>
                   </div>
 
                   {/* Comparativa Aula vs Campo */}
-                  <div className="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-2xl border border-slate-200/80 text-xs">
+                  <div className="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-800/60 p-3 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 text-xs">
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-slate-500">Nota Aula (Teoría)</span>
-                      <p className="text-base font-black text-slate-800">{cal.averageTheoryScore} <span className="text-[10px] text-slate-500 font-medium">/100</span></p>
+                      <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400">Nota Aula (Teoría)</span>
+                      <p className="text-base font-black text-slate-800 dark:text-slate-200">{cal.averageTheoryScore} <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">/100</span></p>
                     </div>
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-slate-500">Nota Campo (Práctica)</span>
-                      <p className="text-base font-black text-[#DA291C]">{cal.averageFieldScore} <span className="text-[10px] text-slate-500 font-medium">/100</span></p>
+                      <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400">Nota Campo (Práctica)</span>
+                      <p className="text-base font-black text-[#DA291C] dark:text-rose-400">{cal.averageFieldScore} <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">/100</span></p>
                     </div>
                   </div>
 
                   {cal.keyFindings && (
-                    <div className="text-xs text-slate-600">
-                      <strong className="text-slate-800">Hallazgos: </strong>
+                    <div className="text-xs text-slate-600 dark:text-slate-400">
+                      <strong className="text-slate-800 dark:text-slate-200">Hallazgos: </strong>
                       <span>{cal.keyFindings}</span>
                     </div>
                   )}
 
                   {cal.actionAgreements && (
-                    <div className="text-xs text-emerald-700 bg-emerald-50/60 p-2.5 rounded-xl border border-emerald-200">
-                      <strong className="text-emerald-900">Acuerdos: </strong>
+                    <div className="text-xs text-emerald-700 dark:text-emerald-300 bg-emerald-50/60 dark:bg-emerald-950/30 p-2.5 rounded-xl border border-emerald-200 dark:border-emerald-900/50">
+                      <strong className="text-emerald-900 dark:text-emerald-200">Acuerdos: </strong>
                       <span>{cal.actionAgreements}</span>
                     </div>
                   )}

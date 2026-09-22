@@ -112,24 +112,24 @@ export const ComplianceReminderModal: React.FC<ComplianceReminderModalProps> = (
       ariaLabel="Despacho de Recordatorios de Cumplimiento"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         
         {/* Modal Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-red-50 border border-red-200 text-[#DA291C] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-[#DA291C] dark:text-red-400 flex items-center justify-center">
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-black text-slate-900">Despacho de Recordatorios de Cumplimiento</h2>
-              <p className="text-xs text-slate-500">
-                Programa: <strong className="text-slate-800 font-bold">{program.title}</strong>
+              <h2 className="text-lg font-black text-slate-900 dark:text-white">Despacho de Recordatorios de Cumplimiento</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Programa: <strong className="text-slate-800 dark:text-slate-200 font-bold">{program.title}</strong>
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -137,7 +137,7 @@ export const ComplianceReminderModal: React.FC<ComplianceReminderModalProps> = (
 
         {/* Target Scope Selector */}
         <div className="space-y-2">
-          <label className="text-xs font-bold text-slate-700 block">
+          <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">
             1. Selecciona el Segmento de Colaboradores:
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -147,18 +147,18 @@ export const ComplianceReminderModal: React.FC<ComplianceReminderModalProps> = (
               onClick={() => setRecipientFilter('all_incomplete')}
               className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
                 recipientFilter === 'all_incomplete'
-                  ? 'bg-red-50 border-[#DA291C] text-red-950 shadow-xs'
-                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
+                  ? 'bg-red-50 dark:bg-red-950/40 border-[#DA291C] text-red-950 dark:text-red-200 shadow-xs'
+                  : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
               }`}
             >
               <div className="flex items-center justify-between mb-1">
-                <Users className="w-4 h-4 text-[#DA291C]" />
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-[#DA291C]">
+                <Users className="w-4 h-4 text-[#DA291C] dark:text-red-400" />
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-950/60 text-[#DA291C] dark:text-red-300">
                   {complianceSummary.participants.filter(p => p.percentage < 100).length}
                 </span>
               </div>
-              <p className={`text-xs font-bold ${recipientFilter === 'all_incomplete' ? 'text-red-950' : 'text-slate-900'}`}>Todos los Incompletos</p>
-              <p className={`text-[10px] mt-0.5 ${recipientFilter === 'all_incomplete' ? 'text-red-900/80' : 'text-slate-500'}`}>Avance menor al 100%</p>
+              <p className={`text-xs font-bold ${recipientFilter === 'all_incomplete' ? 'text-red-950 dark:text-red-200' : 'text-slate-900 dark:text-white'}`}>Todos los Incompletos</p>
+              <p className={`text-[10px] mt-0.5 ${recipientFilter === 'all_incomplete' ? 'text-red-900/80 dark:text-red-300/80' : 'text-slate-500 dark:text-slate-400'}`}>Avance menor al 100%</p>
             </button>
 
             <button
@@ -166,18 +166,18 @@ export const ComplianceReminderModal: React.FC<ComplianceReminderModalProps> = (
               onClick={() => setRecipientFilter('in_progress')}
               className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
                 recipientFilter === 'in_progress'
-                  ? 'bg-amber-50 border-amber-400 text-amber-900 shadow-xs'
-                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
+                  ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-400 dark:border-amber-600 text-amber-900 dark:text-amber-200 shadow-xs'
+                  : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
               }`}
             >
               <div className="flex items-center justify-between mb-1">
-                <Clock className="w-4 h-4 text-amber-600" />
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300">
                   {complianceSummary.inProgressCount}
                 </span>
               </div>
-              <p className="text-xs font-bold text-slate-900">En Progreso</p>
-              <p className="text-[10px] text-slate-500 mt-0.5">Con avance parcial</p>
+              <p className="text-xs font-bold text-slate-900 dark:text-white">En Progreso</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Con avance parcial</p>
             </button>
 
             <button
@@ -185,18 +185,18 @@ export const ComplianceReminderModal: React.FC<ComplianceReminderModalProps> = (
               onClick={() => setRecipientFilter('overdue')}
               className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
                 recipientFilter === 'overdue'
-                  ? 'bg-rose-50 border-rose-400 text-rose-900 shadow-xs'
-                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
+                  ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-400 dark:border-rose-600 text-rose-900 dark:text-rose-200 shadow-xs'
+                  : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
               }`}
             >
               <div className="flex items-center justify-between mb-1">
-                <AlertTriangle className="w-4 h-4 text-rose-600" />
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
+                <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300">
                   {complianceSummary.overdueCount}
                 </span>
               </div>
-              <p className="text-xs font-bold text-slate-900">Atrasados / Vencidos</p>
-              <p className="text-[10px] text-slate-500 mt-0.5">Fecha límite excedida</p>
+              <p className="text-xs font-bold text-slate-900 dark:text-white">Atrasados / Vencidos</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Fecha límite excedida</p>
             </button>
 
           </div>
@@ -204,7 +204,7 @@ export const ComplianceReminderModal: React.FC<ComplianceReminderModalProps> = (
 
         {/* Channel Selector */}
         <div className="space-y-2">
-          <label className="text-xs font-bold text-slate-700 block">
+          <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">
             2. Canal de Comunicación:
           </label>
           <div className="grid grid-cols-3 gap-2.5">
@@ -215,7 +215,7 @@ export const ComplianceReminderModal: React.FC<ComplianceReminderModalProps> = (
               className={`p-3 rounded-2xl border flex items-center justify-center gap-2 text-xs font-bold transition-all cursor-pointer ${
                 channel === 'Email'
                   ? 'bg-[#DA291C] text-white border-[#DA291C] shadow-md shadow-red-500/25'
-                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                  : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
               }`}
             >
               <Mail className="w-4 h-4" />
@@ -228,7 +228,7 @@ export const ComplianceReminderModal: React.FC<ComplianceReminderModalProps> = (
               className={`p-3 rounded-2xl border flex items-center justify-center gap-2 text-xs font-bold transition-all cursor-pointer ${
                 channel === 'Teams'
                   ? 'bg-cyan-700 text-white border-cyan-700 shadow-md shadow-cyan-700/25'
-                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                  : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
               }`}
             >
               <MessageSquare className="w-4 h-4" />
@@ -241,7 +241,7 @@ export const ComplianceReminderModal: React.FC<ComplianceReminderModalProps> = (
               className={`p-3 rounded-2xl border flex items-center justify-center gap-2 text-xs font-bold transition-all cursor-pointer ${
                 channel === 'WhatsApp'
                   ? 'bg-emerald-700 text-white border-emerald-700 shadow-md shadow-emerald-700/25'
-                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                  : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
               }`}
             >
               <Smartphone className="w-4 h-4" />
@@ -254,7 +254,7 @@ export const ComplianceReminderModal: React.FC<ComplianceReminderModalProps> = (
         {/* Message Editor & Variables */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-slate-700">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
               3. Mensaje Personalizado & Variables Dinámicas:
             </label>
           </div>
@@ -263,44 +263,44 @@ export const ComplianceReminderModal: React.FC<ComplianceReminderModalProps> = (
             rows={4}
             value={customMessage}
             onChange={(e) => setCustomMessage(e.target.value)}
-            className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-2xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] font-mono leading-relaxed"
+            className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] font-mono leading-relaxed"
             placeholder="Redacta el mensaje del recordatorio..."
           />
 
-          <div className="flex items-center gap-1.5 flex-wrap text-[10px] text-slate-500 font-semibold">
+          <div className="flex items-center gap-1.5 flex-wrap text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
             <span>Variables admitidas:</span>
-            <span className="px-1.5 py-0.5 rounded bg-slate-100 text-[#DA291C] font-mono font-bold">[NOMBRE_COLABORADOR]</span>
-            <span className="px-1.5 py-0.5 rounded bg-slate-100 text-[#DA291C] font-mono font-bold">[TITULO_CRONOGRAMA]</span>
-            <span className="px-1.5 py-0.5 rounded bg-slate-100 text-[#DA291C] font-mono font-bold">[CURSOS_PENDIENTES]</span>
-            <span className="px-1.5 py-0.5 rounded bg-slate-100 text-[#DA291C] font-mono font-bold">[FECHA_LIMITE]</span>
+            <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[#DA291C] dark:text-red-400 font-mono font-bold">[NOMBRE_COLABORADOR]</span>
+            <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[#DA291C] dark:text-red-400 font-mono font-bold">[TITULO_CRONOGRAMA]</span>
+            <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[#DA291C] dark:text-red-400 font-mono font-bold">[CURSOS_PENDIENTES]</span>
+            <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[#DA291C] dark:text-red-400 font-mono font-bold">[FECHA_LIMITE]</span>
           </div>
         </div>
 
         {/* Live Preview Box */}
-        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-          <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 space-y-2">
+          <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
             <span className="flex items-center gap-1.5">
-              <Eye className="w-3.5 h-3.5 text-[#DA291C]" />
+              <Eye className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
               Vista Previa Dinámica (Ejemplo: {sampleParticipant.participantName})
             </span>
-            <span className="text-[11px] text-[#DA291C] font-bold">Canal: {channel}</span>
+            <span className="text-[11px] text-[#DA291C] dark:text-red-400 font-bold">Canal: {channel}</span>
           </div>
-          <p className="text-xs text-slate-700 whitespace-pre-line bg-white p-3 rounded-xl border border-slate-200 leading-relaxed font-sans shadow-xs">
+          <p className="text-xs text-slate-700 dark:text-slate-300 whitespace-pre-line bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 leading-relaxed font-sans shadow-xs">
             {previewMessage}
           </p>
         </div>
 
         {/* Modal Actions */}
-        <div className="flex items-center justify-between pt-2 border-t border-slate-200">
-          <span className="text-xs text-slate-500 font-medium">
-            Destinatarios a notificar: <strong className="text-slate-900">{targetParticipants.length} colaboradores</strong>
+        <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800">
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+            Destinatarios a notificar: <strong className="text-slate-900 dark:text-white">{targetParticipants.length} colaboradores</strong>
           </span>
 
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+              className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors cursor-pointer"
             >
               Cancelar
             </button>

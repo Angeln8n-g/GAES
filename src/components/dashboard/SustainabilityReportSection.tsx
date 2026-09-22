@@ -320,97 +320,97 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         
         {/* KPI 1: Horas en Sustentabilidad */}
-        <div className="bg-white border border-emerald-200 rounded-3xl p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
+        <div className="bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800/60 rounded-3xl p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500">Horas Sustentabilidad</span>
-            <div className="p-2 rounded-xl bg-emerald-50 text-emerald-700">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Horas Sustentabilidad</span>
+            <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400">
               <Leaf className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <p className="text-3xl font-black text-emerald-700 mt-2">
-              {metrics.totalSustainabilityHours} <span className="text-base font-bold text-emerald-600">hrs</span>
+            <p className="text-3xl font-black text-emerald-700 dark:text-emerald-400 mt-2">
+              {metrics.totalSustainabilityHours} <span className="text-base font-bold text-emerald-600 dark:text-emerald-400">hrs</span>
             </p>
-            <p className="text-[11px] text-slate-500 mt-1">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
               En {metrics.sustainabilityCoursesCount} cursos de Sustentabilidad/SST
             </p>
           </div>
         </div>
 
         {/* KPI 2: Total Horas Capacitaciones */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500">Total Horas Oferta</span>
-            <div className="p-2 rounded-xl bg-red-50 text-[#DA291C]">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Total Horas Oferta</span>
+            <div className="p-2 rounded-xl bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-[#FF6659]">
               <Clock className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <p className="text-3xl font-black text-slate-900 mt-2">
-              {metrics.totalHoursAll} <span className="text-base font-bold text-slate-600">hrs</span>
+            <p className="text-3xl font-black text-slate-900 dark:text-white mt-2">
+              {metrics.totalHoursAll} <span className="text-base font-bold text-slate-600 dark:text-slate-400">hrs</span>
             </p>
-            <p className="text-[11px] text-slate-500 mt-1">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
               En {filteredEvents.length} cursos listados
             </p>
           </div>
         </div>
 
         {/* KPI 3: Total Colaboradores Asistentes */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500">Asistencias Confirmadas</span>
-            <div className="p-2 rounded-xl bg-cyan-50 text-cyan-700">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Asistencias Confirmadas</span>
+            <div className="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 text-cyan-700 dark:text-cyan-400">
               <Users className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <p className="text-3xl font-black text-cyan-700 mt-2">
+            <p className="text-3xl font-black text-cyan-700 dark:text-cyan-400 mt-2">
               {metrics.totalAttendedAll}
             </p>
-            <p className="text-[11px] text-slate-500 mt-1">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
               De {metrics.totalRegisteredAll} colaboradores inscritos
             </p>
           </div>
         </div>
 
         {/* KPI 4: Horas-Hombre Acumuladas */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500">Horas-Hombre</span>
-            <div className="p-2 rounded-xl bg-amber-50 text-amber-700">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Horas-Hombre</span>
+            <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400">
               <BarChart3 className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <p className="text-3xl font-black text-amber-700 mt-2">
+            <p className="text-3xl font-black text-amber-700 dark:text-amber-400 mt-2">
               {metrics.totalManHoursAll.toLocaleString()}
             </p>
-            <p className="text-[11px] text-slate-500 mt-1">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
               Horas de formación impartidas
             </p>
           </div>
         </div>
 
         {/* KPI 5: Sesiones Sincrónicas vs Asincrónicas */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500">Tipo de Sesión</span>
-            <div className="p-2 rounded-xl bg-purple-50 text-purple-700">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Tipo de Sesión</span>
+            <div className="p-2 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-400">
               <Layers className="w-4 h-4" />
             </div>
           </div>
           <div className="space-y-1 mt-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-600">Sincrónica:</span>
-              <strong className="text-slate-900">{metrics.sessionTypeStats['Sincrónica']}</strong>
+              <span className="text-slate-600 dark:text-slate-400">Sincrónica:</span>
+              <strong className="text-slate-900 dark:text-white">{metrics.sessionTypeStats['Sincrónica']}</strong>
             </div>
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-600">Asincrónica:</span>
-              <strong className="text-slate-900">{metrics.sessionTypeStats['Asincrónica']}</strong>
+              <span className="text-slate-600 dark:text-slate-400">Asincrónica:</span>
+              <strong className="text-slate-900 dark:text-white">{metrics.sessionTypeStats['Asincrónica']}</strong>
             </div>
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-600">Híbrido:</span>
-              <strong className="text-slate-900">{metrics.sessionTypeStats['Híbrido']}</strong>
+              <span className="text-slate-600 dark:text-slate-400">Híbrido:</span>
+              <strong className="text-slate-900 dark:text-white">{metrics.sessionTypeStats['Híbrido']}</strong>
             </div>
           </div>
         </div>
@@ -418,14 +418,14 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
       </div>
 
       {/* 3. Desglose Rápido por Programa */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div>
-            <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-[#DA291C]" />
+            <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-[#DA291C] dark:text-[#FF6659]" />
               <span>Distribución por Programas Corporativos</span>
             </h3>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Total de horas y cursos distribuidos en las 6 categorías macro.
             </p>
           </div>
@@ -435,7 +435,7 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
               onlySustainability 
                 ? 'bg-emerald-600 text-white shadow-sm'
-                : 'bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100'
+                : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/40'
             }`}
           >
             <Leaf className="w-3.5 h-3.5" />
@@ -455,54 +455,53 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
                 onClick={() => handleProgramChange(isSelected ? 'all' : prog.id)}
                 className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                   isSelected
-                    ? 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-500/20 shadow-xs'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 dark:border-emerald-500 ring-2 ring-emerald-500/20 shadow-xs'
                     : isSust
-                    ? 'bg-emerald-50/40 border-emerald-200 hover:border-emerald-300'
-                    : 'bg-slate-50 border-slate-200 hover:border-slate-300'
+                    ? 'bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800 hover:border-emerald-300 dark:hover:border-emerald-700'
+                    : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                 }`}
               >
                 <div>
                   <div className="flex items-center justify-between gap-1 mb-1">
-                    <span className="text-xs font-black text-slate-900 line-clamp-1">
+                    <span className="text-xs font-black text-slate-900 dark:text-white line-clamp-1">
                       {prog.shortName}
                     </span>
                     {isSust && (
-                      <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-emerald-100 text-emerald-800 uppercase">
+                      <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 uppercase">
                         Sustentable
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-slate-500 line-clamp-1">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">
                     {prog.subprograms.length} subprogramas
                   </p>
                 </div>
 
-                <div className="mt-2 pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs">
-                  <span className="font-bold text-slate-700">{stat.count} cursos</span>
-                  <span className="font-black text-emerald-700">{stat.hours} hrs</span>
+                <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-xs">
+                  <span className="font-bold text-slate-700 dark:text-slate-300">{stat.count} cursos</span>
+                  <span className="font-black text-emerald-700 dark:text-emerald-400">{stat.hours} hrs</span>
                 </div>
               </button>
             );
           })}
         </div>
       </div>
-
       {/* 4. Barra de Filtros Interactivos */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xs space-y-3.5">
-        <div className="flex items-center justify-between flex-wrap gap-2 pb-2 border-b border-slate-100">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs space-y-3.5">
+        <div className="flex items-center justify-between flex-wrap gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-[#DA291C]" />
-            <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+            <Filter className="w-4 h-4 text-[#DA291C] dark:text-[#FF6659]" />
+            <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
               Filtros Avanzados de Capacitación
             </h3>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
               {filteredEvents.length} {filteredEvents.length === 1 ? 'registro' : 'registros'}
             </span>
           </div>
 
           <button
             onClick={handleResetFilters}
-            className="text-xs font-bold text-slate-500 hover:text-[#DA291C] flex items-center gap-1 cursor-pointer transition-colors"
+            className="text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-[#DA291C] dark:hover:text-[#FF6659] flex items-center gap-1 cursor-pointer transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Restablecer Filtros</span>
@@ -517,7 +516,7 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar por título, suplidor, instructor o descripción de la capacitación..."
-            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] dark:focus:border-[#FF6659]"
           />
         </div>
 
@@ -526,11 +525,11 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
           
           {/* 1. Programa */}
           <div>
-            <label className="block text-[11px] font-bold text-slate-600 mb-1">Programa</label>
+            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">Programa</label>
             <select
               value={selectedProgram}
               onChange={(e) => handleProgramChange(e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#DA291C]"
+              className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#DA291C] dark:focus:border-[#FF6659]"
             >
               <option value="all">Todos los Programas</option>
               {SUSTAINABILITY_PROGRAMS.map(p => (
@@ -541,11 +540,11 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
 
           {/* 2. Subprograma */}
           <div>
-            <label className="block text-[11px] font-bold text-slate-600 mb-1">Subprograma</label>
+            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">Subprograma</label>
             <select
               value={selectedSubprogram}
               onChange={(e) => setSelectedSubprogram(e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#DA291C]"
+              className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#DA291C] dark:focus:border-[#FF6659]"
             >
               <option value="all">Todos los Subprogramas</option>
               {availableSubprograms.map(sub => (
@@ -556,11 +555,11 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
 
           {/* 3. Tipo de Sesión */}
           <div>
-            <label className="block text-[11px] font-bold text-slate-600 mb-1">Tipo de Sesión</label>
+            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">Tipo de Sesión</label>
             <select
               value={selectedSessionType}
               onChange={(e) => setSelectedSessionType(e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#DA291C]"
+              className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#DA291C] dark:focus:border-[#FF6659]"
             >
               <option value="all">Todas las Sesiones</option>
               {SESSION_TYPES.map(st => (
@@ -571,11 +570,11 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
 
           {/* 4. Tipo de Entrenamiento */}
           <div>
-            <label className="block text-[11px] font-bold text-slate-600 mb-1">Tipo Entrenamiento</label>
+            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">Tipo Entrenamiento</label>
             <select
               value={selectedTrainingType}
               onChange={(e) => setSelectedTrainingType(e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#DA291C]"
+              className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#DA291C] dark:focus:border-[#FF6659]"
             >
               <option value="all">Todos los Tipos</option>
               {TRAINING_TYPES.map(tt => (
@@ -586,11 +585,11 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
 
           {/* 5. Modalidad */}
           <div>
-            <label className="block text-[11px] font-bold text-slate-600 mb-1">Modalidad</label>
+            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">Modalidad</label>
             <select
               value={selectedModality}
               onChange={(e) => setSelectedModality(e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#DA291C]"
+              className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#DA291C] dark:focus:border-[#FF6659]"
             >
               <option value="all">Todas las Modalidades</option>
               <option value="Presencial">Presencial</option>
@@ -601,11 +600,11 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
 
           {/* 6. Suplidor */}
           <div>
-            <label className="block text-[11px] font-bold text-slate-600 mb-1">Suplidor</label>
+            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">Suplidor</label>
             <select
               value={selectedSupplier}
               onChange={(e) => setSelectedSupplier(e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#DA291C]"
+              className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#DA291C] dark:focus:border-[#FF6659]"
             >
               <option value="all">Todos los Suplidores</option>
               <option value="Claro">Claro</option>
@@ -619,35 +618,35 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
       </div>
 
       {/* 5. Tabla Oficial de 11 Columnas de Sustentabilidad */}
-      <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xs">
-        <div className="p-5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2 bg-slate-50/50">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-xs">
+        <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between flex-wrap gap-2 bg-slate-50/50 dark:bg-slate-800/50">
           <div>
-            <h3 className="text-sm font-black text-slate-900">
+            <h3 className="text-sm font-black text-slate-900 dark:text-white">
               Matriz Tabular de Capacitaciones ({filteredEvents.length})
             </h3>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Columnas oficiales normalizadas para el programa de sustentabilidad corporativa.
             </p>
           </div>
 
-          <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-xl border border-emerald-200 flex items-center gap-1.5">
-            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+          <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800/60 flex items-center gap-1.5">
+            <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <span>Formato Excel Oficial</span>
           </span>
         </div>
 
         {filteredEvents.length === 0 ? (
           <div className="p-12 text-center space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">
               <Search className="w-6 h-6" />
             </div>
-            <p className="text-sm font-bold text-slate-700">No se encontraron capacitaciones</p>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+            <p className="text-sm font-bold text-slate-700 dark:text-slate-300">No se encontraron capacitaciones</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
               No hay eventos que coincidan con los filtros seleccionados. Intenta restablecer los filtros para ver todos los cursos.
             </p>
             <button
               onClick={handleResetFilters}
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer"
+              className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl transition-colors cursor-pointer"
             >
               Restablecer Filtros
             </button>
@@ -656,7 +655,7 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
           <>
             <div className="table-scroll-hint">
               <span className="flex items-center gap-1.5">
-                <ArrowRightLeft className="w-3.5 h-3.5 text-[#DA291C]" />
+                <ArrowRightLeft className="w-3.5 h-3.5 text-[#DA291C] dark:text-[#FF6659]" />
                 Desliza horizontalmente para ver todas las columnas del reporte oficial
               </span>
               <span className="font-mono text-slate-400">13 dimensiones</span>
@@ -664,7 +663,7 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
             <div className="table-responsive-container">
             <table className="w-full text-left border-collapse text-xs min-w-[1100px]">
               <thead>
-                <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-extrabold text-[11px] whitespace-nowrap">
+                <tr className="bg-slate-100/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-extrabold text-[11px] whitespace-nowrap">
                   <th className="p-3.5 pl-5">#</th>
                   <th className="p-3.5">Título & Programa</th>
                   <th className="p-3.5">Tipo Sesión</th>
@@ -680,7 +679,7 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
                   <th className="p-3.5 pr-5 text-right">Inscritos / Asist.</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {filteredEvents.map((evt, idx) => {
                   const isSust = isSustainabilityProgram(evt.programCategory, evt.subprogram);
                   const dur = getEventDurationMetrics(evt);
@@ -703,22 +702,22 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
                   return (
                     <tr 
                       key={evt.id} 
-                      className={`hover:bg-slate-50/80 transition-colors ${
-                        isSust ? 'bg-emerald-50/15' : ''
+                      className={`hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors ${
+                        isSust ? 'bg-emerald-50/15 dark:bg-emerald-950/20' : ''
                       }`}
                     >
                       {/* No. */}
-                      <td className="p-3.5 pl-5 font-bold text-slate-500">
+                      <td className="p-3.5 pl-5 font-bold text-slate-500 dark:text-slate-400">
                         {idx + 1}
                       </td>
 
                       {/* Título & Programa */}
                       <td className="p-3.5">
-                        <div className="font-bold text-slate-900 leading-tight max-w-xs">
+                        <div className="font-bold text-slate-900 dark:text-white leading-tight max-w-xs">
                           {evt.title}
                         </div>
-                        <div className="text-[10px] text-slate-500 flex items-center gap-1 mt-0.5">
-                          {isSust && <Leaf className="w-3 h-3 text-emerald-600 shrink-0" />}
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-0.5">
+                          {isSust && <Leaf className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />}
                           <span className="truncate">{getProgramShortName(evt.programCategory)}</span>
                         </div>
                       </td>
@@ -727,10 +726,10 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
                       <td className="p-3.5 whitespace-nowrap">
                         <span className={`px-2 py-0.5 rounded-md font-bold text-[10px] ${
                           evt.sessionType === 'Asincrónica'
-                            ? 'bg-blue-50 text-blue-800 border border-blue-200'
+                            ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60'
                             : evt.sessionType === 'Híbrido'
-                            ? 'bg-purple-50 text-purple-800 border border-purple-200'
-                            : 'bg-slate-100 text-slate-800 border border-slate-200'
+                            ? 'bg-purple-50 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700'
                         }`}>
                           {evt.sessionType || 'Sincrónica'}
                         </span>
@@ -740,27 +739,27 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
                       <td className="p-3.5 whitespace-nowrap">
                         <span className={`px-2 py-0.5 rounded-md font-bold text-[10px] ${
                           evt.trainingType === 'Conductual'
-                            ? 'bg-amber-50 text-amber-800 border border-amber-200'
-                            : 'bg-cyan-50 text-cyan-800 border border-cyan-200'
+                            ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60'
+                            : 'bg-cyan-50 dark:bg-cyan-950/40 text-cyan-800 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800/60'
                         }`}>
                           {evt.trainingType || 'Técnico'}
                         </span>
                       </td>
 
                       {/* 3. Formato capacitación */}
-                      <td className="p-3.5 whitespace-nowrap font-semibold text-slate-800">
+                      <td className="p-3.5 whitespace-nowrap font-semibold text-slate-800 dark:text-slate-200">
                         {evt.trainingFormat || evt.category || 'Taller'}
                       </td>
 
                       {/* 4. Modalidad */}
                       <td className="p-3.5 whitespace-nowrap">
-                        <span className="flex items-center gap-1 font-medium text-slate-700">
+                        <span className="flex items-center gap-1 font-medium text-slate-700 dark:text-slate-300">
                           {evt.modality === 'Virtual' ? (
-                            <Video className="w-3.5 h-3.5 text-cyan-600" />
+                            <Video className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
                           ) : evt.modality === 'Presencial' ? (
-                            <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+                            <MapPin className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                           ) : (
-                            <Laptop className="w-3.5 h-3.5 text-purple-600" />
+                            <Laptop className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
                           )}
                           <span>{evt.modality === 'Híbrida' ? 'Mixta' : evt.modality}</span>
                         </span>
@@ -770,40 +769,40 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
                       <td className="p-3.5 whitespace-nowrap">
                         <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
                           isSust
-                            ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
-                            : 'bg-slate-100 text-slate-700'
+                            ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                         }`}>
                           {evt.subprogram || 'Sustentabilidad'}
                         </span>
                       </td>
 
                       {/* 6. Fecha desde */}
-                      <td className="p-3.5 whitespace-nowrap text-slate-600 font-medium">
+                      <td className="p-3.5 whitespace-nowrap text-slate-600 dark:text-slate-400 font-medium">
                         {fDesde}
                       </td>
 
                       {/* 7. Fecha hasta */}
-                      <td className="p-3.5 whitespace-nowrap text-slate-600 font-medium">
+                      <td className="p-3.5 whitespace-nowrap text-slate-600 dark:text-slate-400 font-medium">
                         {fHasta}
                       </td>
 
                       {/* 8. Duración horas */}
-                      <td className="p-3.5 text-center whitespace-nowrap font-black text-slate-900">
-                        <span className="bg-amber-50 text-amber-900 border border-amber-200 px-2 py-0.5 rounded-lg">
+                      <td className="p-3.5 text-center whitespace-nowrap font-black text-slate-900 dark:text-white">
+                        <span className="bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 px-2 py-0.5 rounded-lg">
                           {dur.totalHours} hrs
                         </span>
                       </td>
 
                       {/* 9. Suplidor */}
-                      <td className="p-3.5 whitespace-nowrap font-bold text-slate-800">
+                      <td className="p-3.5 whitespace-nowrap font-bold text-slate-800 dark:text-slate-200">
                         <span className="flex items-center gap-1">
-                          <Building2 className="w-3 h-3 text-[#DA291C]" />
+                          <Building2 className="w-3 h-3 text-[#DA291C] dark:text-[#FF6659]" />
                           <span>{evt.supplier || 'Claro'}</span>
                         </span>
                       </td>
 
                       {/* 10. Descripción */}
-                      <td className="p-3.5 text-slate-600 font-normal leading-relaxed">
+                      <td className="p-3.5 text-slate-600 dark:text-slate-400 font-normal leading-relaxed">
                         <p className="line-clamp-2" title={evt.description}>
                           {evt.description || 'Sin descripción detallada registrada.'}
                         </p>
@@ -811,10 +810,10 @@ export const SustainabilityReportSection: React.FC<SustainabilityReportSectionPr
 
                       {/* Métrica: Inscritos / Asistentes */}
                       <td className="p-3.5 pr-5 text-right whitespace-nowrap">
-                        <div className="font-bold text-slate-900">
-                          {attCount} <span className="text-slate-500 font-normal">/ {regCount}</span>
+                        <div className="font-bold text-slate-900 dark:text-white">
+                          {attCount} <span className="text-slate-500 dark:text-slate-400 font-normal">/ {regCount}</span>
                         </div>
-                        <div className="text-[10px] text-slate-500">
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400">
                           {regCount > 0 ? `${Math.round((attCount / regCount) * 100)}% asist.` : '0%'}
                         </div>
                       </td>

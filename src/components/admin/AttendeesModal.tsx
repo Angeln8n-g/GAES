@@ -445,7 +445,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
       ariaLabel={`Gestión de Asistencia - ${event?.title || ''}`}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
         
         {/* Real-time WebSocket Live Alert Toast */}
         {liveToast && (
@@ -456,39 +456,39 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
         )}
 
         {/* Header & Tabs */}
-        <div className="p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 dark:bg-slate-800/50">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-[#DA291C] border border-red-200">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-rose-400 border border-red-200 dark:border-red-900/50">
                 Gestión de Asistencia & Calificaciones
               </span>
-              <span className="text-xs text-slate-500 font-bold">{event.category}</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-bold">{event.category}</span>
               {hasGrading && (
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1">
-                  <GraduationCap className="w-3 h-3 text-indigo-600" />
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/50 flex items-center gap-1">
+                  <GraduationCap className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
                   {event.evaluationType === 'score_100' ? 'Nota 0-100' : event.evaluationType === 'scale_1_5' ? 'Escala 1-5' : 'Aprobado/Reprobado'}
                 </span>
               )}
               {event.ojtEvaluatorName && (
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1" title="Tutor / Evaluador Responsable">
-                  <UserCheck className="w-3 h-3 text-indigo-600" />
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/50 flex items-center gap-1" title="Tutor / Evaluador Responsable">
+                  <UserCheck className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
                   <span>Tutor: {event.ojtEvaluatorName}</span>
                 </span>
               )}
             </div>
-            <h2 className="text-lg font-black text-slate-900 line-clamp-1">{event.title}</h2>
+            <h2 className="text-lg font-black text-slate-900 dark:text-white line-clamp-1">{event.title}</h2>
           </div>
 
           <div className="flex items-center gap-2 self-end sm:self-auto">
             {/* Tab Switcher if Event Has Grading */}
             {hasGrading && (
-              <div className="flex items-center bg-white p-1 rounded-2xl border border-slate-200 shadow-xs">
+              <div className="flex items-center bg-white dark:bg-slate-800 p-1 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs">
                 <button
                   onClick={() => setActiveTab('attendance')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                     activeTab === 'attendance'
                       ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                      : 'text-slate-600 hover:text-slate-900'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   <Users className="w-3.5 h-3.5" />
@@ -500,13 +500,13 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                     activeTab === 'grades'
                       ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                      : 'text-slate-600 hover:text-slate-900'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   <Award className="w-3.5 h-3.5" />
                   <span>Calificaciones & Debilidades</span>
                   {gradeStats.totalGraded > 0 && (
-                    <span className="px-1.5 py-0.2 bg-indigo-100 text-indigo-800 text-[10px] rounded-full font-extrabold">
+                    <span className="px-1.5 py-0.2 bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 text-[10px] rounded-full font-extrabold">
                       {gradeStats.totalGraded}
                     </span>
                   )}
@@ -517,7 +517,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
             <button
               onClick={onClose}
               aria-label="Cerrar modal de gestión de asistencia"
-              className="p-2 sm:p-1.5 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer inline-flex items-center justify-center"
+              className="p-2 sm:p-1.5 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer inline-flex items-center justify-center"
             >
               <X className="w-5 h-5" />
             </button>
@@ -525,7 +525,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
         </div>
 
         {/* Filters and Date Bar */}
-        <div className="p-4 sm:p-6 border-b border-slate-200 space-y-3 bg-white">
+        <div className="p-4 sm:p-6 border-b border-slate-200 dark:border-slate-800 space-y-3 bg-white dark:bg-slate-900">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             
             {/* Search Input */}
@@ -538,7 +538,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Buscar por nombre, tarjeta, cédula o depto..."
-                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
               />
             </div>
 
@@ -600,15 +600,15 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
           {currentSchedule && (
             <div className="flex items-center justify-between gap-3 pt-1 flex-wrap">
               <div className="flex items-center gap-2 overflow-x-auto">
-                <span className="text-[11px] font-bold text-slate-500">Horarios:</span>
+                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">Horarios:</span>
                 {currentSchedule.slots.map(s => (
                   <button
                     key={s.time}
                     onClick={() => setSelectedTime(s.time)}
                     className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       selectedTime === s.time
-                        ? 'bg-red-50 border border-red-200 text-[#DA291C]'
-                        : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-100'
+                        ? 'bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-[#DA291C] dark:text-rose-400'
+                        : 'bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700'
                     }`}
                   >
                     {s.time}{s.endTime ? ` - ${s.endTime}` : ''} ({s.registered}/{s.capacity})
@@ -618,12 +618,12 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
 
               {currentSlot && (
                 <div className="flex items-center gap-2 text-xs">
-                  <span className="px-2.5 py-1 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-mono font-bold text-[11px] flex items-center gap-1.5" title="Código PIN diario para registrar Entrada">
-                    <span className="text-emerald-600 uppercase font-sans text-[10px]">PIN Entrada:</span>
+                  <span className="px-2.5 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 text-emerald-800 dark:text-emerald-300 font-mono font-bold text-[11px] flex items-center gap-1.5" title="Código PIN diario para registrar Entrada">
+                    <span className="text-emerald-600 dark:text-emerald-400 uppercase font-sans text-[10px]">PIN Entrada:</span>
                     <strong className="tracking-widest">{currentSlot.checkinCode || '----'}</strong>
                   </span>
-                  <span className="px-2.5 py-1 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 font-mono font-bold text-[11px] flex items-center gap-1.5" title="Código PIN diario para registrar Salida">
-                    <span className="text-blue-600 uppercase font-sans text-[10px]">PIN Salida:</span>
+                  <span className="px-2.5 py-1 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/50 text-blue-800 dark:text-blue-300 font-mono font-bold text-[11px] flex items-center gap-1.5" title="Código PIN diario para registrar Salida">
+                    <span className="text-blue-600 dark:text-blue-400 uppercase font-sans text-[10px]">PIN Salida:</span>
                     <strong className="tracking-widest">{currentSlot.checkoutCode || '----'}</strong>
                   </span>
                 </div>
@@ -646,7 +646,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Buscar asistente por nombre, correo o número de tarjeta..."
-                className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
               />
             </div>
 
@@ -655,39 +655,39 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                 {filteredParticipants.map((item, idx) => (
                   <div
                     key={idx}
-                    className="p-3.5 rounded-2xl bg-white border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs hover:border-slate-300 transition-colors"
+                    className="p-3.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs hover:border-slate-300 dark:hover:border-slate-600 transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
                         item.isCompleted 
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                          ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50' 
                           : item.isCheckedIn 
-                            ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                            : 'bg-slate-100 text-slate-600'
+                            ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
                       }`}>
                         {item.name ? item.name.charAt(0).toUpperCase() : 'U'}
                       </div>
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
-                          <p className="text-xs font-bold text-slate-900">{item.name}</p>
+                          <p className="text-xs font-bold text-slate-900 dark:text-white">{item.name}</p>
                           {item.isCompleted ? (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                               Completa
                             </span>
                           ) : item.isCheckedIn ? (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-1 animate-pulse">
-                              <Clock className="w-3 h-3 text-amber-600" />
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800 flex items-center gap-1 animate-pulse">
+                              <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" />
                               En Curso (Entrada OK)
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
                               Pendiente
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] text-slate-500 mt-0.5">
-                          {item.email} {item.card && `• Tarjeta: #${item.card}`} • <span className="text-slate-700 font-semibold">{item.department}</span>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                          {item.email} {item.card && `• Tarjeta: #${item.card}`} • <span className="text-slate-700 dark:text-slate-300 font-semibold">{item.department}</span>
                         </p>
                       </div>
                     </div>
@@ -696,8 +696,8 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                       {/* Check-In Action / Status */}
                       <div className="flex items-center gap-1.5">
                         {item.isCheckedIn ? (
-                          <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1" title={item.checkInAt ? `Entrada: ${new Date(item.checkInAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}` : 'Entrada registrada'}>
-                            <Check className="w-3 h-3 text-emerald-600" />
+                          <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50 flex items-center gap-1" title={item.checkInAt ? `Entrada: ${new Date(item.checkInAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}` : 'Entrada registrada'}>
+                            <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                             <span>Entrada: {item.checkInAt ? new Date(item.checkInAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'OK'}</span>
                           </span>
                         ) : (
@@ -715,8 +715,8 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                       {/* Check-Out Action / Status */}
                       <div className="flex items-center gap-1.5">
                         {item.isCheckedOut ? (
-                          <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1" title={item.checkOutAt ? `Salida: ${new Date(item.checkOutAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}` : 'Salida registrada'}>
-                            <Check className="w-3 h-3 text-blue-600" />
+                          <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900/50 flex items-center gap-1" title={item.checkOutAt ? `Salida: ${new Date(item.checkOutAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}` : 'Salida registrada'}>
+                            <Check className="w-3 h-3 text-blue-600 dark:text-blue-400" />
                             <span>Salida: {item.checkOutAt ? new Date(item.checkOutAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'OK'}</span>
                           </span>
                         ) : item.isCheckedIn ? (
@@ -729,7 +729,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                             <span>+ Salida</span>
                           </button>
                         ) : (
-                          <span className="px-2.5 py-1 rounded-xl text-[10px] font-medium bg-slate-50 text-slate-500 border border-slate-200">
+                          <span className="px-2.5 py-1 rounded-xl text-[10px] font-medium bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
                             Salida Pendiente
                           </span>
                         )}
@@ -740,7 +740,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                         <button
                           type="button"
                           onClick={() => onRevertAttendance(event.id, selectedDate, selectedTime, item.email, item.isCheckedOut ? 'checkout' : 'all')}
-                          className="px-2.5 py-1.5 min-h-[36px] sm:min-h-0 touch-target-44 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 text-[10px] font-semibold transition-colors cursor-pointer flex items-center gap-1"
+                          className="px-2.5 py-1.5 min-h-[36px] sm:min-h-0 touch-target-44 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 text-[10px] font-semibold transition-colors cursor-pointer flex items-center gap-1"
                           title={item.isCheckedOut ? 'Revertir solo la salida (mantener entrada)' : 'Revertir asistencia'}
                         >
                           <RotateCcw className="w-3 h-3" />
@@ -753,10 +753,10 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                         <button
                           type="button"
                           onClick={() => setParticipantToUnassign(item)}
-                          className="px-2.5 py-1.5 min-h-[36px] sm:min-h-0 touch-target-44 rounded-xl text-rose-600 hover:text-rose-700 hover:bg-rose-50 border border-rose-200 text-[10px] font-bold transition-colors cursor-pointer flex items-center gap-1"
+                          className="px-2.5 py-1.5 min-h-[36px] sm:min-h-0 touch-target-44 rounded-xl text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-[10px] font-bold transition-colors cursor-pointer flex items-center gap-1"
                           title="Eliminar asignación del participante (Super Admin - Antes o después de impartirse)"
                         >
-                          <Trash2 className="w-3 h-3 text-rose-600" />
+                          <Trash2 className="w-3 h-3 text-rose-600 dark:text-rose-400" />
                           <span>Desasignar</span>
                         </button>
                       )}
@@ -765,7 +765,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-slate-500 text-xs">
+              <div className="text-center py-8 text-slate-500 dark:text-slate-400 text-xs">
                 No hay colaboradores inscritos que coincidan con la búsqueda en este horario.
               </div>
             )}
@@ -780,36 +780,36 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
             
             {/* KPI Summary Banner */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="bg-white border border-slate-200 rounded-2xl p-3.5 text-center shadow-xs">
-                <span className="text-[10px] text-slate-500 uppercase font-black tracking-wider">Promedio General</span>
-                <p className="text-xl font-black text-[#DA291C] mt-0.5">{gradeStats.avgScore} <span className="text-xs text-slate-500">pts</span></p>
+              <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 text-center shadow-xs">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-wider">Promedio General</span>
+                <p className="text-xl font-black text-[#DA291C] dark:text-rose-400 mt-0.5">{gradeStats.avgScore} <span className="text-xs text-slate-500 dark:text-slate-400">pts</span></p>
               </div>
 
-              <div className="bg-white border border-slate-200 rounded-2xl p-3.5 text-center shadow-xs">
-                <span className="text-[10px] text-slate-500 uppercase font-black tracking-wider">Evaluados</span>
-                <p className="text-xl font-black text-slate-900 mt-0.5">{gradeStats.totalGraded} <span className="text-xs text-slate-500">/ {currentSlotParticipants.length}</span></p>
+              <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 text-center shadow-xs">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-wider">Evaluados</span>
+                <p className="text-xl font-black text-slate-900 dark:text-white mt-0.5">{gradeStats.totalGraded} <span className="text-xs text-slate-500 dark:text-slate-400">/ {currentSlotParticipants.length}</span></p>
               </div>
 
-              <div className="bg-white border border-emerald-200 rounded-2xl p-3.5 text-center shadow-xs">
-                <span className="text-[10px] text-emerald-700 uppercase font-black tracking-wider">Aprobados</span>
-                <p className="text-xl font-black text-emerald-700 mt-0.5">{gradeStats.passedCount}</p>
+              <div className="bg-white dark:bg-slate-800/80 border border-emerald-200 dark:border-emerald-900/50 rounded-2xl p-3.5 text-center shadow-xs">
+                <span className="text-[10px] text-emerald-700 dark:text-emerald-400 uppercase font-black tracking-wider">Aprobados</span>
+                <p className="text-xl font-black text-emerald-700 dark:text-emerald-400 mt-0.5">{gradeStats.passedCount}</p>
               </div>
 
-              <div className="bg-white border border-rose-200 rounded-2xl p-3.5 text-center shadow-xs">
-                <span className="text-[10px] text-rose-700 uppercase font-black tracking-wider">Con Debilidades / Reprobados</span>
-                <p className="text-xl font-black text-rose-700 mt-0.5">{gradeStats.withGapsCount}</p>
+              <div className="bg-white dark:bg-slate-800/80 border border-rose-200 dark:border-rose-900/50 rounded-2xl p-3.5 text-center shadow-xs">
+                <span className="text-[10px] text-rose-700 dark:text-rose-400 uppercase font-black tracking-wider">Con Debilidades / Reprobados</span>
+                <p className="text-xl font-black text-rose-700 dark:text-rose-400 mt-0.5">{gradeStats.withGapsCount}</p>
               </div>
             </div>
 
             {/* Instruction Banner */}
-            <div className="p-3.5 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-start justify-between gap-3">
+            <div className="p-3.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-900/50 flex items-start justify-between gap-3">
               <div className="flex items-center gap-2">
-                <Target className="w-4 h-4 text-indigo-700 shrink-0 mt-0.5" />
-                <p className="text-xs text-indigo-900">
+                <Target className="w-4 h-4 text-indigo-700 dark:text-indigo-400 shrink-0 mt-0.5" />
+                <p className="text-xs text-indigo-900 dark:text-indigo-200">
                   <span className="font-bold">Detección de Brechas:</span> Asienta la nota y haz clic en las competencias evaluadas para marcar si el colaborador mostró debilidad en ese tema.
                 </p>
               </div>
-              <span className="text-[10px] text-indigo-800 font-bold whitespace-nowrap bg-indigo-100 px-2 py-0.5 rounded-lg border border-indigo-200">
+              <span className="text-[10px] text-indigo-800 dark:text-indigo-300 font-bold whitespace-nowrap bg-indigo-100 dark:bg-indigo-900/60 px-2 py-0.5 rounded-lg border border-indigo-200 dark:border-indigo-800">
                 Mínimo para aprobar: {passingScore} pts
               </span>
             </div>
@@ -822,28 +822,28 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Buscar por colaborador, tarjeta o departamento..."
-                className="w-full pl-9 pr-4 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                className="w-full pl-9 pr-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
               />
             </div>
 
             {/* Success alert message */}
             {saveSuccessMsg && (
-              <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-400 text-xs font-bold flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>{saveSuccessMsg}</span>
               </div>
             )}
 
             {/* Module Selector Bar (If Event Has Modules) */}
             {hasModules && (
-              <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-slate-200">
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-slate-200 dark:border-slate-700">
                 <button
                   type="button"
                   onClick={() => setSelectedModuleId('summary')}
                   className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 whitespace-nowrap transition-all cursor-pointer ${
                     selectedModuleId === 'summary'
-                      ? 'bg-slate-900 text-white shadow-xs'
-                      : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                      ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-xs'
+                      : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
                   }`}
                 >
                   <FileSpreadsheet className="w-3.5 h-3.5" />
@@ -858,13 +858,13 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                     className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 whitespace-nowrap transition-all cursor-pointer ${
                       selectedModuleId === m.id
                         ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                        : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                        : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
                     }`}
                   >
                     <Layers className="w-3.5 h-3.5" />
                     <span>{m.title}</span>
                     <span className={`text-[10px] px-1.5 py-0.2 rounded-md ${
-                      selectedModuleId === m.id ? 'bg-white/20 text-white font-black' : 'bg-slate-100 text-slate-600 font-bold'
+                      selectedModuleId === m.id ? 'bg-white/20 text-white font-black' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold'
                     }`}>
                       Mín: {m.passingScore ?? 70} pts
                     </span>
@@ -877,35 +877,35 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
             {hasModules && selectedModuleId === 'summary' ? (
               filteredParticipants.length > 0 ? (
                 <div className="space-y-4">
-                  <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+                  <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-xs">
                     <div className="table-responsive-container">
                       <table className="w-full text-left text-xs border-collapse min-w-[750px]">
                         <thead>
-                          <tr className="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold">
+                          <tr className="bg-slate-50 dark:bg-slate-700/60 border-b border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold">
                             <th className="p-3">Colaborador</th>
                             <th className="p-3">Tarjeta</th>
                             <th className="p-3">Departamento</th>
                             {eventModules.map(m => (
                               <th key={m.id} className="p-3 text-center whitespace-nowrap">
                                 <div>{m.title}</div>
-                                <div className="text-[10px] text-slate-500 font-normal">Mín: {m.passingScore ?? 70} pts</div>
+                                <div className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">Mín: {m.passingScore ?? 70} pts</div>
                               </th>
                             ))}
                             <th className="p-3 text-center">Promedio Final</th>
                             <th className="p-3 text-center">Estado Académico</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
                           {filteredParticipants.map(item => {
                             const g = getParticipantGrade(item.card);
                             return (
-                              <tr key={item.card || item.email} className="hover:bg-slate-50/50">
+                              <tr key={item.card || item.email} className="hover:bg-slate-50/50 dark:hover:bg-slate-700/30">
                                 <td className="p-3">
-                                  <p className="font-bold text-slate-900">{item.name}</p>
-                                  <p className="text-[10px] text-slate-500">{item.email}</p>
+                                  <p className="font-bold text-slate-900 dark:text-white">{item.name}</p>
+                                  <p className="text-[10px] text-slate-500 dark:text-slate-400">{item.email}</p>
                                 </td>
-                                <td className="p-3 text-slate-600 font-mono">#{item.card || 'N/A'}</td>
-                                <td className="p-3 text-slate-600">{item.department}</td>
+                                <td className="p-3 text-slate-600 dark:text-slate-300 font-mono">#{item.card || 'N/A'}</td>
+                                <td className="p-3 text-slate-600 dark:text-slate-300">{item.department}</td>
                                 {eventModules.map(m => {
                                   const mg = (g.moduleGrades || []).find((x: ParticipantModuleGrade) => x.moduleId === m.id);
                                   const scoreVal = mg?.score;
@@ -915,24 +915,24 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                                     <td key={m.id} className="p-3 text-center">
                                       {scoreVal !== null && scoreVal !== undefined ? (
                                         <span className={`inline-block px-2 py-0.5 rounded-lg text-xs font-black ${
-                                          isPassed ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : isFailed ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-700'
+                                          isPassed ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50' : isFailed ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50' : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
                                         }`}>
                                           {scoreVal} pts
                                         </span>
                                       ) : (
-                                        <span className="text-slate-300 text-xs">—</span>
+                                        <span className="text-slate-300 dark:text-slate-600 text-xs">—</span>
                                       )}
                                     </td>
                                   );
                                 })}
                                 <td className="p-3 text-center">
-                                  <span className="font-black text-slate-900 text-xs">
+                                  <span className="font-black text-slate-900 dark:text-white text-xs">
                                     {g.score !== null && g.score !== '' ? `${g.score} pts` : '—'}
                                   </span>
                                 </td>
                                 <td className="p-3 text-center">
                                   <span className={`px-2.5 py-1 rounded-xl text-[10px] font-black ${
-                                    g.academicStatus === 'passed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : g.academicStatus === 'failed' ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-600'
+                                    g.academicStatus === 'passed' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50' : g.academicStatus === 'failed' ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
                                   }`}>
                                     {g.academicStatus === 'passed' ? '✓ Aprobado' : g.academicStatus === 'failed' ? '✕ Reprobado' : '⏳ Pendiente'}
                                   </span>
@@ -946,7 +946,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-8 text-slate-500 text-xs">
+                <div className="text-center py-8 text-slate-500 dark:text-slate-400 text-xs">
                   No hay participantes inscritos para evaluar en este horario.
                 </div>
               )
@@ -960,22 +960,22 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                 return (
                   <div className="space-y-4">
                     {/* Module Title Banner */}
-                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                           <span className="px-2 py-0.5 rounded-md bg-[#DA291C] text-white text-[10px] font-black uppercase tracking-wider">
                             Calificación de Módulo
                           </span>
-                          <span className="text-xs font-black text-slate-900">{currentMod.title}</span>
+                          <span className="text-xs font-black text-slate-900 dark:text-white">{currentMod.title}</span>
                         </div>
                         {currentMod.description && (
-                          <p className="text-xs text-slate-600">{currentMod.description}</p>
+                          <p className="text-xs text-slate-600 dark:text-slate-300">{currentMod.description}</p>
                         )}
                       </div>
 
                       <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-xs font-bold bg-white px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700">
-                          Nota Mínima: <strong className="text-[#DA291C]">{modPass} pts</strong>
+                        <span className="text-xs font-bold bg-white dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
+                          Nota Mínima: <strong className="text-[#DA291C] dark:text-rose-400">{modPass} pts</strong>
                         </span>
                       </div>
                     </div>
@@ -1002,30 +1002,30 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                               key={card || item.email}
                               className={`p-4 rounded-2xl border transition-all ${
                                 isFailed
-                                  ? 'bg-rose-50/40 border-rose-200'
+                                  ? 'bg-rose-50/40 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/40'
                                   : isPassed
-                                  ? 'bg-white border-emerald-200 shadow-xs'
-                                  : 'bg-white border-slate-200 shadow-xs'
+                                  ? 'bg-white dark:bg-slate-800/80 border-emerald-200 dark:border-emerald-900/40 shadow-xs'
+                                  : 'bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 shadow-xs'
                               }`}
                             >
-                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-700/60">
                                 <div className="flex items-center gap-3">
                                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs ${
-                                    isPassed ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : isFailed ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-600'
+                                    isPassed ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50' : isFailed ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
                                   }`}>
                                     {item.name ? item.name.charAt(0).toUpperCase() : 'U'}
                                   </div>
                                   <div>
                                     <div className="flex items-center gap-2">
-                                      <p className="text-xs font-bold text-slate-900">{item.name}</p>
+                                      <p className="text-xs font-bold text-slate-900 dark:text-white">{item.name}</p>
                                       {item.isAttended && (
-                                        <span className="px-1.5 py-0.2 bg-emerald-50 text-emerald-700 text-[9px] font-bold rounded-md border border-emerald-200">
+                                        <span className="px-1.5 py-0.2 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-[9px] font-bold rounded-md border border-emerald-200 dark:border-emerald-900/50">
                                           Asistió
                                         </span>
                                       )}
                                     </div>
-                                    <p className="text-[11px] text-slate-500">
-                                      Tarjeta: <span className="text-slate-800 font-bold">#{card || 'N/A'}</span> • {item.department}
+                                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                                      Tarjeta: <span className="text-slate-800 dark:text-slate-200 font-bold">#{card || 'N/A'}</span> • {item.department}
                                     </p>
                                   </div>
                                 </div>
@@ -1033,7 +1033,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                                 {/* Score input for this module */}
                                 <div className="flex items-center gap-3">
                                   <div className="flex items-center gap-2">
-                                    <label className="text-xs font-bold text-slate-700">Nota (0-{currentMod.maxScore || 100}):</label>
+                                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Nota (0-{currentMod.maxScore || 100}):</label>
                                     <input
                                       type="number"
                                       min={0}
@@ -1041,12 +1041,12 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                                       value={modScore}
                                       onChange={(e) => handleModuleScoreChange(card, currentMod.id, e.target.value)}
                                       placeholder="0 - 100"
-                                      className="w-20 px-2.5 py-1.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold text-center focus:outline-none focus:border-[#DA291C]"
+                                      className="w-20 px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-bold text-center focus:outline-none focus:border-[#DA291C]"
                                     />
                                   </div>
 
                                   <span className={`px-2.5 py-1 rounded-xl text-[10px] font-black ${
-                                    isPassed ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : isFailed ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-500'
+                                    isPassed ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50' : isFailed ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
                                   }`}>
                                     {isPassed ? '✓ Aprobado' : isFailed ? '✕ Reprobado' : 'Pendiente'}
                                   </span>
@@ -1060,7 +1060,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                                   value={mg.feedback || ''}
                                   onChange={(e) => handleModuleFeedbackChange(card, currentMod.id, e.target.value)}
                                   placeholder="Observaciones pedagógicas específicas de este módulo (opcional)..."
-                                  className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                                  className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                                 />
                               </div>
                             </div>
@@ -1068,7 +1068,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                         })}
                       </div>
                     ) : (
-                      <div className="text-center py-8 text-slate-500 text-xs">
+                      <div className="text-center py-8 text-slate-500 dark:text-slate-400 text-xs">
                         No hay participantes inscritos para evaluar en este horario.
                       </div>
                     )}
@@ -1101,31 +1101,31 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                         key={card || item.email}
                         className={`p-4 rounded-2xl border transition-all ${
                           isFailed || grade.needsRetraining
-                            ? 'bg-rose-50/50 border-rose-200'
+                            ? 'bg-rose-50/50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/40'
                             : isPassed
-                            ? 'bg-white border-emerald-200 shadow-xs'
-                            : 'bg-white border-slate-200 shadow-xs'
+                            ? 'bg-white dark:bg-slate-800/80 border-emerald-200 dark:border-emerald-900/40 shadow-xs'
+                            : 'bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 shadow-xs'
                         }`}
                       >
                         {/* Top row: Participant Info & Grade input */}
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-700/60">
                           <div className="flex items-center gap-3">
                             <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs ${
-                              isPassed ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : isFailed ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-600'
+                              isPassed ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50' : isFailed ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
                             }`}>
                               {item.name ? item.name.charAt(0).toUpperCase() : 'U'}
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
-                                <p className="text-xs font-bold text-slate-900">{item.name}</p>
+                                <p className="text-xs font-bold text-slate-900 dark:text-white">{item.name}</p>
                                 {item.isAttended && (
-                                  <span className="px-1.5 py-0.2 bg-emerald-50 text-emerald-700 text-[9px] font-bold rounded-md border border-emerald-200">
+                                  <span className="px-1.5 py-0.2 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-[9px] font-bold rounded-md border border-emerald-200 dark:border-emerald-900/50">
                                     Asistió
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[11px] text-slate-500">
-                                Tarjeta: <span className="text-slate-800 font-bold">#{card || 'N/A'}</span> • {item.department}
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                                Tarjeta: <span className="text-slate-800 dark:text-slate-200 font-bold">#{card || 'N/A'}</span> • {item.department}
                               </p>
                             </div>
                           </div>
@@ -1134,7 +1134,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                           <div className="flex items-center gap-3">
                             {event.evaluationType === 'score_100' && (
                               <div className="flex items-center gap-2">
-                                <label className="text-xs font-bold text-slate-600">Nota (0-100):</label>
+                                <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Nota (0-100):</label>
                                 <input
                                   type="number"
                                   min={0}
@@ -1142,18 +1142,18 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                                   value={grade.score}
                                   onChange={(e) => handleScoreChange(card, e.target.value)}
                                   placeholder="0 - 100"
-                                  className="w-20 px-2.5 py-1.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold text-center focus:outline-none focus:border-[#DA291C]"
+                                  className="w-20 px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-bold text-center focus:outline-none focus:border-[#DA291C]"
                                 />
                               </div>
                             )}
 
                             {event.evaluationType === 'scale_1_5' && (
                               <div className="flex items-center gap-2">
-                                <label className="text-xs font-bold text-slate-600">Escala (1-5):</label>
+                                <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Escala (1-5):</label>
                                 <select
                                   value={grade.score}
                                   onChange={(e) => handleScoreChange(card, e.target.value)}
-                                  className="px-2.5 py-1.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold focus:outline-none focus:border-[#DA291C]"
+                                  className="px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-bold focus:outline-none focus:border-[#DA291C]"
                                 >
                                   <option value="">Sin calificar</option>
                                   <option value="5">5 ★ Excelente</option>
@@ -1173,7 +1173,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                                   className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                                     isPassed
                                       ? 'bg-emerald-600 text-white shadow-xs'
-                                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                      : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
                                   }`}
                                 >
                                   ✓ Aprobado
@@ -1184,7 +1184,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                                   className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                                     isFailed
                                       ? 'bg-rose-600 text-white shadow-xs'
-                                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                      : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
                                   }`}
                                 >
                                   ✕ Reprobado
@@ -1193,7 +1193,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                             )}
 
                             <span className={`px-2.5 py-1 rounded-xl text-[10px] font-black ${
-                              isPassed ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : isFailed ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-500'
+                              isPassed ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50' : isFailed ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
                             }`}>
                               {isPassed ? '✓ Aprobado' : isFailed ? '✕ Reprobado' : 'Pendiente'}
                             </span>
@@ -1202,8 +1202,8 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
 
                         {/* Competencies / Skills Gap Checkers */}
                         {skillsList.length > 0 && (
-                          <div className="py-2.5 border-b border-slate-100 space-y-1.5">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
+                          <div className="py-2.5 border-b border-slate-100 dark:border-slate-700/60 space-y-1.5">
+                            <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                               Competencias Evaluadas (Marcar si mostró debilidad):
                             </label>
                             <div className="flex flex-wrap gap-1.5">
@@ -1216,17 +1216,17 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                                     onClick={() => handleToggleSkillGap(card, skill)}
                                     className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer ${
                                       isGap
-                                        ? 'bg-rose-50 border border-rose-300 text-rose-700 shadow-xs'
-                                        : 'bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                                        ? 'bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 text-rose-700 dark:text-rose-400 shadow-xs'
+                                        : 'bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700'
                                     }`}
                                   >
                                     {isGap ? (
-                                      <ShieldAlert className="w-3 h-3 text-rose-600" />
+                                      <ShieldAlert className="w-3 h-3 text-rose-600 dark:text-rose-400" />
                                     ) : (
-                                      <Target className="w-3 h-3 text-slate-400" />
+                                      <Target className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                                     )}
                                     <span>{skill}</span>
-                                    {isGap && <span className="text-[10px] text-rose-700 font-bold">⚠️ Debilidad</span>}
+                                    {isGap && <span className="text-[10px] text-rose-700 dark:text-rose-400 font-bold">⚠️ Debilidad</span>}
                                   </button>
                                 );
                               })}
@@ -1242,18 +1242,18 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                               value={grade.weaknessesNotes}
                               onChange={(e) => handleWeaknessNotesChange(card, e.target.value)}
                               placeholder="Observaciones pedagógicas específicas sobre debilidades o errores..."
-                              className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                              className="w-full px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                             />
                           </div>
 
-                          <label className="flex items-center gap-2 text-xs text-slate-700 cursor-pointer bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 hover:border-slate-300">
+                          <label className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600">
                             <input
                               type="checkbox"
                               checked={grade.needsRetraining}
                               onChange={() => handleToggleRetraining(card)}
-                              className="rounded border-slate-300 text-rose-600 focus:ring-0 cursor-pointer"
+                              className="rounded border-slate-300 dark:border-slate-600 text-rose-600 focus:ring-0 cursor-pointer"
                             />
-                            <span className={grade.needsRetraining ? 'text-rose-700 font-bold' : 'text-slate-600'}>
+                            <span className={grade.needsRetraining ? 'text-rose-700 dark:text-rose-400 font-bold' : 'text-slate-600 dark:text-slate-400'}>
                               {grade.needsRetraining ? '🚨 Re-capacitación Urgente' : 'Re-capacitación requerida'}
                             </span>
                           </label>
@@ -1263,7 +1263,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                   })}
                 </div>
               ) : (
-                <div className="text-center py-8 text-slate-500 text-xs">
+                <div className="text-center py-8 text-slate-500 dark:text-slate-400 text-xs">
                   No hay participantes inscritos para evaluar en este horario.
                 </div>
               )
@@ -1271,8 +1271,8 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
 
             {/* Save All Grades Button */}
             {filteredParticipants.length > 0 && (
-              <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <p className="text-xs text-slate-500">
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   Las calificaciones registradas se sincronizarán inmediatamente en PostgreSQL con el perfil del participante y su supervisor.
                 </p>
 
@@ -1308,36 +1308,36 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
         ariaLabel="Modo Proyección en Sala"
         className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/90 backdrop-blur-md animate-in fade-in duration-200"
       >
-        <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 flex flex-col items-center text-center relative animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+        <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col items-center text-center relative animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
           <button
             onClick={() => setIsProjectorOpen(false)}
-            className="absolute top-4 right-4 p-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
+            className="absolute top-4 right-4 p-2 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
             title="Cerrar Proyector"
           >
             <X className="w-5 h-5" />
           </button>
 
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 border border-red-200 text-[#DA291C] text-xs font-bold mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-[#DA291C] dark:text-rose-400 text-xs font-bold mb-3">
             <span className="w-2 h-2 rounded-full bg-[#DA291C] animate-pulse" />
             <span>MODO PROYECCIÓN EN SALA</span>
           </div>
 
-          <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight max-w-xl">
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight max-w-xl">
             {event.title}
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 mb-4">
-            Facilitador: <strong className="text-slate-700">{event.instructor}</strong> • {formatDateLong(selectedDate)} ({selectedTime}{currentSlot?.endTime ? ` - ${currentSlot.endTime}` : ''})
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 mb-4">
+            Facilitador: <strong className="text-slate-700 dark:text-slate-200">{event.instructor}</strong> • {formatDateLong(selectedDate)} ({selectedTime}{currentSlot?.endTime ? ` - ${currentSlot.endTime}` : ''})
           </p>
 
           {/* Mode Switcher */}
-          <div className="flex items-center gap-2 p-1.5 bg-slate-100 rounded-2xl mb-4 border border-slate-200">
+          <div className="flex items-center gap-2 p-1.5 bg-slate-100 dark:bg-slate-800 rounded-2xl mb-4 border border-slate-200 dark:border-slate-700">
             <button
               type="button"
               onClick={() => setProjectorMode('checkin')}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 projectorMode === 'checkin'
                   ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
-                  : 'text-slate-600 hover:text-slate-900'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <LogIn className="w-3.5 h-3.5" />
@@ -1349,7 +1349,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 projectorMode === 'checkout'
                   ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/30'
-                  : 'text-slate-600 hover:text-slate-900'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <LogOut className="w-3.5 h-3.5" />
@@ -1357,7 +1357,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
             </button>
           </div>
 
-          {/* Large QR */}
+          {/* Large QR: STRICT SCANNER RULE: Container MUST strictly stay pure white */}
           <div className="my-2 p-5 bg-white rounded-3xl border-2 border-slate-200 shadow-xl inline-block">
             <QRCodeSVG
               value={`${window.location.origin}${window.location.pathname}?tab=attendance&event=${event.id}&date=${selectedDate}&time=${encodeURIComponent(selectedTime)}&type=${projectorMode}`}
@@ -1368,38 +1368,38 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
           </div>
 
           {/* PIN Prominently Displayed */}
-          <div className="mt-3 mb-4 inline-flex items-center gap-3 px-5 py-2 rounded-2xl bg-slate-50 border border-slate-200 shadow-xs">
-            <span className="text-xs font-bold text-slate-500">
+          <div className="mt-3 mb-4 inline-flex items-center gap-3 px-5 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 shadow-xs">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
               O ingresa el PIN de {projectorMode === 'checkin' ? 'Entrada' : 'Salida'}:
             </span>
             <span className={`text-2xl font-black font-mono tracking-widest ${
-              projectorMode === 'checkin' ? 'text-emerald-700' : 'text-[#DA291C]'
+              projectorMode === 'checkin' ? 'text-emerald-700 dark:text-emerald-400' : 'text-[#DA291C] dark:text-rose-400'
             }`}>
               {projectorMode === 'checkin' ? (currentSlot?.checkinCode || '----') : (currentSlot?.checkoutCode || '----')}
             </span>
           </div>
 
           {/* Live Counters */}
-          <div className="w-full max-w-md bg-slate-50 border border-slate-200 rounded-2xl p-3.5 mb-4 grid grid-cols-4 gap-2 text-center text-xs">
+          <div className="w-full max-w-md bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 mb-4 grid grid-cols-4 gap-2 text-center text-xs">
             <div>
-              <span className="text-slate-500 font-bold block text-[10px] uppercase">Inscritos</span>
-              <span className="text-lg font-black text-slate-800">{attendeesList.length}</span>
+              <span className="text-slate-500 dark:text-slate-400 font-bold block text-[10px] uppercase">Inscritos</span>
+              <span className="text-lg font-black text-slate-800 dark:text-white">{attendeesList.length}</span>
             </div>
-            <div className="border-l border-slate-200">
-              <span className="text-emerald-600 font-bold block text-[10px] uppercase">Entradas</span>
-              <span className="text-lg font-black text-emerald-700">{checkInList.length}</span>
+            <div className="border-l border-slate-200 dark:border-slate-700">
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold block text-[10px] uppercase">Entradas</span>
+              <span className="text-lg font-black text-emerald-700 dark:text-emerald-400">{checkInList.length}</span>
             </div>
-            <div className="border-l border-slate-200">
-              <span className="text-blue-600 font-bold block text-[10px] uppercase">Salidas</span>
-              <span className="text-lg font-black text-blue-700">{checkOutList.length}</span>
+            <div className="border-l border-slate-200 dark:border-slate-700">
+              <span className="text-blue-600 dark:text-blue-400 font-bold block text-[10px] uppercase">Salidas</span>
+              <span className="text-lg font-black text-blue-700 dark:text-blue-400">{checkOutList.length}</span>
             </div>
-            <div className="border-l border-slate-200">
-              <span className="text-indigo-600 font-bold block text-[10px] uppercase">Completas</span>
-              <span className="text-lg font-black text-indigo-700">{completedAttendanceList.length}</span>
+            <div className="border-l border-slate-200 dark:border-slate-700">
+              <span className="text-indigo-600 dark:text-indigo-400 font-bold block text-[10px] uppercase">Completas</span>
+              <span className="text-lg font-black text-indigo-700 dark:text-indigo-400">{completedAttendanceList.length}</span>
             </div>
           </div>
 
-          <p className="text-xs text-slate-500 max-w-md">
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md">
             Abre la cámara de tu smartphone y enfoca el código QR o digita el PIN de 4 dígitos para registrar tu {projectorMode === 'checkin' ? 'entrada' : 'salida'}.
           </p>
         </div>
@@ -1413,32 +1413,32 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
         ariaLabel="Eliminar Asignación de Curso"
         className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
       >
-        <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4 animate-in fade-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
+        <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4 animate-in fade-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-rose-50 text-rose-600">
+            <div className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400">
               <Trash2 className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-black text-slate-900">Eliminar Asignación de Curso</h3>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
+              <h3 className="text-base font-black text-slate-900 dark:text-white">Eliminar Asignación de Curso</h3>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300">
                 Super Admin
               </span>
             </div>
           </div>
 
-          <p className="text-xs text-slate-600 leading-relaxed">
-            ¿Estás seguro de que deseas eliminar la asignación de <strong className="text-slate-900">{participantToUnassign?.name}</strong> para el curso <strong className="text-slate-900">{event.title}</strong> en fecha <strong className="text-slate-900">{selectedDate} ({selectedTime})</strong>?
+          <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+            ¿Estás seguro de que deseas eliminar la asignación de <strong className="text-slate-900 dark:text-white">{participantToUnassign?.name}</strong> para el curso <strong className="text-slate-900 dark:text-white">{event.title}</strong> en fecha <strong className="text-slate-900 dark:text-white">{selectedDate} ({selectedTime})</strong>?
           </p>
-          <p className="text-[11px] text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-100">
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
             Esta acción liberará el cupo y cancelará el registro del participante en este horario, independientemente de si el curso ya se impartió o está por impartirse.
           </p>
 
-          <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+          <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
             <button
               type="button"
               onClick={() => setParticipantToUnassign(null)}
               disabled={isUnassigning}
-              className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             >
               Cancelar
             </button>

@@ -58,23 +58,23 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
       ariaLabel="Código QR de Asistencia"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
-        <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
           <div className="flex items-center gap-2.5">
             <div className={`p-2 rounded-xl border ${
               activeMode === 'checkin' 
-                ? 'bg-emerald-50 text-emerald-600 border-emerald-200' 
-                : 'bg-red-50 text-[#DA291C] border-red-200'
+                ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50' 
+                : 'bg-red-50 dark:bg-red-950/40 text-[#DA291C] border-red-200 dark:border-red-900/50'
             }`}>
               {activeMode === 'checkin' ? <LogIn className="w-5 h-5" /> : <LogOut className="w-5 h-5" />}
             </div>
             <div>
-              <h2 className="text-base font-black text-slate-900">
+              <h2 className="text-base font-black text-slate-900 dark:text-white">
                 Control Diario de Asistencia
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Códigos QR y PINs de aula para inicio y cierre de sesión
               </p>
             </div>
@@ -82,14 +82,14 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
           <button
             onClick={onClose}
             aria-label="Cerrar ventana de control de asistencia"
-            className="p-2 sm:p-1.5 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer inline-flex items-center justify-center"
+            className="p-2 sm:p-1.5 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer inline-flex items-center justify-center"
           >
             <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 
         {/* Mode Selector Tabs (Entrada vs Salida) */}
-        <div className="p-3 bg-slate-100/80 border-b border-slate-200 grid grid-cols-2 gap-2">
+        <div className="p-3 bg-slate-100/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 grid grid-cols-2 gap-2">
           <button
             type="button"
             aria-pressed={activeMode === 'checkin'}
@@ -97,7 +97,7 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
             className={`py-2.5 px-4 rounded-2xl text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${
               activeMode === 'checkin'
                 ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25'
-                : 'bg-white text-slate-700 hover:bg-slate-100 hover:text-emerald-800 border border-slate-200'
+                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-emerald-800 dark:hover:text-emerald-300 border border-slate-200 dark:border-slate-700'
             }`}
           >
             <LogIn className="w-4 h-4" aria-hidden="true" />
@@ -111,7 +111,7 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
             className={`py-2.5 px-4 rounded-2xl text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${
               activeMode === 'checkout'
                 ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                : 'bg-white text-slate-700 hover:bg-slate-100 hover:text-red-800 border border-slate-200'
+                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-red-800 dark:hover:text-red-300 border border-slate-200 dark:border-slate-700'
             }`}
           >
             <LogOut className="w-4 h-4" aria-hidden="true" />
@@ -125,11 +125,11 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
           {/* Date & Time Selectors */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-bold text-slate-700">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
                 Selecciona Fecha y Horario de la Sesión:
               </label>
               {currentSlot?.endTime && (
-                <span className="text-[11px] text-slate-500 font-bold flex items-center gap-1">
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 font-bold flex items-center gap-1">
                   <Clock className="w-3 h-3 text-[#DA291C]" />
                   <span>Duración: {currentSlot.time} - {currentSlot.endTime}</span>
                 </span>
@@ -147,8 +147,8 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
                   }}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     selectedDate === sch.date
-                      ? 'bg-slate-900 text-white shadow-xs'
-                      : 'bg-slate-50 border border-slate-300 text-slate-700 hover:bg-slate-100'
+                      ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-xs'
+                      : 'bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                   }`}
                 >
                   {formatDateLong(sch.date)}
@@ -166,9 +166,9 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
                     className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       selectedTime === sl.time
                         ? activeMode === 'checkin'
-                          ? 'bg-emerald-50 border border-emerald-300 text-emerald-800'
-                          : 'bg-red-50 border border-red-300 text-[#DA291C]'
-                        : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50'
+                          ? 'bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300'
+                          : 'bg-red-50 dark:bg-red-950/40 border border-red-300 dark:border-red-800 text-[#DA291C]'
+                        : 'bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
                     }`}
                   >
                     <span>{sl.time}{sl.endTime ? ` - ${sl.endTime}` : ''}</span>
@@ -181,34 +181,34 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
           {/* Printable Badge Card */}
           <div 
             id="printable-qr-badge" 
-            className={`p-6 rounded-3xl bg-white text-slate-900 shadow-xl text-center space-y-4 border-2 transition-all ${
+            className={`p-6 rounded-3xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white print:bg-white print:text-slate-900 shadow-xl text-center space-y-4 border-2 transition-all ${
               activeMode === 'checkin' ? 'border-emerald-500/80' : 'border-[#DA291C]/80'
             }`}
           >
             {/* Badge Mode Header */}
             <div className={`py-2 px-4 rounded-2xl flex items-center justify-between text-xs font-black ${
-              activeMode === 'checkin' ? 'bg-emerald-100 text-emerald-900' : 'bg-red-100 text-red-950'
+              activeMode === 'checkin' ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200' : 'bg-red-100 dark:bg-red-950/60 text-red-950 dark:text-red-200'
             }`}>
               <div className="flex items-center gap-1.5 uppercase tracking-wider">
-                {activeMode === 'checkin' ? <LogIn className="w-4 h-4 text-emerald-700" /> : <LogOut className="w-4 h-4 text-[#DA291C]" />}
+                {activeMode === 'checkin' ? <LogIn className="w-4 h-4 text-emerald-700 dark:text-emerald-400" /> : <LogOut className="w-4 h-4 text-[#DA291C]" />}
                 <span>{activeMode === 'checkin' ? 'Registro de ENTRADA (Inicio)' : 'Registro de SALIDA (Cierre)'}</span>
               </div>
-              <span className="text-[10px] px-2 py-0.5 rounded-md bg-white font-mono shadow-xs">
+              <span className="text-[10px] px-2 py-0.5 rounded-md bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-mono shadow-xs">
                 OFICIAL
               </span>
             </div>
 
-            <div className="border-b border-slate-200 pb-3">
+            <div className="border-b border-slate-200 dark:border-slate-700 pb-3">
               <span className="text-[10px] font-black tracking-widest text-[#DA291C] uppercase">
                 CapacitaHub • Control Presencial
               </span>
-              <h3 className="text-base font-black text-slate-900 mt-1 leading-snug">
+              <h3 className="text-base font-black text-slate-900 dark:text-white mt-1 leading-snug">
                 {event.title}
               </h3>
-              <p className="text-xs text-slate-600 mt-0.5">Facilitador: {event.instructor}</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Facilitador: {event.instructor}</p>
             </div>
 
-            {/* QR Code Container */}
+            {/* QR Code Container - MUST STRICTLY RETAIN bg-white FOR OPTICAL CONTRAST */}
             <div className="p-3 bg-white inline-block rounded-2xl border border-slate-200 shadow-xs">
               <QRCodeSVG
                 value={attendanceUrl}
@@ -221,36 +221,36 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
             {/* PIN Code Box for Classroom Projection */}
             <div className={`p-4 rounded-2xl border space-y-1.5 ${
               activeMode === 'checkin' 
-                ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950' 
-                : 'bg-red-50/70 border-red-200 text-red-950'
+                ? 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900/50 text-emerald-950 dark:text-emerald-200' 
+                : 'bg-red-50/70 dark:bg-red-950/30 border-red-200 dark:border-red-900/50 text-red-950 dark:text-red-200'
             }`}>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center justify-center gap-1">
-                <KeyRound className="w-3 h-3 text-slate-600" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1">
+                <KeyRound className="w-3 h-3 text-slate-600 dark:text-slate-400" />
                 Código PIN Diario ({activeMode === 'checkin' ? 'Entrada' : 'Salida'}):
               </span>
               <div className="text-3xl font-mono font-black tracking-widest text-slate-900 bg-white py-1.5 px-4 rounded-xl border border-slate-200 inline-block shadow-xs">
                 {currentDailyCode}
               </div>
-              <p className="text-[10px] text-slate-500 font-medium">
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
                 Si no puedes escanear con tu cámara, digita este código de 4 dígitos en tu pantalla de asistencia.
               </p>
             </div>
 
             {/* Session Info */}
-            <div className="text-xs text-slate-700 bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1">
-              <p className="font-bold text-slate-900">{formatDateLong(selectedDate)}</p>
+            <div className="text-xs text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-900/60 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-1">
+              <p className="font-bold text-slate-900 dark:text-white">{formatDateLong(selectedDate)}</p>
               <p className="text-[#DA291C] font-black text-sm">
                 {selectedTime}{currentSlot?.endTime ? ` - ${currentSlot.endTime}` : ''}
               </p>
-              <p className="text-[11px] text-slate-500 font-semibold">{event.location}</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">{event.location}</p>
             </div>
 
             {activeMode === 'checkin' ? (
-              <p className="text-[10px] text-emerald-800 font-bold">
+              <p className="text-[10px] text-emerald-800 dark:text-emerald-400 font-bold">
                 ⚠️ Recuerda que al finalizar la sesión deberás registrar tu salida para completar tu asistencia y acceder a la evaluación del facilitador.
               </p>
             ) : (
-              <p className="text-[10px] text-red-800 font-bold">
+              <p className="text-[10px] text-red-800 dark:text-red-400 font-bold">
                 ⭐ Al registrar tu salida se habilitará automáticamente la Encuesta de Satisfacción TEC.
               </p>
             )}
@@ -261,9 +261,9 @@ export const QrModal: React.FC<QrModalProps> = ({ event, onClose }) => {
             <button
               type="button"
               onClick={handleCopyLink}
-              className="flex-1 py-2.5 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center gap-2 border border-slate-300 transition-colors cursor-pointer"
+              className="flex-1 py-2.5 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center justify-center gap-2 border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer"
             >
-              {copied ? <Check className="w-4 h-4 text-emerald-600" aria-hidden="true" /> : <Copy className="w-4 h-4" aria-hidden="true" />}
+              {copied ? <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" aria-hidden="true" /> : <Copy className="w-4 h-4" aria-hidden="true" />}
               <span role="status" aria-live="polite">{copied ? '¡Enlace Copiado!' : `Copiar Enlace (${activeMode === 'checkin' ? 'Entrada' : 'Salida'})`}</span>
             </button>
 

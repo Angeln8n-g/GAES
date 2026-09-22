@@ -75,23 +75,23 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
       ariaLabel="Despacho de Recordatorio de Capacitación"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
-        <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-red-50 text-[#DA291C] border border-red-200">
+            <div className="p-2 rounded-xl bg-red-50 dark:bg-red-950/40 text-[#DA291C] border border-red-200 dark:border-red-900/50">
               <Bell className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-black text-slate-900">Centro de Notificaciones & Alertas</h2>
-              <p className="text-xs text-slate-500">Emisión de recordatorios a inscritos</p>
+              <h2 className="text-base font-black text-slate-900 dark:text-white">Centro de Notificaciones & Alertas</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Emisión de recordatorios a inscritos</p>
             </div>
           </div>
           <button
             onClick={onClose}
             aria-label="Cerrar centro de notificaciones"
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" aria-hidden="true" />
           </button>
@@ -101,14 +101,14 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
         <div className="p-6 overflow-y-auto space-y-5">
           
           {/* Target Event Info */}
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
             <div>
               <span className="text-[10px] font-black text-[#DA291C] uppercase">Capacitación</span>
-              <p className="text-xs font-bold text-slate-900 mt-0.5">{event.title}</p>
+              <p className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">{event.title}</p>
             </div>
             <div className="text-right">
-              <span className="text-[10px] text-slate-500 font-semibold">Destinatarios</span>
-              <p className="text-xs font-black text-slate-800 flex items-center gap-1 justify-end">
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">Destinatarios</span>
+              <p className="text-xs font-black text-slate-800 dark:text-slate-200 flex items-center gap-1 justify-end">
                 <Users className="w-3.5 h-3.5 text-[#DA291C]" aria-hidden="true" />
                 <span>{totalRecipients} colaboradores</span>
               </p>
@@ -117,7 +117,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
 
           {/* Channel Selection */}
           <div className="space-y-2">
-            <label className="block text-xs font-bold text-slate-700">Canal de Envío:</label>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">Canal de Envío:</label>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
@@ -126,7 +126,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                 className={`p-3 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
                   channel === 'Email'
                     ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25 border-[#DA291C]'
-                    : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
+                    : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'
                 }`}
               >
                 <Mail className="w-4 h-4" aria-hidden="true" />
@@ -140,7 +140,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                 className={`p-3 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
                   channel === 'Teams'
                     ? 'bg-cyan-700 text-white shadow-md shadow-cyan-700/25 border-cyan-700'
-                    : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
+                    : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'
                 }`}
               >
                 <Bell className="w-4 h-4" aria-hidden="true" />
@@ -152,14 +152,14 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
           {/* Template Message Input */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label htmlFor="notification-message" className="block text-xs font-bold text-slate-700">Mensaje Personalizado:</label>
-              <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-semibold">
+              <label htmlFor="notification-message" className="block text-xs font-bold text-slate-700 dark:text-slate-300">Mensaje Personalizado:</label>
+              <div className="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
                 <span>Variables:</span>
                 <button
                   type="button"
                   aria-label="Insertar variable título del evento"
                   onClick={() => setMessage(prev => `${prev} [EVENT_TITLE]`)}
-                  className="px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-[#DA291C] font-bold cursor-pointer"
+                  className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[#DA291C] font-bold cursor-pointer"
                 >
                   [EVENT_TITLE]
                 </button>
@@ -167,7 +167,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                   type="button"
                   aria-label="Insertar variable instructor"
                   onClick={() => setMessage(prev => `${prev} [INSTRUCTOR]`)}
-                  className="px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-[#DA291C] font-bold cursor-pointer"
+                  className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[#DA291C] font-bold cursor-pointer"
                 >
                   [INSTRUCTOR]
                 </button>
@@ -175,7 +175,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                   type="button"
                   aria-label="Insertar variable enlace de encuesta"
                   onClick={() => setMessage(prev => `${prev} [SURVEY_LINK]`)}
-                  className="px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-[#DA291C] font-bold cursor-pointer"
+                  className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[#DA291C] font-bold cursor-pointer"
                 >
                   [SURVEY_LINK]
                 </button>
@@ -186,17 +186,17 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
               rows={3}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-2xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+              className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
             />
           </div>
 
           {/* Live Preview */}
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-            <span className="text-[10px] font-black text-slate-600 uppercase flex items-center gap-1">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2">
+            <span className="text-[10px] font-black text-slate-600 dark:text-slate-400 uppercase flex items-center gap-1">
               <Sparkles className="w-3 h-3 text-[#DA291C]" />
               Vista Previa en Tiempo Real:
             </span>
-            <div className="p-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-800 leading-relaxed italic shadow-xs">
+            <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 text-xs text-slate-800 dark:text-slate-200 leading-relaxed italic shadow-xs">
               "{processedMessage}"
             </div>
           </div>
@@ -204,15 +204,15 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
           {/* Notification History Log */}
           {(event.notificationHistory || []).length > 0 && (
             <div className="space-y-2 pt-2">
-              <span className="text-xs font-bold text-slate-700 flex items-center gap-1">
-                <History className="w-3.5 h-3.5 text-slate-500" />
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                <History className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                 Historial de Envíos Anteriores:
               </span>
               <div className="space-y-1.5 max-h-28 overflow-y-auto">
                 {event.notificationHistory?.map((h, i) => (
-                  <div key={i} className="flex items-center justify-between p-2 rounded-xl bg-slate-50 text-[11px] text-slate-600 border border-slate-200">
+                  <div key={i} className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-[11px] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
                     <span>{h.date} • Canal: {h.channel}</span>
-                    <span className="text-emerald-700 font-bold">{h.recipients} destinatarios ({h.status})</span>
+                    <span className="text-emerald-700 dark:text-emerald-400 font-bold">{h.recipients} destinatarios ({h.status})</span>
                   </div>
                 ))}
               </div>

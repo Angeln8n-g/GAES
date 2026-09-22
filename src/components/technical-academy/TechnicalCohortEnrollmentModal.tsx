@@ -507,27 +507,27 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
       ariaLabel={`Gestión de Participantes: ${cohort.courseTitle}`}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto bg-slate-900/60 backdrop-blur-sm animate-fade-in"
     >
-      <div className="relative w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-200/90 overflow-hidden flex flex-col max-h-[92vh]" onClick={(e) => e.stopPropagation()}>
+      <div className="relative w-full max-w-5xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200/90 dark:border-slate-800 overflow-hidden flex flex-col max-h-[92vh]" onClick={(e) => e.stopPropagation()}>
         {/* Cabecera del Modal */}
-        <div className="px-6 py-5 border-b border-slate-100 bg-white">
+        <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-red-50 text-[#DA291C] border border-red-100">
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border border-red-100 dark:border-red-900/50">
                   Academia Técnica
                 </span>
-                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                   {cohort.groupName || 'Sin Grupo Asignado'}
                 </span>
-                <span className="text-xs font-medium text-slate-500 flex items-center gap-1">
+                <span className="text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5 text-slate-400" />
                   {cohort.startDate} al {cohort.endDate}
                 </span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 truncate">
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white truncate">
                 Gestión de Participantes: {cohort.courseTitle}
               </h2>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600 mt-1">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600 dark:text-slate-400 mt-1">
                 <span>
                   <strong>Facilitador:</strong> {cohort.facilitatorName}
                 </span>
@@ -546,22 +546,22 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
 
             <div className="flex items-center gap-3 shrink-0">
               {/* Badge de Cupo / Capacidad */}
-              <div className="hidden sm:flex flex-col items-end px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+              <div className="hidden sm:flex flex-col items-end px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   Matriculados / Cupo
                 </span>
-                <span className="text-sm font-black text-slate-800">
-                  <span className={enrolledParticipants.length > cohort.capacity ? 'text-[#DA291C]' : 'text-emerald-700'}>
+                <span className="text-sm font-black text-slate-800 dark:text-slate-200">
+                  <span className={enrolledParticipants.length > cohort.capacity ? 'text-[#DA291C]' : 'text-emerald-700 dark:text-emerald-400'}>
                     {enrolledParticipants.length}
                   </span>
-                  <span className="text-slate-500 font-normal"> / {cohort.capacity}</span>
+                  <span className="text-slate-500 dark:text-slate-400 font-normal"> / {cohort.capacity}</span>
                 </span>
               </div>
 
               <button
                 type="button"
                 onClick={onClose}
-                className="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100 transition-colors"
+                className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 title="Cerrar ventana"
               >
                 <X className="w-5 h-5" />
@@ -570,20 +570,20 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
           </div>
 
           {/* Barra de Pestañas */}
-          <div className="flex items-center gap-2 mt-5 border-b border-slate-200 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-2 mt-5 border-b border-slate-200 dark:border-slate-800 overflow-x-auto no-scrollbar">
             <button
               type="button"
               onClick={() => setActiveTab('enrolled')}
               className={`pb-3 px-3 text-sm font-bold flex items-center gap-2 border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === 'enrolled'
                   ? 'border-[#DA291C] text-[#DA291C]'
-                  : 'border-transparent text-slate-500 hover:text-slate-800'
+                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
             >
               <Users className="w-4 h-4" />
               Lista de Matriculados
               <span className={`ml-1 text-xs px-2 py-0.5 rounded-full font-bold ${
-                activeTab === 'enrolled' ? 'bg-red-100 text-[#DA291C]' : 'bg-slate-100 text-slate-600'
+                activeTab === 'enrolled' ? 'bg-red-100 dark:bg-red-950/60 text-[#DA291C] dark:text-red-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
               }`}>
                 {enrolledParticipants.length}
               </span>
@@ -597,7 +597,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                   className={`pb-3 px-3 text-sm font-bold flex items-center gap-2 border-b-2 transition-colors whitespace-nowrap ${
                     activeTab === 'upload_excel'
                       ? 'border-[#DA291C] text-[#DA291C]'
-                      : 'border-transparent text-slate-500 hover:text-slate-800'
+                      : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
                 >
                   <FileSpreadsheet className="w-4 h-4" />
@@ -610,7 +610,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                   className={`pb-3 px-3 text-sm font-bold flex items-center gap-2 border-b-2 transition-colors whitespace-nowrap ${
                     activeTab === 'paste_list'
                       ? 'border-[#DA291C] text-[#DA291C]'
-                      : 'border-transparent text-slate-500 hover:text-slate-800'
+                      : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
                 >
                   <FileText className="w-4 h-4" />
@@ -623,7 +623,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                   className={`pb-3 px-3 text-sm font-bold flex items-center gap-2 border-b-2 transition-colors whitespace-nowrap ${
                     activeTab === 'browse_catalog'
                       ? 'border-[#DA291C] text-[#DA291C]'
-                      : 'border-transparent text-slate-500 hover:text-slate-800'
+                      : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
                 >
                   <UserPlus className="w-4 h-4" />
@@ -636,12 +636,12 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
 
         {/* Mensajes de Alerta / Estado */}
         {errorMsg && (
-          <div className="mx-6 mt-4 p-3.5 bg-rose-50 border border-rose-200 rounded-2xl flex items-center gap-3 text-rose-800 text-sm animate-fade-in">
+          <div className="mx-6 mt-4 p-3.5 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 rounded-2xl flex items-center gap-3 text-rose-800 dark:text-rose-300 text-sm animate-fade-in">
             <AlertCircle className="w-5 h-5 shrink-0 text-rose-600" />
             <span className="flex-1 font-medium">{errorMsg}</span>
             <button
               onClick={() => setErrorMsg(null)}
-              className="text-rose-500 hover:text-rose-700 font-bold text-xs"
+              className="text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-bold text-xs"
             >
               Cerrar
             </button>
@@ -649,12 +649,12 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
         )}
 
         {successMsg && (
-          <div className="mx-6 mt-4 p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-emerald-800 text-sm animate-fade-in">
+          <div className="mx-6 mt-4 p-3.5 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 rounded-2xl flex items-center gap-3 text-emerald-800 dark:text-emerald-300 text-sm animate-fade-in">
             <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-600" />
             <span className="flex-1 font-medium">{successMsg}</span>
             <button
               onClick={() => setSuccessMsg(null)}
-              className="text-emerald-500 hover:text-emerald-700 font-bold text-xs"
+              className="text-emerald-500 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-bold text-xs"
             >
               Cerrar
             </button>
@@ -662,14 +662,14 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
         )}
 
         {/* Cuerpo del Modal con scroll */}
-        <div className="p-6 overflow-y-auto flex-1 bg-slate-50/50">
+        <div className="p-6 overflow-y-auto flex-1 bg-slate-50/50 dark:bg-slate-950/40">
           {/* ======================================================== */}
           {/* PESTAÑA 1: LISTA DE MATRICULADOS */}
           {/* ======================================================== */}
           {activeTab === 'enrolled' && (
             <div className="space-y-4">
               {/* Barra de Acciones y Filtros */}
-              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+              <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
                 <div className="flex flex-1 flex-col sm:flex-row items-stretch sm:items-center gap-2">
                   <div className="relative flex-1">
                     <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -678,14 +678,14 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                       placeholder="Buscar por nombre, carnet, cédula o correo..."
                       value={searchQuery}
                       onChange={e => setSearchQuery(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white"
+                      className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white dark:focus:bg-slate-900 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                     />
                   </div>
 
                   <select
                     value={conditionFilter}
                     onChange={e => setConditionFilter(e.target.value as any)}
-                    className="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] text-slate-700 font-medium"
+                    className="px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] text-slate-700 dark:text-slate-200 font-medium"
                   >
                     <option value="ALL">Todas las condiciones</option>
                     <option value="APROBADO">Aprobados (&gt;= 80%)</option>
@@ -699,17 +699,17 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                     type="button"
                     onClick={() => exportCohortParticipantsToExcel(cohort, enrolledParticipants)}
                     disabled={enrolledParticipants.length === 0}
-                    className="px-3.5 py-2 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-colors flex items-center gap-2 shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3.5 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-colors flex items-center gap-2 shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Exportar listado a Excel"
                   >
-                    <Download className="w-3.5 h-3.5 text-emerald-600" />
+                    <Download className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                     Exportar Excel (.xlsx)
                   </button>
 
                   <button
                     type="button"
                     onClick={fetchEnrolledList}
-                    className="p-2 text-slate-500 hover:text-slate-800 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+                    className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                     title="Recargar lista"
                   >
                     <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -721,9 +721,9 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
               {isAdminOrSuper && (
                 <form
                   onSubmit={handleQuickAdd}
-                  className="bg-white p-3.5 rounded-2xl border border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5"
+                  className="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5"
                 >
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-700 whitespace-nowrap">
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">
                     <UserPlus className="w-4 h-4 text-[#DA291C]" />
                     Matrícula Rápida:
                   </div>
@@ -732,7 +732,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                     placeholder="Ingresar Carnet, Cédula o Correo del colaborador..."
                     value={quickAddCard}
                     onChange={e => setQuickAddCard(e.target.value)}
-                    className="flex-1 px-3 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white"
+                    className="flex-1 px-3 py-1.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white dark:focus:bg-slate-900 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                   <button
                     type="submit"
@@ -747,19 +747,19 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
 
               {/* Tabla de Participantes */}
               {loading ? (
-                <div className="py-16 text-center text-slate-500 bg-white rounded-2xl border border-slate-200">
+                <div className="py-16 text-center text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
                   <RefreshCw className="w-8 h-8 mx-auto mb-2 animate-spin text-[#DA291C]" />
                   <p className="text-sm font-medium">Cargando participantes matriculados...</p>
                 </div>
               ) : filteredEnrolled.length === 0 ? (
-                <div className="py-16 text-center bg-white rounded-2xl border border-slate-200 p-8">
-                  <Users className="w-12 h-12 mx-auto mb-3 text-slate-300" />
-                  <h3 className="text-base font-bold text-slate-800 mb-1">
+                <div className="py-16 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8">
+                  <Users className="w-12 h-12 mx-auto mb-3 text-slate-300 dark:text-slate-600" />
+                  <h3 className="text-base font-bold text-slate-800 dark:text-white mb-1">
                     {searchQuery || conditionFilter !== 'ALL'
                       ? 'No hay participantes que coincidan con la búsqueda'
                       : 'No hay participantes matriculados en esta cohorte'}
                   </h3>
-                  <p className="text-xs text-slate-500 max-w-md mx-auto mb-4">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-4">
                     {searchQuery || conditionFilter !== 'ALL'
                       ? 'Intenta ajustar los términos de búsqueda o restablecer los filtros.'
                       : 'Puedes matricular colaboradores cargando una lista de Excel, pegando una lista de carnets o seleccionando directamente del padrón.'}
@@ -777,7 +777,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                       <button
                         type="button"
                         onClick={() => setActiveTab('browse_catalog')}
-                        className="px-3.5 py-2 text-xs font-bold text-slate-700 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors flex items-center gap-1.5"
+                        className="px-3.5 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5"
                       >
                         <UserPlus className="w-3.5 h-3.5" />
                         Seleccionar del Padrón
@@ -786,11 +786,11 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                   )}
                 </div>
               ) : (
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs text-slate-600 border-collapse">
+                    <table className="w-full text-left text-xs text-slate-600 dark:text-slate-300 border-collapse">
                       <thead>
-                        <tr className="bg-slate-50 border-b border-slate-200 text-slate-700 uppercase font-black tracking-wider text-[11px]">
+                        <tr className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 uppercase font-black tracking-wider text-[11px]">
                           <th className="py-3 px-4">#</th>
                           <th className="py-3 px-4">Colaborador / Técnico</th>
                           <th className="py-3 px-4">Carnet</th>
@@ -802,31 +802,31 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                           {(isAdminOrSuper || hasGradingPermission) && <th className="py-3 px-4 text-right">Acciones</th>}
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100 font-medium">
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
                         {filteredEnrolled.map((p, idx) => (
-                          <tr key={p.card} className="hover:bg-slate-50/80 transition-colors">
-                            <td className="py-3 px-4 text-slate-500 font-bold">{idx + 1}</td>
+                          <tr key={p.card} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                            <td className="py-3 px-4 text-slate-500 dark:text-slate-400 font-bold">{idx + 1}</td>
                             <td className="py-3 px-4">
-                              <div className="font-bold text-slate-900">{p.name}</div>
-                              <div className="text-[11px] text-slate-500">{p.email}</div>
+                              <div className="font-bold text-slate-900 dark:text-white">{p.name}</div>
+                              <div className="text-[11px] text-slate-500 dark:text-slate-400">{p.email}</div>
                             </td>
                             <td className="py-3 px-4">
-                              <span className="font-mono px-2 py-0.5 rounded-md bg-slate-100 text-slate-800 font-bold text-[11px]">
+                              <span className="font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-[11px]">
                                 {p.card}
                               </span>
                             </td>
-                            <td className="py-3 px-4 text-slate-600 font-mono text-[11px]">
+                            <td className="py-3 px-4 text-slate-600 dark:text-slate-400 font-mono text-[11px]">
                               {p.cedula ? formatCedula(p.cedula) : '—'}
                             </td>
-                            <td className="py-3 px-4 text-slate-600">
+                            <td className="py-3 px-4 text-slate-600 dark:text-slate-400">
                               {p.department || '—'}
                             </td>
                             <td className="py-3 px-4 text-center">
                               <div className="inline-flex flex-col items-center">
-                                <span className="font-bold text-slate-800 text-xs">
+                                <span className="font-bold text-slate-800 dark:text-slate-200 text-xs">
                                   {p.attendedDays} / {p.totalDays} días ({p.attendancePercentage}%)
                                 </span>
-                                <span className="text-[10px] text-slate-500">
+                                <span className="text-[10px] text-slate-500 dark:text-slate-400">
                                   {p.totalHoursEarned} hrs acreditadas
                                 </span>
                               </div>
@@ -834,16 +834,16 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                             <td className="py-3 px-4 text-center">
                               {p.score !== undefined && p.score !== null ? (
                                 <div className="inline-flex flex-col items-center">
-                                  <span className="font-black text-slate-900 text-xs">
+                                  <span className="font-black text-slate-900 dark:text-white text-xs">
                                     {p.score} / 100
                                   </span>
                                   <span
                                     className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold border mt-0.5 ${
                                       p.academicStatus === 'passed' || (!p.academicStatus && p.score >= 70)
-                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                        ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50'
                                         : p.academicStatus === 'failed' || (!p.academicStatus && p.score < 70)
-                                        ? 'bg-rose-50 text-rose-700 border-rose-200'
-                                        : 'bg-amber-50 text-amber-700 border-amber-200'
+                                        ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-900/50'
+                                        : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-900/50'
                                     }`}
                                   >
                                     {p.academicStatus === 'passed' || (!p.academicStatus && p.score >= 70)
@@ -853,23 +853,23 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                                       : 'Pendiente'}
                                   </span>
                                   {p.feedback && (
-                                    <span className="text-[10px] text-slate-500 truncate max-w-[130px] mt-0.5" title={p.feedback}>
+                                    <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate max-w-[130px] mt-0.5" title={p.feedback}>
                                       💬 {p.feedback}
                                     </span>
                                   )}
                                 </div>
                               ) : (
-                                <span className="text-slate-500 italic text-[11px]">Sin calificar</span>
+                                <span className="text-slate-500 dark:text-slate-400 italic text-[11px]">Sin calificar</span>
                               )}
                             </td>
                             <td className="py-3 px-4 text-center">
                               <span
                                 className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-black tracking-wider uppercase border ${
                                   p.academicCondition === 'APROBADO'
-                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50'
                                     : p.academicCondition === 'EN RIESGO'
-                                    ? 'bg-amber-50 text-amber-700 border-amber-200'
-                                    : 'bg-rose-50 text-rose-700 border-rose-200'
+                                    ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-900/50'
+                                    : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-900/50'
                                 }`}
                               >
                                 {p.academicCondition}
@@ -882,7 +882,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                                     <button
                                       type="button"
                                       onClick={() => openGradingModal(p)}
-                                      className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-1 text-xs font-semibold"
+                                      className="p-1.5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-lg transition-colors flex items-center gap-1 text-xs font-semibold"
                                       title={`Calificar o editar notas de ${p.name}`}
                                     >
                                       <Award className="w-4 h-4" />
@@ -894,11 +894,11 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                                       type="button"
                                       onClick={() => handleRemoveParticipant(p)}
                                       disabled={isRemovingCard === p.card}
-                                      className="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors"
+                                      className="p-1.5 text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors"
                                       title={`Desmatricular a ${p.name}`}
                                     >
                                       {isRemovingCard === p.card ? (
-                                        <RefreshCw className="w-4 h-4 animate-spin text-rose-600" />
+                                        <RefreshCw className="w-4 h-4 animate-spin text-rose-600 dark:text-rose-400" />
                                       ) : (
                                         <Trash2 className="w-4 h-4" />
                                       )}
@@ -923,13 +923,13 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
           {activeTab === 'upload_excel' && isAdminOrSuper && (
             <div className="space-y-5">
               {/* Tarjeta de Instrucciones y Plantilla */}
-              <div className="bg-white p-5 rounded-2xl border border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="flex-1">
-                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 mb-1">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-1">
                     <FileSpreadsheet className="w-4 h-4 text-[#DA291C]" />
                     Carga Masiva de Participantes desde Archivo
                   </h3>
-                  <p className="text-xs text-slate-600">
+                  <p className="text-xs text-slate-600 dark:text-slate-400">
                     Sube un archivo de Excel (.xlsx, .xls) o CSV con las tarjetas, cédulas o correos de los técnicos.
                     El sistema identificará a los colaboradores automáticamente en el padrón.
                   </p>
@@ -937,7 +937,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                 <button
                   type="button"
                   onClick={downloadCohortParticipantsTemplateExcel}
-                  className="px-4 py-2 text-xs font-bold text-[#DA291C] bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-colors flex items-center gap-2 shrink-0 shadow-xs"
+                  className="px-4 py-2 text-xs font-bold text-[#DA291C] dark:text-red-400 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/60 transition-colors flex items-center gap-2 shrink-0 shadow-xs"
                 >
                   <Download className="w-4 h-4" />
                   Descargar Plantilla Oficial (.xlsx)
@@ -947,7 +947,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
               {/* Zona de Arrastre de Archivo */}
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-slate-300 hover:border-[#DA291C] bg-white rounded-3xl p-8 text-center cursor-pointer transition-all hover:bg-red-50/10 group"
+                className="border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-[#DA291C] dark:hover:border-[#DA291C] bg-white dark:bg-slate-900 rounded-3xl p-8 text-center cursor-pointer transition-all hover:bg-red-50/10 dark:hover:bg-red-950/10 group"
               >
                 <input
                   ref={fileInputRef}
@@ -957,59 +957,59 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                   className="hidden"
                 />
                 <UploadCloud className="w-12 h-12 mx-auto mb-3 text-slate-400 group-hover:text-[#DA291C] group-hover:scale-110 transition-all" />
-                <h4 className="text-sm font-bold text-slate-800 mb-1">
+                <h4 className="text-sm font-bold text-slate-800 dark:text-white mb-1">
                   {selectedFileName ? selectedFileName : 'Haz clic para seleccionar o arrastra el archivo aquí'}
                 </h4>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   Formatos compatibles: .xlsx, .xls, .csv (Máximo 5MB)
                 </p>
               </div>
 
               {/* Vista Previa del Archivo */}
               {isParsingExcel && (
-                <div className="py-8 text-center text-slate-500 bg-white rounded-2xl border border-slate-200">
+                <div className="py-8 text-center text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
                   <RefreshCw className="w-6 h-6 mx-auto mb-2 animate-spin text-[#DA291C]" />
                   <p className="text-xs font-medium">Validando identificadores contra el padrón...</p>
                 </div>
               )}
 
               {excelPreview && (
-                <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4 animate-fade-in shadow-sm">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 space-y-4 animate-fade-in shadow-sm">
                   {/* Resumen de Métrica */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200">
-                      <div className="text-[10px] uppercase font-bold text-emerald-700">Listos p/ Matricular</div>
-                      <div className="text-xl font-black text-emerald-800">
+                    <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50">
+                      <div className="text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-400">Listos p/ Matricular</div>
+                      <div className="text-xl font-black text-emerald-800 dark:text-emerald-300">
                         {excelPreview.matched.filter(m => !enrolledCardSet.has(m.card.trim().toLowerCase())).length}
                       </div>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-blue-50 border border-blue-200">
-                      <div className="text-[10px] uppercase font-bold text-blue-700">Ya Matriculados</div>
-                      <div className="text-xl font-black text-blue-800">
+                    <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/50">
+                      <div className="text-[10px] uppercase font-bold text-blue-700 dark:text-blue-400">Ya Matriculados</div>
+                      <div className="text-xl font-black text-blue-800 dark:text-blue-300">
                         {excelPreview.matched.filter(m => enrolledCardSet.has(m.card.trim().toLowerCase())).length}
                       </div>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-rose-50 border border-rose-200">
-                      <div className="text-[10px] uppercase font-bold text-rose-700">No Encontrados</div>
-                      <div className="text-xl font-black text-rose-800">
+                    <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50">
+                      <div className="text-[10px] uppercase font-bold text-rose-700 dark:text-rose-400">No Encontrados</div>
+                      <div className="text-xl font-black text-rose-800 dark:text-rose-300">
                         {excelPreview.unmatched.length}
                       </div>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                      <div className="text-[10px] uppercase font-bold text-slate-700">Duplicados en Archivo</div>
-                      <div className="text-xl font-black text-slate-800">
+                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                      <div className="text-[10px] uppercase font-bold text-slate-700 dark:text-slate-300">Duplicados en Archivo</div>
+                      <div className="text-xl font-black text-slate-800 dark:text-white">
                         {excelPreview.duplicatesInFile}
                       </div>
                     </div>
                   </div>
 
                   {/* Tabla de Coincidencias */}
-                  <div className="max-h-60 overflow-y-auto border border-slate-200 rounded-xl">
-                    <table className="w-full text-left text-xs text-slate-600 border-collapse">
-                      <thead className="bg-slate-50 sticky top-0 border-b border-slate-200 text-slate-700 uppercase font-black text-[10px]">
+                  <div className="max-h-60 overflow-y-auto border border-slate-200 dark:border-slate-800 rounded-xl">
+                    <table className="w-full text-left text-xs text-slate-600 dark:text-slate-300 border-collapse">
+                      <thead className="bg-slate-50 dark:bg-slate-800 sticky top-0 border-b border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 uppercase font-black text-[10px]">
                         <tr>
                           <th className="py-2.5 px-3">Estado</th>
                           <th className="py-2.5 px-3">Colaborador</th>
@@ -1018,26 +1018,26 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                           <th className="py-2.5 px-3">Identificado Por</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100">
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                         {excelPreview.matched.map(m => {
                           const isAlready = enrolledCardSet.has(m.card.trim().toLowerCase());
                           return (
-                            <tr key={m.card} className={isAlready ? 'bg-slate-50/50' : ''}>
+                            <tr key={m.card} className={isAlready ? 'bg-slate-50/50 dark:bg-slate-800/40' : ''}>
                               <td className="py-2 px-3">
                                 {isAlready ? (
-                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900/50">
                                     Ya Matriculado
                                   </span>
                                 ) : (
-                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50">
                                     Listo
                                   </span>
                                 )}
                               </td>
-                              <td className="py-2 px-3 font-bold text-slate-900">{m.name}</td>
-                              <td className="py-2 px-3 font-mono font-bold text-slate-700">{m.card}</td>
-                              <td className="py-2 px-3 text-slate-600">{m.department || '—'}</td>
-                              <td className="py-2 px-3 text-slate-500 uppercase text-[10px] font-bold">
+                              <td className="py-2 px-3 font-bold text-slate-900 dark:text-white">{m.name}</td>
+                              <td className="py-2 px-3 font-mono font-bold text-slate-700 dark:text-slate-300">{m.card}</td>
+                              <td className="py-2 px-3 text-slate-600 dark:text-slate-400">{m.department || '—'}</td>
+                              <td className="py-2 px-3 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-bold">
                                 {m.matchedBy}
                               </td>
                             </tr>
@@ -1045,16 +1045,16 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                         })}
 
                         {excelPreview.unmatched.map((u, i) => (
-                          <tr key={`unmatched-${i}`} className="bg-rose-50/40">
+                          <tr key={`unmatched-${i}`} className="bg-rose-50/40 dark:bg-rose-950/20">
                             <td className="py-2 px-3">
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50">
                                 No Encontrado
                               </span>
                             </td>
-                            <td className="py-2 px-3 font-mono text-rose-800 font-bold" colSpan={2}>
+                            <td className="py-2 px-3 font-mono text-rose-800 dark:text-rose-300 font-bold" colSpan={2}>
                               {u.rawValue}
                             </td>
-                            <td className="py-2 px-3 text-rose-600 text-[11px]" colSpan={2}>
+                            <td className="py-2 px-3 text-rose-600 dark:text-rose-400 text-[11px]" colSpan={2}>
                               Fila {u.rowNumber}: {u.reason}
                             </td>
                           </tr>
@@ -1071,7 +1071,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                         setExcelPreview(null);
                         setSelectedFileName(null);
                       }}
-                      className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-colors"
+                      className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                     >
                       Cancelar
                     </button>
@@ -1101,12 +1101,12 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
           {/* ======================================================== */}
           {activeTab === 'paste_list' && isAdminOrSuper && (
             <div className="space-y-4">
-              <div className="bg-white p-5 rounded-2xl border border-slate-200">
-                <h3 className="text-sm font-bold text-slate-900 mb-1 flex items-center gap-2">
+              <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
                   <FileText className="w-4 h-4 text-[#DA291C]" />
                   Pegar Lista de Carnets, Cédulas o Correos
                 </h3>
-                <p className="text-xs text-slate-600 mb-3">
+                <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
                   Pega un listado de identificadores separados por saltos de línea, comas o espacios.
                   El sistema buscará los registros coincidentes en el padrón general.
                 </p>
@@ -1116,11 +1116,11 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                   placeholder={`Ejemplo:\n2010\n2012\n001-0876543-2\nluis.almazan@empresa.com`}
                   value={pastedText}
                   onChange={e => setPastedText(e.target.value)}
-                  className="w-full p-3 text-xs font-mono bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white resize-y"
+                  className="w-full p-3 text-xs font-mono bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white dark:focus:bg-slate-900 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 resize-y"
                 />
 
                 <div className="flex items-center justify-between gap-3 mt-3">
-                  <span className="text-[11px] text-slate-500 font-medium">
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                     Puedes pegar desde una columna de Excel directamente.
                   </span>
                   <button
@@ -1137,19 +1137,19 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
 
               {/* Vista Previa de la Lista Pegada */}
               {parsedPastedPreview && (
-                <div className="bg-white p-5 rounded-2xl border border-slate-200 space-y-3 animate-fade-in shadow-sm">
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3 animate-fade-in shadow-sm">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">
                       Resultados de la Validación:
                     </h4>
-                    <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                    <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-900/50">
                       {parsedPastedPreview.matched.filter(m => !enrolledCardSet.has(m.card.trim().toLowerCase())).length} Válidos Nuevos
                     </span>
                   </div>
 
-                  <div className="max-h-56 overflow-y-auto border border-slate-200 rounded-xl">
-                    <table className="w-full text-left text-xs text-slate-600 border-collapse">
-                      <thead className="bg-slate-50 sticky top-0 border-b border-slate-200 text-[10px] uppercase font-black text-slate-700">
+                  <div className="max-h-56 overflow-y-auto border border-slate-200 dark:border-slate-800 rounded-xl">
+                    <table className="w-full text-left text-xs text-slate-600 dark:text-slate-300 border-collapse">
+                      <thead className="bg-slate-50 dark:bg-slate-800 sticky top-0 border-b border-slate-200 dark:border-slate-700 text-[10px] uppercase font-black text-slate-700 dark:text-slate-300">
                         <tr>
                           <th className="py-2 px-3">Estado</th>
                           <th className="py-2 px-3">Nombre</th>
@@ -1157,37 +1157,37 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                           <th className="py-2 px-3">Correo</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100">
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                         {parsedPastedPreview.matched.map(p => {
                           const isAlready = enrolledCardSet.has(p.card.trim().toLowerCase());
                           return (
-                            <tr key={p.card} className={isAlready ? 'bg-slate-50/50' : ''}>
+                            <tr key={p.card} className={isAlready ? 'bg-slate-50/50 dark:bg-slate-800/40' : ''}>
                               <td className="py-2 px-3">
                                 {isAlready ? (
-                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900/50">
                                     Ya Matriculado
                                   </span>
                                 ) : (
-                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50">
                                     Listo
                                   </span>
                                 )}
                               </td>
-                              <td className="py-2 px-3 font-bold text-slate-900">{p.name}</td>
-                              <td className="py-2 px-3 font-mono font-bold text-slate-700">{p.card}</td>
-                              <td className="py-2 px-3 text-slate-500">{p.email}</td>
+                              <td className="py-2 px-3 font-bold text-slate-900 dark:text-white">{p.name}</td>
+                              <td className="py-2 px-3 font-mono font-bold text-slate-700 dark:text-slate-300">{p.card}</td>
+                              <td className="py-2 px-3 text-slate-500 dark:text-slate-400">{p.email}</td>
                             </tr>
                           );
                         })}
 
                         {parsedPastedPreview.unmatched.map((raw, i) => (
-                          <tr key={`unmatched-paste-${i}`} className="bg-rose-50/40">
+                          <tr key={`unmatched-paste-${i}`} className="bg-rose-50/40 dark:bg-rose-950/20">
                             <td className="py-2 px-3">
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50">
                                 No Identificado
                               </span>
                             </td>
-                            <td className="py-2 px-3 font-mono text-rose-800 font-bold" colSpan={3}>
+                            <td className="py-2 px-3 font-mono text-rose-800 dark:text-rose-300 font-bold" colSpan={3}>
                               {raw}
                             </td>
                           </tr>
@@ -1200,7 +1200,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                     <button
                       type="button"
                       onClick={() => setParsedPastedPreview(null)}
-                      className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-colors"
+                      className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                     >
                       Descartar
                     </button>
@@ -1231,7 +1231,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
           {activeTab === 'browse_catalog' && isAdminOrSuper && (
             <div className="space-y-4">
               {/* Barra de Filtros y Selección */}
-              <div className="bg-white p-4 rounded-2xl border border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-sm">
+              <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-sm">
                 <div className="flex flex-1 flex-col sm:flex-row items-stretch sm:items-center gap-2">
                   <div className="relative flex-1">
                     <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -1240,14 +1240,14 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                       placeholder="Buscar por nombre, carnet, cédula..."
                       value={catalogSearch}
                       onChange={e => setCatalogSearch(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white"
+                      className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white dark:focus:bg-slate-900 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                     />
                   </div>
 
                   <select
                     value={departmentFilter}
                     onChange={e => setDepartmentFilter(e.target.value)}
-                    className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] text-slate-700 font-medium"
+                    className="px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] text-slate-700 dark:text-slate-200 font-medium"
                   >
                     <option value="ALL">Todos los Departamentos</option>
                     {uniqueDepartments.map(d => (
@@ -1260,7 +1260,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                   <button
                     type="button"
                     onClick={handleSelectAllVisibleCatalog}
-                    className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+                    className="px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors"
                   >
                     Seleccionar Visibles
                   </button>
@@ -1269,7 +1269,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                     <button
                       type="button"
                       onClick={handleDeselectAllCatalog}
-                      className="px-3 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 rounded-xl transition-colors"
+                      className="px-3 py-1.5 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 rounded-xl transition-colors"
                     >
                       Deseleccionar
                     </button>
@@ -1297,10 +1297,10 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
               )}
 
               {/* Lista del Padrón */}
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <div className="max-h-[380px] overflow-y-auto">
-                  <table className="w-full text-left text-xs text-slate-600 border-collapse">
-                    <thead className="bg-slate-50 sticky top-0 border-b border-slate-200 text-[10px] uppercase font-black text-slate-700">
+                  <table className="w-full text-left text-xs text-slate-600 dark:text-slate-300 border-collapse">
+                    <thead className="bg-slate-50 dark:bg-slate-800 sticky top-0 border-b border-slate-200 dark:border-slate-700 text-[10px] uppercase font-black text-slate-700 dark:text-slate-300">
                       <tr>
                         <th className="py-2.5 px-4 w-12 text-center">Sel.</th>
                         <th className="py-2.5 px-4">Colaborador</th>
@@ -1310,7 +1310,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                         <th className="py-2.5 px-4 text-center">Estado</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                       {filteredCatalog.slice(0, 100).map(p => {
                         const isEnrolled = enrolledCardSet.has(p.card.trim().toLowerCase());
                         const isSelected = selectedCatalogCards.has(p.card);
@@ -1321,10 +1321,10 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                             onClick={() => !isEnrolled && toggleCatalogSelection(p.card)}
                             className={`transition-colors ${
                               isEnrolled
-                                ? 'bg-slate-50/70 opacity-60 cursor-not-allowed'
+                                ? 'bg-slate-50/70 dark:bg-slate-800/40 opacity-60 cursor-not-allowed'
                                 : isSelected
-                                ? 'bg-red-50/50 cursor-pointer'
-                                : 'hover:bg-slate-50 cursor-pointer'
+                                ? 'bg-red-50/50 dark:bg-red-950/30 cursor-pointer'
+                                : 'hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer'
                             }`}
                           >
                             <td className="py-2.5 px-4 text-center" onClick={e => e.stopPropagation()}>
@@ -1333,29 +1333,29 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                                 checked={isSelected}
                                 disabled={isEnrolled}
                                 onChange={() => toggleCatalogSelection(p.card)}
-                                className="w-4 h-4 text-[#DA291C] rounded border-slate-300 focus:ring-[#DA291C] cursor-pointer disabled:cursor-not-allowed"
+                                className="w-4 h-4 text-[#DA291C] rounded border-slate-300 dark:border-slate-600 dark:bg-slate-700 focus:ring-[#DA291C] cursor-pointer disabled:cursor-not-allowed"
                               />
                             </td>
                             <td className="py-2.5 px-4">
-                              <div className="font-bold text-slate-900">{p.name}</div>
-                              <div className="text-[11px] text-slate-500">{p.email}</div>
+                              <div className="font-bold text-slate-900 dark:text-white">{p.name}</div>
+                              <div className="text-[11px] text-slate-500 dark:text-slate-400">{p.email}</div>
                             </td>
-                            <td className="py-2.5 px-4 font-mono font-bold text-slate-700">
+                            <td className="py-2.5 px-4 font-mono font-bold text-slate-700 dark:text-slate-300">
                               {p.card}
                             </td>
-                            <td className="py-2.5 px-4 font-mono text-slate-600">
+                            <td className="py-2.5 px-4 font-mono text-slate-600 dark:text-slate-400">
                               {p.cedula ? formatCedula(p.cedula) : '—'}
                             </td>
-                            <td className="py-2.5 px-4 text-slate-600">
+                            <td className="py-2.5 px-4 text-slate-600 dark:text-slate-400">
                               {p.department || '—'}
                             </td>
                             <td className="py-2.5 px-4 text-center">
                               {isEnrolled ? (
-                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900/50">
                                   Ya Matriculado
                                 </span>
                               ) : (
-                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
                                   Disponible
                                 </span>
                               )}
@@ -1368,7 +1368,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                 </div>
 
                 {filteredCatalog.length > 100 && (
-                  <div className="p-3 text-center text-xs text-slate-500 bg-slate-50 border-t border-slate-200">
+                  <div className="p-3 text-center text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-200 dark:border-slate-800">
                     Mostrando los primeros 100 resultados de {filteredCatalog.length}. Usa el buscador para filtrar más específicamente.
                   </div>
                 )}
@@ -1378,16 +1378,16 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
         </div>
 
         {/* Pie del Modal */}
-        <div className="px-6 py-4 border-t border-slate-100 bg-white flex items-center justify-between gap-4">
-          <div className="text-xs text-slate-500 flex items-center gap-1.5">
+        <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between gap-4">
+          <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
             <Users className="w-4 h-4 text-slate-400" />
-            Total Matriculados: <strong className="text-slate-800">{enrolledParticipants.length}</strong> colaboradores
+            Total Matriculados: <strong className="text-slate-800 dark:text-white">{enrolledParticipants.length}</strong> colaboradores
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+            className="px-5 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors"
           >
             Cerrar
           </button>
@@ -1401,23 +1401,23 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
           className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in"
         >
           {gradingParticipant && (
-            <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-md w-full p-6 space-y-4 animate-scale-up" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-6 space-y-4 animate-scale-up" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#DA291C] bg-red-50 px-2.5 py-0.5 rounded-full border border-red-100">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#DA291C] dark:text-red-400 bg-red-50 dark:bg-red-950/40 px-2.5 py-0.5 rounded-full border border-red-100 dark:border-red-900/50">
                     Academia Técnica • Calificación
                   </span>
-                  <h3 className="text-base font-black text-slate-900 mt-1">
+                  <h3 className="text-base font-black text-slate-900 dark:text-white mt-1">
                     {gradingParticipant.name}
                   </h3>
-                  <p className="text-xs text-slate-500">
-                    Carnet: <span className="font-mono font-bold text-slate-700">{gradingParticipant.card}</span> • {gradingParticipant.department || 'Sin Depto'}
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Carnet: <span className="font-mono font-bold text-slate-700 dark:text-slate-300">{gradingParticipant.card}</span> • {gradingParticipant.department || 'Sin Depto'}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setGradingParticipant(null)}
-                  className="p-1.5 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100 transition-colors"
+                  className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1426,10 +1426,10 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
               <form onSubmit={handleSaveSingleGrade} className="space-y-4">
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-bold text-slate-700">
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
                       Calificación / Nota (0 a 100 pts)
                     </label>
-                    <span className="text-[10px] font-semibold text-slate-500">
+                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
                       Aprobación: &gt;= 70 pts
                     </span>
                   </div>
@@ -1451,18 +1451,18 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                       }
                     }}
                     placeholder="Ej: 90"
-                    className="w-full px-3.5 py-2.5 text-base font-black bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white text-slate-900"
+                    className="w-full px-3.5 py-2.5 text-base font-black bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white dark:focus:bg-slate-900 text-slate-900 dark:text-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Estado Académico
                   </label>
                   <select
                     value={gradingStatus}
                     onChange={e => setGradingStatus(e.target.value as any)}
-                    className="w-full px-3 py-2 text-xs font-bold bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] text-slate-800"
+                    className="w-full px-3 py-2 text-xs font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] text-slate-800 dark:text-slate-200"
                   >
                     <option value="passed">Aprobado (Cumple competencias)</option>
                     <option value="failed">Reprobado (No alcanza nota mínima)</option>
@@ -1471,7 +1471,7 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Retroalimentación / Observaciones Técnicas (Opcional)
                   </label>
                   <textarea
@@ -1479,15 +1479,15 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
                     value={gradingFeedback}
                     onChange={e => setGradingFeedback(e.target.value)}
                     placeholder="Observaciones sobre desempeño práctico, destrezas técnicas, etc..."
-                    className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white text-slate-800"
+                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DA291C] focus:bg-white dark:focus:bg-slate-900 text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                 </div>
 
-                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                   <button
                     type="button"
                     onClick={() => setGradingParticipant(null)}
-                    className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+                    className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
                   >
                     Cancelar
                   </button>

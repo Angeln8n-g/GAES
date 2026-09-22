@@ -126,7 +126,7 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
       ariaLabel={isEdit ? 'Editar Curso Técnico' : 'Nuevo Curso Técnico Recurrente'}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-xl overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-xl overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-slate-900 text-white">
           <div className="flex items-center gap-3">
@@ -155,7 +155,7 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {errorMsg && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2">
+            <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 text-xs rounded-xl flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{errorMsg}</span>
             </div>
@@ -163,9 +163,9 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
 
           {/* VINCULACIÓN CON CAPACITACIÓN EXISTENTE */}
           {!isEdit && events && events.length > 0 && (
-            <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-2">
+            <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/80 dark:border-slate-700 space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                   <span>Tomar de Capacitación Creada (Opcional):</span>
                 </label>
@@ -177,7 +177,7 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
                       setTitle('');
                       setDescription('');
                     }}
-                    className="text-[11px] font-bold text-slate-500 hover:text-slate-800 underline cursor-pointer"
+                    className="text-[11px] font-bold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 underline cursor-pointer"
                   >
                     Limpiar selección
                   </button>
@@ -199,7 +199,7 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
                     if (foundEvt.companyId) setCompanyId(foundEvt.companyId);
                   }
                 }}
-                className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500"
+                className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500"
               >
                 <option value="">-- Seleccionar capacitación del catálogo general --</option>
                 {events.map(ev => (
@@ -208,7 +208,7 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
                   </option>
                 ))}
               </select>
-              <p className="text-[10px] text-slate-500">
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">
                 Al seleccionar una capacitación existente, se vincularán sus datos para crear el curso recurrente de impartición diaria.
               </p>
             </div>
@@ -216,7 +216,7 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
 
           {/* Title & Code */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
               Título de la Capacitación Técnica *
             </label>
             <input
@@ -224,14 +224,14 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
               placeholder="Ej. Empalme y Medición OTDR de Fibra Óptica"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-slate-800 bg-white"
+              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-slate-800 dark:text-white bg-white dark:bg-slate-800"
               required
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                 Código del Curso
               </label>
               <input
@@ -239,18 +239,18 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
                 placeholder="Ej. TEC-FO-101"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                className="w-full px-3 py-2 text-xs font-mono rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 text-slate-800 bg-white"
+                className="w-full px-3 py-2 text-xs font-mono rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 text-slate-800 dark:text-white bg-white dark:bg-slate-800"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5 text-slate-500" />
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <Layers className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                 Especialidad / Categoría
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 text-slate-800 bg-white"
+                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 text-slate-800 dark:text-white bg-white dark:bg-slate-800"
               >
                 {TECHNICAL_CATEGORIES.map(cat => (
                   <option key={cat} value={cat}>{cat}</option>
@@ -262,8 +262,8 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
           {/* Hours & Duration */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-slate-500" />
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                 Horas Diarias por Sesión
               </label>
               <input
@@ -273,13 +273,13 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
                 max="12"
                 value={dailyHours}
                 onChange={(e) => setDailyHours(Number(e.target.value))}
-                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 text-slate-800 bg-white"
+                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white bg-white dark:bg-slate-800"
               />
-              <span className="text-[10px] text-slate-500 font-medium block">Total acumulado: {(dailyHours * durationDays)} hrs</span>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium block">Total acumulado: {(dailyHours * durationDays)} hrs</span>
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                 Duración del Taller (Días Hábiles)
               </label>
               <input
@@ -288,16 +288,16 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
                 max="30"
                 value={durationDays}
                 onChange={(e) => setDurationDays(Number(e.target.value))}
-                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 text-slate-800 bg-white"
+                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white bg-white dark:bg-slate-800"
               />
-              <span className="text-[10px] text-slate-500 font-medium block">Típicamente 5 días (Semana técnica)</span>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium block">Típicamente 5 días (Semana técnica)</span>
             </div>
           </div>
 
           {/* Modality & Location */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                 Modalidad
               </label>
               <input
@@ -305,12 +305,12 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
                 value={modality}
                 onChange={(e) => setModality(e.target.value)}
                 placeholder="Presencial (Taller Técnico)"
-                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 text-slate-800 bg-white"
+                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white bg-white dark:bg-slate-800"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-slate-500" />
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                 Ubicación / Taller por Defecto
               </label>
               <input
@@ -318,14 +318,14 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Ej. Taller Central Fibra Óptica"
-                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 text-slate-800 bg-white"
+                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white bg-white dark:bg-slate-800"
               />
             </div>
           </div>
 
           {/* Description */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
               Objetivo / Descripción del Curso
             </label>
             <textarea
@@ -333,23 +333,23 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Competencias técnicas a desarrollar, protocolos de seguridad y herramientas..."
-              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 text-slate-800 resize-none"
+              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 text-slate-800 dark:text-white bg-white dark:bg-slate-800 resize-none"
             />
           </div>
 
           {/* Footer Actions */}
-          <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+          <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
+              className="px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded-xl transition-colors shadow-sm shadow-red-600/20 flex items-center gap-1.5"
+              className="px-5 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded-xl transition-colors shadow-sm shadow-red-600/20 flex items-center gap-1.5 cursor-pointer"
             >
               {isSubmitting ? (
                 <>

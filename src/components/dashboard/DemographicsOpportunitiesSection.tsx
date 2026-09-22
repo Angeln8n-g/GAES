@@ -321,72 +321,72 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
       {/* KPI Top Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
-        <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Fichas Completadas</span>
-            <div className="w-9 h-9 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Fichas Completadas</span>
+            <div className="w-9 h-9 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200 dark:border-emerald-800/60">
               <CheckCircle2 className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-black text-slate-900">{profileCompletionRate}%</span>
-            <span className="text-xs font-semibold text-slate-500">({completedProfilesCount}/{totalParticipants})</span>
+            <span className="text-3xl font-black text-slate-900 dark:text-white">{profileCompletionRate}%</span>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">({completedProfilesCount}/{totalParticipants})</span>
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">Censo sociodemográfico actualizado</p>
-          <div className="h-1.5 w-full bg-slate-100 rounded-full mt-3 overflow-hidden">
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Censo sociodemográfico actualizado</p>
+          <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full mt-3 overflow-hidden">
             <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${profileCompletionRate}%` }} />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Estudiantes Activos</span>
-            <div className="w-9 h-9 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-200">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Estudiantes Activos</span>
+            <div className="w-9 h-9 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200 dark:border-amber-800/60">
               <Sparkles className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-black text-slate-900">{activeStudents.length}</span>
-            <span className="text-xs font-semibold text-amber-600 font-bold">({activeStudentsRate}% plantilla)</span>
+            <span className="text-3xl font-black text-slate-900 dark:text-white">{activeStudents.length}</span>
+            <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 font-bold">({activeStudentsRate}% plantilla)</span>
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">Cursando carrera o posgrado</p>
-          <div className="h-1.5 w-full bg-slate-100 rounded-full mt-3 overflow-hidden">
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Cursando carrera o posgrado</p>
+          <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full mt-3 overflow-hidden">
             <div className="h-full bg-amber-500 rounded-full" style={{ width: `${activeStudentsRate}%` }} />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Edad Promedio</span>
-            <div className="w-9 h-9 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-200">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Edad Promedio</span>
+            <div className="w-9 h-9 rounded-2xl bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-200 dark:border-sky-800/60">
               <Calendar className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-black text-slate-900">{avgAge}</span>
-            <span className="text-xs font-semibold text-slate-500">años</span>
+            <span className="text-3xl font-black text-slate-900 dark:text-white">{avgAge}</span>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">años</span>
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">Predominio Millennial / Gen-Z</p>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Predominio Millennial / Gen-Z</p>
           <div className="flex gap-1 mt-3">
-            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600">&lt;25: {ageGroups.under25}</span>
-            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600">25-34: {ageGroups.between25and34}</span>
-            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600">35+: {ageGroups.between35and49 + ageGroups.over50}</span>
+            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">&lt;25: {ageGroups.under25}</span>
+            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">25-34: {ageGroups.between25and34}</span>
+            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">35+: {ageGroups.between35and49 + ageGroups.over50}</span>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Nivel Predominante</span>
-            <div className="w-9 h-9 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-200">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nivel Predominante</span>
+            <div className="w-9 h-9 rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-200 dark:border-purple-800/60">
               <GraduationCap className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3">
-            <span className="text-xl font-black text-slate-900 block truncate">
+            <span className="text-xl font-black text-slate-900 dark:text-white block truncate">
               {educationStats.sort((a, b) => b.membersCount - a.membersCount)[0]?.level || 'Técnico'}
             </span>
           </div>
-          <p className="text-[11px] text-purple-700 font-semibold mt-1">
+          <p className="text-[11px] text-purple-700 dark:text-purple-400 font-semibold mt-1">
             {educationStats.sort((a, b) => b.membersCount - a.membersCount)[0]?.percentageOfTotal || 0}% de los colaboradores
           </p>
         </div>
@@ -521,18 +521,18 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
       </div>
 
       {/* SECCIÓN 2: CORRELACIÓN NIVEL DE ESTUDIO VS RENDIMIENTO ACADÉMICO */}
-      <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-4">
           <div>
-            <h3 className="text-base font-black text-slate-900 tracking-tight flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-[#DA291C]" />
+            <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-[#DA291C] dark:text-[#FF6659]" />
               <span>Resultados de Capacitación por Nivel de Estudio</span>
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Medición comparativa de notas promedio, tasas de aprobación y horas de formación recibidas.
             </p>
           </div>
-          <span className="text-xs text-slate-500 font-semibold bg-slate-50 px-3 py-1 rounded-xl border border-slate-200 self-start sm:self-auto">
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold bg-slate-50 dark:bg-slate-800 px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-700 self-start sm:self-auto">
             Correlación Formativa
           </span>
         </div>
@@ -540,7 +540,7 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
         <div className="table-responsive-container">
           <table className="w-full text-left text-xs min-w-[700px]">
             <thead>
-              <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px] bg-slate-50/50">
+              <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider text-[10px] bg-slate-50/50 dark:bg-slate-800/50">
                 <th className="py-3 px-4 rounded-l-xl">Nivel de Estudio</th>
                 <th className="py-3 px-4">Colaboradores</th>
                 <th className="py-3 px-4">% de Fuerza</th>
@@ -550,30 +550,30 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
                 <th className="py-3 px-4 rounded-r-xl">Diagnóstico</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 font-medium">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
               {educationStats.map(stat => {
-                let badgeColor = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                let badgeColor = 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/60';
                 let label = 'Óptimo';
                 if (stat.passRate < 75) {
-                  badgeColor = 'bg-rose-50 text-rose-700 border-rose-200';
+                  badgeColor = 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800/60';
                   label = 'Requiere Nivelación';
                 } else if (stat.passRate < 85) {
-                  badgeColor = 'bg-amber-50 text-amber-700 border-amber-200';
+                  badgeColor = 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/60';
                   label = 'Estable';
                 }
 
                 return (
-                  <tr key={stat.level} className="hover:bg-slate-50/70 transition-colors">
-                    <td className="py-3.5 px-4 font-bold text-slate-900 flex items-center gap-2">
+                  <tr key={stat.level} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors">
+                    <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white flex items-center gap-2">
                       <GraduationCap className="w-4 h-4 text-slate-400" />
                       <span>{stat.level}</span>
                     </td>
-                    <td className="py-3.5 px-4 font-semibold text-slate-700">{stat.membersCount} colaboradores</td>
-                    <td className="py-3.5 px-4 font-semibold text-slate-500">{stat.percentageOfTotal}%</td>
+                    <td className="py-3.5 px-4 font-semibold text-slate-700 dark:text-slate-300">{stat.membersCount} colaboradores</td>
+                    <td className="py-3.5 px-4 font-semibold text-slate-500 dark:text-slate-400">{stat.percentageOfTotal}%</td>
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2">
-                        <span className="font-black text-slate-900">{stat.avgScore} pts</span>
-                        <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden hidden sm:block">
+                        <span className="font-black text-slate-900 dark:text-white">{stat.avgScore} pts</span>
+                        <div className="w-16 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden hidden sm:block">
                           <div 
                             className={`h-full rounded-full ${stat.avgScore >= 80 ? 'bg-emerald-500' : stat.avgScore >= 70 ? 'bg-amber-500' : 'bg-rose-500'}`}
                             style={{ width: `${stat.avgScore}%` }}
@@ -582,11 +582,11 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
                       </div>
                     </td>
                     <td className="py-3.5 px-4">
-                      <span className={`font-black ${stat.passRate >= 80 ? 'text-emerald-600' : stat.passRate >= 70 ? 'text-amber-600' : 'text-rose-600'}`}>
+                      <span className={`font-black ${stat.passRate >= 80 ? 'text-emerald-600 dark:text-emerald-400' : stat.passRate >= 70 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400'}`}>
                         {stat.passRate}%
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 text-slate-700 font-semibold">{stat.totalHours} hrs</td>
+                    <td className="py-3.5 px-4 text-slate-700 dark:text-slate-300 font-semibold">{stat.totalHours} hrs</td>
                     <td className="py-3.5 px-4">
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-black border ${badgeColor}`}>
                         {label}
@@ -603,33 +603,33 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
       {/* SECCIÓN 3: MATRIZ DE INTERESES FORMATIVOS SOLICITADOS VS CATÁLOGO */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
             <div>
-              <h3 className="text-sm font-black text-slate-900 tracking-tight flex items-center gap-2">
-                <Target className="w-4 h-4 text-emerald-600" />
+              <h3 className="text-sm font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                <Target className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Demandas Formativas Solicitadas por Colaboradores</span>
               </h3>
-              <p className="text-[11px] text-slate-500 mt-0.5">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                 Áreas de interés recolectadas a través del formulario de perfil.
               </p>
             </div>
-            <span className="text-[10px] font-bold text-slate-500">Ranking</span>
+            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">Ranking</span>
           </div>
 
           <div className="space-y-2.5">
             {trainingInterestsAnalysis.length === 0 ? (
-              <p className="text-xs text-slate-500 py-4 text-center">Aún no hay intereses registrados en las fichas.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 py-4 text-center">Aún no hay intereses registrados en las fichas.</p>
             ) : (
               trainingInterestsAnalysis.map((item, idx) => (
-                <div key={item.topic} className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3 text-xs">
+                <div key={item.topic} className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between gap-3 text-xs">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="w-5 h-5 rounded-lg bg-slate-200 text-slate-700 font-black text-[10px] flex items-center justify-center shrink-0">
+                    <span className="w-5 h-5 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-black text-[10px] flex items-center justify-center shrink-0">
                       #{idx + 1}
                     </span>
                     <div className="truncate">
-                      <p className="font-bold text-slate-800 truncate">{item.topic}</p>
-                      <span className="text-[10px] text-slate-500">
+                      <p className="font-bold text-slate-800 dark:text-slate-200 truncate">{item.topic}</p>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400">
                         {item.requestCount} solicitudes ({item.percentage}% colaboradores)
                       </span>
                     </div>
@@ -639,15 +639,15 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
                     <button
                       type="button"
                       onClick={() => setSelectedTopicModal(item.topic)}
-                      className="px-2.5 py-1 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold border border-slate-200 text-[11px] flex items-center gap-1 transition-colors cursor-pointer shadow-2xs"
+                      className="px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold border border-slate-200 dark:border-slate-700 text-[11px] flex items-center gap-1 transition-colors cursor-pointer shadow-2xs"
                       title="Ver los colaboradores que solicitaron este tema"
                     >
-                      <Users className="w-3 h-3 text-slate-500" />
+                      <Users className="w-3 h-3 text-slate-500 dark:text-slate-400" />
                       <span>{item.requestCount}</span>
                     </button>
 
                     {item.isCovered ? (
-                      <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                      <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60 flex items-center gap-1">
                         <CheckCircle2 className="w-3 h-3" /> Cubierto
                       </span>
                     ) : (
@@ -676,14 +676,14 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
         </div>
 
         {/* PADRÓN DE COLABORADORES EN ESTUDIO ACTIVO */}
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
             <div>
-              <h3 className="text-sm font-black text-slate-900 tracking-tight flex items-center gap-2">
-                <School className="w-4 h-4 text-amber-600" />
+              <h3 className="text-sm font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                <School className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                 <span>Colaboradores Estudiando Actualmente ({activeStudents.length})</span>
               </h3>
-              <p className="text-[11px] text-slate-500 mt-0.5">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                 Talento interno en formación continua para planes de sucesión.
               </p>
             </div>
@@ -693,29 +693,29 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
                 placeholder="Buscar..."
                 value={searchStudentQuery}
                 onChange={(e) => setSearchStudentQuery(e.target.value)}
-                className="w-full px-2.5 py-1 text-xs rounded-xl border border-slate-200 focus:outline-none"
+                className="w-full px-2.5 py-1 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none"
               />
             </div>
           </div>
 
           <div className="space-y-2 max-h-80 overflow-y-auto custom-scrollbar pr-1">
             {filteredStudents.length === 0 ? (
-              <p className="text-xs text-slate-500 py-6 text-center">No se encontraron colaboradores cursando estudios con ese criterio.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 py-6 text-center">No se encontraron colaboradores cursando estudios con ese criterio.</p>
             ) : (
               filteredStudents.map(student => (
-                <div key={student.card} className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1 text-xs">
+                <div key={student.card} className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-1 text-xs">
                   <div className="flex items-center justify-between">
-                    <span className="font-black text-slate-900">{student.name}</span>
-                    <span className="text-[10px] font-mono text-[#DA291C] font-bold">Tarj: #{student.card}</span>
+                    <span className="font-black text-slate-900 dark:text-white">{student.name}</span>
+                    <span className="text-[10px] font-mono text-[#DA291C] dark:text-[#FF6659] font-bold">Tarj: #{student.card}</span>
                   </div>
-                  <div className="flex items-center justify-between text-[11px] text-slate-600 pt-0.5">
-                    <span className="font-semibold text-amber-800">
+                  <div className="flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-400 pt-0.5">
+                    <span className="font-semibold text-amber-800 dark:text-amber-400">
                       🎓 {student.currentStudyField || 'Carrera en curso'}
                     </span>
-                    <span className="text-slate-500 font-medium">{student.institutionName || 'Centro Universitario'}</span>
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">{student.institutionName || 'Centro Universitario'}</span>
                   </div>
                   {student.department && (
-                    <span className="text-[10px] text-slate-500 block pt-0.5">
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 block pt-0.5">
                       Dpto: {student.department}
                     </span>
                   )}
@@ -730,8 +730,8 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
       {/* Modal de Detalle de Solicitantes de un Tema Formativo */}
       {selectedTopicModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-lg w-full overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200">
-            <div className="bg-gradient-to-r from-slate-900 to-slate-800 p-5 text-white flex items-center justify-between">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 max-w-lg w-full overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200">
+            <div className="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900 p-5 text-white flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-amber-300">
                   <Target className="w-5 h-5" />
@@ -755,7 +755,7 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
                 const topicParticipants = participants.filter(p => (p.trainingInterestAreas || []).includes(selectedTopicModal));
                 return (
                   <>
-                    <div className="flex items-center justify-between text-xs text-slate-500 pb-2 border-b border-slate-100">
+                    <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pb-2 border-b border-slate-100 dark:border-slate-800">
                       <span>{topicParticipants.length} colaboradores han solicitado este tema:</span>
                       <button
                         type="button"
@@ -764,7 +764,7 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
                           navigator.clipboard.writeText(emails);
                           onShowToast?.('Correos Copiados', `${topicParticipants.length} correos copiados al portapapeles.`, 'info');
                         }}
-                        className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 cursor-pointer"
+                        className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center gap-1 cursor-pointer"
                       >
                         <Copy className="w-3.5 h-3.5" />
                         <span>Copiar Correos</span>
@@ -773,20 +773,20 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
 
                     <div className="space-y-2">
                       {topicParticipants.length === 0 ? (
-                        <p className="text-xs text-slate-500 py-4 text-center">No hay colaboradores asociados.</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 py-4 text-center">No hay colaboradores asociados.</p>
                       ) : (
                         topicParticipants.map(p => (
-                          <div key={p.card} className="p-3 rounded-2xl bg-slate-50 border border-slate-200/70 flex items-center justify-between text-xs">
+                          <div key={p.card} className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/80 flex items-center justify-between text-xs">
                             <div>
-                              <div className="font-bold text-slate-900">{p.name}</div>
-                              <div className="text-[11px] text-slate-500">{p.email}</div>
+                              <div className="font-bold text-slate-900 dark:text-white">{p.name}</div>
+                              <div className="text-[11px] text-slate-500 dark:text-slate-400">{p.email}</div>
                             </div>
                             <div className="text-right">
-                              <span className="px-2 py-0.5 rounded-full bg-white text-slate-700 font-semibold border border-slate-200 text-[10px]">
+                              <span className="px-2 py-0.5 rounded-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold border border-slate-200 dark:border-slate-700 text-[10px]">
                                 {p.educationLevel || 'Secundaria / Bachiller'}
                               </span>
                               {p.isCurrentlyStudying && (
-                                <span className="block text-[10px] text-amber-600 font-bold mt-0.5">
+                                <span className="block text-[10px] text-amber-600 dark:text-amber-400 font-bold mt-0.5">
                                   🎓 {p.currentStudyField || 'Estudiando'}
                                 </span>
                               )}
@@ -800,11 +800,11 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
               })()}
             </div>
 
-            <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3">
+            <div className="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
               <button
                 type="button"
                 onClick={() => setSelectedTopicModal(null)}
-                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-100 transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 Cerrar
               </button>

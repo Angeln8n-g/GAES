@@ -106,22 +106,22 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
       ariaLabel="Editar Usuario"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
         
         {/* Modal Header */}
-        <div className="p-6 border-b border-slate-200 flex items-start justify-between bg-slate-50">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-start justify-between bg-slate-50 dark:bg-slate-850">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-red-50 text-[#DA291C] border border-red-200 flex items-center justify-center font-black text-base shadow-xs shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-900/50 flex items-center justify-center font-black text-base shadow-xs shrink-0">
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-50 text-[#DA291C] border border-red-200">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-900/50">
                   Edición de Cuenta
                 </span>
-                <span className="text-xs font-bold text-slate-500 font-mono">ID: {user.id}</span>
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 font-mono">ID: {user.id}</span>
               </div>
-              <h2 className="text-lg font-black text-slate-900 mt-0.5">
+              <h2 className="text-lg font-black text-slate-900 dark:text-white mt-0.5">
                 Editar Usuario: {user.name}
               </h2>
             </div>
@@ -130,7 +130,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
           <button
             onClick={onClose}
             aria-label="Cerrar ventana de edición de usuario"
-            className="p-2 sm:p-1.5 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer inline-flex items-center justify-center"
+            className="p-2 sm:p-1.5 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-xl text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer inline-flex items-center justify-center"
           >
             <X className="w-5 h-5" aria-hidden="true" />
           </button>
@@ -140,8 +140,8 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
         <form onSubmit={handleSubmit} className="p-6 flex-1 overflow-y-auto space-y-5">
           
           {error && (
-            <div role="alert" aria-live="assertive" className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-2.5 text-rose-700 text-xs font-medium animate-in shake duration-300">
-              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-rose-500" aria-hidden="true" />
+            <div role="alert" aria-live="assertive" className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 flex items-start gap-2.5 text-rose-700 dark:text-rose-300 text-xs font-medium animate-in shake duration-300">
+              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-rose-500 dark:text-rose-400" aria-hidden="true" />
               <span>{error}</span>
             </div>
           )}
@@ -150,7 +150,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
             
             {/* Nombre Completo */}
             <div className="sm:col-span-2">
-              <label htmlFor="edit-user-name" className="block text-xs font-bold text-slate-700 mb-1">
+              <label htmlFor="edit-user-name" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Nombre Completo *
               </label>
               <input
@@ -159,18 +159,18 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="ej. Ana María Morales Batista"
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-[#DA291C] focus:bg-white font-medium"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C] focus:bg-white dark:focus:bg-slate-800 font-medium"
                 required
               />
             </div>
 
             {/* Correo Corporativo */}
             <div>
-              <label htmlFor="edit-user-email" className="block text-xs font-bold text-slate-700 mb-1">
+              <label htmlFor="edit-user-email" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Correo Corporativo *
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                   <Mail className="w-4 h-4" aria-hidden="true" />
                 </div>
                 <input
@@ -179,7 +179,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="ej. ana.morales@empresa.com"
-                  className="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-[#DA291C] focus:bg-white font-medium"
+                  className="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C] focus:bg-white dark:focus:bg-slate-800 font-medium"
                   required
                 />
               </div>
@@ -187,7 +187,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
 
             {/* Cédula */}
             <div>
-              <label htmlFor="edit-user-cedula" className="block text-xs font-bold text-slate-700 mb-1">
+              <label htmlFor="edit-user-cedula" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Cédula de Identidad (11 dígitos)
               </label>
               <input
@@ -197,13 +197,13 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                 onChange={(e) => setCedula(formatCedula(e.target.value))}
                 placeholder="ej. 402-2196163-1"
                 maxLength={13}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-900 font-mono focus:outline-none focus:border-[#DA291C] focus:bg-white font-bold"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white font-mono focus:outline-none focus:border-[#DA291C] focus:bg-white dark:focus:bg-slate-800 font-bold"
               />
             </div>
 
             {/* Empresa */}
             <div>
-              <label htmlFor="edit-user-company" className="block text-xs font-bold text-slate-700 mb-1">
+              <label htmlFor="edit-user-company" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Empresa / Filial
               </label>
               {isSuperAdmin ? (
@@ -212,7 +212,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                     id="edit-user-company"
                     value={companyId}
                     onChange={(e) => setCompanyId(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-[#DA291C] focus:bg-white font-bold cursor-pointer"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C] focus:bg-white dark:focus:bg-slate-800 font-bold cursor-pointer"
                   >
                     {companies.map(c => (
                       <option key={c.id} value={c.id}>🏢 {c.name}</option>
@@ -220,7 +220,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                   </select>
                 </div>
               ) : (
-                <div className="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-700">
+                <div className="w-full px-3.5 py-2.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300">
                   🏢 {companies.find(c => c.id === companyId)?.name || 'Empresa asignada'}
                 </div>
               )}
@@ -228,11 +228,11 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
 
             {/* Departamento */}
             <div>
-              <label htmlFor="edit-user-department" className="block text-xs font-bold text-slate-700 mb-1">
+              <label htmlFor="edit-user-department" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Departamento / Área
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                   <Briefcase className="w-4 h-4" aria-hidden="true" />
                 </div>
                 <input
@@ -241,14 +241,14 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                   value={department}
                   onChange={(e) => setDepartment(e.target.value)}
                   placeholder="ej. Tecnología, Operaciones, Ventas..."
-                  className="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-[#DA291C] focus:bg-white font-medium"
+                  className="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C] focus:bg-white dark:focus:bg-slate-800 font-medium"
                 />
               </div>
             </div>
 
             {/* Rol en Sistema */}
             <div>
-              <label htmlFor="edit-user-role" className="block text-xs font-bold text-slate-700 mb-1">
+              <label htmlFor="edit-user-role" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Rol en Plataforma *
               </label>
               <div className="relative">
@@ -256,7 +256,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                   id="edit-user-role"
                   value={role === 'Evaluador / Tutor OJT' ? 'Evaluador / Tutor' : role}
                   onChange={(e) => setRole(e.target.value as UserRole)}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-[#DA291C] focus:bg-white font-bold cursor-pointer"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C] focus:bg-white dark:focus:bg-slate-800 font-bold cursor-pointer"
                 >
                   <option value="Colaborador (User)">Colaborador (User)</option>
                   <option value="Evaluador / Tutor">Evaluador / Tutor</option>
@@ -271,7 +271,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
 
             {/* Estado Laboral */}
             <div>
-              <label htmlFor="edit-user-status" className="block text-xs font-bold text-slate-700 mb-1">
+              <label htmlFor="edit-user-status" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Estado Laboral *
               </label>
               <select
@@ -283,12 +283,12 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                   if (st === 'inactivo') setIsActive(false);
                   else setIsActive(true);
                 }}
-                className={`w-full px-3.5 py-2.5 bg-slate-50 border rounded-xl text-xs sm:text-sm font-bold focus:outline-none focus:bg-white cursor-pointer ${
+                className={`w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border rounded-xl text-xs sm:text-sm font-bold focus:outline-none focus:bg-white dark:focus:bg-slate-800 cursor-pointer ${
                   employmentStatus === 'contratado'
-                    ? 'text-emerald-700 border-emerald-300'
+                    ? 'text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800'
                     : employmentStatus === 'en_proceso'
-                    ? 'text-amber-700 border-amber-300'
-                    : 'text-rose-700 border-rose-300'
+                    ? 'text-amber-700 dark:text-amber-400 border-amber-300 dark:border-amber-800'
+                    : 'text-rose-700 dark:text-rose-400 border-rose-300 dark:border-rose-800'
                 }`}
               >
                 <option value="contratado">🟢 Contratado (Activo)</option>
@@ -298,12 +298,12 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
             </div>
 
             {/* Restablecer Contraseña (Opcional) */}
-            <div className="sm:col-span-2 pt-2 border-t border-slate-100">
-              <label htmlFor="edit-user-password" className="block text-xs font-bold text-slate-700 mb-1">
+            <div className="sm:col-span-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <label htmlFor="edit-user-password" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                 Restablecer Contraseña (Dejar en blanco para mantener la actual)
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                   <Lock className="w-4 h-4" aria-hidden="true" />
                 </div>
                 <input
@@ -312,13 +312,13 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Escribe una nueva contraseña si deseas cambiarla..."
-                  className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] focus:bg-white font-medium"
+                  className="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] focus:bg-white dark:focus:bg-slate-800 font-medium"
                 />
                 <button
                   type="button"
                   aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
                 </button>
@@ -328,11 +328,11 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
           </div>
 
           {/* Modal Footer Controls */}
-          <div className="pt-4 border-t border-slate-200 flex items-center justify-end gap-2.5">
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-2.5">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
+              className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             >
               Cancelar
             </button>

@@ -127,6 +127,9 @@ export function applyTheme(preference: ThemePreference): EffectiveTheme {
   }
 
   syncMetaThemeColor(effective);
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('ch_theme_changed', { detail: { effective, preference, theme: preference } }));
+  }
   return effective;
 }
 
@@ -139,6 +142,11 @@ export function setThemePreference(preference: ThemePreference): EffectiveTheme 
   }
   return applyTheme(preference);
 }
+
+// Aliases para compatibilidad directa
+export type Theme = ThemePreference;
+export const getStoredTheme = getStoredThemePreference;
+export const setStoredTheme = setThemePreference;
 
 /**
  * Inicializa la escucha de cambios en prefers-color-scheme a nivel de sistema operativo

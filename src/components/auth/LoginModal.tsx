@@ -13,11 +13,14 @@ import {
   ArrowLeft,
   ShieldCheck,
   Sparkles,
-  CreditCard
+  CreditCard,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { UserAccount } from '../../types';
 import { apiService } from '../../services/api';
 import { ReceptionLobbySection } from '../lobby/ReceptionLobbySection';
+import { getStoredTheme, setStoredTheme, applyTheme, Theme } from '../../utils/theme';
 
 interface LoginModalProps {
   users: UserAccount[];
@@ -68,6 +71,26 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Theme state
+  const [currentTheme, setCurrentTheme] = useState<Theme>(() => getStoredTheme());
+
+  React.useEffect(() => {
+    const onThemeChanged = (e: any) => {
+      if (e.detail?.theme) {
+        setCurrentTheme(e.detail.theme);
+      }
+    };
+    window.addEventListener('ch_theme_changed', onThemeChanged);
+    return () => window.removeEventListener('ch_theme_changed', onThemeChanged);
+  }, []);
+
+  const handleToggleTheme = () => {
+    const nextTheme: Theme = currentTheme === 'dark' ? 'light' : 'dark';
+    setStoredTheme(nextTheme);
+    applyTheme(nextTheme);
+    setCurrentTheme(nextTheme);
+  };
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -223,37 +246,50 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F6F9] flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden transition-colors duration-300">
       
       {/* Background Soft Red Glows */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-red-100/60 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/3 w-80 h-80 bg-slate-200/50 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-red-100/60 dark:bg-red-950/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/3 w-80 h-80 bg-slate-200/50 dark:bg-slate-800/30 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Top Bar Floating Controls (Theme Toggle) */}
+      <div className="absolute top-4 right-4 z-20">
+        <button
+          type="button"
+          onClick={handleToggleTheme}
+          aria-label={currentTheme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+          className="p-2.5 rounded-2xl bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-[#DA291C] dark:hover:text-red-400 backdrop-blur-sm shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer"
+          title={currentTheme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}
+        >
+          {currentTheme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+        </button>
+      </div>
 
       <div className={`w-full relative z-10 transition-all duration-300 ${activeMainTab === 'kiosk' ? 'max-w-4xl' : 'max-w-md'}`}>
         
         {/* Logo & Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-gradient-to-tr from-[#DA291C] via-[#EA382D] to-orange-500 shadow-xl shadow-red-500/25 mb-4 text-white ring-4 ring-white animate-in zoom-in-90 duration-500">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-gradient-to-tr from-[#DA291C] via-[#EA382D] to-orange-500 shadow-xl shadow-red-500/25 mb-4 text-white ring-4 ring-white dark:ring-slate-900 animate-in zoom-in-90 duration-500">
             <BookOpen className="w-8 h-8" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
-            Aprendizaje y <span className="text-[#DA291C]">Desarrollo</span>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+            Aprendizaje y <span className="text-[#DA291C] dark:text-red-400">Desarrollo</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 font-semibold">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 font-semibold">
             Portal de Formación Inteligente
           </p>
         </div>
 
         {/* Main Mode Switcher: Iniciar Sesión vs Kiosco de Recepción */}
         {onLookupCedula && onOpenCedulaScanner && (
-          <div className="flex p-1.5 bg-slate-200/80 rounded-2xl mb-6 shadow-inner border border-slate-300/60 max-w-sm mx-auto w-full">
+          <div className="flex p-1.5 bg-slate-200/80 dark:bg-slate-900/90 rounded-2xl mb-6 shadow-inner border border-slate-300/60 dark:border-slate-800 max-w-sm mx-auto w-full">
             <button
               type="button"
               onClick={() => setActiveMainTab('login')}
               className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
                 activeMainTab === 'login'
-                  ? 'bg-white text-[#DA291C] shadow-sm scale-[1.01]'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+                  ? 'bg-white dark:bg-slate-800 text-[#DA291C] dark:text-red-400 shadow-sm scale-[1.01]'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-slate-800/50'
               }`}
             >
               <Lock className="w-3.5 h-3.5" />
@@ -264,11 +300,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               onClick={() => setActiveMainTab('kiosk')}
               className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
                 activeMainTab === 'kiosk'
-                  ? 'bg-white text-[#DA291C] shadow-sm scale-[1.01]'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+                  ? 'bg-white dark:bg-slate-800 text-[#DA291C] dark:text-red-400 shadow-sm scale-[1.01]'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-slate-800/50'
               }`}
             >
-              <CreditCard className="w-3.5 h-3.5 text-[#DA291C]" />
+              <CreditCard className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
               <span>Kiosco Recepción</span>
             </button>
           </div>
@@ -288,16 +324,16 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           <>
             {/* QR Context Alert Banner if user clicked a QR code */}
         {attendanceEventTitle && viewMode === 'login' && (
-          <div role="region" aria-label="Aviso de confirmación QR" className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 shadow-sm animate-in slide-in-from-top-3 duration-300">
+          <div role="region" aria-label="Aviso de confirmación QR" className="mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 shadow-sm animate-in slide-in-from-top-3 duration-300">
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-xl bg-red-100 text-[#DA291C] shrink-0 mt-0.5">
+              <div className="p-2 rounded-xl bg-red-100 dark:bg-red-900/50 text-[#DA291C] dark:text-red-400 shrink-0 mt-0.5">
                 <QrCode className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-[#DA291C] uppercase tracking-wider">Confirmación de Asistencia QR</p>
-                <p className="text-sm font-bold text-slate-900 mt-0.5 leading-snug">{attendanceEventTitle}</p>
-                {attendanceTime && <p className="text-xs text-slate-600 mt-0.5 font-medium">Horario: {attendanceTime}</p>}
-                <p className="text-xs text-slate-600 mt-2">
+                <p className="text-xs font-bold text-[#DA291C] dark:text-red-400 uppercase tracking-wider">Confirmación de Asistencia QR</p>
+                <p className="text-sm font-bold text-slate-900 dark:text-white mt-0.5 leading-snug">{attendanceEventTitle}</p>
+                {attendanceTime && <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5 font-medium">Horario: {attendanceTime}</p>}
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-2">
                   Inicia sesión con tus credenciales corporativas para registrar tu asistencia de forma automática.
                 </p>
               </div>
@@ -307,16 +343,16 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
         {/* Success Alert Banner */}
         {successMessage && (
-          <div role="status" aria-live="polite" className="mb-5 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 text-emerald-800 text-xs font-medium animate-in fade-in duration-300 shadow-xs">
-            <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600" />
+          <div role="status" aria-live="polite" className="mb-5 p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 flex items-start gap-3 text-emerald-800 dark:text-emerald-200 text-xs font-medium animate-in fade-in duration-300 shadow-xs">
+            <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600 dark:text-emerald-400" />
             <span>{successMessage}</span>
           </div>
         )}
 
         {/* Error Alert Banner */}
         {error && (
-          <div role="alert" aria-live="assertive" className="mb-5 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-3 text-rose-700 text-xs font-medium animate-in shake duration-300 shadow-xs">
-            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-rose-500" />
+          <div role="alert" aria-live="assertive" className="mb-5 p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/60 flex items-start gap-3 text-rose-700 dark:text-rose-200 text-xs font-medium animate-in shake duration-300 shadow-xs">
+            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-rose-500 dark:text-rose-400" />
             <span>{error}</span>
           </div>
         )}
@@ -325,18 +361,18 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         {/* VIEW 1: STANDARD LOGIN FORM (No Demo Accounts)            */}
         {/* ========================================================== */}
         {viewMode === 'login' && (
-          <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-xl">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-900/5 dark:shadow-slate-950/50">
             
             <div className="mb-6">
-              <h2 className="text-lg font-black text-slate-900">Iniciar Sesión</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Ingresa tus credenciales corporativas para acceder</p>
+              <h2 className="text-lg font-black text-slate-900 dark:text-white">Iniciar Sesión</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Ingresa tus credenciales corporativas para acceder</p>
             </div>
 
             <form onSubmit={handleLoginSubmit} className="space-y-4">
               
               {/* Email or Cedula Input */}
               <div>
-                <label htmlFor="login-email" className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label htmlFor="login-email" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   Correo Corporativo o Cédula
                 </label>
                 <div className="relative">
@@ -349,7 +385,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="ej. nombre@claro.com.do o 402-2196163-1"
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] focus:ring-2 focus:ring-red-100 transition-all font-medium"
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] dark:focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-red-950/50 transition-all font-medium"
                     required
                   />
                 </div>
@@ -358,7 +394,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               {/* Password Input */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label htmlFor="login-password" className="block text-xs font-bold text-slate-700">
+                  <label htmlFor="login-password" className="block text-xs font-bold text-slate-700 dark:text-slate-300">
                     Contraseña
                   </label>
                   <button
@@ -369,7 +405,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                       setRecoveryIdentifier(email);
                       setViewMode('recover-request');
                     }}
-                    className="text-xs font-bold text-[#DA291C] hover:text-red-700 transition-colors cursor-pointer"
+                    className="text-xs font-bold text-[#DA291C] dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors cursor-pointer"
                   >
                     ¿Olvidaste tu contraseña?
                   </button>
@@ -384,14 +420,14 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-10 pr-11 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] focus:ring-2 focus:ring-red-100 transition-all font-medium"
+                    className="w-full pl-10 pr-11 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] dark:focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-red-950/50 transition-all font-medium"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
-                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -418,16 +454,16 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
             {/* Quick Button to Switch to Kiosk */}
             {onLookupCedula && onOpenCedulaScanner && (
-              <div className="mt-6 pt-5 border-t border-slate-100 text-center">
-                <p className="text-xs text-slate-500 font-medium mb-2.5">
+              <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 text-center">
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-2.5">
                   ¿Visitas por primera vez o asistes a un curso presencial?
                 </p>
                 <button
                   type="button"
                   onClick={() => setActiveMainTab('kiosk')}
-                  className="w-full py-2.5 px-4 rounded-2xl bg-red-50 hover:bg-red-100 text-[#DA291C] border border-red-200 text-xs font-extrabold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs active:scale-95"
+                  className="w-full py-2.5 px-4 rounded-2xl bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/50 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-800/60 text-xs font-extrabold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs active:scale-95"
                 >
-                  <CreditCard className="w-4 h-4 text-[#DA291C]" />
+                  <CreditCard className="w-4 h-4 text-[#DA291C] dark:text-red-400" />
                   <span>Consultar Horario & Aula por Cédula (Kiosco)</span>
                 </button>
               </div>
@@ -440,7 +476,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         {/* VIEW 2: RECOVER PASSWORD - STEP 1 (Identifier Entry)      */}
         {/* ========================================================== */}
         {viewMode === 'recover-request' && (
-          <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-xl animate-in slide-in-from-right-4 duration-200">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-900/5 dark:shadow-slate-950/50 animate-in slide-in-from-right-4 duration-200">
             
             <div className="flex items-center gap-3 mb-5">
               <button
@@ -450,24 +486,24 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   setViewMode('login');
                 }}
                 aria-label="Volver al inicio de sesión"
-                className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors"
+                className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 title="Volver"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div>
-                <h2 className="text-lg font-black text-slate-900">Recuperar Contraseña</h2>
-                <p className="text-xs text-slate-500">Paso 1 de 2: Identificación de cuenta</p>
+                <h2 className="text-lg font-black text-slate-900 dark:text-white">Recuperar Contraseña</h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Paso 1 de 2: Identificación de cuenta</p>
               </div>
             </div>
 
-            <p className="text-xs text-slate-600 mb-5 leading-relaxed">
+            <p className="text-xs text-slate-600 dark:text-slate-300 mb-5 leading-relaxed">
               Ingresa tu correo institucional o número de cédula para recibir un código de seguridad temporal y restablecer tu clave de acceso.
             </p>
 
             <form onSubmit={handleRequestRecoveryOtp} className="space-y-4">
               <div>
-                <label htmlFor="login-recovery-identifier" className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label htmlFor="login-recovery-identifier" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   Correo Corporativo o Cédula
                 </label>
                 <div className="relative">
@@ -480,7 +516,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                     value={recoveryIdentifier}
                     onChange={(e) => setRecoveryIdentifier(e.target.value)}
                     placeholder="ej. nombre@claro.com.do o 402-2196163-1"
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] focus:ring-2 focus:ring-red-100 transition-all font-medium"
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] dark:focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-red-950/50 transition-all font-medium"
                     required
                     autoFocus
                   />
@@ -508,7 +544,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   setError('');
                   setViewMode('login');
                 }}
-                className="w-full py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 transition-colors"
+                className="w-full py-2.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
               >
                 Volver al inicio de sesión
               </button>
@@ -521,7 +557,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         {/* VIEW 3: RECOVER PASSWORD - STEP 2 (Verify OTP & Reset)    */}
         {/* ========================================================== */}
         {viewMode === 'recover-verify' && targetUser && (
-          <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-xl animate-in slide-in-from-right-4 duration-200">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-900/5 dark:shadow-slate-950/50 animate-in slide-in-from-right-4 duration-200">
             
             <div className="flex items-center gap-3 mb-5">
               <button
@@ -531,27 +567,27 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   setViewMode('recover-request');
                 }}
                 aria-label="Volver a identificación de cuenta"
-                className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors"
+                className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 title="Volver"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div>
-                <h2 className="text-lg font-black text-slate-900">Validar Código & Nueva Clave</h2>
-                <p className="text-xs text-slate-500">Paso 2 de 2: Establecer nueva contraseña</p>
+                <h2 className="text-lg font-black text-slate-900 dark:text-white">Validar Código & Nueva Clave</h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Paso 2 de 2: Establecer nueva contraseña</p>
               </div>
             </div>
 
             {/* OTP Notification Card */}
-            <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 mb-5 space-y-1.5">
+            <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 text-xs text-amber-900 dark:text-amber-200 mb-5 space-y-1.5">
               <div className="flex items-center gap-1.5 font-bold">
-                <Sparkles className="w-4 h-4 text-amber-600" />
+                <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                 <span>Código de Recuperación Generado:</span>
               </div>
-              <p className="text-[11px] text-amber-800">
+              <p className="text-[11px] text-amber-800 dark:text-amber-300">
                 Se envió a <strong className="font-bold">{maskEmail(targetUser.email)}</strong>.
               </p>
-              <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-white border border-amber-300 rounded-xl font-mono text-sm font-black text-[#DA291C] shadow-xs">
+              <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-white dark:bg-slate-800 border border-amber-300 dark:border-amber-700 rounded-xl font-mono text-sm font-black text-[#DA291C] dark:text-red-400 shadow-xs">
                 <span>Código OTP: {generatedOtp}</span>
               </div>
             </div>
@@ -560,7 +596,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               
               {/* OTP Input */}
               <div>
-                <label htmlFor="login-otp" className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label htmlFor="login-otp" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   Código de Seguridad (6 dígitos)
                 </label>
                 <input
@@ -570,7 +606,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   value={enteredOtp}
                   onChange={(e) => setEnteredOtp(e.target.value.replace(/\D/g, ''))}
                   placeholder="Ej. 123456"
-                  className="w-full text-center tracking-widest font-mono text-lg font-black py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-slate-900 focus:outline-none focus:border-[#DA291C] focus:ring-2 focus:ring-red-100 transition-all"
+                  className="w-full text-center tracking-widest font-mono text-lg font-black py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-2xl text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C] dark:focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-red-950/50 transition-all"
                   required
                   autoFocus
                 />
@@ -578,7 +614,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
               {/* New Password Input */}
               <div>
-                <label htmlFor="login-new-password" className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label htmlFor="login-new-password" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   Nueva Contraseña
                 </label>
                 <div className="relative">
@@ -591,14 +627,14 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Mínimo 6 caracteres"
-                    className="w-full pl-10 pr-11 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] focus:ring-2 focus:ring-red-100 transition-all font-medium"
+                    className="w-full pl-10 pr-11 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] dark:focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-red-950/50 transition-all font-medium"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
                     aria-label={showNewPassword ? 'Ocultar nueva contraseña' : 'Ver nueva contraseña'}
-                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600"
+                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                   >
                     {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -607,7 +643,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 {/* Strength Meter */}
                 {newPassword && (
                   <div className="mt-2 space-y-1">
-                    <div className="flex gap-1 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div className="flex gap-1 h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                       <div className={`h-full transition-all duration-300 ${recoveryStrength >= 1 ? (recoveryStrength <= 2 ? 'w-1/3 bg-amber-500' : recoveryStrength <= 4 ? 'w-2/3 bg-blue-500' : 'w-full bg-emerald-500') : 'w-0'}`} />
                     </div>
                   </div>
@@ -616,7 +652,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
               {/* Confirm Password Input */}
               <div>
-                <label htmlFor="login-confirm-password" className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label htmlFor="login-confirm-password" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   Confirmar Nueva Contraseña
                 </label>
                 <div className="relative">
@@ -629,20 +665,20 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                     value={confirmNewPassword}
                     onChange={(e) => setConfirmNewPassword(e.target.value)}
                     placeholder="Repite la nueva contraseña"
-                    className="w-full pl-10 pr-11 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] focus:ring-2 focus:ring-red-100 transition-all font-medium"
+                    className="w-full pl-10 pr-11 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] dark:focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-red-950/50 transition-all font-medium"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     aria-label={showConfirmPassword ? 'Ocultar confirmación de contraseña' : 'Ver confirmación de contraseña'}
-                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600"
+                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
                 {confirmNewPassword && newPassword && (
-                  <p className={`text-[11px] mt-1 flex items-center gap-1 font-semibold ${newPassword === confirmNewPassword ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  <p className={`text-[11px] mt-1 flex items-center gap-1 font-semibold ${newPassword === confirmNewPassword ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                     {newPassword === confirmNewPassword ? (
                       <>
                         <CheckCircle2 className="w-3 h-3" /> Las contraseñas coinciden

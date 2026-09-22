@@ -124,22 +124,22 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       ariaLabel={`Reservar Curso - ${event.title}`}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
         
         {/* Modal Header */}
-        <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
+        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/80 dark:bg-slate-800/60">
           <div>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-50 text-[#DA291C] border border-red-200 uppercase tracking-wider">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-rose-400 border border-red-200 dark:border-red-900/50 uppercase tracking-wider">
               {event.category}
             </span>
-            <h2 className="text-lg font-extrabold text-slate-900 mt-1 line-clamp-1">
+            <h2 className="text-lg font-extrabold text-slate-900 dark:text-white mt-1 line-clamp-1">
               {event.title}
             </h2>
           </div>
           <button
             onClick={onClose}
             aria-label="Cerrar ventana de reserva"
-            className="p-2 sm:p-1.5 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer inline-flex items-center justify-center"
+            className="p-2 sm:p-1.5 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer inline-flex items-center justify-center"
           >
             <X className="w-5 h-5" aria-hidden="true" />
           </button>
@@ -151,27 +151,27 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
           {isSuccess ? (
             /* Success Confirmation Screen */
             <div role="status" aria-live="polite" className="text-center py-6 space-y-5 animate-in zoom-in-95 duration-300">
-              <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto shadow-md">
+              <div className="w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50 flex items-center justify-center mx-auto shadow-md">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
 
               <div>
-                <h3 className="text-xl font-extrabold text-slate-900">¡Inscripción Confirmada!</h3>
-                <p className="text-xs text-slate-600 max-w-sm mx-auto mt-1 leading-relaxed">
+                <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">¡Inscripción Confirmada!</h3>
+                <p className="text-xs text-slate-600 dark:text-slate-300 max-w-sm mx-auto mt-1 leading-relaxed">
                   Hemos confirmado tu lugar para <strong>{event.title}</strong> ({durationMetrics.totalHours} hrs lectivas en {durationMetrics.totalDays} {durationMetrics.totalDays === 1 ? 'día' : 'días'}) el día <strong>{formatDateLong(selectedDate)}</strong> a las <strong>{selectedSlot?.time}{selectedSlot?.endTime ? ` - ${selectedSlot.endTime}` : ''}</strong>.
                 </p>
               </div>
 
               {/* Add to Calendar Actions */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-left space-y-3">
-                <p className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 text-left space-y-3">
+                <p className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
                   <CalendarIcon className="w-4 h-4 text-[#DA291C]" />
                   Agendar en tu Calendario Laboral:
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <button
                     onClick={() => selectedSlot && downloadIcsFile(event, selectedDate, selectedSlot.time)}
-                    className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold transition-colors border border-slate-200 shadow-sm"
+                    className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold transition-colors border border-slate-200 dark:border-slate-700 shadow-sm"
                   >
                     <Download className="w-3.5 h-3.5" />
                     Descargar .ICS
@@ -180,7 +180,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                     href={selectedSlot ? getGoogleCalendarUrl(event, selectedDate, selectedSlot.time) : '#'}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-[#DA291C] text-xs font-bold transition-colors border border-red-200"
+                    className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/50 text-[#DA291C] dark:text-rose-400 text-xs font-bold transition-colors border border-red-200 dark:border-red-900/50"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     Google Calendar
@@ -201,49 +201,49 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               
               {/* Mandatory assignment notice */}
               {mandatoryAssignment && (
-                <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl flex items-start gap-3 text-xs text-rose-800">
-                  <Lock className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                <div className="p-4 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 rounded-2xl flex items-start gap-3 text-xs text-rose-800 dark:text-rose-300">
+                  <Lock className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
                   <div>
                     <p className="font-bold">Asignación Obligatoria Activa</p>
-                    <p className="text-slate-700 mt-0.5">
+                    <p className="text-slate-700 dark:text-slate-300 mt-0.5">
                       Tu supervisor ({mandatoryAssignment.assignedBy || 'Líder'}) te asignó obligatoriamente el <strong>{formatDateLong(mandatoryAssignment.date)} ({mandatoryAssignment.time})</strong>.
                     </p>
                     {mandatoryAssignment.notes && (
-                      <p className="text-amber-800 italic mt-1 text-[11px]">Nota: "{mandatoryAssignment.notes}"</p>
+                      <p className="text-amber-800 dark:text-amber-400 italic mt-1 text-[11px]">Nota: "{mandatoryAssignment.notes}"</p>
                     )}
                   </div>
                 </div>
               )}
 
               {/* Event Details Quick Summary */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-xs text-slate-700">
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-2 text-xs text-slate-700 dark:text-slate-300">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Duración del Programa:</span>
-                  <span className="font-extrabold text-amber-900 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200 flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-amber-600" />
+                  <span className="text-slate-500 dark:text-slate-400">Duración del Programa:</span>
+                  <span className="font-extrabold text-amber-900 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-lg border border-amber-200 dark:border-amber-900/50 flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                     {durationMetrics.totalHours} hrs lectivas ({durationMetrics.totalDays} {durationMetrics.totalDays === 1 ? 'día' : 'días'})
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Instructor:</span>
-                  <span className="font-bold text-slate-900">{event.instructor}</span>
+                  <span className="text-slate-500 dark:text-slate-400">Instructor:</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{event.instructor}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Modalidad:</span>
-                  <span className="font-bold text-slate-900 flex items-center gap-1">
-                    {event.modality === 'Virtual' ? <Video className="w-3.5 h-3.5 text-cyan-600" /> : <MapPin className="w-3.5 h-3.5 text-emerald-600" />}
+                  <span className="text-slate-500 dark:text-slate-400">Modalidad:</span>
+                  <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1">
+                    {event.modality === 'Virtual' ? <Video className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" /> : <MapPin className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />}
                     {event.modality}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Ubicación / Sala:</span>
-                  <span className="font-bold text-slate-900 line-clamp-1">{event.location}</span>
+                  <span className="text-slate-500 dark:text-slate-400">Ubicación / Sala:</span>
+                  <span className="font-bold text-slate-900 dark:text-white line-clamp-1">{event.location}</span>
                 </div>
               </div>
 
               {/* 1. Date Selector */}
               <div>
-                <span id="reservation-date-label" className="block text-xs font-bold text-slate-700 mb-2 flex items-center gap-1.5">
+                <span id="reservation-date-label" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-1.5">
                   <CalendarIcon className="w-3.5 h-3.5 text-[#DA291C]" aria-hidden="true" />
                   1. Selecciona la Fecha Disponible:
                 </span>
@@ -260,26 +260,26 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                         onClick={() => handleDateChange(sch.date)}
                         className={`p-3 rounded-2xl border text-left transition-all ${
                           isSelected
-                            ? 'bg-red-50 border-[#DA291C] text-[#DA291C] font-bold ring-1 ring-[#DA291C]'
+                            ? 'bg-red-50 dark:bg-red-950/40 border-[#DA291C] dark:border-rose-500 text-[#DA291C] dark:text-rose-400 font-bold ring-1 ring-[#DA291C] dark:ring-rose-500'
                             : isPast
-                            ? 'bg-slate-100/70 border-slate-200 text-slate-400 hover:bg-slate-100'
-                            : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                            ? 'bg-slate-100/70 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                            : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
                         }`}
                       >
                         <div className="flex items-center justify-between gap-1">
                           <p className="text-xs font-bold">{formatDateLong(sch.date)}</p>
                           {sch.date === todayStr && (
-                            <span className="px-1.5 py-0.2 rounded-md bg-red-100 text-[#DA291C] text-[9px] font-black uppercase">
+                            <span className="px-1.5 py-0.2 rounded-md bg-red-100 dark:bg-red-950/60 text-[#DA291C] dark:text-rose-400 text-[9px] font-black uppercase">
                               Hoy
                             </span>
                           )}
                           {isPast && (
-                            <span className="px-1.5 py-0.2 rounded-md bg-slate-200 text-slate-600 text-[9px] font-bold">
+                            <span className="px-1.5 py-0.2 rounded-md bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 text-[9px] font-bold">
                               Pasada
                             </span>
                           )}
                         </div>
-                        <p className="text-[10px] text-slate-500 mt-0.5">{totalSlots} horario(s) disponible(s)</p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{totalSlots} horario(s) disponible(s)</p>
                       </button>
                     );
                   })}
@@ -289,7 +289,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               {/* 2. Slot / Time Selector */}
               {currentSchedule && (
                 <div>
-                  <span id="reservation-time-label" className="block text-xs font-bold text-slate-700 mb-2 flex items-center gap-1.5">
+                  <span id="reservation-time-label" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 text-[#DA291C]" aria-hidden="true" />
                     2. Selecciona el Horario:
                   </span>
@@ -308,10 +308,10 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                           onClick={() => handleSlotSelect(slot)}
                           className={`p-3 rounded-2xl border text-left transition-all ${
                             isFull
-                              ? 'opacity-40 bg-slate-100 border-slate-200 cursor-not-allowed text-slate-400'
+                              ? 'opacity-40 bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 cursor-not-allowed text-slate-400 dark:text-slate-500'
                               : isSelected
                               ? 'bg-[#DA291C] text-white font-bold shadow-md shadow-red-500/25 ring-1 ring-red-400'
-                              : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                              : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
                           }`}
                         >
                           <div className="flex items-center justify-between">
@@ -320,20 +320,20 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                             </span>
                             <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold ${
                               isFull
-                                ? 'bg-rose-100 text-rose-700'
+                                ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400'
                                 : isSelected
                                 ? 'bg-white/20 text-white'
-                                : 'bg-slate-200 text-slate-700'
+                                : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
                             }`}>
                               {isFull ? 'Agotado' : `${remaining} libres`}
                             </span>
                           </div>
                           <div className="flex items-center justify-between text-[10px] mt-1">
-                            <span className={isSelected ? 'text-white/80' : 'text-slate-500'}>
+                            <span className={isSelected ? 'text-white/80' : 'text-slate-500 dark:text-slate-400'}>
                               Capacidad: {slot.registered} / {slot.capacity}
                             </span>
                             {slot.endTime && (
-                              <span className={`font-semibold ${isSelected ? 'text-white/90' : 'text-amber-700'}`}>
+                              <span className={`font-semibold ${isSelected ? 'text-white/90' : 'text-amber-700 dark:text-amber-400'}`}>
                                 {calculateTimeDurationHours(slot.time, slot.endTime)} hrs
                               </span>
                             )}
@@ -347,7 +347,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
               {/* 3. Collaborator Email Input */}
               <div>
-                <label htmlFor="reservation-collaborator-email" className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label htmlFor="reservation-collaborator-email" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   3. Correo Electrónico del Colaborador:
                 </label>
                 <input
@@ -356,14 +356,14 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                   value={emailInput}
                   onChange={(e) => setEmailInput(e.target.value)}
                   placeholder="nombre.apellido@claro.com.do"
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] font-medium"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] font-medium"
                   required
                 />
               </div>
 
               {/* Error Message */}
               {errorMessage && (
-                <div role="alert" aria-live="assertive" className="p-3 rounded-2xl bg-rose-50 border border-rose-200 flex items-center gap-2 text-rose-700 text-xs font-medium">
+                <div role="alert" aria-live="assertive" className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 flex items-center gap-2 text-rose-700 dark:text-rose-400 text-xs font-medium">
                   <AlertTriangle className="w-4 h-4 shrink-0 text-rose-500" aria-hidden="true" />
                   <span>{errorMessage}</span>
                 </div>

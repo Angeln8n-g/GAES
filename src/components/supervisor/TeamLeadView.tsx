@@ -573,22 +573,22 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
     <div className="space-y-8 animate-in fade-in duration-300">
       
       {/* Top Banner Header (Light Theme & Fully Responsive) */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-red-50 border border-red-200 text-[#DA291C] flex items-center justify-center shrink-0 shadow-sm">
+          <div className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-[#DA291C] dark:text-red-400 flex items-center justify-center shrink-0 shadow-sm">
             <Users className="w-6 h-6" />
           </div>
           <div>
             <div className="flex items-center gap-2.5 flex-wrap">
-              <h1 className="text-xl font-black text-slate-900 tracking-tight">Portal de Mi Equipo & Cumplimiento</h1>
-              <span className="px-3 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 flex items-center gap-1.5 shadow-sm">
+              <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Portal de Mi Equipo & Cumplimiento</h1>
+              <span className="px-3 py-0.5 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 flex items-center gap-1.5 shadow-sm">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 Líder de Área
               </span>
             </div>
-            <p className="text-xs text-slate-500 mt-1">
-              Supervisando como: <strong className="text-slate-800">{effectiveSupervisor.name}</strong> 
-              {effectiveSupervisor.department && <span> • Área: <strong className="text-[#DA291C]">{effectiveSupervisor.department}</strong></span>}
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Supervisando como: <strong className="text-slate-800 dark:text-slate-200">{effectiveSupervisor.name}</strong> 
+              {effectiveSupervisor.department && <span> • Área: <strong className="text-[#DA291C] dark:text-red-400">{effectiveSupervisor.department}</strong></span>}
             </p>
           </div>
         </div>
@@ -599,11 +599,11 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
           {/* Selector de Supervisor para Administradores */}
           {isFullAdmin && availableSupervisors.length > 1 && (
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-500 whitespace-nowrap">Supervisor:</span>
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">Supervisor:</span>
               <select
                 value={selectedSupervisorId}
                 onChange={(e) => setSelectedSupervisorId(e.target.value)}
-                className="px-3 py-2 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl text-xs font-bold focus:outline-none focus:border-[#DA291C]"
+                className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:border-[#DA291C]"
               >
                 <option value="all">🏢 Todo el Padrón General ({participants.length})</option>
                 {availableSupervisors.map(s => (
@@ -617,11 +617,11 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
 
           {/* Sub-filtro de Alcance */}
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-500 whitespace-nowrap">Alcance:</span>
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">Alcance:</span>
             <select
               value={selectedScope}
               onChange={(e) => setSelectedScope(e.target.value)}
-              className="px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-[#DA291C]"
+              className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-200 focus:outline-none focus:border-[#DA291C]"
             >
               <option value="all">👥 Todo el Equipo ({allTeamCards.size})</option>
               {directlyAssignedCards.size > 0 && (
@@ -639,11 +639,11 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
           {/* Selector de Cronograma Formativo */}
           {programs.length > 0 && viewMode === 'program' && (
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-500 whitespace-nowrap">Cronograma:</span>
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">Cronograma:</span>
               <select
                 value={selectedProgramId}
                 onChange={(e) => setSelectedProgramId(e.target.value)}
-                className="px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-200 focus:outline-none focus:border-[#DA291C]"
               >
                 {programs.map(p => (
                   <option key={p.id} value={p.id}>{p.title}</option>
@@ -656,15 +656,15 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
       </div>
 
       {/* Mode Switcher Tabs & Quick Actions */}
-      <div className="flex items-center justify-between border-b border-slate-200 pb-3 flex-wrap gap-3">
-        <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 flex-wrap">
+      <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3 flex-wrap gap-3">
+        <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 flex-wrap">
           <button
             type="button"
             onClick={() => setViewMode('program')}
             className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
               viewMode === 'program'
                 ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
@@ -677,7 +677,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
             className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
               viewMode === 'assignments'
                 ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700'
             }`}
           >
             <UserPlus className="w-3.5 h-3.5" />
@@ -690,7 +690,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
             className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
               viewMode === 'global'
                 ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700'
             }`}
           >
             <BookOpen className="w-3.5 h-3.5" />
@@ -703,7 +703,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
             className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
               viewMode === 'skills'
                 ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700'
             }`}
           >
             <GraduationCap className="w-3.5 h-3.5" />
@@ -730,7 +730,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
             <button
               type="button"
               onClick={handleExportTeamExcel}
-              className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 border border-slate-300 transition-colors"
+              className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center gap-1.5 border border-slate-300 dark:border-slate-700 transition-colors"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Exportar Excel</span>
@@ -741,9 +741,9 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
             <button
               type="button"
               onClick={() => exportSkillsGapReportToExcel(events, participants, teamGradesAnalysis.allGrades)}
-              className="px-3.5 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold flex items-center gap-1.5 border border-purple-200 transition-colors shadow-sm"
+              className="px-3.5 py-2 rounded-xl bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-900/40 text-purple-700 dark:text-purple-300 text-xs font-bold flex items-center gap-1.5 border border-purple-200 dark:border-purple-800 transition-colors shadow-sm"
             >
-              <Download className="w-3.5 h-3.5 text-purple-600" />
+              <Download className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
               <span>Exportar Diagnóstico (.xlsx)</span>
             </button>
           )}
@@ -763,32 +763,32 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         
         {/* KPI 1: Total Colaboradores */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500">Total en mi Equipo</span>
-            <div className="p-2 rounded-xl bg-red-50 text-[#DA291C]">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Total en mi Equipo</span>
+            <div className="p-2 rounded-xl bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400">
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-3xl font-black text-slate-900 mt-2">{totalTeamMembers}</p>
-          <p className="text-[11px] text-slate-500 mt-1">
+          <p className="text-3xl font-black text-slate-900 dark:text-white mt-2">{totalTeamMembers}</p>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
             ⭐ {directlyAssignedCards.size} asignados directamente
           </p>
         </div>
 
         {/* KPI 2: % Cumplimiento Promedio */}
-        <div className="bg-gradient-to-br from-emerald-50 via-white to-slate-50 border border-emerald-300 rounded-3xl p-5 shadow-sm relative overflow-hidden">
+        <div className="bg-gradient-to-br from-emerald-50 via-white to-slate-50 dark:from-emerald-950/30 dark:via-slate-900 dark:to-slate-900 border border-emerald-300 dark:border-emerald-800/60 rounded-3xl p-5 shadow-sm relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-emerald-700">Avance Promedio</span>
-            <div className="p-2 rounded-xl bg-emerald-100 text-emerald-700">
+            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">Avance Promedio</span>
+            <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline gap-2 mt-2">
-            <p className="text-3xl font-black text-emerald-700">{avgTeamPercentage}%</p>
-            <span className="text-[10px] text-emerald-600 font-bold">cumplimiento</span>
+            <p className="text-3xl font-black text-emerald-700 dark:text-emerald-400">{avgTeamPercentage}%</p>
+            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">cumplimiento</span>
           </div>
-          <div className="w-full bg-slate-100 rounded-full h-1.5 mt-2 overflow-hidden border border-emerald-200">
+          <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mt-2 overflow-hidden border border-emerald-200 dark:border-emerald-900/60">
             <div 
               className="bg-emerald-600 h-1.5 rounded-full transition-all duration-500" 
               style={{ width: `${avgTeamPercentage}%` }} 
@@ -797,39 +797,39 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
         </div>
 
         {/* KPI 3: Al Día (100%) */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500">Al Día (100%)</span>
-            <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Al Día (100%)</span>
+            <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-3xl font-black text-emerald-600 mt-2">{completedTeamMembers}</p>
-          <p className="text-[11px] text-slate-500 mt-1">Completaron todos los cursos</p>
+          <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-2">{completedTeamMembers}</p>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Completaron todos los cursos</p>
         </div>
 
         {/* KPI 4: En Progreso */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500">En Progreso</span>
-            <div className="p-2 rounded-xl bg-cyan-50 text-cyan-600">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">En Progreso</span>
+            <div className="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400">
               <Clock className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-3xl font-black text-cyan-600 mt-2">{inProgressTeamMembers}</p>
-          <p className="text-[11px] text-slate-500 mt-1">Cursos en curso o agendados</p>
+          <p className="text-3xl font-black text-cyan-600 dark:text-cyan-400 mt-2">{inProgressTeamMembers}</p>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Cursos en curso o agendados</p>
         </div>
 
         {/* KPI 5: Atrasados / En Riesgo */}
-        <div className="bg-gradient-to-br from-rose-50 via-white to-slate-50 border border-rose-300 rounded-3xl p-5 shadow-sm relative overflow-hidden">
+        <div className="bg-gradient-to-br from-rose-50 via-white to-slate-50 dark:from-rose-950/30 dark:via-slate-900 dark:to-slate-900 border border-rose-300 dark:border-rose-800/60 rounded-3xl p-5 shadow-sm relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-rose-700">Atrasados / Riesgo</span>
-            <div className="p-2 rounded-xl bg-rose-100 text-rose-700">
+            <span className="text-xs font-bold text-rose-700 dark:text-rose-400">Atrasados / Riesgo</span>
+            <div className="p-2 rounded-xl bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300">
               <AlertTriangle className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-3xl font-black text-rose-700 mt-2">{overdueTeamMembers}</p>
-          <p className="text-[11px] text-rose-600 font-bold mt-1">Requieren atención</p>
+          <p className="text-3xl font-black text-rose-700 dark:text-rose-400 mt-2">{overdueTeamMembers}</p>
+          <p className="text-[11px] text-rose-600 dark:text-rose-400 font-bold mt-1">Requieren atención</p>
         </div>
 
       </div>
@@ -849,7 +849,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Buscar por nombre, tarjeta, cédula o correo..."
-                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-2xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
               />
             </div>
 
@@ -869,13 +869,13 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 ${
                     statusFilter === f.id
                       ? 'bg-[#DA291C] text-white shadow-sm'
-                      : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-300 hover:bg-slate-50'
+                      : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
                   }`}
                 >
                   <span>{f.label}</span>
                   {f.count !== undefined && (
                     <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-                      statusFilter === f.id ? 'bg-red-800 text-white' : 'bg-slate-100 text-slate-600'
+                      statusFilter === f.id ? 'bg-red-800 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
                     }`}>
                       {f.count}
                     </span>
@@ -887,11 +887,11 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
           </div>
 
           {/* Main Matrix Table (Light Theme) */}
-          <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50 text-slate-600">
+                  <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300">
                     <th className="p-4 font-bold">Colaborador</th>
                     <th className="p-4 font-bold">Tarjeta / Cédula</th>
                     <th className="p-4 font-bold">Departamento</th>
@@ -901,7 +901,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                     <th className="p-4 font-bold text-right">Contacto</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {teamParticipantsCompliance.length > 0 ? (
                     teamParticipantsCompliance.map((p) => {
                       const isDirect = directlyAssignedCards.has(p.participantCard);
@@ -909,7 +909,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                       const empStatus = participantObj?.employmentStatus || 'contratado';
 
                       return (
-                        <tr key={p.participantCard} className="hover:bg-slate-50/80 transition-colors">
+                        <tr key={p.participantCard} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
                           
                           {/* Colaborador */}
                           <td className="p-4">
@@ -918,39 +918,39 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                               onClick={() => participantObj && setViewingProfileParticipant(participantObj)}
                               className="flex items-center gap-3 text-left group"
                             >
-                              <div className="w-8 h-8 rounded-xl bg-red-50 text-[#DA291C] border border-red-200 flex items-center justify-center font-bold text-xs shrink-0">
+                              <div className="w-8 h-8 rounded-xl bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-900/60 flex items-center justify-center font-bold text-xs shrink-0">
                                 {p.participantName.charAt(0)}
                               </div>
                               <div className="min-w-0">
                                 <div className="flex items-center gap-1.5 flex-wrap">
-                                  <span className="font-bold text-slate-900 group-hover:text-[#DA291C] transition-colors truncate">{p.participantName}</span>
+                                  <span className="font-bold text-slate-900 dark:text-white group-hover:text-[#DA291C] dark:group-hover:text-red-400 transition-colors truncate">{p.participantName}</span>
                                   {isDirect && (
-                                    <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                                    <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/60 shrink-0">
                                       ⭐ Asignado
                                     </span>
                                   )}
                                   {empStatus === 'en_proceso' && (
-                                    <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200 shrink-0">
+                                    <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/60 shrink-0">
                                       🟡 En Proceso
                                     </span>
                                   )}
                                   {empStatus === 'inactivo' && (
-                                    <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-rose-50 text-rose-700 border border-rose-200 shrink-0">
+                                    <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/60 shrink-0">
                                       🔴 Inactivo
                                     </span>
                                   )}
                                 </div>
-                                <p className="text-[11px] text-slate-500 truncate">{p.participantEmail}</p>
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{p.participantEmail}</p>
                                 {(participantObj?.isCurrentlyStudying || participantObj?.educationLevel) && (
                                   <div className="flex flex-wrap items-center gap-1 mt-1">
                                     {participantObj.educationLevel && (
-                                      <span className="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                      <span className="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                                         {participantObj.educationLevel}
                                       </span>
                                     )}
                                     {participantObj.isCurrentlyStudying && (
                                       <span 
-                                        className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200" 
+                                        className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9px] font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900/60" 
                                         title={`Estudia: ${participantObj.currentStudyField || ''} en ${participantObj.institutionName || ''}`}
                                       >
                                         🎓 Estudia: {participantObj.currentStudyField || 'En curso'}
@@ -965,16 +965,16 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                           {/* Tarjeta y Cédula */}
                           <td className="p-4 font-mono text-[11px]">
                             <div className="space-y-0.5">
-                              <span className="font-bold text-slate-800">#{p.participantCard}</span>
+                              <span className="font-bold text-slate-800 dark:text-slate-200">#{p.participantCard}</span>
                               {p.participantCedula && (
-                                <p className="text-[10px] text-slate-500">{p.participantCedula}</p>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400">{p.participantCedula}</p>
                               )}
                             </div>
                           </td>
 
                           {/* Departamento */}
                           <td className="p-4">
-                            <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 text-[11px] font-semibold">
+                            <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold">
                               {effectiveSupervisor.department || 'General'}
                             </span>
                           </td>
@@ -983,10 +983,10 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                           <td className="p-4">
                             <div className="space-y-1.5 w-36">
                               <div className="flex items-center justify-between text-[11px]">
-                                <span className="font-extrabold text-slate-900">{p.percentage}%</span>
-                                <span className="text-slate-500 text-[10px] font-medium">{p.completedEventsCount}/{p.totalAssignedEvents}</span>
+                                <span className="font-extrabold text-slate-900 dark:text-white">{p.percentage}%</span>
+                                <span className="text-slate-500 dark:text-slate-400 text-[10px] font-medium">{p.completedEventsCount}/{p.totalAssignedEvents}</span>
                               </div>
-                              <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden border border-slate-200">
+                              <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden border border-slate-200 dark:border-slate-700">
                                 <div
                                   className={`h-1.5 rounded-full transition-all duration-300 ${
                                     p.percentage === 100
@@ -995,7 +995,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                                       ? 'bg-[#DA291C]'
                                       : p.percentage > 0
                                       ? 'bg-amber-500'
-                                      : 'bg-slate-300'
+                                      : 'bg-slate-300 dark:bg-slate-600'
                                   }`}
                                   style={{ width: `${p.percentage}%` }}
                                 />
@@ -1006,25 +1006,25 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                           {/* Estatus */}
                           <td className="p-4">
                             {p.status === 'completed' && (
-                              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1 w-fit shadow-sm">
-                                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/60 flex items-center gap-1 w-fit shadow-sm">
+                                <CheckCircle2 className="w-3 pupil-emerald-600" />
                                 Al Día (100%)
                               </span>
                             )}
                             {p.status === 'in_progress' && (
-                              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-cyan-50 text-cyan-700 border border-cyan-200 flex items-center gap-1 w-fit shadow-sm">
-                                <Clock className="w-3 h-3 text-cyan-600" />
+                              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-cyan-50 dark:bg-cyan-950/40 text-cyan-700 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-900/60 flex items-center gap-1 w-fit shadow-sm">
+                                <Clock className="w-3 h-3 text-cyan-600 dark:text-cyan-400" />
                                 En Progreso
                               </span>
                             )}
                             {p.status === 'overdue' && (
-                              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200 flex items-center gap-1 w-fit shadow-sm">
-                                <AlertTriangle className="w-3 h-3 text-rose-600" />
+                              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/60 flex items-center gap-1 w-fit shadow-sm">
+                                <AlertTriangle className="w-3 h-3 text-rose-600 dark:text-rose-400" />
                                 Atrasado
                               </span>
                             )}
                             {p.status === 'not_started' && (
-                              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-1 w-fit">
+                              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 flex items-center gap-1 w-fit">
                                 Sin Iniciar
                               </span>
                             )}
@@ -1043,10 +1043,10 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                                     title={`${evtTitle}: ${ed.status === 'attended' ? 'Asistió' : ed.status === 'registered' ? 'Inscrito' : 'Pendiente'}`}
                                     className={`px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 ${
                                       ed.status === 'attended'
-                                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                        ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/60'
                                         : ed.status === 'registered'
-                                        ? 'bg-cyan-50 text-cyan-700 border border-cyan-200'
-                                        : 'bg-slate-100 text-slate-600 border border-slate-200'
+                                        ? 'bg-cyan-50 dark:bg-cyan-950/40 text-cyan-700 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-900/60'
+                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
                                     }`}
                                   >
                                     {ed.status === 'attended' ? '✓' : ed.status === 'registered' ? '📅' : '○'}
@@ -1062,7 +1062,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                             <div className="flex items-center justify-end gap-1.5">
                               <a
                                 href={`mailto:${p.participantEmail}?subject=Recordatorio%20de%20Capacitaci%C3%B3n%20-%20${encodeURIComponent(activeProgram?.title || 'CapacitaHub')}&body=Hola%20${encodeURIComponent(p.participantName)},%20te%20recordamos%20que%20tienes%20capacitaciones%20pendientes%20en%20el%20cronograma%20institucional.`}
-                                className="p-1.5 text-slate-600 hover:text-red-700 hover:bg-slate-100 rounded-lg transition-colors"
+                                className="p-1.5 text-slate-600 dark:text-slate-400 hover:text-red-700 dark:hover:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                                 title="Enviar correo individual"
                               >
                                 <Mail className="w-3.5 h-3.5" />
@@ -1072,7 +1072,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                                 href={`https://wa.me/?text=${encodeURIComponent(`Hola ${p.participantName}, te escribo para recordarte que tienes capacitaciones pendientes en el cronograma "${activeProgram?.title || 'CapacitaHub'}". Por favor revisa tu avance en la plataforma.`)}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="p-1.5 text-slate-600 hover:text-emerald-700 hover:bg-slate-100 rounded-lg transition-colors"
+                                className="p-1.5 text-slate-600 dark:text-slate-400 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                                 title="Enviar WhatsApp"
                               >
                                 <MessageSquare className="w-3.5 h-3.5" />
@@ -1087,11 +1087,11 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                     <tr>
                       <td colSpan={7} className="p-12 text-center">
                         <div className="max-w-md mx-auto space-y-3">
-                          <div className="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center mx-auto text-slate-500">
+                          <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center mx-auto text-slate-500 dark:text-slate-400">
                             <Users className="w-6 h-6" />
                           </div>
-                          <p className="text-sm font-bold text-slate-800">No hay colaboradores en este equipo</p>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-sm font-bold text-slate-800 dark:text-slate-200">No hay colaboradores en este equipo</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
                             {allTeamCards.size === 0
                               ? "Tu cuenta de supervisor aún no tiene colaboradores asignados directamente ni por departamento. Un administrador puede vincular a tu equipo desde el Padrón o Gestión de Usuarios."
                               : "No se encontraron colaboradores que coincidan con la búsqueda o filtros aplicados."}
@@ -1104,9 +1104,9 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
               </table>
             </div>
 
-            <div className="p-4 border-t border-slate-200 text-xs text-slate-500 flex justify-between bg-slate-50">
+            <div className="p-4 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 flex justify-between bg-slate-50 dark:bg-slate-800/50">
               <span>Mostrando {teamParticipantsCompliance.length} de {activeScopeCards.size} colaboradores supervisados</span>
-              <span>Cronograma: <strong className="text-slate-800">{activeProgram?.title || 'N/A'}</strong></span>
+              <span>Cronograma: <strong className="text-slate-800 dark:text-slate-200">{activeProgram?.title || 'N/A'}</strong></span>
             </div>
           </div>
 
@@ -1117,13 +1117,13 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
       {viewMode === 'global' && (
         <div className="space-y-6 animate-in fade-in duration-200">
           
-          <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
-            <div className="p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
+            <div className="p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/80 flex items-center justify-between">
               <div>
-                <h2 className="text-sm font-black text-slate-900">Historial Consolidado de Asistencias & Horas del Equipo</h2>
-                <p className="text-xs text-slate-500 mt-0.5">Todas las capacitaciones acumuladas en la empresa</p>
+                <h2 className="text-sm font-black text-slate-900 dark:text-white">Historial Consolidado de Asistencias & Horas del Equipo</h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Todas las capacitaciones acumuladas en la empresa</p>
               </div>
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-[#DA291C] border border-red-200">
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-900/60">
                 {globalTeamStats.length} Colaboradores
               </span>
             </div>
@@ -1131,7 +1131,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50 text-slate-600">
+                  <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300">
                     <th className="p-4 font-bold">Colaborador</th>
                     <th className="p-4 font-bold">Tarjeta / Cédula</th>
                     <th className="p-4 font-bold">Departamento</th>
@@ -1141,34 +1141,34 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                     <th className="p-4 font-bold text-right">Contacto</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {globalTeamStats.map((item: any) => (
-                    <tr key={item.card} className="hover:bg-slate-50/80 transition-colors">
+                    <tr key={item.card} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-xl bg-red-50 text-[#DA291C] border border-red-200 flex items-center justify-center font-bold text-xs shrink-0">
+                          <div className="w-8 h-8 rounded-xl bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-900/60 flex items-center justify-center font-bold text-xs shrink-0">
                             {item.name.charAt(0)}
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="font-bold text-slate-900">{item.name}</span>
+                              <span className="font-bold text-slate-900 dark:text-white">{item.name}</span>
                               {item.isDirect && (
-                                <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/60">
                                   ⭐ Asignado
                                 </span>
                               )}
                             </div>
-                            <p className="text-[11px] text-slate-500">{item.email}</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400">{item.email}</p>
                             {(item.isCurrentlyStudying || item.educationLevel) && (
                               <div className="flex flex-wrap items-center gap-1 mt-1">
                                 {item.educationLevel && (
-                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                                     {item.educationLevel}
                                   </span>
                                 )}
                                 {item.isCurrentlyStudying && (
                                   <span 
-                                    className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200" 
+                                    className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9px] font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900/60" 
                                     title={`Estudia: ${item.currentStudyField || ''} en ${item.institutionName || ''}`}
                                   >
                                     🎓 Estudia: {item.currentStudyField || 'En curso'}
@@ -1181,31 +1181,31 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                       </td>
 
                       <td className="p-4 font-mono text-[11px]">
-                        <span className="font-bold text-slate-800">#{item.card}</span>
-                        {item.cedula && <p className="text-[10px] text-slate-500">{item.cedula}</p>}
+                        <span className="font-bold text-slate-800 dark:text-slate-200">#{item.card}</span>
+                        {item.cedula && <p className="text-[10px] text-slate-500 dark:text-slate-400">{item.cedula}</p>}
                       </td>
 
-                      <td className="p-4 text-slate-700">
-                        <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 text-[11px] font-semibold">
+                      <td className="p-4 text-slate-700 dark:text-slate-300">
+                        <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold">
                           {item.department}
                         </span>
                       </td>
 
                       <td className="p-4">
-                        <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/60">
                           {item.attendedCount} cursos completados
                         </span>
                       </td>
 
                       <td className="p-4">
-                        <span className="font-extrabold text-slate-900 text-xs">{item.totalHours} hrs</span>
+                        <span className="font-extrabold text-slate-900 dark:text-white text-xs">{item.totalHours} hrs</span>
                       </td>
 
-                      <td className="p-4 text-slate-600">
+                      <td className="p-4 text-slate-600 dark:text-slate-400">
                         {item.registeredFutureCount > 0 ? (
-                          <span className="text-cyan-700 font-bold">{item.registeredFutureCount} agendados</span>
+                          <span className="text-cyan-700 dark:text-cyan-400 font-bold">{item.registeredFutureCount} agendados</span>
                         ) : (
-                          <span className="text-slate-500 italic">Ninguno agendado</span>
+                          <span className="text-slate-500 dark:text-slate-400 italic">Ninguno agendado</span>
                         )}
                       </td>
 
@@ -1213,7 +1213,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                         <div className="flex items-center justify-end gap-1.5">
                           <a
                             href={`mailto:${item.email}?subject=Capacitaciones%20Corporativas`}
-                            className="p-1.5 text-slate-600 hover:text-red-700 hover:bg-slate-100 rounded-lg transition-colors"
+                            className="p-1.5 text-slate-600 dark:text-slate-400 hover:text-red-700 dark:hover:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                           >
                             <Mail className="w-3.5 h-3.5" />
                           </a>
@@ -1221,7 +1221,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                             href={`https://wa.me/?text=${encodeURIComponent(`Hola ${item.name}, te contacto desde la supervisión de capacitaciones de tu área.`)}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-1.5 text-slate-600 hover:text-emerald-700 hover:bg-slate-100 rounded-lg transition-colors"
+                            className="p-1.5 text-slate-600 dark:text-slate-400 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                           >
                             <MessageSquare className="w-3.5 h-3.5" />
                           </a>
@@ -1237,67 +1237,67 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
         </div>
       )}
 
-      {/* VIEW MODE C: ASIGNACIONES ACTIVAS DE CAPACITACIÓN (Light Theme) */}
+      {/* VIEW MODE C: ASIGNACIONES ACTIVAS DE CAPACITACIÓN */}
       {viewMode === 'assignments' && (
         <div className="space-y-6 animate-in fade-in duration-200">
           
           {/* Top KPI Cards for Assignments */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
-              <span className="text-xs font-bold text-slate-500">Total Asignaciones / Registros</span>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm">
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Total Asignaciones / Registros</span>
               <div className="flex items-baseline gap-2 mt-2">
-                <span className="text-2xl font-black text-slate-900">{teamAssignmentsList.length}</span>
-                <span className="text-xs text-slate-500">en el equipo</span>
+                <span className="text-2xl font-black text-slate-900 dark:text-white">{teamAssignmentsList.length}</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">en el equipo</span>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-rose-50 via-white to-slate-50 border border-rose-200 rounded-3xl p-5 shadow-sm">
-              <span className="text-xs font-bold text-rose-700 flex items-center gap-1">
+            <div className="bg-gradient-to-br from-rose-50 via-white to-slate-50 dark:from-rose-950/20 dark:via-slate-900 dark:to-slate-900 border border-rose-200 dark:border-rose-900/40 rounded-3xl p-5 shadow-sm">
+              <span className="text-xs font-bold text-rose-700 dark:text-rose-400 flex items-center gap-1">
                 <ShieldAlert className="w-3.5 h-3.5" /> Asignaciones Obligatorias
               </span>
               <div className="flex items-baseline gap-2 mt-2">
-                <span className="text-2xl font-black text-rose-700">
+                <span className="text-2xl font-black text-rose-700 dark:text-rose-400">
                   {teamAssignmentsList.filter(a => a.isMandatory).length}
                 </span>
-                <span className="text-xs text-slate-500 font-medium">fijadas por líder</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">fijadas por líder</span>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-cyan-50 via-white to-slate-50 border border-cyan-200 rounded-3xl p-5 shadow-sm">
-              <span className="text-xs font-bold text-cyan-700 flex items-center gap-1">
+            <div className="bg-gradient-to-br from-cyan-50 via-white to-slate-50 dark:from-cyan-950/20 dark:via-slate-900 dark:to-slate-900 border border-cyan-200 dark:border-cyan-900/40 rounded-3xl p-5 shadow-sm">
+              <span className="text-xs font-bold text-cyan-700 dark:text-cyan-400 flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5" /> Asignaciones Voluntarias
               </span>
               <div className="flex items-baseline gap-2 mt-2">
-                <span className="text-2xl font-black text-cyan-700">
+                <span className="text-2xl font-black text-cyan-700 dark:text-cyan-400">
                   {teamAssignmentsList.filter(a => !a.isMandatory && a.assignedBy).length}
                 </span>
-                <span className="text-xs text-slate-500 font-medium">sugeridas</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">sugeridas</span>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-emerald-50 via-white to-slate-50 border border-emerald-200 rounded-3xl p-5 shadow-sm">
-              <span className="text-xs font-bold text-emerald-700 flex items-center gap-1">
+            <div className="bg-gradient-to-br from-emerald-50 via-white to-slate-50 dark:from-emerald-950/20 dark:via-slate-900 dark:to-slate-900 border border-emerald-200 dark:border-emerald-900/40 rounded-3xl p-5 shadow-sm">
+              <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
                 <CheckCircle2 className="w-3.5 h-3.5" /> Asistencias Confirmadas
               </span>
               <div className="flex items-baseline gap-2 mt-2">
-                <span className="text-2xl font-black text-emerald-700">
+                <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400">
                   {teamAssignmentsList.filter(a => a.hasAttended).length}
                 </span>
-                <span className="text-xs text-slate-500 font-medium">con check-in QR</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">con check-in QR</span>
               </div>
             </div>
           </div>
 
           {/* Table Container */}
-          <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
             
             {/* Header & Controls */}
-            <div className="p-5 border-b border-slate-200 bg-slate-50 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
-                <h2 className="text-sm font-black text-slate-900 flex items-center gap-2">
+                <h2 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
                   <span>Asignaciones de Capacitaciones a Miembros del Equipo</span>
                 </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   Gestiona las matrículas, verifica el carácter obligatorio y desasigna si es necesario.
                 </p>
               </div>
@@ -1311,16 +1311,16 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                     placeholder="Buscar por colaborador o curso..."
                     value={assignmentSearch}
                     onChange={(e) => setAssignmentSearch(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                    className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                   />
                 </div>
 
-                <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
                   <button
                     type="button"
                     onClick={() => setAssignmentFilterType('all')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                      assignmentFilterType === 'all' ? 'bg-[#DA291C] text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                      assignmentFilterType === 'all' ? 'bg-[#DA291C] text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     Todos ({teamAssignmentsList.length})
@@ -1329,7 +1329,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                     type="button"
                     onClick={() => setAssignmentFilterType('mandatory')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                      assignmentFilterType === 'mandatory' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-600 hover:text-rose-600'
+                      assignmentFilterType === 'mandatory' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400'
                     }`}
                   >
                     Obligatorios ({teamAssignmentsList.filter(a => a.isMandatory).length})
@@ -1338,7 +1338,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                     type="button"
                     onClick={() => setAssignmentFilterType('voluntary')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                      assignmentFilterType === 'voluntary' ? 'bg-cyan-600 text-white shadow-sm' : 'text-slate-600 hover:text-cyan-600'
+                      assignmentFilterType === 'voluntary' ? 'bg-cyan-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400'
                     }`}
                   >
                     Voluntarios ({teamAssignmentsList.filter(a => !a.isMandatory).length})
@@ -1351,7 +1351,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50 text-slate-600">
+                  <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300">
                     <th className="p-4 font-bold">Colaborador</th>
                     <th className="p-4 font-bold">Capacitación / Evento</th>
                     <th className="p-4 font-bold">Fecha y Horario</th>
@@ -1361,31 +1361,31 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                     <th className="p-4 font-bold text-right">Acción</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {filteredTeamAssignments.length > 0 ? (
                     filteredTeamAssignments.map((item, idx) => (
                       <tr 
                         key={`${item.event.id}-${item.schedule.date}-${item.slot.time}-${item.participant.card}-${idx}`}
-                        className="hover:bg-slate-50/80 transition-colors"
+                        className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors"
                       >
                         {/* Colaborador */}
                         <td className="p-4">
-                          <p className="font-bold text-slate-900 text-xs">{item.participant.name}</p>
-                          <p className="text-[11px] text-slate-500">{item.participant.email}</p>
-                          <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-slate-500 font-medium">
+                          <p className="font-bold text-slate-900 dark:text-white text-xs">{item.participant.name}</p>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">{item.participant.email}</p>
+                          <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-slate-500 dark:text-slate-400 font-medium">
                             <span>ID: #{item.participant.card}</span>
                             {item.participant.cedula && <span>• Céd: {item.participant.cedula}</span>}
                           </div>
                           {(item.participant.isCurrentlyStudying || item.participant.educationLevel) && (
                             <div className="flex flex-wrap items-center gap-1 mt-1">
                               {item.participant.educationLevel && (
-                                <span className="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                <span className="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                                   {item.participant.educationLevel}
                                 </span>
                               )}
                               {item.participant.isCurrentlyStudying && (
                                 <span 
-                                  className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200" 
+                                  className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9px] font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/50" 
                                   title={`Estudia: ${item.participant.currentStudyField || ''} en ${item.participant.institutionName || ''}`}
                                 >
                                   🎓 Estudia: {item.participant.currentStudyField || 'En curso'}
@@ -1397,9 +1397,9 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
 
                         {/* Evento */}
                         <td className="p-4">
-                          <p className="font-bold text-slate-900 text-xs">{item.event.title}</p>
-                          <div className="flex items-center gap-2 mt-0.5 text-[11px] text-slate-500">
-                            <span className="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-semibold text-slate-700 border border-slate-200">
+                          <p className="font-bold text-slate-900 dark:text-white text-xs">{item.event.title}</p>
+                          <div className="flex items-center gap-2 mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
+                            <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                               {item.event.category}
                             </span>
                             <span>{item.event.instructor}</span>
@@ -1408,11 +1408,11 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
 
                         {/* Fecha y Horario */}
                         <td className="p-4 whitespace-nowrap">
-                          <div className="flex items-center gap-1.5 text-slate-800 font-bold">
+                          <div className="flex items-center gap-1.5 text-slate-800 dark:text-slate-200 font-bold">
                             <Calendar className="w-3.5 h-3.5 text-[#DA291C]" />
                             <span>{item.schedule.date}</span>
                           </div>
-                          <div className="flex items-center gap-1.5 text-slate-500 text-[11px] mt-0.5 font-medium">
+                          <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-[11px] mt-0.5 font-medium">
                             <Clock className="w-3.5 h-3.5 text-slate-400" />
                             <span>{item.slot.time}</span>
                           </div>
@@ -1421,45 +1421,45 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                         {/* Carácter */}
                         <td className="p-4 whitespace-nowrap">
                           {item.isMandatory ? (
-                            <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-rose-50 text-rose-700 border border-rose-200 flex items-center gap-1.5 w-max">
-                              <ShieldAlert className="w-3 h-3 text-rose-600" />
+                            <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50 flex items-center gap-1.5 w-max">
+                              <ShieldAlert className="w-3 h-3 text-rose-600 dark:text-rose-400" />
                               ★ Obligatorio
                             </span>
                           ) : item.assignedBy ? (
-                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-cyan-50 text-cyan-700 border border-cyan-200 flex items-center gap-1.5 w-max">
-                              <ShieldCheck className="w-3 h-3 text-cyan-600" />
+                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-cyan-50 dark:bg-cyan-950/40 text-cyan-700 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-900/50 flex items-center gap-1.5 w-max">
+                              <ShieldCheck className="w-3 h-3 text-cyan-600 dark:text-cyan-400" />
                               Voluntario
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200 w-max">
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 w-max">
                               Auto-inscrito
                             </span>
                           )}
                         </td>
 
                         {/* Asignado por */}
-                        <td className="p-4 text-[11px] text-slate-600">
+                        <td className="p-4 text-[11px] text-slate-600 dark:text-slate-400">
                           {item.assignedBy ? (
                             <div>
-                              <p className="font-bold text-slate-800">{item.assignedBy}</p>
+                              <p className="font-bold text-slate-800 dark:text-slate-200">{item.assignedBy}</p>
                               {item.assignmentNotes && (
-                                <p className="text-[10px] text-amber-700 italic mt-0.5">"{item.assignmentNotes}"</p>
+                                <p className="text-[10px] text-amber-700 dark:text-amber-400 italic mt-0.5">"{item.assignmentNotes}"</p>
                               )}
                             </div>
                           ) : (
-                            <span className="text-slate-500 italic">Inscripción Directa</span>
+                            <span className="text-slate-500 dark:text-slate-400 italic">Inscripción Directa</span>
                           )}
                         </td>
 
                         {/* Estado Asistencia */}
                         <td className="p-4 whitespace-nowrap">
                           {item.hasAttended ? (
-                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1 w-max">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Asistencia OK
+                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50 flex items-center gap-1 w-max">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> Asistencia OK
                             </span>
                           ) : (
-                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-cyan-50 text-cyan-700 border border-cyan-200 flex items-center gap-1 w-max">
-                              <Clock className="w-3 h-3 text-cyan-600" /> Agendado
+                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-cyan-50 dark:bg-cyan-950/40 text-cyan-700 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-900/50 flex items-center gap-1 w-max">
+                              <Clock className="w-3 h-3 text-cyan-600 dark:text-cyan-400" /> Agendado
                             </span>
                           )}
                         </td>
@@ -1475,7 +1475,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                               item.participant.email,
                               item.participant.name
                             )}
-                            className="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors inline-flex items-center gap-1 cursor-pointer"
+                            className="p-1.5 text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors inline-flex items-center gap-1 cursor-pointer"
                             title="Desasignar a este colaborador"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -1488,11 +1488,11 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                     <tr>
                       <td colSpan={7} className="p-12 text-center">
                         <div className="max-w-md mx-auto space-y-3">
-                          <div className="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center mx-auto text-slate-500">
+                          <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center mx-auto text-slate-500 dark:text-slate-400">
                             <BookOpen className="w-6 h-6" />
                           </div>
-                          <p className="text-sm font-bold text-slate-800">No hay asignaciones en esta vista</p>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-sm font-bold text-slate-800 dark:text-slate-200">No hay asignaciones en esta vista</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
                             Puedes asignar cursos directamente a tus colaboradores usando el botón "⚡ Asignar Curso al Equipo".
                           </p>
                           <button
@@ -1511,7 +1511,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
               </table>
             </div>
 
-            <div className="p-4 border-t border-slate-200 text-xs text-slate-500 flex justify-between bg-slate-50">
+            <div className="p-4 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 flex justify-between bg-slate-50 dark:bg-slate-800/50">
               <span>Mostrando {filteredTeamAssignments.length} de {teamAssignmentsList.length} asignaciones totales</span>
             </div>
           </div>
@@ -1519,70 +1519,70 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
         </div>
       )}
 
-      {/* VIEW MODE D: DIAGNÓSTICO DE DEBILIDADES & CALIFICACIONES (Light Theme) */}
+      {/* VIEW MODE D: DIAGNÓSTICO DE DEBILIDADES & CALIFICACIONES */}
       {viewMode === 'skills' && (
         <div className="space-y-6 animate-in fade-in duration-200">
           
           {/* Top KPI Cards for Skills & Grades */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
-              <span className="text-xs font-bold text-slate-500">Promedio General del Equipo</span>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm">
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Promedio General del Equipo</span>
               <div className="flex items-baseline justify-between mt-2">
-                <span className="text-2xl font-black text-blue-700">{teamGradesAnalysis.overallTeamAvg}</span>
-                <span className="text-xs font-bold text-slate-500">Escala 0 - 100</span>
+                <span className="text-2xl font-black text-blue-700 dark:text-blue-400">{teamGradesAnalysis.overallTeamAvg}</span>
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Escala 0 - 100</span>
               </div>
-              <p className="text-[11px] text-slate-500 mt-1">Calculado sobre cursos con evaluación formal</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Calculado sobre cursos con evaluación formal</p>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
-              <span className="text-xs font-bold text-slate-500">Total Evaluaciones Realizadas</span>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm">
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Total Evaluaciones Realizadas</span>
               <div className="flex items-baseline justify-between mt-2">
-                <span className="text-2xl font-black text-slate-900">{teamGradesAnalysis.totalGradesCount}</span>
-                <span className="text-xs font-bold text-[#DA291C]">{teamGradesAnalysis.gradedParticipants.length} miembros</span>
+                <span className="text-2xl font-black text-slate-900 dark:text-white">{teamGradesAnalysis.totalGradesCount}</span>
+                <span className="text-xs font-bold text-[#DA291C] dark:text-rose-400">{teamGradesAnalysis.gradedParticipants.length} miembros</span>
               </div>
-              <p className="text-[11px] text-slate-500 mt-1">Calificaciones asentadas en PostgreSQL</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Calificaciones asentadas en PostgreSQL</p>
             </div>
 
-            <div className="bg-gradient-to-br from-emerald-50 via-white to-slate-50 border border-emerald-200 rounded-3xl p-5 shadow-sm">
-              <span className="text-xs font-bold text-emerald-700">Capacitaciones Aprobadas</span>
+            <div className="bg-gradient-to-br from-emerald-50 via-white to-slate-50 dark:from-emerald-950/20 dark:via-slate-900 dark:to-slate-900 border border-emerald-200 dark:border-emerald-900/40 rounded-3xl p-5 shadow-sm">
+              <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">Capacitaciones Aprobadas</span>
               <div className="flex items-baseline justify-between mt-2">
-                <span className="text-2xl font-black text-emerald-700">{teamGradesAnalysis.totalPassed}</span>
-                <span className="text-xs font-bold text-emerald-600">
+                <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400">{teamGradesAnalysis.totalPassed}</span>
+                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
                   {teamGradesAnalysis.totalGradesCount > 0 
                     ? `${((teamGradesAnalysis.totalPassed / teamGradesAnalysis.totalGradesCount) * 100).toFixed(0)}% éxito`
                     : '100%'}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 mt-1">Superaron la nota mínima aprobatoria</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Superaron la nota mínima aprobatoria</p>
             </div>
 
-            <div className="bg-gradient-to-br from-rose-50 via-white to-slate-50 border border-rose-200 rounded-3xl p-5 shadow-sm">
-              <span className="text-xs font-bold text-rose-700">Colaboradores con Debilidades / Refuerzo</span>
+            <div className="bg-gradient-to-br from-rose-50 via-white to-slate-50 dark:from-rose-950/20 dark:via-slate-900 dark:to-slate-900 border border-rose-200 dark:border-rose-900/40 rounded-3xl p-5 shadow-sm">
+              <span className="text-xs font-bold text-rose-700 dark:text-rose-400">Colaboradores con Debilidades / Refuerzo</span>
               <div className="flex items-baseline justify-between mt-2">
-                <span className="text-2xl font-black text-rose-700">{teamGradesAnalysis.totalMembersWithGaps}</span>
-                <span className="text-xs font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-full border border-rose-200">
+                <span className="text-2xl font-black text-rose-700 dark:text-rose-400">{teamGradesAnalysis.totalMembersWithGaps}</span>
+                <span className="text-xs font-bold text-rose-700 dark:text-rose-400 bg-rose-100 dark:bg-rose-950/60 px-2 py-0.5 rounded-full border border-rose-200 dark:border-rose-900/50">
                   🚨 Requieren Atención
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 mt-1">Identificados con brechas técnicas o reprobados</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Identificados con brechas técnicas o reprobados</p>
             </div>
           </div>
 
           {/* Radar / Diagnostic Panel of Weaknesses */}
           {teamGradesAnalysis.topGaps.length > 0 && (
-            <div className="p-6 rounded-3xl bg-slate-50 border border-slate-200 shadow-sm space-y-3">
+            <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Target className="w-5 h-5 text-[#DA291C]" />
-                  <h2 className="text-sm font-black text-slate-900">
+                  <h2 className="text-sm font-black text-slate-900 dark:text-white">
                     Matriz de Detección de Debilidades en el Equipo (Skills Gap Analysis)
                   </h2>
                 </div>
-                <span className="text-[11px] text-blue-800 font-bold bg-blue-50 px-3 py-1 rounded-xl border border-blue-200 shadow-xs">
+                <span className="text-[11px] text-blue-800 dark:text-blue-300 font-bold bg-blue-50 dark:bg-blue-950/50 px-3 py-1 rounded-xl border border-blue-200 dark:border-blue-900/50 shadow-xs">
                   {teamGradesAnalysis.topGaps.length} áreas identificadas
                 </span>
               </div>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-slate-600 dark:text-slate-400">
                 A continuación se listan las competencias y temas donde los miembros de tu equipo han mostrado mayor índice de dificultad en sus evaluaciones:
               </p>
 
@@ -1590,18 +1590,18 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                 {teamGradesAnalysis.topGaps.map(gap => (
                   <div 
                     key={gap.skill}
-                    className="p-3 rounded-2xl bg-white border border-rose-200 shadow-xs flex items-center justify-between gap-2"
+                    className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-900/40 shadow-xs flex items-center justify-between gap-2"
                   >
                     <div className="space-y-0.5">
-                      <p className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                      <p className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                         <ShieldAlert className="w-3.5 h-3.5 text-[#DA291C] shrink-0" />
                         <span>{gap.skill}</span>
                       </p>
-                      <p className="text-[11px] text-slate-500">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
                         {gap.participantsCount} {gap.participantsCount === 1 ? 'colaborador afectado' : 'colaboradores afectados'}
                       </p>
                     </div>
-                    <span className="px-2 py-0.5 bg-rose-50 text-rose-700 text-xs font-extrabold rounded-lg border border-rose-200">
+                    <span className="px-2 py-0.5 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 text-xs font-extrabold rounded-lg border border-rose-200 dark:border-rose-900/50">
                       {gap.count} {gap.count === 1 ? 'caso' : 'casos'}
                     </span>
                   </div>
@@ -1611,7 +1611,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
           )}
 
           {/* Search & Filter Bar */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-4 rounded-3xl border border-slate-200 shadow-sm">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
             <div className="relative flex-1">
               <Search className="w-4 h-4 text-slate-400 absolute inset-y-0 left-3 my-auto" />
               <input
@@ -1619,16 +1619,16 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Buscar por colaborador, tarjeta, cédula o debilidad..."
-                className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
               />
             </div>
 
             <div className="flex items-center gap-2">
-              <Filter className="w-3.5 h-3.5 text-slate-500" />
+              <Filter className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
               <select
                 value={skillsFilterStatus}
                 onChange={(e) => setSkillsFilterStatus(e.target.value as any)}
-                className="px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#DA291C]"
+                className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#DA291C]"
               >
                 <option value="all">🔍 Todos los Colaboradores</option>
                 <option value="needs_retraining">🚨 Con Debilidades / Re-capacitación Requerida</option>
@@ -1668,35 +1668,35 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                     key={p.card}
                     className={`p-5 rounded-3xl border transition-all ${
                       hasGaps
-                        ? 'bg-white border-rose-300 shadow-sm hover:border-rose-400'
+                        ? 'bg-white dark:bg-slate-900 border-rose-300 dark:border-rose-800/80 shadow-sm hover:border-rose-400'
                         : item.grades.length > 0
-                        ? 'bg-white border-slate-200 shadow-sm hover:border-slate-300'
-                        : 'bg-white border-slate-200 shadow-xs'
+                        ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm hover:border-slate-300 dark:hover:border-slate-700'
+                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-xs'
                     }`}
                   >
                     {/* Header: Participant Info + Avg Score + Action Buttons */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
                       <div className="flex items-center gap-3.5">
                         <div className={`w-11 h-11 rounded-2xl flex items-center justify-center font-bold text-sm shadow-sm ${
-                          hasGaps ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-red-50 text-[#DA291C] border border-red-200'
+                          hasGaps ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50' : 'bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-rose-400 border border-red-200 dark:border-red-900/50'
                         }`}>
                           {p.name.charAt(0).toUpperCase()}
                         </div>
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="text-sm font-bold text-slate-900">{p.name}</h3>
-                            <span className="px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-bold rounded-lg">
+                            <h3 className="text-sm font-bold text-slate-900 dark:text-white">{p.name}</h3>
+                            <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-[10px] font-bold rounded-lg">
                               Tarjeta: #{p.card}
                             </span>
                             {hasGaps && (
-                              <span className="px-2 py-0.5 bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-extrabold rounded-lg flex items-center gap-1">
-                                <ShieldAlert className="w-3 h-3 text-rose-600" />
+                              <span className="px-2 py-0.5 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50 text-[10px] font-extrabold rounded-lg flex items-center gap-1">
+                                <ShieldAlert className="w-3 h-3 text-rose-600 dark:text-rose-400" />
                                 🚨 Requiere Refuerzo
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-slate-500 mt-0.5">
-                            {p.email} • <span className="text-slate-700 font-semibold">{p.department || 'General'}</span>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                            {p.email} • <span className="text-slate-700 dark:text-slate-300 font-semibold">{p.department || 'General'}</span>
                           </p>
                         </div>
                       </div>
@@ -1704,14 +1704,14 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                       {/* Score Summary & Actions */}
                       <div className="flex items-center gap-2.5 self-start sm:self-auto flex-wrap">
                         {item.grades.length > 0 ? (
-                          <div className="px-3.5 py-1.5 bg-slate-50 rounded-2xl border border-slate-200 text-right">
-                            <span className="text-[10px] text-slate-500 uppercase font-bold block">Promedio</span>
-                            <span className={`text-base font-extrabold ${item.avgScore >= 70 ? 'text-emerald-700' : 'text-rose-700'}`}>
-                              {item.avgScore} <span className="text-xs text-slate-500 font-medium">pts</span>
+                          <div className="px-3.5 py-1.5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700 text-right">
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold block">Promedio</span>
+                            <span className={`text-base font-extrabold ${item.avgScore >= 70 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>
+                              {item.avgScore} <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">pts</span>
                             </span>
                           </div>
                         ) : (
-                          <span className="text-xs text-slate-500 italic bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+                          <span className="text-xs text-slate-500 dark:text-slate-400 italic bg-slate-50 dark:bg-slate-800/60 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
                             Sin evaluaciones registradas
                           </span>
                         )}
@@ -1721,7 +1721,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                           onClick={() => {
                             setViewingProfileParticipant(p);
                           }}
-                          className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+                          className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors cursor-pointer"
                         >
                           Ver Expediente
                         </button>
@@ -1742,7 +1742,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                     {/* Evaluated Courses Breakdown */}
                     {item.grades.length > 0 ? (
                       <div className="pt-3.5 space-y-2.5">
-                        <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                        <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                           Historial de Capacitaciones Evaluadas:
                         </span>
 
@@ -1757,30 +1757,30 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                                 key={idx}
                                 className={`p-3.5 rounded-2xl border ${
                                   isFailed || grd.needsRetraining
-                                    ? 'bg-rose-50/40 border-rose-200'
-                                    : 'bg-slate-50/70 border-slate-200'
+                                    ? 'bg-rose-50/40 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/40'
+                                    : 'bg-slate-50/70 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800'
                                 }`}
                               >
                                 <div className="flex items-start justify-between gap-2">
                                   <div>
-                                    <span className="text-[10px] text-[#DA291C] font-bold">{grd.category}</span>
-                                    <h4 className="text-xs font-bold text-slate-900 line-clamp-1">{grd.eventTitle}</h4>
+                                    <span className="text-[10px] text-[#DA291C] dark:text-rose-400 font-bold">{grd.category}</span>
+                                    <h4 className="text-xs font-bold text-slate-900 dark:text-white line-clamp-1">{grd.eventTitle}</h4>
                                   </div>
 
                                   <div className="flex items-center gap-1.5 shrink-0">
                                     {grd.score !== null && (
                                       <span className={`px-2 py-0.5 rounded-lg text-xs font-black ${
-                                        isPassed ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'
+                                        isPassed ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50' : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50'
                                       }`}>
                                         {grd.score} pts
                                       </span>
                                     )}
                                     <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase ${
                                       isPassed
-                                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                        ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50'
                                         : isFailed
-                                        ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                                        : 'bg-slate-100 text-slate-600 border border-slate-200'
+                                        ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50'
+                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
                                     }`}>
                                       {isPassed ? 'Aprobado' : isFailed ? 'Reprobado' : 'Pendiente'}
                                     </span>
@@ -1789,17 +1789,17 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
 
                                 {/* Debilidades detectadas en este curso */}
                                 {hasLocalGaps && (
-                                  <div className="mt-2.5 pt-2 border-t border-rose-200/60 space-y-1">
-                                    <span className="text-[10px] text-rose-700 font-bold uppercase block">
+                                  <div className="mt-2.5 pt-2 border-t border-rose-200/60 dark:border-rose-900/40 space-y-1">
+                                    <span className="text-[10px] text-rose-700 dark:text-rose-400 font-bold uppercase block">
                                       Debilidades señaladas:
                                     </span>
                                     <div className="flex flex-wrap gap-1">
                                       {(grd.detectedSkillGaps || []).map(skill => (
                                         <span 
                                           key={skill}
-                                          className="px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 text-[10px] font-semibold border border-rose-200 flex items-center gap-1"
+                                          className="px-2 py-0.5 rounded-md bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-900/50 flex items-center gap-1"
                                         >
-                                          <ShieldAlert className="w-2.5 h-2.5 text-rose-600" />
+                                          <ShieldAlert className="w-2.5 h-2.5 text-rose-600 dark:text-rose-400" />
                                           <span>{skill}</span>
                                         </span>
                                       ))}
@@ -1809,7 +1809,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
 
                                 {/* Notas del docente / Evaluador */}
                                 {grd.weaknessesNotes && (
-                                  <p className="text-[11px] text-slate-600 italic mt-2 bg-white p-2.5 rounded-xl border border-slate-200 shadow-xs">
+                                  <p className="text-[11px] text-slate-600 dark:text-slate-300 italic mt-2 bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
                                     "{grd.weaknessesNotes}"
                                   </p>
                                 )}
@@ -1819,7 +1819,7 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                         </div>
                       </div>
                     ) : (
-                      <div className="pt-2 text-xs text-slate-500 italic">
+                      <div className="pt-2 text-xs text-slate-500 dark:text-slate-400 italic">
                         Este colaborador aún no ha completado capacitaciones con calificación formal.
                       </div>
                     )}

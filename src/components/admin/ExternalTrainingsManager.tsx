@@ -151,15 +151,15 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
   const renderStatusBadge = (status?: string) => {
     switch (status) {
       case 'passed':
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Aprobado</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">Aprobado</span>;
       case 'completed':
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">Completado</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">Completado</span>;
       case 'in_progress':
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">En Curso</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">En Curso</span>;
       case 'failed':
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200">No Aprobado</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800">No Aprobado</span>;
       default:
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">{status || 'Acreditado'}</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{status || 'Acreditado'}</span>;
     }
   };
 
@@ -322,49 +322,49 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
 
       {/* KPI Cards Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold shrink-0">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold shrink-0">
             <GraduationCap className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Capacitaciones Externas</p>
-            <p className="text-xl font-black text-slate-900">{metrics.totalCount}</p>
+            <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Capacitaciones Externas</p>
+            <p className="text-xl font-black text-slate-900 dark:text-white">{metrics.totalCount}</p>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold shrink-0">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold shrink-0">
             <Clock className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Horas Acreditadas</p>
-            <p className="text-xl font-black text-slate-900">{metrics.totalHours.toLocaleString()} hrs</p>
+            <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Horas Acreditadas</p>
+            <p className="text-xl font-black text-slate-900 dark:text-white">{metrics.totalHours.toLocaleString()} hrs</p>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold shrink-0">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold shrink-0">
             <Users className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Colaboradores Beneficiados</p>
-            <p className="text-xl font-black text-slate-900">{metrics.uniqueParticipants}</p>
+            <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Colaboradores Beneficiados</p>
+            <p className="text-xl font-black text-slate-900 dark:text-white">{metrics.uniqueParticipants}</p>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold shrink-0">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold shrink-0">
             <Building2 className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Suplidores Educativos</p>
-            <p className="text-xl font-black text-slate-900">{metrics.uniqueSuppliers}</p>
+            <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Suplidores Educativos</p>
+            <p className="text-xl font-black text-slate-900 dark:text-white">{metrics.uniqueSuppliers}</p>
           </div>
         </div>
       </div>
 
       {/* Barra de Búsqueda y Filtros */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-3">
         <div className="flex flex-col sm:flex-row items-center gap-3">
           {/* Buscador */}
           <div className="relative flex-1 w-full">
@@ -376,7 +376,7 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
               placeholder="Buscar por colaborador, cédula, tarjeta, capacitación o suplidor..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800"
+              className="w-full pl-10 pr-4 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
             />
           </div>
 
@@ -387,7 +387,7 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
               aria-label="Filtrar por Programa de Sustentabilidad"
               value={selectedProgramFilter}
               onChange={(e) => setSelectedProgramFilter(e.target.value)}
-              className="w-full px-3 py-2.5 text-xs font-semibold rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-700 bg-white"
+              className="w-full px-3 py-2.5 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800"
             >
               <option value="all">🌿 Todos los Programas ({trainings.length})</option>
               {SUSTAINABILITY_PROGRAMS.map(prog => (
@@ -405,7 +405,7 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
               aria-label="Filtrar por Formato de Capacitación"
               value={selectedFormatFilter}
               onChange={(e) => setSelectedFormatFilter(e.target.value)}
-              className="w-full px-3 py-2.5 text-xs font-semibold rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-700 bg-white"
+              className="w-full px-3 py-2.5 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800"
             >
               <option value="all">📑 Todos los Formatos</option>
               {TRAINING_FORMATS.map(fmt => (
@@ -423,7 +423,7 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
               aria-label="Filtrar por Estado Académico"
               value={selectedStatusFilter}
               onChange={(e) => setSelectedStatusFilter(e.target.value)}
-              className="w-full px-3 py-2.5 text-xs font-semibold rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-700 bg-white"
+              className="w-full px-3 py-2.5 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800"
             >
               <option value="all">🎓 Todos los Estados</option>
               <option value="passed">Aprobado / Certificado</option>
@@ -441,7 +441,7 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                 aria-label="Filtrar por Empresa"
                 value={selectedCompanyFilter}
                 onChange={(e) => setSelectedCompanyFilter(e.target.value)}
-                className="w-full px-3 py-2.5 text-xs font-semibold rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-700 bg-white"
+                className="w-full px-3 py-2.5 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800"
               >
                 <option value="all">🏢 Todas las Empresas</option>
                 {companies.map(c => (
@@ -459,7 +459,7 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
               type="button"
               onClick={handleClearFilters}
               aria-label="Restablecer todos los filtros"
-              className="px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+              className="px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
               title="Restablecer todos los filtros"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -470,13 +470,13 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
       </div>
 
       {/* Tabla de Capacitaciones Externas */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-black text-slate-900">
+            <h3 className="text-sm font-black text-slate-900 dark:text-white">
               Registros de Formación Externa
             </h3>
-            <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700">
+            <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
               {filteredTrainings.length} encontrados
             </span>
           </div>
@@ -484,11 +484,11 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
 
         {filteredTrainings.length === 0 ? (
           <div className="p-12 text-center space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center mx-auto">
               <GraduationCap className="w-6 h-6" />
             </div>
-            <p className="text-sm font-bold text-slate-700">No hay capacitaciones externas registradas</p>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+            <p className="text-sm font-bold text-slate-700 dark:text-slate-200">No hay capacitaciones externas registradas</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
               {searchQuery || selectedProgramFilter !== 'all'
                 ? 'No se encontraron resultados con los filtros actuales.'
                 : 'Comienza haciendo clic en "Registrar Capacitación Externa" para acreditar cursos y certificaciones tomadas fuera del sistema.'}
@@ -509,11 +509,11 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                 <ArrowRightLeft className="w-3.5 h-3.5 text-[#DA291C]" />
                 Desliza horizontalmente para ver todas las columnas
               </span>
-              <span className="font-mono text-slate-400">6 columnas</span>
+              <span className="font-mono text-slate-400 dark:text-slate-500">6 columnas</span>
             </div>
             <div className="table-responsive-container">
-            <table className="w-full text-left text-xs text-slate-700 divide-y divide-slate-100 min-w-[900px]">
-              <thead className="bg-slate-50 text-[11px] font-black text-slate-500 uppercase tracking-wider">
+            <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300 divide-y divide-slate-100 dark:divide-slate-800 min-w-[900px]">
+              <thead className="bg-slate-50 dark:bg-slate-850 text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 <tr>
                   <th className="py-3.5 px-4">Colaborador</th>
                   <th className="py-3.5 px-4">Capacitación Externa</th>
@@ -523,7 +523,7 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                   <th className="py-3.5 px-4 text-right">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-medium">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
                 {paginatedTrainings.map(item => {
                   const part = participantsMap.get(item.participantCard);
                   const pName = part?.name || item.participantName || 'Colaborador';
@@ -531,19 +531,19 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                   const pDept = part?.department || item.participantDepartment || 'General';
 
                   return (
-                    <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                    <tr key={item.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-850/60 transition-colors">
                       {/* Colaborador */}
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs shrink-0">
+                          <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center font-bold text-xs shrink-0">
                             {pName.charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <p className="font-bold text-slate-900">{pName}</p>
-                            <p className="text-[11px] text-slate-500 font-mono">
+                            <p className="font-bold text-slate-900 dark:text-white">{pName}</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                               Tarj: #{item.participantCard} {pCedula && `• ${formatCedula(pCedula)}`}
                             </p>
-                            <span className="text-[10px] text-slate-500 block">{pDept}</span>
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400 block">{pDept}</span>
                           </div>
                         </div>
                       </td>
@@ -552,16 +552,16 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                       <td className="py-3.5 px-4">
                         <div className="space-y-1 max-w-xs">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-50 text-blue-700 border border-blue-200">
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900/50">
                               Externa
                             </span>
-                            <span className="font-bold text-slate-900 leading-tight">
+                            <span className="font-bold text-slate-900 dark:text-white leading-tight">
                               {item.title}
                             </span>
                           </div>
-                          <div className="flex items-center gap-2 text-[11px] text-slate-500">
-                            <span className="flex items-center gap-1 font-semibold text-slate-700">
-                              <Building2 className="w-3 h-3 text-slate-400" />
+                          <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+                            <span className="flex items-center gap-1 font-semibold text-slate-700 dark:text-slate-300">
+                              <Building2 className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                               {item.supplier}
                             </span>
                             <span>• {item.trainingFormat}</span>
@@ -573,13 +573,13 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                       {/* Sustentabilidad */}
                       <td className="py-3.5 px-4">
                         <div className="space-y-0.5 max-w-[200px]">
-                          <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50">
                             {getProgramShortName(item.programCategory)}
                           </span>
-                          <p className="text-[11px] text-slate-600 truncate" title={item.subprogram}>
+                          <p className="text-[11px] text-slate-600 dark:text-slate-300 truncate" title={item.subprogram}>
                             {item.subprogram}
                           </p>
-                          <span className="text-[10px] text-slate-500 block">
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400 block">
                             {item.sessionType} • {item.trainingType}
                           </span>
                         </div>
@@ -588,11 +588,11 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                       {/* Duración & Fechas */}
                       <td className="py-3.5 px-4">
                         <div>
-                          <span className="font-bold text-slate-900 flex items-center gap-1">
+                          <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1">
                             <Clock className="w-3.5 h-3.5 text-[#DA291C]" />
                             {item.totalHours} hrs
                           </span>
-                          <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">
                             {formatDateShort(item.startDate)} → {formatDateShort(item.endDate)}
                           </p>
                         </div>
@@ -604,13 +604,13 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                           <div className="flex items-center gap-1.5 flex-wrap">
                             {renderStatusBadge(item.academicStatus)}
                             {item.score !== null && item.score !== undefined && (
-                              <span className="text-[11px] font-bold text-slate-700 font-mono">
+                              <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">
                                 ({item.score} pts)
                               </span>
                             )}
                           </div>
                           {item.certificateNumber && (
-                            <p className="text-[10px] text-slate-500 font-mono">
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
                               Folio: {item.certificateNumber}
                             </p>
                           )}
@@ -619,7 +619,7 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                               href={item.credentialUrl!}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-[11px] text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold cursor-pointer"
+                              className="text-[11px] text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center gap-1 font-semibold cursor-pointer"
                               title="Ver credencial oficial"
                             >
                               <ExternalLink className="w-3 h-3" /> Ver Certificado
@@ -637,7 +637,7 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                               target="_blank"
                               rel="noopener noreferrer"
                               aria-label={`Abrir credencial externa de ${item.title}`}
-                              className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-lg text-blue-600 hover:text-blue-800 hover:bg-blue-50 transition-colors cursor-pointer inline-flex items-center justify-center"
+                              className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-lg text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors cursor-pointer inline-flex items-center justify-center"
                               title="Abrir credencial externa"
                             >
                               <ExternalLink className="w-4 h-4" />
@@ -647,7 +647,7 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                             type="button"
                             onClick={() => handleOpenEdit(item)}
                             aria-label={`Editar capacitación externa: ${item.title}`}
-                            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer inline-flex items-center justify-center"
+                            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer inline-flex items-center justify-center"
                             title="Editar capacitación"
                           >
                             <Edit3 className="w-4 h-4" />
@@ -656,7 +656,7 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                             type="button"
                             onClick={() => setDeletingId(item.id)}
                             aria-label={`Eliminar capacitación externa: ${item.title}`}
-                            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer inline-flex items-center justify-center"
+                            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-lg text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer inline-flex items-center justify-center"
                             title="Eliminar capacitación"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -672,11 +672,11 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
 
           {/* Paginación */}
           {filteredTrainings.length > itemsPerPage && (
-            <div className="p-3.5 sm:p-4 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between flex-wrap gap-3">
-              <span className="text-xs text-slate-500 font-medium">
-                Mostrando <strong className="text-slate-800">{(currentPage - 1) * itemsPerPage + 1}</strong> a{' '}
-                <strong className="text-slate-800">{Math.min(currentPage * itemsPerPage, filteredTrainings.length)}</strong> de{' '}
-                <strong className="text-slate-800">{filteredTrainings.length}</strong> capacitaciones
+            <div className="p-3.5 sm:p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850/60 flex items-center justify-between flex-wrap gap-3">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                Mostrando <strong className="text-slate-800 dark:text-slate-200">{(currentPage - 1) * itemsPerPage + 1}</strong> a{' '}
+                <strong className="text-slate-800 dark:text-slate-200">{Math.min(currentPage * itemsPerPage, filteredTrainings.length)}</strong> de{' '}
+                <strong className="text-slate-800 dark:text-slate-200">{filteredTrainings.length}</strong> capacitaciones
               </span>
 
               <div className="flex items-center gap-1.5">
@@ -685,7 +685,7 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                   onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
                   aria-label="Página anterior"
-                  className="px-3 py-2 sm:px-2.5 sm:py-1.5 min-h-[40px] sm:min-h-0 touch-target-44 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
+                  className="px-3 py-2 sm:px-2.5 sm:py-1.5 min-h-[40px] sm:min-h-0 touch-target-44 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                   <span>Anterior</span>
@@ -707,14 +707,14 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                           className={`w-9 h-9 sm:w-7 sm:h-7 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-lg text-xs font-bold transition-all cursor-pointer inline-flex items-center justify-center ${
                             currentPage === pNum
                               ? 'bg-[#DA291C] text-white shadow-xs'
-                              : 'text-slate-600 hover:bg-slate-100'
+                              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                           }`}
                         >
                           {pNum}
                         </button>
                       );
                     } else if (pNum === currentPage - 2 || pNum === currentPage + 2) {
-                      return <span key={pNum} className="text-slate-500 font-bold text-xs px-0.5">...</span>;
+                      return <span key={pNum} className="text-slate-500 dark:text-slate-400 font-bold text-xs px-0.5">...</span>;
                     }
                     return null;
                   })}
@@ -725,7 +725,7 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                   onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
                   aria-label="Página siguiente"
-                  className="px-3 py-2 sm:px-2.5 sm:py-1.5 min-h-[40px] sm:min-h-0 touch-target-44 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
+                  className="px-3 py-2 sm:px-2.5 sm:py-1.5 min-h-[40px] sm:min-h-0 touch-target-44 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
                 >
                   <span>Siguiente</span>
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -771,13 +771,13 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
           aria-labelledby="ext-delete-title"
           className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in"
         >
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-200 space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center mx-auto">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 flex items-center justify-center mx-auto">
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div className="text-center space-y-1">
-              <h2 id="ext-delete-title" className="text-base font-black text-slate-900">¿Eliminar Capacitación Externa?</h2>
-              <p className="text-xs text-slate-500">
+              <h2 id="ext-delete-title" className="text-base font-black text-slate-900 dark:text-white">¿Eliminar Capacitación Externa?</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Esta acción removerá el registro externo y las horas acreditadas del colaborador. No se puede deshacer.
               </p>
             </div>
@@ -785,7 +785,7 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
               <button
                 type="button"
                 onClick={() => setDeletingId(null)}
-                className="flex-1 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+                className="flex-1 px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
               >
                 Cancelar
               </button>

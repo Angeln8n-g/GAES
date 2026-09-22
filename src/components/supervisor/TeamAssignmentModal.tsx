@@ -189,25 +189,25 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
       ariaLabel="Asignar Capacitación a Mi Equipo"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
-        <div className="p-6 border-b border-slate-200 flex items-start justify-between bg-slate-50">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-start justify-between bg-slate-50 dark:bg-slate-850">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-[#DA291C] border border-red-200 flex items-center gap-1">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-800/60 flex items-center gap-1">
                 <Sparkles className="w-3 h-3" />
                 Panel de Supervisión
               </span>
             </div>
-            <h2 className="text-xl font-black text-slate-900">Asignar Capacitación a Mi Equipo</h2>
-            <p className="text-xs text-slate-500 mt-1">
+            <h2 className="text-xl font-black text-slate-900 dark:text-white">Asignar Capacitación a Mi Equipo</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               Matricula directamente a tus colaboradores y define si la capacitación es obligatoria o recomendada.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-2xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors cursor-pointer"
+            className="p-2 rounded-2xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -218,13 +218,13 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
           
           {/* Paso 1: Seleccionar Capacitación / Curso */}
           <div className="space-y-2">
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
               1. Selecciona la Capacitación / Curso
             </label>
             <select
               value={selectedEventId}
               onChange={(e) => setSelectedEventId(e.target.value)}
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#DA291C] transition-colors"
+              className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C] transition-colors"
             >
               {activeEvents.map(evt => (
                 <option key={evt.id} value={evt.id}>
@@ -234,19 +234,19 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
             </select>
 
             {selectedEvent && (
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl flex items-center gap-3 text-xs text-slate-600">
-                <span className="px-2 py-0.5 rounded-md bg-red-50 text-[#DA291C] font-bold text-[11px] border border-red-200">
+              <div className="p-3 bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center gap-3 text-xs text-slate-600 dark:text-slate-300">
+                <span className="px-2 py-0.5 rounded-md bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 font-bold text-[11px] border border-red-200 dark:border-red-800/60">
                   {selectedEvent.modality}
                 </span>
-                <span>Lugar: <strong className="text-slate-800">{selectedEvent.location || 'Instalaciones'}</strong></span>
-                <span className="ml-auto">Instructor: <strong className="text-slate-800">{selectedEvent.instructor}</strong></span>
+                <span>Lugar: <strong className="text-slate-800 dark:text-slate-200">{selectedEvent.location || 'Instalaciones'}</strong></span>
+                <span className="ml-auto">Instructor: <strong className="text-slate-800 dark:text-slate-200">{selectedEvent.instructor}</strong></span>
               </div>
             )}
           </div>
 
           {/* Paso 2: Seleccionar Fecha y Horario */}
           <div className="space-y-3">
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
               2. Selecciona Fecha y Horario
             </label>
 
@@ -261,15 +261,15 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
                       onClick={() => handleDateChange(sch.date)}
                       className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
                         selectedDate === sch.date
-                          ? 'bg-red-50 border-[#DA291C] text-red-950 shadow-sm'
-                          : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
+                          ? 'bg-red-50 dark:bg-red-950/40 border-[#DA291C] text-red-950 dark:text-red-200 shadow-sm'
+                          : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
                       }`}
                     >
                       <div className="flex items-center gap-1.5 text-xs font-bold mb-0.5">
-                        <CalendarIcon className="w-3.5 h-3.5 text-[#DA291C]" />
+                        <CalendarIcon className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
                         <span>{sch.date}</span>
                       </div>
-                      <span className="text-[11px] text-slate-500 block truncate">
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block truncate">
                         {sch.slots.length} horario(s) disponible(s)
                       </span>
                     </button>
@@ -291,14 +291,14 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
                           className={`p-2.5 rounded-2xl border text-center transition-all cursor-pointer ${
                             isSelected
                               ? 'bg-[#DA291C] text-white border-[#DA291C] font-bold shadow-md shadow-red-500/25'
-                              : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                              : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600'
                           }`}
                         >
                           <div className="flex items-center justify-center gap-1 text-xs">
                             <Clock className="w-3.5 h-3.5" />
                             <span>{slot.time}</span>
                           </div>
-                          <span className={`text-[10px] mt-0.5 block ${isSelected ? 'text-red-100' : isFull ? 'text-rose-600 font-bold' : 'text-slate-500 font-medium'}`}>
+                          <span className={`text-[10px] mt-0.5 block ${isSelected ? 'text-red-100' : isFull ? 'text-rose-600 dark:text-rose-400 font-bold' : 'text-slate-500 dark:text-slate-400 font-medium'}`}>
                             {slot.registered}/{slot.capacity} ocupados
                           </span>
                         </button>
@@ -308,13 +308,13 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
                 )}
               </div>
             ) : (
-              <p className="text-xs text-amber-700 bg-amber-50 p-3 rounded-xl border border-amber-200">No hay fechas u horarios programados para esta capacitación.</p>
+              <p className="text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 p-3 rounded-xl border border-amber-200 dark:border-amber-900/60">No hay fechas u horarios programados para esta capacitación.</p>
             )}
           </div>
 
           {/* Paso 3: Tipo de Carácter (Obligatorio vs Voluntario) */}
           <div className="space-y-2">
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
               3. Carácter de la Asignación
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -324,18 +324,18 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
                 onClick={() => setIsMandatory(true)}
                 className={`p-4 rounded-2xl border text-left transition-all relative cursor-pointer ${
                   isMandatory
-                    ? 'bg-rose-50 border-rose-400 text-rose-950 shadow-sm'
-                    : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
+                    ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-400 dark:border-rose-600 text-rose-950 dark:text-rose-200 shadow-sm'
+                    : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
                 }`}
               >
                 <div className="flex items-center justify-between gap-2 mb-1.5">
                   <div className="flex items-center gap-2">
-                    <ShieldAlert className={`w-4 h-4 ${isMandatory ? 'text-rose-600' : 'text-slate-400'}`} />
-                    <span className="text-sm font-bold text-rose-800">Obligatorio</span>
+                    <ShieldAlert className={`w-4 h-4 ${isMandatory ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400 dark:text-slate-500'}`} />
+                    <span className="text-sm font-bold text-rose-800 dark:text-rose-300">Obligatorio</span>
                   </div>
-                  {isMandatory && <Check className="w-4 h-4 text-rose-600 stroke-[3]" />}
+                  {isMandatory && <Check className="w-4 h-4 text-rose-600 dark:text-rose-400 stroke-[3]" />}
                 </div>
-                <p className={`text-[11px] leading-relaxed ${isMandatory ? 'text-rose-900/80' : 'text-slate-500'}`}>
+                <p className={`text-[11px] leading-relaxed ${isMandatory ? 'text-rose-900/80 dark:text-rose-200/80' : 'text-slate-500 dark:text-slate-400'}`}>
                   El colaborador no podrá cancelar ni desasignarse desde su panel. Se exigirá asistencia.
                 </p>
               </button>
@@ -346,18 +346,18 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
                 onClick={() => setIsMandatory(false)}
                 className={`p-4 rounded-2xl border text-left transition-all relative cursor-pointer ${
                   !isMandatory
-                    ? 'bg-cyan-50 border-cyan-400 text-cyan-950 shadow-sm'
-                    : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
+                    ? 'bg-cyan-50 dark:bg-cyan-950/40 border-cyan-400 dark:border-cyan-600 text-cyan-950 dark:text-cyan-200 shadow-sm'
+                    : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
                 }`}
               >
                 <div className="flex items-center justify-between gap-2 mb-1.5">
                   <div className="flex items-center gap-2">
-                    <ShieldCheck className={`w-4 h-4 ${!isMandatory ? 'text-cyan-600' : 'text-slate-400'}`} />
-                    <span className="text-sm font-bold text-cyan-800">Voluntario / Sugerido</span>
+                    <ShieldCheck className={`w-4 h-4 ${!isMandatory ? 'text-cyan-600 dark:text-cyan-400' : 'text-slate-400 dark:text-slate-500'}`} />
+                    <span className="text-sm font-bold text-cyan-800 dark:text-cyan-300">Voluntario / Sugerido</span>
                   </div>
-                  {!isMandatory && <Check className="w-4 h-4 text-cyan-600 stroke-[3]" />}
+                  {!isMandatory && <Check className="w-4 h-4 text-cyan-600 dark:text-cyan-400 stroke-[3]" />}
                 </div>
-                <p className={`text-[11px] leading-relaxed ${!isMandatory ? 'text-cyan-900/80' : 'text-slate-500'}`}>
+                <p className={`text-[11px] leading-relaxed ${!isMandatory ? 'text-cyan-900/80 dark:text-cyan-200/80' : 'text-slate-500 dark:text-slate-400'}`}>
                   Aparecerá recomendado por el líder, pero el colaborador podrá cancelar o ajustar su horario.
                 </p>
               </button>
@@ -367,13 +367,13 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
           {/* Paso 4: Selección de Colaboradores */}
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-2 flex-wrap">
-              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                 4. Seleccionar Colaboradores ({selectedEmails.size} seleccionados)
               </label>
               <button
                 type="button"
                 onClick={handleSelectAllVisible}
-                className="text-xs text-[#DA291C] hover:text-red-700 font-bold cursor-pointer"
+                className="text-xs text-[#DA291C] dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-bold cursor-pointer"
               >
                 {filteredParticipants.length > 0 && filteredParticipants.every(p => selectedEmails.has(p.email.toLowerCase()))
                   ? 'Deseleccionar todos'
@@ -389,12 +389,12 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
                 placeholder="Buscar por nombre, cédula o correo..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-2xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] transition-colors"
+                className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] transition-colors"
               />
             </div>
 
             {/* Lista de Colaboradores */}
-            <div className="max-h-56 overflow-y-auto space-y-2 p-1 border border-slate-200 rounded-2xl bg-slate-50/50 custom-scrollbar">
+            <div className="max-h-56 overflow-y-auto space-y-2 p-1 border border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-850/50 custom-scrollbar">
               {filteredParticipants.length > 0 ? (
                 filteredParticipants.map(p => {
                   const cleanEmail = p.email.toLowerCase();
@@ -407,22 +407,22 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
                       onClick={() => toggleSelectEmail(p.email)}
                       className={`p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition-all ${
                         isChecked
-                          ? 'bg-red-50/80 border-[#DA291C] text-slate-900 shadow-xs'
-                          : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                          ? 'bg-red-50/80 dark:bg-red-950/40 border-[#DA291C] text-slate-900 dark:text-white shadow-xs'
+                          : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <div className={`w-4 h-4 rounded-md border flex items-center justify-center transition-colors ${
-                          isChecked ? 'bg-[#DA291C] border-[#DA291C] text-white' : 'border-slate-300 bg-white'
+                          isChecked ? 'bg-[#DA291C] border-[#DA291C] text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
                         }`}>
                           {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-xs font-bold text-slate-900 truncate">{p.name}</p>
-                          <div className="flex items-center gap-2 text-[11px] text-slate-500">
+                          <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{p.name}</p>
+                          <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
                             <span>{p.email}</span>
                             {p.department && (
-                              <span className="px-1.5 py-0.2 rounded bg-slate-100 text-[10px] text-slate-600 font-semibold">
+                              <span className="px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-700 text-[10px] text-slate-600 dark:text-slate-300 font-semibold">
                                 {p.department}
                               </span>
                             )}
@@ -431,7 +431,7 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
                       </div>
 
                       {isAlreadyInSlot && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 whitespace-nowrap shrink-0">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 whitespace-nowrap shrink-0">
                           Ya en este horario
                         </span>
                       )}
@@ -439,7 +439,7 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
                   );
                 })
               ) : (
-                <div className="p-4 text-center text-xs text-slate-500">
+                <div className="p-4 text-center text-xs text-slate-500 dark:text-slate-400">
                   No se encontraron colaboradores en el equipo con ese filtro.
                 </div>
               )}
@@ -448,7 +448,7 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
 
           {/* Paso 5: Instrucciones / Nota Opcional */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
               5. Nota o Instrucciones (Opcional)
             </label>
             <input
@@ -456,19 +456,19 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
               placeholder="Ej: Requerido para el plan de certificación Q3..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-2xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] transition-colors"
+              className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] transition-colors"
             />
           </div>
 
         </form>
 
         {/* Footer Actions */}
-        <div className="p-6 border-t border-slate-200 flex items-center justify-between gap-4 bg-slate-50">
+        <div className="p-6 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4 bg-slate-50 dark:bg-slate-850">
           <button
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+            className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors cursor-pointer"
           >
             Cancelar
           </button>

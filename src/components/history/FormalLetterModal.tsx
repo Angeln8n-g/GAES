@@ -249,22 +249,22 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
         }
       `}</style>
 
-      <div className="bg-slate-100 rounded-3xl w-full max-w-7xl shadow-2xl border border-slate-300 flex flex-col max-h-[95vh] overflow-hidden my-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-slate-100 dark:bg-slate-950 rounded-3xl w-full max-w-7xl shadow-2xl border border-slate-300 dark:border-slate-800 flex flex-col max-h-[95vh] overflow-hidden my-auto" onClick={(e) => e.stopPropagation()}>
         
         {/* Modal Header */}
-        <div className="bg-white px-6 py-4 border-b border-slate-200 flex items-center justify-between gap-4 shrink-0">
+        <div className="bg-white dark:bg-slate-900 px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-red-50 text-[#DA291C] border border-red-100 flex items-center justify-center shadow-xs">
+            <div className="w-10 h-10 rounded-2xl bg-red-50 dark:bg-red-950/50 text-[#DA291C] dark:text-red-400 border border-red-100 dark:border-red-900/60 flex items-center justify-center shadow-xs">
               <FileText className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
+              <h2 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
                 <span>Módulo de Elaboración de Carta Formal</span>
-                <span className="px-2 py-0.5 rounded-md bg-red-100 text-[#DA291C] text-[10px] font-black tracking-wider uppercase">
+                <span className="px-2 py-0.5 rounded-md bg-red-100 dark:bg-red-950/60 text-[#DA291C] dark:text-red-400 text-[10px] font-black tracking-wider uppercase">
                   Histórico Oficial
                 </span>
               </h2>
-              <p className="text-xs text-slate-500 font-medium">
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                 Generador de constancias institucionales de capacitación y horas acumuladas de formación continua.
               </p>
             </div>
@@ -274,11 +274,11 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handleCopyText}
-              className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
               title="Copiar texto formal al portapapeles"
               aria-label="Copiar texto formal al portapapeles"
             >
-              {isCopied ? <Check className="w-4 h-4 text-emerald-600" aria-hidden="true" /> : <Copy className="w-4 h-4 text-slate-600" aria-hidden="true" />}
+              {isCopied ? <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" aria-hidden="true" /> : <Copy className="w-4 h-4 text-slate-600 dark:text-slate-400" aria-hidden="true" />}
               <span role="status" aria-live="polite">{isCopied ? '¡Copiado!' : 'Copiar Texto'}</span>
             </button>
 
@@ -293,7 +293,7 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
             <button
               onClick={onClose}
               aria-label="Cerrar ventana de elaboración de carta formal"
-              className="p-2 sm:p-1.5 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer ml-1 inline-flex items-center justify-center"
+              className="p-2 sm:p-1.5 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 touch-target-44 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer ml-1 inline-flex items-center justify-center"
             >
               <X className="w-5 h-5" aria-hidden="true" />
             </button>
@@ -304,69 +304,69 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 overflow-y-auto flex-1 p-4 sm:p-6 gap-6">
           
           {/* COLUMNA IZQUIERDA: PANEL DE CONFIGURACIÓN & EDICIÓN (5 cols) */}
-          <div className="lg:col-span-5 space-y-5 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/90 shadow-xs overflow-y-auto">
+          <div className="lg:col-span-5 space-y-5 bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-xs overflow-y-auto">
             
-            <div className="flex items-center gap-2 text-xs font-black text-[#DA291C] uppercase tracking-wider pb-2 border-b border-slate-100">
+            <div className="flex items-center gap-2 text-xs font-black text-[#DA291C] dark:text-red-400 uppercase tracking-wider pb-2 border-b border-slate-100 dark:border-slate-800">
               <SlidersHorizontal className="w-4 h-4" />
               <span>Personalización de la Carta</span>
             </div>
 
             {/* 1. Datos del Colaborador */}
             <div className="space-y-3">
-              <span id="formal-letter-collab-section-title" className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-[#DA291C]" aria-hidden="true" />
+              <span id="formal-letter-collab-section-title" className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" aria-hidden="true" />
                 Datos del Colaborador:
               </span>
               <div className="space-y-2">
                 <div>
-                  <label htmlFor="formal-letter-collab-name" className="text-[11px] text-slate-500 font-medium">Nombre Completo:</label>
+                  <label htmlFor="formal-letter-collab-name" className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Nombre Completo:</label>
                   <input
                     id="formal-letter-collab-name"
                     type="text"
                     value={collaboratorName}
                     onChange={(e) => setCollaboratorName(e.target.value)}
-                    className="w-full mt-0.5 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                    className="w-full mt-0.5 px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label htmlFor="formal-letter-collab-cedula" className="text-[11px] text-slate-500 font-medium">Cédula:</label>
+                    <label htmlFor="formal-letter-collab-cedula" className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Cédula:</label>
                     <input
                       id="formal-letter-collab-cedula"
                       type="text"
                       value={collaboratorCedula}
                       onChange={(e) => setCollaboratorCedula(e.target.value)}
-                      className="w-full mt-0.5 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                      className="w-full mt-0.5 px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
                     />
                   </div>
                   <div>
-                    <label htmlFor="formal-letter-collab-card" className="text-[11px] text-slate-500 font-medium">No. Carnet:</label>
+                    <label htmlFor="formal-letter-collab-card" className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">No. Carnet:</label>
                     <input
                       id="formal-letter-collab-card"
                       type="text"
                       value={collaboratorCard}
                       onChange={(e) => setCollaboratorCard(e.target.value)}
-                      className="w-full mt-0.5 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                      className="w-full mt-0.5 px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
                     />
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="formal-letter-collab-dept" className="text-[11px] text-slate-500 font-medium">Departamento / Posición:</label>
+                  <label htmlFor="formal-letter-collab-dept" className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Departamento / Posición:</label>
                   <input
                     id="formal-letter-collab-dept"
                     type="text"
                     value={collaboratorDept}
                     onChange={(e) => setCollaboratorDept(e.target.value)}
-                    className="w-full mt-0.5 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                    className="w-full mt-0.5 px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
                   />
                 </div>
               </div>
             </div>
 
             {/* 2. Destinatario */}
-            <div className="space-y-2 pt-2 border-t border-slate-100">
-              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <Building2 className="w-3.5 h-3.5 text-[#DA291C]" />
+            <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <label className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                <Building2 className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
                 Destinatario de la Carta:
               </label>
               <div className="grid grid-cols-2 gap-2 text-xs">
@@ -375,8 +375,8 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                   onClick={() => setRecipientType('a_quien_interese')}
                   className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer ${
                     recipientType === 'a_quien_interese'
-                      ? 'bg-red-50 border-[#DA291C] text-[#DA291C]'
-                      : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                      ? 'bg-red-50 dark:bg-red-950/50 border-[#DA291C] text-[#DA291C] dark:text-red-400'
+                      : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
                   }`}
                 >
                   A Quien Interese
@@ -386,8 +386,8 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                   onClick={() => setRecipientType('gestion_humana')}
                   className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer ${
                     recipientType === 'gestion_humana'
-                      ? 'bg-red-50 border-[#DA291C] text-[#DA291C]'
-                      : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                      ? 'bg-red-50 dark:bg-red-950/50 border-[#DA291C] text-[#DA291C] dark:text-red-400'
+                      : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
                   }`}
                 >
                   Gestión Humana
@@ -397,8 +397,8 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                   onClick={() => setRecipientType('universidad')}
                   className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer ${
                     recipientType === 'universidad'
-                      ? 'bg-red-50 border-[#DA291C] text-[#DA291C]'
-                      : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                      ? 'bg-red-50 dark:bg-red-950/50 border-[#DA291C] text-[#DA291C] dark:text-red-400'
+                      : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
                   }`}
                 >
                   Universidad
@@ -408,8 +408,8 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                   onClick={() => setRecipientType('personalizado')}
                   className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer ${
                     recipientType === 'personalizado'
-                      ? 'bg-red-50 border-[#DA291C] text-[#DA291C]'
-                      : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                      ? 'bg-red-50 dark:bg-red-950/50 border-[#DA291C] text-[#DA291C] dark:text-red-400'
+                      : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
                   }`}
                 >
                   Personalizado...
@@ -424,56 +424,56 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                     value={customRecipient}
                     onChange={(e) => setCustomRecipient(e.target.value)}
                     placeholder="Ej: Lic. Marcos Peña, Banco Central..."
-                    className="w-full mt-2 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                    className="w-full mt-2 px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
                   />
                 </div>
               )}
             </div>
 
             {/* 3. Fecha y Lugar de Emisión */}
-            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
               <div>
-                <label htmlFor="formal-letter-issue-date" className="text-[11px] text-slate-500 font-medium">Fecha de Emisión:</label>
+                <label htmlFor="formal-letter-issue-date" className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Fecha de Emisión:</label>
                 <input
                   id="formal-letter-issue-date"
                   type="date"
                   value={issueDate}
                   onChange={(e) => setIssueDate(e.target.value)}
-                  className="w-full mt-0.5 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                  className="w-full mt-0.5 px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
                 />
               </div>
               <div>
-                <label htmlFor="formal-letter-issue-city" className="text-[11px] text-slate-500 font-medium">Ciudad:</label>
+                <label htmlFor="formal-letter-issue-city" className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Ciudad:</label>
                 <input
                   id="formal-letter-issue-city"
                   type="text"
                   value={issueCity}
                   onChange={(e) => setIssueCity(e.target.value)}
-                  className="w-full mt-0.5 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                  className="w-full mt-0.5 px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
                 />
               </div>
             </div>
 
             {/* 4. Selector de Cursos a Certificar */}
-            <div className="space-y-2 pt-2 border-t border-slate-100">
+            <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <Award className="w-3.5 h-3.5 text-[#DA291C]" />
+                <label className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                  <Award className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
                   Cursos a Incluir ({coursesInLetter.length} de {trainingRecords.length}):
                 </label>
                 <div className="flex items-center gap-1 text-[11px]">
                   <button
                     type="button"
                     onClick={() => handleToggleSelectAll(true)}
-                    className="text-[#DA291C] hover:underline font-bold cursor-pointer"
+                    className="text-[#DA291C] dark:text-red-400 hover:underline font-bold cursor-pointer"
                   >
                     Todos
                   </button>
-                  <span className="text-slate-300">|</span>
+                  <span className="text-slate-300 dark:text-slate-600">|</span>
                   <button
                     type="button"
                     onClick={() => handleToggleSelectAll(false)}
-                    className="text-slate-500 hover:underline font-medium cursor-pointer"
+                    className="text-slate-500 dark:text-slate-400 hover:underline font-medium cursor-pointer"
                   >
                     Ninguno
                   </button>
@@ -481,7 +481,7 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
               </div>
 
               {/* Lista scrollable de cursos */}
-              <div className="max-h-52 overflow-y-auto space-y-1.5 pr-1 border border-slate-200 rounded-2xl p-2 bg-slate-50">
+              <div className="max-h-52 overflow-y-auto space-y-1.5 pr-1 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-2 bg-slate-50 dark:bg-slate-850/60">
                 {trainingRecords.length > 0 ? (
                   trainingRecords.map(rec => {
                     const isChecked = Boolean(selectedCourses[rec.id]);
@@ -490,7 +490,7 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                       <div 
                         key={rec.id}
                         className={`p-2 rounded-xl border transition-all flex items-center justify-between gap-2 text-xs ${
-                          isChecked ? 'bg-white border-red-200 shadow-2xs' : 'bg-slate-100/60 border-slate-200 opacity-60'
+                          isChecked ? 'bg-white dark:bg-slate-800 border-red-200 dark:border-red-900/60 shadow-2xs' : 'bg-slate-100/60 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 opacity-60'
                         }`}
                       >
                         <label className="flex items-center gap-2 cursor-pointer flex-1 min-w-0">
@@ -503,25 +503,25 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                             className="rounded text-[#DA291C] focus:ring-[#DA291C]"
                           />
                           <div className="min-w-0">
-                            <p className="font-bold text-slate-900 truncate text-[11px] flex items-center gap-1.5">
+                            <p className="font-bold text-slate-900 dark:text-white truncate text-[11px] flex items-center gap-1.5">
                               <span>{rec.title}</span>
                               {rec.isExternal && (
-                                <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-blue-100 text-blue-800 border border-blue-200">
+                                <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
                                   Externa
                                 </span>
                               )}
                               {rec.isRecurrent && (
-                                <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-purple-100 text-purple-800 border border-purple-200">
+                                <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
                                   Academia
                                 </span>
                               )}
                             </p>
-                            <div className="flex items-center gap-2 text-[10px] text-slate-500">
+                            <div className="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400">
                               <span>📅 {formatDateShort(rec.date)}</span>
                               <span>• {rec.modality}</span>
                               {rec.supplier && <span>• {rec.supplier}</span>}
                               {rec.hasAttended && (
-                                <span className="text-emerald-700 font-bold">✓ Asistió</span>
+                                <span className="text-emerald-700 dark:text-emerald-400 font-bold">✓ Asistió</span>
                               )}
                             </div>
                           </div>
@@ -539,49 +539,49 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                               setCourseHours(prev => ({ ...prev, [rec.id]: val }));
                             }}
                             disabled={!isChecked}
-                            className="w-12 px-1.5 py-1 text-center bg-slate-50 border border-slate-300 rounded-lg text-xs font-bold text-slate-800 disabled:opacity-50"
+                            className="w-12 px-1.5 py-1 text-center bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-bold text-slate-800 dark:text-white disabled:opacity-50"
                             title="Horas acreditadas"
                           />
-                          <span className="text-[10px] font-bold text-slate-500">hrs</span>
+                          <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">hrs</span>
                         </div>
                       </div>
                     );
                   })
                 ) : (
-                  <p className="text-xs text-slate-500 text-center py-4">No hay capacitaciones registradas.</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 text-center py-4">No hay capacitaciones registradas.</p>
                 )}
               </div>
             </div>
 
             {/* 5. Datos del Firmante */}
-            <div className="space-y-2 pt-2 border-t border-slate-100">
-              <span id="formal-letter-signer-section-title" className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#DA291C]" aria-hidden="true" />
+            <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <span id="formal-letter-signer-section-title" className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" aria-hidden="true" />
                 Firma & Autenticidad:
               </span>
               <div className="space-y-2 text-xs">
                 <div>
-                  <label htmlFor="formal-letter-signer-name" className="text-[11px] text-slate-500 font-medium">Nombre del Firmante:</label>
+                  <label htmlFor="formal-letter-signer-name" className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Nombre del Firmante:</label>
                   <input
                     id="formal-letter-signer-name"
                     type="text"
                     value={signerName}
                     onChange={(e) => setSignerName(e.target.value)}
-                    className="w-full mt-0.5 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                    className="w-full mt-0.5 px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
                   />
                 </div>
                 <div>
-                  <label htmlFor="formal-letter-signer-title" className="text-[11px] text-slate-500 font-medium">Cargo / Rol:</label>
+                  <label htmlFor="formal-letter-signer-title" className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Cargo / Rol:</label>
                   <input
                     id="formal-letter-signer-title"
                     type="text"
                     value={signerTitle}
                     onChange={(e) => setSignerTitle(e.target.value)}
-                    className="w-full mt-0.5 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#DA291C]"
+                    className="w-full mt-0.5 px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C]"
                   />
                 </div>
                 <div className="flex items-center justify-between pt-1">
-                  <label htmlFor="formal-letter-include-stamp" className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
+                  <label htmlFor="formal-letter-include-stamp" className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-300">
                     <input
                       id="formal-letter-include-stamp"
                       type="checkbox"
@@ -591,7 +591,7 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
                     />
                     <span>Incluir Sello Digital Claro</span>
                   </label>
-                  <label htmlFor="formal-letter-include-qr" className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
+                  <label htmlFor="formal-letter-include-qr" className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-300">
                     <input
                       id="formal-letter-include-qr"
                       type="checkbox"
@@ -606,15 +606,15 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
             </div>
 
             {/* 6. Nota o párrafo adicional */}
-            <div className="pt-2 border-t border-slate-100">
-              <label htmlFor="formal-letter-custom-note" className="text-[11px] text-slate-500 font-medium">Nota o párrafo adicional (Opcional):</label>
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+              <label htmlFor="formal-letter-custom-note" className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Nota o párrafo adicional (Opcional):</label>
               <textarea
                 id="formal-letter-custom-note"
                 value={customNote}
                 onChange={(e) => setCustomNote(e.target.value)}
                 placeholder="Ej: Se destaca su excelente desempeño y alto compromiso en el cumplimiento de los estándares corporativos..."
                 rows={2}
-                className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#DA291C]"
+                className="w-full mt-1 px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
               />
             </div>
 

@@ -347,40 +347,40 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
       ariaLabel="Matricular Usuarios de Forma Masiva"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
         
         {/* Modal Header */}
-        <div className="p-6 border-b border-slate-200 flex items-start justify-between bg-slate-50">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-start justify-between bg-slate-50 dark:bg-slate-800/50">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900/50">
                 Super Administrador
               </span>
-              <span className="text-xs text-slate-500 font-bold">Matriculación Masiva Oficial</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-bold">Matriculación Masiva Oficial</span>
             </div>
-            <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
+            <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
               <UserPlus className="w-5 h-5 text-[#DA291C]" />
               <span>Matricular Usuarios de Forma Masiva</span>
             </h2>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               Inscribe a grupos de colaboradores en cualquier capacitación y horario del sistema con 1 solo clic.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Step 1: Select Event, Date & Slot */}
-        <div className="p-5 border-b border-slate-200 bg-slate-50/50 space-y-4">
+        <div className="p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             
             {/* Event Selector */}
             <div>
-              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+              <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                 <BookOpen className="w-3.5 h-3.5 text-[#DA291C]" />
                 <span>Capacitación / Evento</span>
               </label>
@@ -395,7 +395,7 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
                     setSelectedTime(ev.schedule[0].slots[0]?.time || '');
                   }
                 }}
-                className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-bold focus:outline-none focus:border-[#DA291C]"
               >
                 {events.map(e => (
                   <option key={e.id} value={e.id}>
@@ -407,7 +407,7 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
 
             {/* Date Selector */}
             <div>
-              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+              <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-[#DA291C]" />
                 <span>Fecha del Evento</span>
               </label>
@@ -421,7 +421,7 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
                     setSelectedTime(sch.slots[0].time);
                   }
                 }}
-                className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-bold focus:outline-none focus:border-[#DA291C]"
               >
                 {currentEvent?.schedule.map(sch => (
                   <option key={sch.date} value={sch.date}>
@@ -433,14 +433,14 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
 
             {/* Slot Selector */}
             <div>
-              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+              <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-[#DA291C]" />
                 <span>Horario y Cupo</span>
               </label>
               <select
                 value={selectedTime}
                 onChange={(e) => setSelectedTime(e.target.value)}
-                className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold focus:outline-none focus:border-[#DA291C]"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-bold focus:outline-none focus:border-[#DA291C]"
               >
                 {currentSchedule?.slots.map(sl => (
                   <option key={sl.time} value={sl.time}>
@@ -454,13 +454,13 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
 
           {/* Current Slot Quick Status Badge */}
           {currentSlot && (
-            <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-red-50/60 border border-red-200 text-xs">
+            <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-red-50/60 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 text-xs">
               <div className="flex items-center gap-2">
                 <span className="text-[#DA291C] font-bold">Estado del Turno Seleccionado:</span>
-                <span className="text-slate-900">
+                <span className="text-slate-900 dark:text-white">
                   <strong>{currentSlot.registered}</strong> de <strong>{currentSlot.capacity}</strong> cupos ocupados
                 </span>
-                <span className="text-slate-500">({currentSlot.capacity - currentSlot.registered} disponibles)</span>
+                <span className="text-slate-500 dark:text-slate-400">({currentSlot.capacity - currentSlot.registered} disponibles)</span>
               </div>
 
               <div className="flex items-center gap-2">
@@ -469,9 +469,9 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
                   id="autoExpand"
                   checked={autoExpandCapacity}
                   onChange={(e) => setAutoExpandCapacity(e.target.checked)}
-                  className="w-4 h-4 rounded border-slate-300 text-[#DA291C] focus:ring-0 cursor-pointer"
+                  className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-[#DA291C] focus:ring-0 cursor-pointer"
                 />
-                <label htmlFor="autoExpand" className="text-xs text-slate-700 font-semibold cursor-pointer">
+                <label htmlFor="autoExpand" className="text-xs text-slate-700 dark:text-slate-300 font-semibold cursor-pointer">
                   Auto-ampliar capacidad si la matrícula supera el cupo máximo
                 </label>
               </div>
@@ -480,13 +480,13 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
         </div>
 
         {/* Step 2: Mode Selector */}
-        <div className="px-6 pt-3 pb-2 border-b border-slate-200 bg-slate-50/50 flex items-center gap-2 overflow-x-auto">
+        <div className="px-6 pt-3 pb-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex items-center gap-2 overflow-x-auto">
           <button
             onClick={() => setActiveTab('select')}
             className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'select'
                 ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <Users className="w-4 h-4" />
@@ -501,7 +501,7 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
             className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'text'
                 ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <Clipboard className="w-4 h-4" />
@@ -513,7 +513,7 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
             className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'file'
                 ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <Upload className="w-4 h-4" />
@@ -530,7 +530,7 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
           {/* TAB 1: VISUAL DIRECTORY */}
           {activeTab === 'select' && (
             <div className="space-y-4">
-              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/80 space-y-2.5">
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
                   <div className="relative flex-1">
                     <Search className="w-3.5 h-3.5 text-slate-400 absolute inset-y-0 left-3 my-auto" />
@@ -539,7 +539,7 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Buscar por nombre, correo o cédula..."
-                      className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                      className="w-full pl-8 pr-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                     />
                   </div>
 
@@ -547,7 +547,7 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
                     <select
                       value={roleFilter}
                       onChange={(e) => setRoleFilter(e.target.value)}
-                      className="px-2.5 py-1.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none"
+                      className="px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none"
                     >
                       <option value="all">Todos los Roles</option>
                       <option value="Colaborador (User)">Colaborador (User)</option>
@@ -559,7 +559,7 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
                     <select
                       value={educationFilter}
                       onChange={(e) => setEducationFilter(e.target.value)}
-                      className="px-2.5 py-1.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none"
+                      className="px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none"
                     >
                       <option value="all">Todo Grado de Estudio</option>
                       <option value="Secundaria / Bachiller">Secundaria / Bachiller</option>
@@ -572,7 +572,7 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
                     <select
                       value={studyingFilter}
                       onChange={(e) => setStudyingFilter(e.target.value)}
-                      className="px-2.5 py-1.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none"
+                      className="px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none"
                     >
                       <option value="all">Estudios (Todos)</option>
                       <option value="studying">🎓 Estudiando Actualmente</option>
@@ -581,18 +581,18 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200/80">
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200/80 dark:border-slate-700/80">
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={selectMatchingInterestEmails}
-                      className="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-xs font-black text-indigo-700 whitespace-nowrap cursor-pointer flex items-center gap-1.5 transition-colors active:scale-95 shadow-2xs"
+                      className="px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 border border-indigo-200 dark:border-indigo-800 text-xs font-black text-indigo-700 dark:text-indigo-300 whitespace-nowrap cursor-pointer flex items-center gap-1.5 transition-colors active:scale-95 shadow-2xs"
                       title="Seleccionar colaboradores cuya ficha formativa coincide con este curso"
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                      <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                       <span>⚡ Interesados en este Tema ({matchingInterestEmails.length})</span>
                     </button>
-                    <span className="text-[11px] text-slate-500 font-medium">
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                       Mostrando {filteredDirectory.length} de {unifiedDirectory.length} colaboradores
                     </span>
                   </div>
@@ -600,7 +600,7 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
                   <button
                     type="button"
                     onClick={selectAllFiltered}
-                    className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-300 text-xs font-bold text-slate-700 whitespace-nowrap cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap cursor-pointer"
                   >
                     {selectedEmails.size === filteredDirectory.filter(i => !alreadyEnrolledSet.has(i.email)).length && selectedEmails.size > 0
                       ? 'Deseleccionar Todos'
@@ -610,7 +610,7 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
               </div>
 
               {/* Directory list */}
-              <div className="max-h-64 overflow-y-auto divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white shadow-xs">
+              <div className="max-h-64 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 shadow-xs">
                 {filteredDirectory.map(item => {
                   const isAlready = alreadyEnrolledSet.has(item.email);
                   const isChecked = selectedEmails.has(item.email);
@@ -621,10 +621,10 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
                       onClick={() => !isAlready && toggleEmail(item.email)}
                       className={`p-3 flex items-center justify-between gap-3 transition-colors ${
                         isAlready 
-                          ? 'opacity-60 bg-slate-50 cursor-not-allowed' 
+                          ? 'opacity-60 bg-slate-50 dark:bg-slate-800/50 cursor-not-allowed' 
                           : isChecked 
-                          ? 'bg-red-50/60 cursor-pointer' 
-                          : 'hover:bg-slate-50 cursor-pointer'
+                          ? 'bg-red-50/60 dark:bg-red-950/30 cursor-pointer' 
+                          : 'hover:bg-slate-50 dark:hover:bg-slate-700/40 cursor-pointer'
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -633,26 +633,26 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
                           checked={isChecked || isAlready}
                           disabled={isAlready}
                           onChange={() => {}}
-                          className="w-4 h-4 rounded border-slate-300 text-[#DA291C] focus:ring-0 cursor-pointer disabled:cursor-not-allowed"
+                          className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-[#DA291C] focus:ring-0 cursor-pointer disabled:cursor-not-allowed"
                         />
                         <div>
                           <div className="flex items-center gap-2">
-                            <p className="text-xs font-bold text-slate-900">{item.name}</p>
+                            <p className="text-xs font-bold text-slate-900 dark:text-white">{item.name}</p>
                             {item.cedula && (
-                              <span className="text-[10px] font-mono text-[#DA291C] bg-red-50 px-1.5 py-0.2 rounded border border-red-200">
+                              <span className="text-[10px] font-mono text-[#DA291C] bg-red-50 dark:bg-red-950/40 px-1.5 py-0.2 rounded border border-red-200 dark:border-red-900/50">
                                 {item.cedula}
                               </span>
                             )}
                           </div>
-                          <p className="text-[11px] text-slate-500">{item.email} • {item.role || 'Colaborador'}</p>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">{item.email} • {item.role || 'Colaborador'}</p>
                           <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                             {item.educationLevel && (
-                              <span className="px-2 py-0.2 rounded-md bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-semibold">
+                              <span className="px-2 py-0.2 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600 text-[10px] font-semibold">
                                 {item.educationLevel}
                               </span>
                             )}
                             {item.isCurrentlyStudying && (
-                              <span className="px-2 py-0.2 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold">
+                              <span className="px-2 py-0.2 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900/50 text-[10px] font-bold">
                                 🎓 {item.currentStudyField || 'Estudiando'}
                               </span>
                             )}
@@ -662,11 +662,11 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
 
                       <div className="text-right">
                         {isAlready ? (
-                          <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                          <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900/50">
                             Ya Matriculado
                           </span>
                         ) : (
-                          <span className={`text-[10px] font-bold ${isChecked ? 'text-[#DA291C]' : 'text-slate-400'}`}>
+                          <span className={`text-[10px] font-bold ${isChecked ? 'text-[#DA291C]' : 'text-slate-400 dark:text-slate-500'}`}>
                             {isChecked ? 'Seleccionado' : 'Disponible'}
                           </span>
                         )}
@@ -681,8 +681,8 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
           {/* TAB 2: TEXT INPUT */}
           {activeTab === 'text' && (
             <div className="space-y-3">
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-                <label className="text-xs font-bold text-slate-900 flex items-center gap-2">
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-2">
+                <label className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2">
                   <Clipboard className="w-4 h-4 text-[#DA291C]" />
                   <span>Pega una lista de correos o números de cédula</span>
                 </label>
@@ -691,9 +691,9 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
                   onChange={(e) => setRawText(e.target.value)}
                   placeholder={`Ejemplo:\nana.morales@empresa.com\n402-2196163-1\ncarlos.gomez@empresa.com\n001-0876543-2`}
                   rows={6}
-                  className="w-full p-3.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-mono placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                  className="w-full p-3.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-mono placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                 />
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
                   Detecta automáticamente correos corporativos o cédulas vinculadas al directorio de colaboradores.
                 </p>
               </div>
@@ -703,11 +703,11 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
           {/* TAB 3: FILE INPUT */}
           {activeTab === 'file' && (
             <div className="space-y-3">
-              <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-3">
+              <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-center space-y-3">
                 <Upload className="w-8 h-8 text-[#DA291C] mx-auto" />
                 <div>
-                  <h4 className="text-xs font-bold text-slate-900">Subir archivo Excel o CSV con asistentes</h4>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
+                  <h4 className="text-xs font-bold text-slate-900 dark:text-white">Subir archivo Excel o CSV con asistentes</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                     El sistema extraerá automáticamente todas las columnas con correos electrónicos para matricularlos.
                   </p>
                 </div>
@@ -716,7 +716,7 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
                     type="file"
                     accept=".xlsx,.xls,.csv"
                     onChange={handleFileUpload}
-                    className="text-xs text-slate-700 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#DA291C] file:text-white hover:file:opacity-90 cursor-pointer"
+                    className="text-xs text-slate-700 dark:text-slate-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#DA291C] file:text-white hover:file:opacity-90 cursor-pointer"
                   />
                 </div>
               </div>
@@ -725,15 +725,15 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
 
           {/* SUMMARY REVIEW */}
           {targetEmails.length > 0 && (
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-slate-800">Resumen de Matriculación:</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">Resumen de Matriculación:</span>
                 <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/50">
                     +{validNewToEnroll.length} Nuevas Matrículas
                   </span>
                   {alreadyEnrolledCount > 0 && (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900/50">
                       {alreadyEnrolledCount} Omitidos (Ya inscritos)
                     </span>
                   )}
@@ -741,8 +741,8 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
               </div>
 
               {willExceedCapacity && (
-                <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-800 flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 text-[11px] text-amber-800 dark:text-amber-300 flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
                   <span>
                     El grupo a matricular ({validNewToEnroll.length}) superará el cupo original ({currentCapacity}). 
                     {autoExpandCapacity ? ' La capacidad del turno se ampliará automáticamente a ' + projectedTotal + '.' : ' Ajusta el cupo antes de proceder.'}
@@ -755,10 +755,10 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-6 border-t border-slate-200 bg-slate-50 flex items-center justify-between gap-4">
-          <div className="text-xs text-slate-500 font-medium">
+        <div className="p-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between gap-4">
+          <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
             {validNewToEnroll.length > 0 ? (
-              <span>Listos para matricular: <strong className="text-slate-900">{validNewToEnroll.length} usuarios</strong> en <em className="text-slate-800 font-semibold">{currentEvent?.title}</em></span>
+              <span>Listos para matricular: <strong className="text-slate-900 dark:text-white">{validNewToEnroll.length} usuarios</strong> en <em className="text-slate-800 dark:text-slate-200 font-semibold">{currentEvent?.title}</em></span>
             ) : (
               <span>Selecciona los usuarios a matricular</span>
             )}
@@ -768,7 +768,7 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+              className="px-4 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors cursor-pointer"
             >
               Cancelar
             </button>

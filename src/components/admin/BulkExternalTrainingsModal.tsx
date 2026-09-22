@@ -82,15 +82,15 @@ export const BulkExternalTrainingsModal: React.FC<BulkExternalTrainingsModalProp
   const renderStatusBadge = (status?: string) => {
     switch (status) {
       case 'passed':
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Aprobado</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50">Aprobado</span>;
       case 'completed':
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">Completado</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900/50">Completado</span>;
       case 'in_progress':
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">En Curso</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50">En Curso</span>;
       case 'failed':
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200">No Aprobado</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/50">No Aprobado</span>;
       default:
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">{status || 'Finalizado'}</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{status || 'Finalizado'}</span>;
     }
   };
 
@@ -187,7 +187,7 @@ export const BulkExternalTrainingsModal: React.FC<BulkExternalTrainingsModalProp
       ariaLabel="Importación Masiva de Capacitaciones Externas"
       className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
     >
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-5xl w-full overflow-hidden flex flex-col max-h-[92vh]" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 max-w-5xl w-full overflow-hidden flex flex-col max-h-[92vh]" onClick={(e) => e.stopPropagation()}>
         
         {/* Header con gradiente institucional */}
         <div className="bg-gradient-to-r from-slate-900 via-[#0F172A] to-slate-900 p-5 sm:p-6 text-white relative">
@@ -277,20 +277,20 @@ export const BulkExternalTrainingsModal: React.FC<BulkExternalTrainingsModalProp
               />
 
               {loadedFileName ? (
-                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                <div className="bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
                   <div className="flex items-center gap-3.5 min-w-0">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-xs">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0 shadow-xs">
                       <FileSpreadsheet className="w-6 h-6" />
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <p className="text-xs font-bold text-slate-900 truncate max-w-sm">{loadedFileName}</p>
-                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 shrink-0">
+                        <p className="text-xs font-bold text-slate-900 dark:text-white truncate max-w-sm">{loadedFileName}</p>
+                        <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-900/50 shrink-0">
                           Procesado
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-0.5">
-                        Tamaño: {loadedFileSize} • <strong className="text-emerald-700">{excelTrainings.length}</strong> válidas • <strong className="text-amber-700">{excelErrors.length}</strong> advertencias
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                        Tamaño: {loadedFileSize} • <strong className="text-emerald-700 dark:text-emerald-400">{excelTrainings.length}</strong> válidas • <strong className="text-amber-700 dark:text-amber-400">{excelErrors.length}</strong> advertencias
                       </p>
                     </div>
                   </div>
@@ -298,15 +298,15 @@ export const BulkExternalTrainingsModal: React.FC<BulkExternalTrainingsModalProp
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="px-3.5 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+                      className="px-3.5 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
                     >
-                      <RefreshCw className="w-3.5 h-3.5 text-slate-500" />
+                      <RefreshCw className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                       <span>Cambiar Archivo</span>
                     </button>
                     <button
                       type="button"
                       onClick={handleClearExcelFile}
-                      className="px-3 py-2 text-xs font-bold text-red-700 hover:text-red-900 hover:bg-red-100 rounded-xl transition-colors cursor-pointer flex items-center gap-1 border border-red-200 bg-red-50/50"
+                      className="px-3 py-2 text-xs font-bold text-red-700 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 hover:bg-red-100 dark:hover:bg-red-950/50 rounded-xl transition-colors cursor-pointer flex items-center gap-1 border border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-950/30"
                       title="Quitar archivo cargado"
                     >
                       <X className="w-3.5 h-3.5" />
@@ -317,9 +317,9 @@ export const BulkExternalTrainingsModal: React.FC<BulkExternalTrainingsModalProp
               ) : (
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-slate-300 hover:border-[#DA291C] rounded-2xl p-8 text-center bg-slate-50/60 hover:bg-red-50/20 transition-all cursor-pointer group flex flex-col items-center justify-center space-y-2.5"
+                  className="border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-[#DA291C] dark:hover:border-[#DA291C] rounded-2xl p-8 text-center bg-slate-50/60 dark:bg-slate-850/60 hover:bg-red-50/20 dark:hover:bg-red-950/20 transition-all cursor-pointer group flex flex-col items-center justify-center space-y-2.5"
                 >
-                  <div className="w-14 h-14 rounded-2xl bg-white shadow-md border border-slate-200 flex items-center justify-center text-[#DA291C] group-hover:scale-110 transition-transform">
+                  <div className="w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 shadow-md border border-slate-200 dark:border-slate-700 flex items-center justify-center text-[#DA291C] group-hover:scale-110 transition-transform">
                     {isProcessingFile ? (
                       <RefreshCw className="w-6 h-6 animate-spin text-[#DA291C]" />
                     ) : (
@@ -327,14 +327,14 @@ export const BulkExternalTrainingsModal: React.FC<BulkExternalTrainingsModalProp
                     )}
                   </div>
                   <div>
-                    <p className="text-sm font-black text-slate-800">
+                    <p className="text-sm font-black text-slate-800 dark:text-slate-200">
                       {isProcessingFile ? 'Analizando archivo Excel...' : 'Haz clic o arrastra tu archivo Excel aquí'}
                     </p>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Soporta formatos <strong className="text-slate-700">.xlsx</strong> y <strong className="text-slate-700">.xls</strong> con columnas de identificación, título, fechas y horas.
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      Soporta formatos <strong className="text-slate-700 dark:text-slate-300">.xlsx</strong> y <strong className="text-slate-700 dark:text-slate-300">.xls</strong> con columnas de identificación, título, fechas y horas.
                     </p>
                   </div>
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#DA291C] bg-red-50 px-3 py-1 rounded-full border border-red-200">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#DA291C] bg-red-50 dark:bg-red-950/40 px-3 py-1 rounded-full border border-red-200 dark:border-red-900/50">
                     <FileSpreadsheet className="w-3.5 h-3.5" /> Seleccionar Archivo
                   </span>
                 </div>
@@ -345,11 +345,11 @@ export const BulkExternalTrainingsModal: React.FC<BulkExternalTrainingsModalProp
           {/* TAB 2: TEXTO PEGADO */}
           {activeTab === 'text' && (
             <div className="space-y-3">
-              <div className="flex items-center justify-between text-xs text-slate-600">
+              <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
                 <span className="font-semibold">
                   Pega filas copiadas de Excel o Google Sheets separadas por tabulación:
                 </span>
-                <span className="text-[11px] text-slate-500 font-medium">
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                   Columnas mínimas: Identificación (Cédula/Tarj/Email) y Título de capacitación
                 </span>
               </div>
@@ -358,7 +358,7 @@ export const BulkExternalTrainingsModal: React.FC<BulkExternalTrainingsModalProp
                 value={rawText}
                 onChange={(e) => handleTextChange(e.target.value)}
                 placeholder="402-2194060-0&#9;Certificación AWS Solutions Architect&#9;Amazon&#9;Tecnología&#9;Desarrollo de software&#9;Certificación&#9;2026-08-01&#9;2026-08-25&#9;48&#9;Aprobado"
-                className="w-full p-3.5 text-xs font-mono rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 bg-slate-50/50"
+                className="w-full p-3.5 text-xs font-mono rounded-2xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#DA291C]/30 focus:border-[#DA291C] text-slate-800 dark:text-white bg-slate-50/50 dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
             </div>
           )}
@@ -366,31 +366,31 @@ export const BulkExternalTrainingsModal: React.FC<BulkExternalTrainingsModalProp
           {/* Resumen de análisis (Valid vs Invalid) */}
           {(activeTrainings.length > 0 || activeErrors.length > 0) && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 flex items-center gap-3.5">
+              <div className="bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 rounded-2xl p-4 flex items-center gap-3.5">
                 <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold shrink-0 shadow-xs">
                   <CheckCircle2 className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Capacitaciones Válidas</p>
-                  <p className="text-xl font-black text-emerald-950">{activeTrainings.length}</p>
+                  <p className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider">Capacitaciones Válidas</p>
+                  <p className="text-xl font-black text-emerald-950 dark:text-emerald-100">{activeTrainings.length}</p>
                 </div>
               </div>
 
               <div className={`border rounded-2xl p-4 flex items-center justify-between gap-3.5 ${
-                activeErrors.length > 0 ? 'bg-amber-50/70 border-amber-200' : 'bg-slate-50 border-slate-200'
+                activeErrors.length > 0 ? 'bg-amber-50/70 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/50' : 'bg-slate-50 dark:bg-slate-850 border-slate-200 dark:border-slate-800'
               }`}>
                 <div className="flex items-center gap-3.5">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold shrink-0 shadow-xs ${
-                    activeErrors.length > 0 ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-500'
+                    activeErrors.length > 0 ? 'bg-amber-500 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                   }`}>
                     <AlertTriangle className="w-5 h-5" />
                   </div>
                   <div>
                     <p className={`text-[11px] font-bold uppercase tracking-wider ${
-                      activeErrors.length > 0 ? 'text-amber-800' : 'text-slate-500'
+                      activeErrors.length > 0 ? 'text-amber-800 dark:text-amber-300' : 'text-slate-500 dark:text-slate-400'
                     }`}>Filas con Advertencias</p>
                     <p className={`text-xl font-black ${
-                      activeErrors.length > 0 ? 'text-amber-950' : 'text-slate-700'
+                      activeErrors.length > 0 ? 'text-amber-950 dark:text-amber-100' : 'text-slate-700 dark:text-slate-300'
                     }`}>{activeErrors.length}</p>
                   </div>
                 </div>
@@ -399,7 +399,7 @@ export const BulkExternalTrainingsModal: React.FC<BulkExternalTrainingsModalProp
                   <button
                     type="button"
                     onClick={() => setShowErrorsList(!showErrorsList)}
-                    className="text-xs font-bold text-amber-800 hover:text-amber-950 flex items-center gap-1 cursor-pointer"
+                    className="text-xs font-bold text-amber-800 dark:text-amber-300 hover:text-amber-950 dark:hover:text-amber-100 flex items-center gap-1 cursor-pointer"
                   >
                     <span>{showErrorsList ? 'Ocultar' : 'Ver Detalle'}</span>
                     {showErrorsList ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -411,15 +411,15 @@ export const BulkExternalTrainingsModal: React.FC<BulkExternalTrainingsModalProp
 
           {/* Desglose de Errores / Advertencias */}
           {activeErrors.length > 0 && showErrorsList && (
-            <div className="bg-amber-50/60 border border-amber-200 rounded-2xl p-4 space-y-2 animate-in fade-in">
-              <p className="text-xs font-black text-amber-900 flex items-center gap-1.5">
-                <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+            <div className="bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 rounded-2xl p-4 space-y-2 animate-in fade-in">
+              <p className="text-xs font-black text-amber-900 dark:text-amber-200 flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                 Filas que no pudieron ser procesadas (se omitirán):
               </p>
-              <div className="max-h-36 overflow-y-auto space-y-1.5 text-[11px] text-amber-800 font-mono pr-2">
+              <div className="max-h-36 overflow-y-auto space-y-1.5 text-[11px] text-amber-800 dark:text-amber-300 font-mono pr-2">
                 {activeErrors.map((err, i) => (
-                  <div key={i} className="flex items-start gap-2 bg-white/70 p-2 rounded-lg border border-amber-100">
-                    <span className="font-bold text-amber-900 shrink-0">Fila {err.line}:</span>
+                  <div key={i} className="flex items-start gap-2 bg-white/70 dark:bg-slate-900/70 p-2 rounded-lg border border-amber-100 dark:border-amber-900/30">
+                    <span className="font-bold text-amber-900 dark:text-amber-200 shrink-0">Fila {err.line}:</span>
                     <span>{err.reason}</span>
                   </div>
                 ))}
@@ -431,19 +431,19 @@ export const BulkExternalTrainingsModal: React.FC<BulkExternalTrainingsModalProp
           {activeTrainings.length > 0 && (
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-[#DA291C]" />
                   Previsualización de Capacitaciones a Importar ({activeTrainings.length})
                 </h3>
-                <span className="text-[11px] text-slate-500 font-medium">
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                   Se asociarán automáticamente al padrón oficial
                 </span>
               </div>
 
-              <div className="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-xs">
+              <div className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden bg-white dark:bg-slate-900 shadow-xs">
                 <div className="max-h-64 overflow-y-auto">
-                  <table className="w-full text-left text-xs text-slate-700 divide-y divide-slate-100">
-                    <thead className="bg-slate-50 text-[10px] font-black text-slate-500 uppercase tracking-wider sticky top-0 z-10">
+                  <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300 divide-y divide-slate-100 dark:divide-slate-800">
+                    <thead className="bg-slate-50 dark:bg-slate-850 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider sticky top-0 z-10">
                       <tr>
                         <th className="py-2.5 px-3">Colaborador Asociado</th>
                         <th className="py-2.5 px-3">Capacitación Externa</th>
@@ -452,30 +452,30 @@ export const BulkExternalTrainingsModal: React.FC<BulkExternalTrainingsModalProp
                         <th className="py-2.5 px-3">Estado</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 font-medium text-[11px]">
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium text-[11px]">
                       {activeTrainings.slice(0, 50).map((item, idx) => (
-                        <tr key={idx} className="hover:bg-slate-50/70 transition-colors">
+                        <tr key={idx} className="hover:bg-slate-50/70 dark:hover:bg-slate-850/60 transition-colors">
                           <td className="py-2.5 px-3">
-                            <p className="font-bold text-slate-900">{item.participantName || 'Colaborador'}</p>
-                            <p className="text-[10px] text-slate-500 font-mono">
+                            <p className="font-bold text-slate-900 dark:text-white">{item.participantName || 'Colaborador'}</p>
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
                               Tarj: #{item.participantCard} {item.participantCedula && `• Céd: ${formatCedula(item.participantCedula)}`}
                             </p>
                           </td>
                           <td className="py-2.5 px-3 max-w-xs">
-                            <p className="font-bold text-slate-900 line-clamp-1">{item.title}</p>
-                            <span className="text-[10px] text-slate-500 block">{item.supplier} • {item.trainingFormat}</span>
+                            <p className="font-bold text-slate-900 dark:text-white line-clamp-1">{item.title}</p>
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400 block">{item.supplier} • {item.trainingFormat}</span>
                           </td>
                           <td className="py-2.5 px-3">
-                            <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50">
                               {getProgramShortName(item.programCategory)}
                             </span>
-                            <span className="text-[10px] text-slate-500 block truncate max-w-[150px] font-medium">{item.subprogram}</span>
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate max-w-[150px] font-medium">{item.subprogram}</span>
                           </td>
                           <td className="py-2.5 px-3">
-                            <span className="font-bold text-slate-800 flex items-center gap-1">
+                            <span className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">
                               <Clock className="w-3 h-3 text-[#DA291C]" /> {item.totalHours} hrs
                             </span>
-                            <span className="text-[10px] text-slate-500 font-mono block">
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono block">
                               {formatDateShort(item.startDate)} → {formatDateShort(item.endDate)}
                             </span>
                           </td>
@@ -488,7 +488,7 @@ export const BulkExternalTrainingsModal: React.FC<BulkExternalTrainingsModalProp
                   </table>
                 </div>
                 {activeTrainings.length > 50 && (
-                  <div className="p-2.5 text-center text-xs text-slate-500 bg-slate-50 border-t border-slate-100 font-medium">
+                  <div className="p-2.5 text-center text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-850 border-t border-slate-100 dark:border-slate-800 font-medium">
                     Mostrando las primeras 50 de {activeTrainings.length} capacitaciones detectadas.
                   </div>
                 )}
@@ -499,11 +499,11 @@ export const BulkExternalTrainingsModal: React.FC<BulkExternalTrainingsModalProp
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 sm:p-5 border-t border-slate-200 bg-slate-50/80 flex items-center justify-between flex-wrap gap-3">
+        <div className="p-4 sm:p-5 border-t border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 flex items-center justify-between flex-wrap gap-3">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
+            className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
           >
             Cancelar
           </button>

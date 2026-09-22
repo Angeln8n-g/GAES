@@ -88,22 +88,22 @@ export const CalibrationModal: React.FC<CalibrationModalProps> = ({
       ariaLabel="Mesas de Calibración y Auditorías Cruzadas"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
-        <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-850">
           <div>
-            <div className="flex items-center gap-2 text-xs font-bold text-[#DA291C] mb-0.5">
+            <div className="flex items-center gap-2 text-xs font-bold text-[#DA291C] dark:text-red-400 mb-0.5">
               <Scale className="w-3.5 h-3.5" />
               <span>Alineación Operaciones vs Capacitación</span>
             </div>
-            <h2 className="text-lg font-black text-slate-900">
+            <h2 className="text-lg font-black text-slate-900 dark:text-white">
               Mesas de Calibración & Auditorías Cruzadas
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -114,10 +114,10 @@ export const CalibrationModal: React.FC<CalibrationModalProps> = ({
           
           {/* Create Button Banner */}
           {!isCreating && (
-            <div className="flex items-center justify-between p-4 rounded-2xl bg-red-50/60 border border-red-200">
+            <div className="flex items-center justify-between p-4 rounded-2xl bg-red-50/60 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40">
               <div>
-                <p className="text-xs font-bold text-slate-900">¿Deseas registrar una nueva sesión de calibración?</p>
-                <p className="text-[11px] text-slate-600 mt-0.5">
+                <p className="text-xs font-bold text-slate-900 dark:text-white">¿Deseas registrar una nueva sesión de calibración?</p>
+                <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5">
                   Compara notas de exámenes teóricos vs evaluaciones prácticas en campo para cerrar la brecha de evaluación.
                 </p>
               </div>
@@ -134,13 +134,13 @@ export const CalibrationModal: React.FC<CalibrationModalProps> = ({
 
           {/* Form Create */}
           {isCreating && (
-            <form onSubmit={handleCreate} className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4 animate-in slide-in-from-top-2 duration-200">
-              <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
-                <span className="text-xs font-black text-slate-900">Registrar Nueva Mesa de Calibración</span>
+            <form onSubmit={handleCreate} className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 space-y-4 animate-in slide-in-from-top-2 duration-200">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2.5">
+                <span className="text-xs font-black text-slate-900 dark:text-white">Registrar Nueva Mesa de Calibración</span>
                 <button
                   type="button"
                   onClick={() => setIsCreating(false)}
-                  className="text-xs text-slate-500 hover:text-slate-800 font-bold cursor-pointer"
+                  className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-bold cursor-pointer"
                 >
                   Cancelar
                 </button>
@@ -148,24 +148,24 @@ export const CalibrationModal: React.FC<CalibrationModalProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Título de la Sesión *</label>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Título de la Sesión *</label>
                   <input
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="ej. Calibración Mensual Técnicos Nivel 1 - Q3"
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Fecha *</label>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Fecha *</label>
                   <input
                     type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#DA291C]"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-semibold focus:outline-none focus:border-[#DA291C]"
                     required
                   />
                 </div>
@@ -173,71 +173,71 @@ export const CalibrationModal: React.FC<CalibrationModalProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Colaboradores Auditados</label>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Colaboradores Auditados</label>
                   <input
                     type="number"
                     min="1"
                     value={participantsReviewed}
                     onChange={(e) => setParticipantsReviewed(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#DA291C]"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-semibold focus:outline-none focus:border-[#DA291C]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Promedio Teórico (Aula)</label>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Promedio Teórico (Aula)</label>
                   <input
                     type="number"
                     min="0"
                     max="100"
                     value={averageTheoryScore}
                     onChange={(e) => setAverageTheoryScore(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#DA291C]"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-semibold focus:outline-none focus:border-[#DA291C]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Promedio Real (Campo)</label>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Promedio Real (Campo)</label>
                   <input
                     type="number"
                     min="0"
                     max="100"
                     value={averageFieldScore}
                     onChange={(e) => setAverageFieldScore(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#DA291C]"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-semibold focus:outline-none focus:border-[#DA291C]"
                   />
                 </div>
               </div>
 
               {/* Variance Indicator */}
-              <div className="p-3 rounded-xl bg-white border border-slate-200 flex items-center justify-between text-xs shadow-xs">
-                <span className="text-slate-600 font-medium">Discrepancia Calculada (Gap Teoría vs Campo):</span>
+              <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs shadow-xs">
+                <span className="text-slate-600 dark:text-slate-300 font-medium">Discrepancia Calculada (Gap Teoría vs Campo):</span>
                 <span className={`font-mono font-bold px-2 py-0.5 rounded-md ${
-                  varianceGap <= 10 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
-                  'bg-amber-50 text-amber-800 border border-amber-200'
+                  varianceGap <= 10 ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' :
+                  'bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
                 }`}>
                   {varianceGap.toFixed(1)}% de variación
                 </span>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Hallazgos Principales</label>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Hallazgos Principales</label>
                 <textarea
                   rows={2}
                   value={keyFindings}
                   onChange={(e) => setKeyFindings(e.target.value)}
                   placeholder="Detalla qué pasos teóricos no se están aplicando en el terreno de juego..."
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Acuerdos & Plan de Acción Conjunto</label>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Acuerdos & Plan de Acción Conjunto</label>
                 <textarea
                   rows={2}
                   value={actionAgreements}
                   onChange={(e) => setActionAgreements(e.target.value)}
                   placeholder="ej. Modificar simulador práctico, agregar 2 días de shadowing y recalibrar rúbrica..."
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                 />
               </div>
 
@@ -256,42 +256,42 @@ export const CalibrationModal: React.FC<CalibrationModalProps> = ({
 
           {/* Historical List */}
           <div className="space-y-3">
-            <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+            <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
               Historial de Mesas de Calibración ({calibrations.length})
             </h3>
 
             {calibrations.length === 0 ? (
-              <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-2xl text-slate-500 text-xs">
+              <div className="p-8 text-center bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-500 dark:text-slate-400 text-xs">
                 No hay sesiones de calibración registradas aún.
               </div>
             ) : (
               calibrations.map(c => (
-                <div key={c.id} className="p-4 rounded-2xl bg-white border border-slate-200 space-y-3 hover:border-slate-300 transition-colors shadow-xs">
+                <div key={c.id} className="p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-3 hover:border-slate-300 dark:hover:border-slate-600 transition-colors shadow-xs">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                     <div>
-                      <h4 className="text-xs font-bold text-slate-900 flex items-center gap-2">
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2">
                         <span>{c.title}</span>
-                        <span className="text-[10px] text-[#DA291C] font-bold bg-red-50 px-2 py-0.2 rounded-md border border-red-200">
+                        <span className="text-[10px] text-[#DA291C] dark:text-red-400 font-bold bg-red-50 dark:bg-red-950/60 px-2 py-0.2 rounded-md border border-red-200 dark:border-red-800">
                           {c.participantsReviewed} colaboradores analizados
                         </span>
                       </h4>
-                      <p className="text-[11px] text-slate-500 mt-0.5 font-medium">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
                         📅 {c.date} • Facilitado por: {c.conductedBy}
                       </p>
                     </div>
 
                     <div className="flex items-center gap-3 self-end sm:self-auto">
                       <div className="text-right text-[11px]">
-                        <span className="text-slate-500">Teoría: </span>
-                        <span className="font-mono font-bold text-[#DA291C]">{c.averageTheoryScore}%</span>
-                        <span className="text-slate-300 mx-1">|</span>
-                        <span className="text-slate-500">Campo: </span>
-                        <span className="font-mono font-bold text-slate-900">{c.averageFieldScore}%</span>
+                        <span className="text-slate-500 dark:text-slate-400">Teoría: </span>
+                        <span className="font-mono font-bold text-[#DA291C] dark:text-red-400">{c.averageTheoryScore}%</span>
+                        <span className="text-slate-300 dark:text-slate-600 mx-1">|</span>
+                        <span className="text-slate-500 dark:text-slate-400">Campo: </span>
+                        <span className="font-mono font-bold text-slate-900 dark:text-white">{c.averageFieldScore}%</span>
                       </div>
                       <span className={`px-2.5 py-1 rounded-xl text-xs font-mono font-bold border ${
                         c.varianceGapPct <= 10 
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                          : 'bg-amber-50 text-amber-800 border-amber-200'
+                          ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' 
+                          : 'bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
                       }`}>
                         Gap: {c.varianceGapPct}%
                       </span>
@@ -299,16 +299,16 @@ export const CalibrationModal: React.FC<CalibrationModalProps> = ({
                   </div>
 
                   {c.keyFindings && (
-                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] space-y-1">
-                      <span className="font-bold text-slate-800">🔍 Hallazgos Principales:</span>
-                      <p className="text-slate-600 leading-relaxed">{c.keyFindings}</p>
+                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-700 text-[11px] space-y-1">
+                      <span className="font-bold text-slate-800 dark:text-slate-200">🔍 Hallazgos Principales:</span>
+                      <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{c.keyFindings}</p>
                     </div>
                   )}
 
                   {c.actionAgreements && (
-                    <div className="p-3 rounded-xl bg-red-50/50 border border-red-200 text-[11px] space-y-1">
-                      <span className="font-bold text-[#DA291C]">⚡ Acuerdos Ops-Capacitación:</span>
-                      <p className="text-slate-700 leading-relaxed">{c.actionAgreements}</p>
+                    <div className="p-3 rounded-xl bg-red-50/50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 text-[11px] space-y-1">
+                      <span className="font-bold text-[#DA291C] dark:text-red-400">⚡ Acuerdos Ops-Capacitación:</span>
+                      <p className="text-slate-700 dark:text-slate-300 leading-relaxed">{c.actionAgreements}</p>
                     </div>
                   )}
                 </div>
@@ -319,11 +319,11 @@ export const CalibrationModal: React.FC<CalibrationModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-end">
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 flex items-center justify-end">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 rounded-xl hover:bg-slate-200 transition-colors cursor-pointer"
+            className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             Cerrar
           </button>

@@ -197,7 +197,7 @@ export const CompaniesManager: React.FC<CompaniesManagerProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar por nombre, sector, RNC o contacto..."
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-2xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C] shadow-xs"
+            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] shadow-xs"
           />
         </div>
 
@@ -221,16 +221,16 @@ export const CompaniesManager: React.FC<CompaniesManagerProps> = ({
           return (
             <div 
               key={comp.id}
-              className={`bg-white border rounded-3xl p-6 shadow-sm flex flex-col justify-between transition-all relative overflow-hidden ${
+              className={`bg-white dark:bg-slate-900 border rounded-3xl p-6 shadow-sm flex flex-col justify-between transition-all relative overflow-hidden ${
                 isSelected 
-                  ? "border-[#DA291C] shadow-md ring-2 ring-red-500/20" 
-                  : "border-slate-200 hover:border-slate-300"
+                  ? "border-[#DA291C] dark:border-red-500 shadow-md ring-2 ring-red-500/20" 
+                  : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
               }`}
             >
               {/* Active / Inactive Badge */}
               <div className="flex items-start justify-between gap-3 mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 p-1 flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
+                  <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-1 flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
                     {comp.logoUrl ? (
                       <img
                         src={comp.logoUrl}
@@ -240,77 +240,77 @@ export const CompaniesManager: React.FC<CompaniesManagerProps> = ({
                         className="w-full h-full object-cover rounded-xl"
                       />
                     ) : (
-                      <Building2 className="w-7 h-7 text-[#DA291C]" />
+                      <Building2 className="w-7 h-7 text-[#DA291C] dark:text-red-400" />
                     )}
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-black text-slate-900 text-sm truncate">{comp.name}</h3>
+                      <h3 className="font-black text-slate-900 dark:text-white text-sm truncate">{comp.name}</h3>
                     </div>
-                    <span className="inline-block px-2.5 py-0.5 mt-1 rounded-md bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-bold">
+                    <span className="inline-block px-2.5 py-0.5 mt-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-[10px] font-bold">
                       {comp.industry || "Corporativo"}
                     </span>
                   </div>
                 </div>
 
                 {comp.isActive !== false ? (
-                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold flex items-center gap-1 shrink-0">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[10px] font-bold flex items-center gap-1 shrink-0">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                     Activa
                   </span>
                 ) : (
-                  <span className="px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold flex items-center gap-1 shrink-0">
-                    <XCircle className="w-3 h-3 text-rose-600" />
+                  <span className="px-2.5 py-0.5 rounded-full bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-[10px] font-bold flex items-center gap-1 shrink-0">
+                    <XCircle className="w-3 h-3 text-rose-600 dark:text-rose-400" />
                     Inactiva
                   </span>
                 )}
               </div>
 
               {/* Tax & Contact details */}
-              <div className="space-y-1.5 text-xs text-slate-600 border-t border-b border-slate-100 py-3 mb-4">
+              <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-400 border-t border-b border-slate-100 dark:border-slate-800 py-3 mb-4">
                 {comp.rncTaxId && (
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-slate-500 font-medium">RNC / Tax ID:</span>
-                    <span className="font-mono text-slate-800 font-bold">{comp.rncTaxId}</span>
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">RNC / Tax ID:</span>
+                    <span className="font-mono text-slate-800 dark:text-slate-200 font-bold">{comp.rncTaxId}</span>
                   </div>
                 )}
                 {comp.contactEmail && (
                   <div className="flex items-center justify-between text-[11px] truncate">
-                    <span className="text-slate-500 font-medium flex items-center gap-1">
+                    <span className="text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1">
                       <Mail className="w-3 h-3 text-slate-400" />
                       Email:
                     </span>
-                    <span className="font-mono text-slate-700 truncate max-w-[170px]">{comp.contactEmail}</span>
+                    <span className="font-mono text-slate-700 dark:text-slate-300 truncate max-w-[170px]">{comp.contactEmail}</span>
                   </div>
                 )}
                 {comp.contactPhone && (
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-slate-500 font-medium flex items-center gap-1">
+                    <span className="text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1">
                       <Phone className="w-3 h-3 text-slate-400" />
                       Tel:
                     </span>
-                    <span className="text-slate-700">{comp.contactPhone}</span>
+                    <span className="text-slate-700 dark:text-slate-300">{comp.contactPhone}</span>
                   </div>
                 )}
               </div>
 
               {/* Quick Metrics Bar */}
-              <div className="grid grid-cols-4 gap-2 bg-slate-50 p-2.5 rounded-2xl border border-slate-200 text-center mb-4">
+              <div className="grid grid-cols-4 gap-2 bg-slate-50 dark:bg-slate-850 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 text-center mb-4">
                 <div>
-                  <p className="text-xs font-black text-slate-900">{stats.participants}</p>
-                  <p className="text-[9px] text-slate-500 font-semibold">Padrón</p>
+                  <p className="text-xs font-black text-slate-900 dark:text-white">{stats.participants}</p>
+                  <p className="text-[9px] text-slate-500 dark:text-slate-400 font-semibold">Padrón</p>
                 </div>
                 <div>
-                  <p className="text-xs font-black text-amber-600">{stats.supervisors}</p>
-                  <p className="text-[9px] text-slate-500 font-semibold">Líderes</p>
+                  <p className="text-xs font-black text-amber-600 dark:text-amber-400">{stats.supervisors}</p>
+                  <p className="text-[9px] text-slate-500 dark:text-slate-400 font-semibold">Líderes</p>
                 </div>
                 <div>
-                  <p className="text-xs font-black text-emerald-600">{stats.users}</p>
-                  <p className="text-[9px] text-slate-500 font-semibold">Usuarios</p>
+                  <p className="text-xs font-black text-emerald-600 dark:text-emerald-400">{stats.users}</p>
+                  <p className="text-[9px] text-slate-500 dark:text-slate-400 font-semibold">Usuarios</p>
                 </div>
                 <div>
-                  <p className="text-xs font-black text-[#DA291C]">{stats.events}</p>
-                  <p className="text-[9px] text-slate-500 font-semibold">Cursos</p>
+                  <p className="text-xs font-black text-[#DA291C] dark:text-red-400">{stats.events}</p>
+                  <p className="text-[9px] text-slate-500 dark:text-slate-400 font-semibold">Cursos</p>
                 </div>
               </div>
 
@@ -322,7 +322,7 @@ export const CompaniesManager: React.FC<CompaniesManagerProps> = ({
                   className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                     isSelected
                       ? "bg-[#DA291C] text-white shadow-md shadow-red-500/25"
-                      : "bg-white hover:bg-slate-50 text-slate-700 border border-slate-300"
+                      : "bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700"
                   }`}
                 >
                   <Building2 className="w-3.5 h-3.5" />
@@ -333,7 +333,7 @@ export const CompaniesManager: React.FC<CompaniesManagerProps> = ({
                   <button
                     type="button"
                     onClick={() => handleOpenEditModal(comp)}
-                    className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+                    className="p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
                     title="Editar Empresa"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
@@ -343,7 +343,7 @@ export const CompaniesManager: React.FC<CompaniesManagerProps> = ({
                     <button
                       type="button"
                       onClick={() => handleDelete(comp)}
-                      className="p-2 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
+                      className="p-2 text-rose-600 hover:text-rose-800 dark:text-rose-400 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-colors cursor-pointer"
                       title="Eliminar Empresa"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -359,18 +359,18 @@ export const CompaniesManager: React.FC<CompaniesManagerProps> = ({
       {/* Modal Crear / Editar Empresa */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden">
             
-            <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-              <div className="flex items-center gap-2 text-slate-900">
-                <Building2 className="w-5 h-5 text-[#DA291C]" />
+            <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-850">
+              <div className="flex items-center gap-2 text-slate-900 dark:text-white">
+                <Building2 className="w-5 h-5 text-[#DA291C] dark:text-red-400" />
                 <h2 className="font-black text-base">
                   {editingCompany ? "Editar Empresa" : "Registrar Nueva Empresa"}
                 </h2>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-200 transition-colors cursor-pointer"
+                className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -378,85 +378,85 @@ export const CompaniesManager: React.FC<CompaniesManagerProps> = ({
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">Nombre de la Empresa *</label>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Nombre de la Empresa *</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => handleNameChange(e.target.value)}
                   placeholder="ej. Gran Resort & Hospitality Club"
-                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                  className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">Slug / Identificador</label>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Slug / Identificador</label>
                   <input
                     type="text"
                     value={slug}
                     onChange={(e) => setSlug(e.target.value)}
                     placeholder="ej. gran-resort"
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-mono placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-mono placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">Sector / Industria</label>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Sector / Industria</label>
                   <input
                     type="text"
                     value={industry}
                     onChange={(e) => setIndustry(e.target.value)}
                     placeholder="ej. Turismo & Hotelería"
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">RNC / Tax ID</label>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">RNC / Tax ID</label>
                   <input
                     type="text"
                     value={rncTaxId}
                     onChange={(e) => setRncTaxId(e.target.value)}
                     placeholder="ej. 101-445566-2"
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-mono placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-mono placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">URL del Logo</label>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">URL del Logo</label>
                   <input
                     type="text"
                     value={logoUrl}
                     onChange={(e) => setLogoUrl(e.target.value)}
                     placeholder="https://..."
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">Email de Contacto</label>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Email de Contacto</label>
                   <input
                     type="email"
                     value={contactEmail}
                     onChange={(e) => setContactEmail(e.target.value)}
                     placeholder="rrhh@empresa.com"
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">Teléfono</label>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Teléfono</label>
                   <input
                     type="text"
                     value={contactPhone}
                     onChange={(e) => setContactPhone(e.target.value)}
                     placeholder="+1 (809) 555-0000"
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#DA291C]"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
                   />
                 </div>
               </div>
@@ -469,16 +469,16 @@ export const CompaniesManager: React.FC<CompaniesManagerProps> = ({
                   onChange={(e) => setIsActive(e.target.checked)}
                   className="rounded border-slate-300 text-[#DA291C] focus:ring-[#DA291C] cursor-pointer"
                 />
-                <label htmlFor="activeCheck" className="text-xs text-slate-700 font-bold cursor-pointer">
+                <label htmlFor="activeCheck" className="text-xs text-slate-700 dark:text-slate-300 font-bold cursor-pointer">
                   Empresa Activa (Permitir inscripciones y acceso a colaboradores)
                 </label>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-200">
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-200 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                  className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-colors cursor-pointer"
                 >
                   Cancelar
                 </button>
