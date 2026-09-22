@@ -47,6 +47,9 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
   if (url.origin !== self.location.origin) return;
 
+  // Bypass Service Worker for API and WebSocket requests
+  if (url.pathname.startsWith('/api') || url.pathname.startsWith('/ws')) return;
+
   // Strategy 1: For Navigation (HTML documents) -> Network first, fallback to cached index.html
   if (request.mode === 'navigate') {
     event.respondWith(

@@ -131,7 +131,13 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
 
       if (isSuperAdmin && selectedCompanyFilter !== "all" && uCompany !== selectedCompanyFilter) return false;
       if (selectedStatusFilter !== "all" && uStatus !== selectedStatusFilter) return false;
-      if (selectedRoleFilter !== "all" && u.role !== selectedRoleFilter) return false;
+      if (selectedRoleFilter !== "all") {
+        if (selectedRoleFilter === "Evaluador / Tutor") {
+          if (u.role !== "Evaluador / Tutor" && u.role !== "Evaluador / Tutor OJT") return false;
+        } else if (u.role !== selectedRoleFilter) {
+          return false;
+        }
+      }
 
       if (!q) return true;
 
@@ -484,7 +490,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                 <option value="Super Administrador">Super Administrador</option>
               )}
               <option value="Administrador / Editor">Administrador / Editor</option>
-              <option value="Evaluador / Tutor OJT">Evaluador / Tutor OJT</option>
+              <option value="Evaluador / Tutor">Evaluador / Tutor</option>
               <option value="Líder de Área / Supervisor">Líder de Área / Supervisor</option>
               <option value="Colaborador (User)">Colaborador (User)</option>
             </select>
@@ -606,7 +612,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                 className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-[#DA291C]"
               >
                 <option value="Colaborador (User)">Colaborador (User)</option>
-                <option value="Evaluador / Tutor OJT">Evaluador / Tutor OJT</option>
+                <option value="Evaluador / Tutor">Evaluador / Tutor</option>
                 <option value="Líder de Área / Supervisor">Líder de Área / Supervisor</option>
                 <option value="Administrador / Editor">Administrador / Editor</option>
                 {isSuperAdmin && (
@@ -759,14 +765,14 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                       {/* Rol */}
                       <td className="p-4">
                         <select
-                          value={u.role}
+                          value={u.role === "Evaluador / Tutor OJT" ? "Evaluador / Tutor" : u.role}
                           onChange={(e) => handleChangeRole(u.id, e.target.value as UserRole)}
                           className={`px-3 py-1 rounded-xl text-xs font-bold bg-white border border-slate-300 ${
                             u.role === "Super Administrador"
                               ? "text-amber-700"
                               : u.role === "Administrador / Editor"
                               ? "text-[#DA291C]"
-                              : u.role === "Evaluador / Tutor OJT"
+                              : u.role === "Evaluador / Tutor" || u.role === "Evaluador / Tutor OJT"
                               ? "text-indigo-700"
                               : u.role === "Líder de Área / Supervisor"
                               ? "text-emerald-700"
@@ -777,7 +783,7 @@ export const UsersManager: React.FC<UsersManagerProps> = ({
                             <option value="Super Administrador">Super Administrador</option>
                           )}
                           <option value="Administrador / Editor">Administrador / Editor</option>
-                          <option value="Evaluador / Tutor OJT">Evaluador / Tutor OJT</option>
+                          <option value="Evaluador / Tutor">Evaluador / Tutor</option>
                           <option value="Líder de Área / Supervisor">Líder de Área / Supervisor</option>
                           <option value="Colaborador (User)">Colaborador (User)</option>
                         </select>

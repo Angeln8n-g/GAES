@@ -1,5 +1,7 @@
-import { Server as HttpServer } from 'http';
+import { Server as HttpServer, IncomingMessage } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
+import jwt from 'jsonwebtoken';
+import { JWT_SECRET, AuthenticatedUser } from './middlewares/auth';
 
 export interface AttendanceWsMessage {
   type: 
@@ -33,6 +35,7 @@ export interface AttendanceWsMessage {
 
 interface ExtWebSocket extends WebSocket {
   isAlive: boolean;
+  user?: AuthenticatedUser;
 }
 
 let wss: WebSocketServer | null = null;
@@ -43,12 +46,51 @@ let wss: WebSocketServer | null = null;
 export function initWebSocketServer(server: HttpServer) {
   wss = new WebSocketServer({ 
     server, 
-    path: '/ws' 
+    path: '/ws',
+    verifyClient: (info, callback) => {
+      try {
+        const req = info.req;
+        const host = req.headers.host || 'localhost';
+        const url = new URL(req.url || '', `http://${host}`);
+        
+        let token: string | null | undefined = url.searchParams.get('token');
+
+        if (!token && req.headers['authorization']) {
+          const authHeader = req.headers['authorization'];
+          if (typeof authHeader === 'string') {
+            if (authHeader.startsWith('Bearer ')) {
+              token = authHeader.slice(7).trim();
+            } else {
+              token = authHeader.trim();
+            }
+          }
+        }
+
+        if (!token && req.headers['sec-websocket-protocol']) {
+          const rawProtocols = req.headers['sec-websocket-protocol'];
+          if (typeof rawProtocols === 'string') {
+            const protocols = rawProtocols.split(',').map(p => p.trim());
+            token = protocols.find(p => p !== 'Bearer' && p.length > 20);
+          }
+        }
+
+        if (!token) {
+          return callback(false, 401, 'Unauthorized: Missing authentication token');
+        }
+
+        const decoded = jwt.verify(token, JWT_SECRET) as AuthenticatedUser;
+        (req as any).user = decoded;
+        return callback(true);
+      } catch (err) {
+        return callback(false, 401, 'Unauthorized: Invalid or expired token');
+      }
+    }
   });
 
-  wss.on('connection', (ws: WebSocket, req) => {
+  wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
     const extWs = ws as ExtWebSocket;
     extWs.isAlive = true;
+    extWs.user = (req as any).user;
 
     // Enviar mensaje de bienvenida
     extWs.send(JSON.stringify({

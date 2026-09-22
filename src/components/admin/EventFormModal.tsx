@@ -963,12 +963,12 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
               </div>
             </div>
 
-            {/* Asignación de Tutor / Evaluador OJT */}
+            {/* Asignación de Tutor / Evaluador */}
             <div className="bg-indigo-50/50 border border-indigo-200/80 p-4 rounded-2xl space-y-2">
               <div className="flex items-center justify-between">
                 <label htmlFor="event-form-ojt-evaluator" className="block text-xs font-black text-slate-800 flex items-center gap-1.5">
                   <UserCheck className="w-4 h-4 text-indigo-700" />
-                  <span>Tutor / Evaluador OJT Responsable (Acompañamiento en Campo)</span>
+                  <span>Tutor / Evaluador Responsable (Acompañamiento en Campo)</span>
                 </label>
                 <span className="text-[10px] text-indigo-700 bg-indigo-100/70 font-bold px-2 py-0.5 rounded-full border border-indigo-300">
                   Bitácoras & Calibración
@@ -983,19 +983,19 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                 onChange={(e) => setOjtEvaluatorId(e.target.value)}
                 className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#DA291C]"
               >
-                <option value="">— Sin tutor OJT asignado (Formación general o solo docente de aula) —</option>
-                {users.filter(u => u.role === 'Evaluador / Tutor OJT').length > 0 && (
-                  <optgroup label="⭐ Evaluadores & Tutores OJT Calificados">
-                    {users.filter(u => u.role === 'Evaluador / Tutor OJT').map(u => (
+                <option value="">— Sin tutor asignado (Formación general o solo docente de aula) —</option>
+                {users.filter(u => u.role === 'Evaluador / Tutor' || u.role === 'Evaluador / Tutor OJT').length > 0 && (
+                  <optgroup label="⭐ Evaluadores & Tutores Calificados">
+                    {users.filter(u => u.role === 'Evaluador / Tutor' || u.role === 'Evaluador / Tutor OJT').map(u => (
                       <option key={u.id} value={u.id}>
                         {u.name} ({u.department || 'Operaciones'} • {u.email})
                       </option>
                     ))}
                   </optgroup>
                 )}
-                {users.filter(u => u.role !== 'Evaluador / Tutor OJT' && u.role !== 'Colaborador (User)').length > 0 && (
+                {users.filter(u => u.role !== 'Evaluador / Tutor' && u.role !== 'Evaluador / Tutor OJT' && u.role !== 'Colaborador (User)').length > 0 && (
                   <optgroup label="👥 Otros Supervisores / Evaluadores Disponibles">
-                    {users.filter(u => u.role !== 'Evaluador / Tutor OJT' && u.role !== 'Colaborador (User)').map(u => (
+                    {users.filter(u => u.role !== 'Evaluador / Tutor' && u.role !== 'Evaluador / Tutor OJT' && u.role !== 'Colaborador (User)').map(u => (
                       <option key={u.id} value={u.id}>
                         {u.name} ({u.role} • {u.email})
                       </option>
@@ -1221,7 +1221,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
                   3. Estructura de Módulos & Calificación Continua
                 </h3>
                 <p className="text-[11px] text-slate-500 mt-0.5">
-                  Divide el evento en etapas o módulos para que el tutor OJT asiente calificaciones progresivas.
+                  Divide el evento en etapas o módulos para que el tutor asiente calificaciones progresivas.
                 </p>
               </div>
 

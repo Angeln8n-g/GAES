@@ -4,6 +4,17 @@ import crypto from 'crypto';
 
 export const externalTrainingsRouter = Router();
 
+/**
+ * Validador estricto de URLs para mitigar XSS almacenado (Stored XSS).
+ * Sólo permite esquemas http:// y https://.
+ */
+function isValidHttpUrl(url: string): boolean {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+  return /^https?:\/\//i.test(trimmed);
+}
+
 // GET /api/external-trainings - Listar capacitaciones externas con filtros opcionales
 externalTrainingsRouter.get('/', async (req: Request, res: Response) => {
   try {
@@ -179,7 +190,20 @@ externalTrainingsRouter.post('/bulk', async (req: Request, res: Response) => {
       const programCategory = item.programCategory || 'Capacitacion_tecnologica_digital';
       const subprogram = item.subprogram || 'Desarrollo de software';
       const description = item.description || '';
-      const credentialUrl = item.credentialUrl || null;
+      let cleanCredentialUrl: string | null = null;
+      if (item.credentialUrl && typeof item.credentialUrl === 'string') {
+        const trimmedUrl = item.credentialUrl.trim();
+        if (trimmedUrl) {
+          if (!isValidHttpUrl(trimmedUrl)) {
+            await client.query('ROLLBACK');
+            return res.status(400).json({
+              error: `URL de credencial no válida (${trimmedUrl}). Sólo se permiten URLs seguras con protocolo http:// o https://.`
+            });
+          }
+          cleanCredentialUrl = trimmedUrl;
+        }
+      }
+      const credentialUrl = cleanCredentialUrl;
       const certificateNumber = item.certificateNumber || null;
       const score = item.score !== undefined && item.score !== null && item.score !== '' ? Number(item.score) : null;
       const academicStatus = item.academicStatus || 'passed';
@@ -286,6 +310,19 @@ externalTrainingsRouter.post('/', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'El título, fecha de inicio y fecha de fin son obligatorios.' });
     }
 
+    let cleanCredentialUrl: string | null = null;
+    if (credentialUrl && typeof credentialUrl === 'string') {
+      const trimmedUrl = credentialUrl.trim();
+      if (trimmedUrl) {
+        if (!isValidHttpUrl(trimmedUrl)) {
+          return res.status(400).json({
+            error: `URL de credencial no válida (${trimmedUrl}). Sólo se permiten URLs seguras con protocolo http:// o https://.`
+          });
+        }
+        cleanCredentialUrl = trimmedUrl;
+      }
+    }
+
     // Unificar lista de participantes a los que aplica
     let cards: string[] = [];
     if (Array.isArray(participantCards) && participantCards.length > 0) {
@@ -331,7 +368,7 @@ externalTrainingsRouter.post('/', async (req: Request, res: Response) => {
         Number(totalHours) || 1,
         supplier || 'Externo',
         description || '',
-        credentialUrl || null,
+        cleanCredentialUrl,
         certificateNumber || null,
         score !== null && score !== undefined && score !== '' ? Number(score) : null,
         academicStatus || 'passed',
@@ -392,8 +429,22 @@ externalTrainingsRouter.put('/:id', async (req: Request, res: Response) => {
     if (endDate !== undefined) { updates.push(`end_date = $${paramIndex++}`); values.push(endDate); }
     if (totalHours !== undefined) { updates.push(`total_hours = $${paramIndex++}`); values.push(Number(totalHours) || 0); }
     if (supplier !== undefined) { updates.push(`supplier = $${paramIndex++}`); values.push(supplier); }
-    if (description !== undefined) { updates.push(`description = $${paramIndex++}`); values.push(description); }
-    if (credentialUrl !== undefined) { updates.push(`credential_url = $${paramIndex++}`); values.push(credentialUrl || null); }
+    if (credentialUrl !== undefined) {
+      let cleanCredentialUrl: string | null = null;
+      if (credentialUrl && typeof credentialUrl === 'string') {
+        const trimmedUrl = credentialUrl.trim();
+        if (trimmedUrl) {
+          if (!isValidHttpUrl(trimmedUrl)) {
+            return res.status(400).json({
+              error: `URL de credencial no válida (${trimmedUrl}). Sólo se permiten URLs seguras con protocolo http:// o https://.`
+            });
+          }
+          cleanCredentialUrl = trimmedUrl;
+        }
+      }
+      updates.push(`credential_url = $${paramIndex++}`);
+      values.push(cleanCredentialUrl);
+    }
     if (certificateNumber !== undefined) { updates.push(`certificate_number = $${paramIndex++}`); values.push(certificateNumber || null); }
     if (score !== undefined) { updates.push(`score = $${paramIndex++}`); values.push(score !== null && score !== '' ? Number(score) : null); }
     if (academicStatus !== undefined) { updates.push(`academic_status = $${paramIndex++}`); values.push(academicStatus); }

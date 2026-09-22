@@ -196,7 +196,7 @@ export const CalibrationModal: React.FC<CalibrationModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Promedio Real (Campo OJT)</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Promedio Real (Campo)</label>
                   <input
                     type="number"
                     min="0"

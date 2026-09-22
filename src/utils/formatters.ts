@@ -63,6 +63,16 @@ export const generateRandomCard = (): string => {
 };
 
 /**
+ * Valida de forma estricta que una URL comience con http:// o https://
+ * para prevenir vulnerabilidades de Cross-Site Scripting (XSS) como javascript: o data:
+ */
+export const isSafeHttpUrl = (url?: string | null): boolean => {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  return /^https?:\/\//i.test(trimmed);
+};
+
+/**
  * Valida si una cédula cumple con el formato estricto de 11 dígitos (000-0000000-0)
  * Ejemplo válido: 402-2196163-1
  */

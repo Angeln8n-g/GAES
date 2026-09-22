@@ -1,9 +1,14 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.initWebSocketServer = initWebSocketServer;
 exports.broadcastAttendanceEvent = broadcastAttendanceEvent;
 exports.getConnectedClientsCount = getConnectedClientsCount;
 const ws_1 = require("ws");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const auth_1 = require("./middlewares/auth");
 let wss = null;
 /**
  * Inicializa el servidor WebSocket adjunto al servidor HTTP
@@ -11,11 +16,47 @@ let wss = null;
 function initWebSocketServer(server) {
     wss = new ws_1.WebSocketServer({
         server,
-        path: '/ws'
+        path: '/ws',
+        verifyClient: (info, callback) => {
+            try {
+                const req = info.req;
+                const host = req.headers.host || 'localhost';
+                const url = new URL(req.url || '', `http://${host}`);
+                let token = url.searchParams.get('token');
+                if (!token && req.headers['authorization']) {
+                    const authHeader = req.headers['authorization'];
+                    if (typeof authHeader === 'string') {
+                        if (authHeader.startsWith('Bearer ')) {
+                            token = authHeader.slice(7).trim();
+                        }
+                        else {
+                            token = authHeader.trim();
+                        }
+                    }
+                }
+                if (!token && req.headers['sec-websocket-protocol']) {
+                    const rawProtocols = req.headers['sec-websocket-protocol'];
+                    if (typeof rawProtocols === 'string') {
+                        const protocols = rawProtocols.split(',').map(p => p.trim());
+                        token = protocols.find(p => p !== 'Bearer' && p.length > 20);
+                    }
+                }
+                if (!token) {
+                    return callback(false, 401, 'Unauthorized: Missing authentication token');
+                }
+                const decoded = jsonwebtoken_1.default.verify(token, auth_1.JWT_SECRET);
+                req.user = decoded;
+                return callback(true);
+            }
+            catch (err) {
+                return callback(false, 401, 'Unauthorized: Invalid or expired token');
+            }
+        }
     });
     wss.on('connection', (ws, req) => {
         const extWs = ws;
         extWs.isAlive = true;
+        extWs.user = req.user;
         // Enviar mensaje de bienvenida
         extWs.send(JSON.stringify({
             type: 'CONNECTION_ESTABLISHED',

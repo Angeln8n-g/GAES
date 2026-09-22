@@ -501,12 +501,12 @@ export const EditParticipantModal: React.FC<EditParticipantModalProps> = ({
             </p>
             <select
               id="edit-participant-user-role"
-              value={userRole}
+              value={userRole === 'Evaluador / Tutor OJT' ? 'Evaluador / Tutor' : userRole}
               onChange={(e) => setUserRole(e.target.value as UserRole)}
               className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 font-bold focus:outline-none focus:border-[#DA291C]"
             >
               <option value="Colaborador (User)">Colaborador (User) - Reservar y consultar cursos</option>
-              <option value="Evaluador / Tutor OJT">Evaluador / Tutor OJT - Bitácoras de campo y calibración</option>
+              <option value="Evaluador / Tutor">Evaluador / Tutor - Bitácoras de campo y calibración</option>
               <option value="Líder de Área / Supervisor">Líder de Área / Supervisor - Asignar y supervisar equipo</option>
               <option value="Administrador / Editor">Administrador / Editor - Gestionar catálogo y reportes</option>
               {isSuperAdmin && (

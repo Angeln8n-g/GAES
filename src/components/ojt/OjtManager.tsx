@@ -66,11 +66,11 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
   // Handlers for Export
   const handleExportChecklists = () => {
     if (checklists.length === 0) {
-      onShowToast('Sin datos para exportar', 'No hay bitácoras OJT registradas actualmente.', 'info');
+      onShowToast('Sin datos para exportar', 'No hay bitácoras de campo registradas actualmente.', 'info');
       return;
     }
     exportOjtChecklistsToExcel(checklists, participants, companies);
-    onShowToast('Reporte generado', 'Se ha descargado el reporte completo de bitácoras OJT en Excel.', 'success');
+    onShowToast('Reporte generado', 'Se ha descargado el reporte completo de bitácoras en Excel.', 'success');
   };
 
   const handleExportCalibrations = () => {
@@ -215,7 +215,7 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
                 className="px-4 py-2 bg-[#DA291C] hover:bg-red-700 text-white text-xs font-extrabold rounded-2xl shadow-md shadow-red-500/25 flex items-center gap-1.5 transition-all cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>Registrar Bitácora OJT</span>
+                <span>Registrar Bitácora</span>
               </button>
             </>
           )}
@@ -333,7 +333,7 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
                     <tr className="border-b border-slate-200 text-[11px] font-bold text-slate-600 uppercase tracking-wider bg-slate-50">
                       <th className="p-4">Colaborador</th>
                       <th className="p-4">Fecha & Tipo</th>
-                      <th className="p-4">Evaluador OJT</th>
+                      <th className="p-4">Evaluador / Tutor</th>
                       <th className="p-4">Seguridad & FTF</th>
                       <th className="p-4">Puntaje</th>
                       <th className="p-4">Diagnóstico</th>
@@ -452,7 +452,7 @@ export const OjtManager: React.FC<OjtManagerProps> = ({
                               </button>
                               <button
                                 onClick={async () => {
-                                  if (window.confirm('¿Deseas eliminar esta bitácora OJT?')) {
+                                  if (window.confirm('¿Deseas eliminar esta bitácora?')) {
                                     await onDeleteChecklist(c.id);
                                     onShowToast('Bitácora eliminada', 'El registro ha sido removido.', 'info');
                                   }

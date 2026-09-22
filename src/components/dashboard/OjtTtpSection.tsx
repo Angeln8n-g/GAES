@@ -39,7 +39,7 @@ export const OjtTtpSection: React.FC<OjtTtpSectionProps> = ({
         const data = await apiService.getOjtMetrics(companyId);
         setMetrics(data);
       } catch (err) {
-        console.error('Error al cargar métricas OJT TTP:', err);
+        console.error('Error al cargar métricas de campo TTP:', err);
       } finally {
         setLoading(false);
       }
@@ -179,7 +179,7 @@ export const OjtTtpSection: React.FC<OjtTtpSectionProps> = ({
 
             <div>
               <div className="flex items-center justify-between text-xs mb-1">
-                <span className="text-slate-600 font-bold">Desempeño Práctico en Campo (OJT)</span>
+                <span className="text-slate-600 font-bold">Desempeño Práctico en Campo</span>
                 <span className="font-extrabold text-[#DA291C]">{metrics.avgFieldScore} / 100</span>
               </div>
               <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200">
@@ -212,7 +212,7 @@ export const OjtTtpSection: React.FC<OjtTtpSectionProps> = ({
           </div>
 
           <p className="text-xs text-slate-600 leading-relaxed">
-            Frecuencia de desvíos detectados en las bitácoras digitales de acompañamiento OJT:
+            Frecuencia de desvíos detectados en las bitácoras digitales de acompañamiento en campo:
           </p>
 
           {metrics.topFieldWeaknesses.length > 0 ? (
@@ -241,7 +241,7 @@ export const OjtTtpSection: React.FC<OjtTtpSectionProps> = ({
 
           <div className="pt-2">
             <p className="text-[11px] text-slate-500 italic text-center">
-              💡 Fuente: Bitácoras y rúbricas de acompañamiento diario y semanal registradas por la Red de OJTs.
+              💡 Fuente: Bitácoras y rúbricas de acompañamiento diario y semanal registradas por la Red de Tutores y Evaluadores de Campo.
             </p>
           </div>
         </div>

@@ -10,8 +10,12 @@ import {
   resolveBackupsDir
 } from '../services/backupService.js';
 import { getMigrationStatus, runMigrations } from '../migrator.js';
+import { requireSuperAdmin } from '../middlewares/auth.js';
 
 export const adminBackupsRouter = Router();
+
+// Exigir autenticación con rol de Super Administrador para todas las operaciones de respaldo y migraciones
+adminBackupsRouter.use(requireSuperAdmin);
 
 /**
  * GET /api/admin/backups
@@ -36,7 +40,7 @@ adminBackupsRouter.get('/backups', async (_req: Request, res: Response) => {
  */
 adminBackupsRouter.post('/backups', async (req: Request, res: Response) => {
   try {
-    const triggeredBy = req.body.triggeredBy || 'Super Administrador';
+    const triggeredBy = req.user?.email || req.user?.name || 'Super Administrador';
     const metadata = await createDatabaseBackup('manual_admin', triggeredBy);
     res.status(201).json({
       success: true,
@@ -105,7 +109,7 @@ adminBackupsRouter.delete('/backups/:filename', async (req: Request, res: Respon
   try {
     const rawFilename = req.params.filename;
     const filename = path.basename(rawFilename);
-    const triggeredBy = req.body.triggeredBy || 'Super Administrador';
+    const triggeredBy = req.user?.email || req.user?.name || 'Super Administrador';
 
     await deleteBackupFile(filename, triggeredBy);
     res.json({
@@ -126,7 +130,7 @@ adminBackupsRouter.post('/backups/:filename/restore', async (req: Request, res: 
   try {
     const rawFilename = req.params.filename;
     const filename = path.basename(rawFilename);
-    const { confirm, triggeredBy } = req.body;
+    const { confirm } = req.body;
 
     if (confirm !== true) {
       return res.status(400).json({
@@ -134,7 +138,8 @@ adminBackupsRouter.post('/backups/:filename/restore', async (req: Request, res: 
       });
     }
 
-    const result = await restoreDatabaseBackup(filename, triggeredBy || 'Super Administrador');
+    const triggeredBy = req.user?.email || req.user?.name || 'Super Administrador';
+    const result = await restoreDatabaseBackup(filename, triggeredBy);
     res.json({
       success: true,
       message: result.message,

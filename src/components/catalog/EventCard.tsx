@@ -215,11 +215,11 @@ export const EventCard: React.FC<EventCardProps> = ({
             {event.description}
           </p>
 
-          {/* Tutor OJT Badge if Assigned */}
+          {/* Tutor Badge if Assigned */}
           {event.ojtEvaluatorName && (
-            <div className="flex items-center gap-2 text-[11px] font-black text-purple-700 bg-purple-50/90 px-3 py-1.5 rounded-2xl border border-purple-200 mb-3.5 shadow-2xs" title="Tutor / Evaluador OJT Responsable">
+            <div className="flex items-center gap-2 text-[11px] font-black text-purple-700 bg-purple-50/90 px-3 py-1.5 rounded-2xl border border-purple-200 mb-3.5 shadow-2xs" title="Tutor / Evaluador Responsable">
               <UserCheck className="w-3.5 h-3.5 text-purple-600 shrink-0" />
-              <span>Tutor OJT: <strong className="text-purple-900">{event.ojtEvaluatorName}</strong></span>
+              <span>Tutor: <strong className="text-purple-900">{event.ojtEvaluatorName}</strong></span>
             </div>
           )}
 

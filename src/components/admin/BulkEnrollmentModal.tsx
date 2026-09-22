@@ -161,7 +161,10 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
       (item.cedula && item.cedula.includes(q)) || 
       (item.card && item.card.includes(q));
 
-    const matchesRole = roleFilter === 'all' || item.role === roleFilter;
+    const matchesRole = roleFilter === 'all' || 
+      (roleFilter === 'Evaluador / Tutor' 
+        ? (item.role === 'Evaluador / Tutor' || item.role === 'Evaluador / Tutor OJT')
+        : item.role === roleFilter);
     const matchesEdu = educationFilter === 'all' || (item.educationLevel || 'Secundaria / Bachiller') === educationFilter;
     const matchesStudying = studyingFilter === 'all' || 
       (studyingFilter === 'studying' ? Boolean(item.isCurrentlyStudying) : !item.isCurrentlyStudying);
@@ -548,7 +551,7 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
                     >
                       <option value="all">Todos los Roles</option>
                       <option value="Colaborador (User)">Colaborador (User)</option>
-                      <option value="Evaluador / Tutor OJT">Evaluador / Tutor OJT</option>
+                      <option value="Evaluador / Tutor">Evaluador / Tutor</option>
                       <option value="Líder de Área / Supervisor">Líder / Supervisor</option>
                       <option value="Administrador / Editor">Admin / Editor</option>
                     </select>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { apiService, MOCK_USERS, MOCK_GROUPS, MOCK_PROGRAMS, MOCK_COMPANIES } from './services/api';
 import { 
   TrainingEvent, 
@@ -50,21 +50,29 @@ import { initThemeListener } from './utils/theme';
 // Helper seguro para obtener el usuario autenticado desde localStorage
 const getSafeStoredUser = (): UserAccount | null => {
   if (typeof localStorage === 'undefined') return null;
+  const token = localStorage.getItem('ch_token');
   const saved = localStorage.getItem('ch_logged_user');
-  if (!saved || saved === 'undefined' || saved === 'null' || saved.trim() === '') {
-    try { localStorage.removeItem('ch_logged_user'); } catch {}
+  if (!token || !saved || saved === 'undefined' || saved === 'null' || saved.trim() === '') {
+    try {
+      localStorage.removeItem('ch_logged_user');
+      localStorage.removeItem('ch_token');
+    } catch {}
     return null;
   }
   try {
     const parsed = JSON.parse(saved);
     if (!parsed || typeof parsed !== 'object') {
       localStorage.removeItem('ch_logged_user');
+      localStorage.removeItem('ch_token');
       return null;
     }
     return parsed;
   } catch (e) {
     console.warn('Usuario inválido en localStorage, reseteando sesión:', e);
-    try { localStorage.removeItem('ch_logged_user'); } catch {}
+    try {
+      localStorage.removeItem('ch_logged_user');
+      localStorage.removeItem('ch_token');
+    } catch {}
     return null;
   }
 };
@@ -116,7 +124,7 @@ export function App() {
   // Vista actual / Navegación
   const [currentTab, setCurrentTab] = useState<TabView>(() => {
     const u = getSafeStoredUser();
-    if (u && u.role === 'Evaluador / Tutor OJT') {
+    if (u && (u.role === 'Evaluador / Tutor' || u.role === 'Evaluador / Tutor OJT')) {
       return 'evaluator-courses';
     }
     return 'landing';
@@ -160,75 +168,105 @@ export function App() {
     setToast({ title, message, type });
   };
 
-  // Carga inicial de datos
-  useEffect(() => {
-    const loadData = async () => {
+  // Carga inicial y reactiva de datos
+  const loadData = useCallback(async () => {
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('ch_token') : null;
+
+    // Si no hay token de sesión, solo cargar configuración pública
+    if (!token) {
       try {
-        const [
-          loadedCompanies, 
-          loadedEvents, 
-          loadedParticipants, 
-          loadedUsers, 
-          loadedGroups, 
-          loadedPrograms,
-          loadedSettings,
-          loadedChecklists,
-          loadedCalibrations,
-          loadedExternalTrainings,
-          loadedTechnicalHistory,
-          loadedTechnicalCohorts
-        ] = await Promise.all([
-          apiService.getCompanies(),
-          apiService.getEvents(),
-          apiService.getParticipants(),
-          apiService.getUsers(),
-          apiService.getGroups(),
-          apiService.getPrograms(),
-          apiService.getSettings(),
-          apiService.getOjtChecklists(),
-          apiService.getCalibrationSessions(),
-          apiService.getExternalTrainings(),
-          apiService.getTechnicalAcademyHistory(),
-          apiService.getTechnicalCohorts()
+        const [loadedCompanies, loadedSettings] = await Promise.all([
+          apiService.getCompanies().catch(() => []),
+          apiService.getSettings().catch(() => null)
         ]);
-        setCompanies(loadedCompanies);
-        setEvents(loadedEvents);
-        setParticipants(loadedParticipants);
-        setUsers(loadedUsers);
-        setGroups(loadedGroups);
-        setPrograms(loadedPrograms);
+        if (loadedCompanies && loadedCompanies.length > 0) setCompanies(loadedCompanies);
         if (loadedSettings) setSettings(loadedSettings);
-        if (loadedChecklists) setChecklists(loadedChecklists);
-        if (loadedCalibrations) setCalibrations(loadedCalibrations);
-        if (loadedExternalTrainings) setExternalTrainings(loadedExternalTrainings);
-        if (loadedTechnicalHistory) setTechnicalHistory(loadedTechnicalHistory);
-        if (loadedTechnicalCohorts) setTechnicalCohorts(loadedTechnicalCohorts);
-
-        // Auto-consulta si la URL contiene ?cedula=
-        const urlParams = new URLSearchParams(window.location.search);
-        const cedulaFromUrl = urlParams.get('cedula');
-        if (cedulaFromUrl) {
-          const res = findAttendeeByCedula(cedulaFromUrl, loadedParticipants, loadedUsers, loadedEvents, loadedTechnicalHistory || []);
-          setAttendeeLookupResult(res);
-          setIsAttendeeScheduleModalOpen(true);
-          setLastSearchedCedula(cedulaFromUrl);
-        }
-
-        // Verificar si el usuario autenticado tiene perfil incompleto
-        const savedUser = getSafeStoredUser();
-        if (savedUser) {
-          const freshUser = loadedUsers.find(u => u.id === savedUser.id) || savedUser;
-          setCurrentUser(freshUser);
-          if (!isUserProfileComplete(freshUser, loadedParticipants)) {
-            setIsProfileMandatory(true);
-            setIsProfileModalOpen(true);
-          }
-        }
       } catch (err) {
-        console.error('Error al cargar datos:', err);
+        console.warn('Error al cargar datos públicos iniciales:', err);
       }
-    };
+      return;
+    }
+
+    try {
+      const [
+        loadedCompanies, 
+        loadedEvents, 
+        loadedParticipants, 
+        loadedUsers, 
+        loadedGroups, 
+        loadedPrograms,
+        loadedSettings,
+        loadedChecklists,
+        loadedCalibrations,
+        loadedExternalTrainings,
+        loadedTechnicalHistory,
+        loadedTechnicalCohorts
+      ] = await Promise.all([
+        apiService.getCompanies().catch(err => { console.warn('Error al cargar empresas:', err); return []; }),
+        apiService.getEvents().catch(err => { console.warn('Error al cargar eventos:', err); return []; }),
+        apiService.getParticipants().catch(err => { console.warn('Error al cargar participantes:', err); return []; }),
+        apiService.getUsers().catch(err => { console.warn('Error al cargar usuarios:', err); return []; }),
+        apiService.getGroups().catch(err => { console.warn('Error al cargar grupos:', err); return []; }),
+        apiService.getPrograms().catch(err => { console.warn('Error al cargar programas:', err); return []; }),
+        apiService.getSettings().catch(err => { console.warn('Error al cargar ajustes:', err); return null; }),
+        apiService.getOjtChecklists().catch(err => { console.warn('Error al cargar checklists:', err); return []; }),
+        apiService.getCalibrationSessions().catch(err => { console.warn('Error al cargar calibraciones:', err); return []; }),
+        apiService.getExternalTrainings().catch(err => { console.warn('Error al cargar capacitaciones externas:', err); return []; }),
+        apiService.getTechnicalAcademyHistory().catch(err => { console.warn('Error al cargar historial técnico:', err); return []; }),
+        apiService.getTechnicalCohorts().catch(err => { console.warn('Error al cargar cohortes técnicas:', err); return []; })
+      ]);
+
+      if (loadedCompanies && loadedCompanies.length > 0) setCompanies(loadedCompanies);
+      if (loadedEvents) setEvents(loadedEvents);
+      if (loadedParticipants) setParticipants(loadedParticipants);
+      if (loadedUsers && loadedUsers.length > 0) setUsers(loadedUsers);
+      if (loadedGroups && loadedGroups.length > 0) setGroups(loadedGroups);
+      if (loadedPrograms && loadedPrograms.length > 0) setPrograms(loadedPrograms);
+      if (loadedSettings) setSettings(loadedSettings);
+      if (loadedChecklists) setChecklists(loadedChecklists);
+      if (loadedCalibrations) setCalibrations(loadedCalibrations);
+      if (loadedExternalTrainings) setExternalTrainings(loadedExternalTrainings);
+      if (loadedTechnicalHistory) setTechnicalHistory(loadedTechnicalHistory);
+      if (loadedTechnicalCohorts) setTechnicalCohorts(loadedTechnicalCohorts);
+
+      // Auto-consulta si la URL contiene ?cedula=
+      const urlParams = new URLSearchParams(window.location.search);
+      const cedulaFromUrl = urlParams.get('cedula');
+      if (cedulaFromUrl) {
+        const res = findAttendeeByCedula(cedulaFromUrl, loadedParticipants || [], loadedUsers || [], loadedEvents || [], loadedTechnicalHistory || []);
+        setAttendeeLookupResult(res);
+        setIsAttendeeScheduleModalOpen(true);
+        setLastSearchedCedula(cedulaFromUrl);
+      }
+
+      // Verificar si el usuario autenticado tiene perfil incompleto
+      const savedUser = getSafeStoredUser();
+      if (savedUser) {
+        const freshUser = (loadedUsers && loadedUsers.find(u => u.id === savedUser.id)) || savedUser;
+        setCurrentUser(freshUser);
+        if (!isUserProfileComplete(freshUser, loadedParticipants || [])) {
+          setIsProfileMandatory(true);
+          setIsProfileModalOpen(true);
+        }
+      }
+    } catch (err) {
+      console.error('Error al cargar datos:', err);
+    }
+  }, []);
+
+  useEffect(() => {
     loadData();
+  }, [loadData]);
+
+  // Escucha activa de expiración de sesión (401)
+  useEffect(() => {
+    const handleAuthExpired = () => {
+      attendanceWs.disconnect();
+      setCurrentUser(null);
+      showToast('Sesión Expirada', 'Tu sesión ha expirado o requiere autenticación. Por favor inicia sesión.', 'warning');
+    };
+    window.addEventListener('ch_auth_expired', handleAuthExpired);
+    return () => window.removeEventListener('ch_auth_expired', handleAuthExpired);
   }, []);
 
   // Detección de parámetros URL (para QR Check-In y Kiosco Lobby)
@@ -338,6 +376,7 @@ export function App() {
 
   const canAccessEvaluatorCourses = Boolean(
     currentUser?.role === 'Super Administrador' || 
+    currentUser?.role === 'Evaluador / Tutor' ||
     currentUser?.role === 'Evaluador / Tutor OJT' ||
     isFacilitatorOfAnyCohort ||
     isInstructorOfAnyEvent
@@ -351,16 +390,22 @@ export function App() {
   }, [currentTab, currentUser]);
 
   // Handlers de Sesión
-  const handleLoginSuccess = (user: UserAccount) => {
+  const handleLoginSuccess = async (user: UserAccount) => {
     setCurrentUser(user);
     if (user.role !== 'Super Administrador') {
       setSelectedCompanyId(user.companyId || 'emp_kasino');
     }
     localStorage.setItem('ch_logged_user', JSON.stringify(user));
-    if (user.role === 'Evaluador / Tutor OJT') {
+    if (user.role === 'Evaluador / Tutor' || user.role === 'Evaluador / Tutor OJT') {
       setCurrentTab('evaluator-courses');
     }
     showToast('¡Bienvenido!', `Has iniciado sesión como ${user.name}.`, 'success');
+
+    // Conectar WebSocket de sincronización en tiempo real con el token de sesión
+    attendanceWs.connect();
+
+    // Cargar todos los datos autenticados inmediatamente
+    await loadData();
 
     // Validación de Onboarding Obligatorio
     if (!isUserProfileComplete(user, participants)) {
@@ -404,6 +449,7 @@ export function App() {
   };
 
   const handleLogout = () => {
+    attendanceWs.disconnect();
     setCurrentUser(null);
     setSelectedCompanyId('all');
     localStorage.removeItem('ch_logged_user');
@@ -941,14 +987,14 @@ export function App() {
           />
         )}
 
-        {/* Tab OJT: Bitácoras de Campo, Mesas de Calibración & Analítica TTP (Exclusivo SuperAdmin y OJT) */}
-        {currentTab === 'ojt' && (currentUser.role === 'Super Administrador' || currentUser.role === 'Evaluador / Tutor OJT') && (
+        {/* Tab OJT: Bitácoras de Campo, Mesas de Calibración & Analítica TTP (Exclusivo SuperAdmin y Tutores de Campo) */}
+        {currentTab === 'ojt' && (currentUser.role === 'Super Administrador' || currentUser.role === 'Evaluador / Tutor' || currentUser.role === 'Evaluador / Tutor OJT') && (
           <div className="space-y-6">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm">
               <div>
                 <div className="flex items-center gap-2 text-xs font-bold text-[#DA291C] mb-1">
                   <span className="w-2 h-2 rounded-full bg-[#DA291C] animate-pulse"></span>
-                  <span>Módulo Especializado de Formación en Campo (OJT)</span>
+                  <span>Módulo Especializado de Formación en Campo</span>
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                   Bitácoras & Mesas de Calibración
@@ -974,7 +1020,7 @@ export function App() {
           </div>
         )}
 
-        {/* Tab Evaluator: Cursos Asignados & Calificación Modular (SuperAdmin, Evaluador OJT o Facilitador asignado) */}
+        {/* Tab Evaluator: Cursos Asignados & Calificación Modular (SuperAdmin, Evaluador o Facilitador asignado) */}
         {currentTab === 'evaluator-courses' && canAccessEvaluatorCourses && (
           <EvaluatorCoursesView
             events={events}

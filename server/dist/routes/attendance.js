@@ -1,11 +1,26 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.attendanceRouter = void 0;
+exports.verifyPinLimiter = exports.attendanceRouter = void 0;
 const express_1 = require("express");
+const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const db_js_1 = require("../db.js");
 const events_js_1 = require("./events.js");
 const websocket_js_1 = require("../websocket.js");
 exports.attendanceRouter = (0, express_1.Router)();
+// Limitador de intentos para validación de PIN diario (máximo 5 intentos por ventana de 5 minutos por IP)
+exports.verifyPinLimiter = (0, express_rate_limit_1.default)({
+    windowMs: 5 * 60 * 1000,
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+        valid: false,
+        message: 'Demasiados intentos de verificación de PIN. Por favor espere 5 minutos antes de reintentar.'
+    }
+});
 // POST /api/attendance (Check-in o Check-out presencial con QR o PIN diario)
 exports.attendanceRouter.post('/', async (req, res) => {
     const { eventId, date, time, email, type = 'checkin', code } = req.body;
@@ -216,8 +231,8 @@ exports.attendanceRouter.post('/revert', async (req, res) => {
         client.release();
     }
 });
-// POST /api/attendance/verify-code (Verificar código PIN del día)
-exports.attendanceRouter.post('/verify-code', async (req, res) => {
+// POST /api/attendance/verify-code (Verificar código PIN del día con rate-limiting)
+exports.attendanceRouter.post('/verify-code', exports.verifyPinLimiter, async (req, res) => {
     const { eventId, date, time, code } = req.body;
     if (!eventId || !date || !time || !code) {
         return res.status(400).json({ valid: false, message: 'Parámetros incompletos' });

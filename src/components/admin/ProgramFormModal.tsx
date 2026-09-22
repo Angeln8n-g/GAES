@@ -323,7 +323,7 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:border-[#DA291C]"
                 >
                   <option value="standard">📚 Estándar (Cursos Regulares)</option>
-                  <option value="70_20_10">⚡ Modelo 70-20-10 & Shadowing OJT</option>
+                  <option value="70_20_10">⚡ Modelo 70-20-10 & Shadowing en Campo</option>
                 </select>
               </div>
             </div>
@@ -451,7 +451,7 @@ export const ProgramFormModal: React.FC<ProgramFormModalProps> = ({
                             className="px-2.5 py-1.5 rounded-xl bg-white border border-slate-300 text-[11px] font-bold text-slate-800 focus:outline-none"
                           >
                             <option value="field_practice_70">🛠️ 70% Práctica en Campo</option>
-                            <option value="shadowing_coaching_20">👥 20% Shadowing & OJT</option>
+                            <option value="shadowing_coaching_20">👥 20% Shadowing & Acompañamiento</option>
                             <option value="formal_course_10">📖 10% Aula Formal / Taller</option>
                           </select>
                         )}

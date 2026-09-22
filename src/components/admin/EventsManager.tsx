@@ -228,9 +228,9 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
                         </span>
                       ) : null}
                       {event.ojtEvaluatorName && (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1" title="Tutor / Evaluador OJT Asignado">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1" title="Tutor / Evaluador Asignado">
                           <UserCheck className="w-3 h-3 text-indigo-600" />
-                          <span>Tutor OJT: {event.ojtEvaluatorName}</span>
+                          <span>Tutor: {event.ojtEvaluatorName}</span>
                         </span>
                       )}
                     </div>
@@ -255,11 +255,11 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
                 <div className="flex flex-wrap items-center gap-2 border-t lg:border-t-0 pt-4 lg:pt-0 border-slate-100">
                   <button
                     onClick={() => exportSessionGradesForOjtAndCalibration(event, participants, companies)}
-                    title="Exportar calificaciones e insumos para Bitácoras OJT, Mesas de Calibración y Estadísticas en Excel"
+                    title="Exportar calificaciones e insumos para Bitácoras de Campo, Mesas de Calibración y Estadísticas en Excel"
                     className="px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-indigo-700 text-xs font-bold flex items-center gap-1.5 border border-slate-200 hover:border-indigo-200 transition-colors cursor-pointer shadow-xs"
                   >
                     <FileSpreadsheet className="w-3.5 h-3.5 text-indigo-600" />
-                    <span className="hidden sm:inline">Exportar OJT & Calibración</span>
+                    <span className="hidden sm:inline">Exportar Bitácoras & Calibración</span>
                   </button>
 
                   <button

@@ -743,7 +743,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <span>Sustentabilidad & Capacitaciones</span>
             </button>
 
-            {settings?.ojt_plan_90d?.enabled !== false && (currentUser?.role === 'Super Administrador' || currentUser?.role === 'Evaluador / Tutor OJT') && (
+            {settings?.ojt_plan_90d?.enabled !== false && (currentUser?.role === 'Super Administrador' || currentUser?.role === 'Evaluador / Tutor' || currentUser?.role === 'Evaluador / Tutor OJT') && (
               <button
                 onClick={() => setActiveTab('ojt_ttp')}
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
@@ -753,7 +753,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 }`}
               >
                 <Activity className="w-3.5 h-3.5" />
-                <span>Operaciones OJT & TTP</span>
+                <span>Operaciones de Campo & TTP</span>
               </button>
             )}
 
@@ -1950,9 +1950,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       )}
 
       {/* ==========================================
-          SUB-TAB 5: OPERACIONES OJT & TIME TO PRODUCTIVITY (90 DÍAS)
+          SUB-TAB 5: OPERACIONES DE CAMPO & TIME TO PRODUCTIVITY (90 DÍAS)
           ========================================== */}
-      {activeTab === 'ojt_ttp' && settings?.ojt_plan_90d?.enabled !== false && (currentUser?.role === 'Super Administrador' || currentUser?.role === 'Evaluador / Tutor OJT') && (
+      {activeTab === 'ojt_ttp' && settings?.ojt_plan_90d?.enabled !== false && (currentUser?.role === 'Super Administrador' || currentUser?.role === 'Evaluador / Tutor' || currentUser?.role === 'Evaluador / Tutor OJT') && (
         <OjtTtpSection
           companyId={selectedCompanyId}
           checklists={checklists}

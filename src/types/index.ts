@@ -2,7 +2,7 @@
 // TIPOS E INTERFACES TYPESCRIPT CENTRALIZADOS
 // ==========================================
 
-export type UserRole = 'Super Administrador' | 'Administrador / Editor' | 'Líder de Área / Supervisor' | 'Evaluador / Tutor OJT' | 'Colaborador (User)';
+export type UserRole = 'Super Administrador' | 'Administrador / Editor' | 'Líder de Área / Supervisor' | 'Evaluador / Tutor' | 'Evaluador / Tutor OJT' | 'Colaborador (User)';
 
 export type EventStatus = 'active' | 'inactive';
 export type EventModality = 'Presencial' | 'Virtual' | 'Híbrida';
@@ -388,7 +388,7 @@ export interface TrainingProgram {
 }
 
 // ==========================================
-// MÓDULO OJT & PLAN DE ACCIÓN 90 DÍAS
+// MÓDULO DE CAMPO & PLAN DE ACCIÓN 90 DÍAS
 // ==========================================
 
 export interface OjtPlanSettings {

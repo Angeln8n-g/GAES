@@ -42,7 +42,7 @@ import {
   getProgramLabel, 
   getProgramShortName 
 } from '../../constants/sustainabilityPrograms';
-import { formatDateShort, formatCedula } from '../../utils/formatters';
+import { formatDateShort, formatCedula, isSafeHttpUrl } from '../../utils/formatters';
 import { 
   downloadExternalTrainingsTemplateExcel, 
   exportExternalTrainingsToExcel 
@@ -614,9 +614,9 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                               Folio: {item.certificateNumber}
                             </p>
                           )}
-                          {item.credentialUrl && (
+                          {isSafeHttpUrl(item.credentialUrl) && (
                             <a
-                              href={item.credentialUrl}
+                              href={item.credentialUrl!}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-[11px] text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold cursor-pointer"
@@ -631,9 +631,9 @@ export const ExternalTrainingsManager: React.FC<ExternalTrainingsManagerProps> =
                       {/* Acciones */}
                       <td className="py-3.5 px-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
-                          {item.credentialUrl && (
+                          {isSafeHttpUrl(item.credentialUrl) && (
                             <a
-                              href={item.credentialUrl}
+                              href={item.credentialUrl!}
                               target="_blank"
                               rel="noopener noreferrer"
                               aria-label={`Abrir credencial externa de ${item.title}`}

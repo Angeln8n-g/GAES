@@ -192,7 +192,7 @@ export const downloadUsersTemplateExcel = (): void => {
       'Correo Corporativo *': 'ana.morales@empresa.com',
       'Empresa / Filial (ej. Claro Dominicana)': 'Claro Dominicana',
       'Departamento / Área': 'Tecnología',
-      'Rol en Sistema (Colaborador / Tutor OJT / Líder / Administrador / Super Admin)': 'Colaborador (User)',
+      'Rol en Sistema (Colaborador / Tutor / Líder / Administrador / Super Admin)': 'Colaborador (User)',
       'Estado Laboral (Contratado / En Proceso / Inactivo)': 'Contratado',
       'Contraseña Inicial (Opcional)': '123'
     },
@@ -202,7 +202,7 @@ export const downloadUsersTemplateExcel = (): void => {
       'Correo Corporativo *': 'carlos.gomez@empresa.com',
       'Empresa / Filial (ej. Claro Dominicana)': 'Kasino 21 Corporativo',
       'Departamento / Área': 'Operaciones',
-      'Rol en Sistema (Colaborador / Tutor OJT / Líder / Administrador / Super Admin)': 'Evaluador / Tutor OJT',
+      'Rol en Sistema (Colaborador / Tutor / Líder / Administrador / Super Admin)': 'Evaluador / Tutor',
       'Estado Laboral (Contratado / En Proceso / Inactivo)': 'Contratado',
       'Contraseña Inicial (Opcional)': '123'
     },
@@ -212,7 +212,7 @@ export const downloadUsersTemplateExcel = (): void => {
       'Correo Corporativo *': 'laura.gomez@empresa.com',
       'Empresa / Filial (ej. Claro Dominicana)': 'Claro Dominicana',
       'Departamento / Área': 'Tecnología',
-      'Rol en Sistema (Colaborador / Tutor OJT / Líder / Administrador / Super Admin)': 'Líder de Área / Supervisor',
+      'Rol en Sistema (Colaborador / Tutor / Líder / Administrador / Super Admin)': 'Líder de Área / Supervisor',
       'Estado Laboral (Contratado / En Proceso / Inactivo)': 'Contratado',
       'Contraseña Inicial (Opcional)': '123'
     },
@@ -222,7 +222,7 @@ export const downloadUsersTemplateExcel = (): void => {
       'Correo Corporativo *': 'fernando.castillo@empresa.com',
       'Empresa / Filial (ej. Claro Dominicana)': 'Kasino 21 Corporativo',
       'Departamento / Área': 'Recursos Humanos',
-      'Rol en Sistema (Colaborador / Tutor OJT / Líder / Administrador / Super Admin)': 'Administrador / Editor',
+      'Rol en Sistema (Colaborador / Tutor / Líder / Administrador / Super Admin)': 'Administrador / Editor',
       'Estado Laboral (Contratado / En Proceso / Inactivo)': 'Contratado',
       'Contraseña Inicial (Opcional)': 'admin2026'
     },
@@ -232,7 +232,7 @@ export const downloadUsersTemplateExcel = (): void => {
       'Correo Corporativo *': 'roberto.diaz@empresa.com',
       'Empresa / Filial (ej. Claro Dominicana)': 'Claro Dominicana',
       'Departamento / Área': 'Comercial & Ventas',
-      'Rol en Sistema (Colaborador / Tutor OJT / Líder / Administrador / Super Admin)': 'Colaborador (User)',
+      'Rol en Sistema (Colaborador / Tutor / Líder / Administrador / Super Admin)': 'Colaborador (User)',
       'Estado Laboral (Contratado / En Proceso / Inactivo)': 'En Proceso',
       'Contraseña Inicial (Opcional)': '123'
     }
@@ -272,7 +272,7 @@ export const downloadUsersTemplateExcel = (): void => {
     {
       'Campo': 'Rol en Sistema',
       'Obligatorio': 'Opcional (Defecto: Colaborador)',
-      'Formato / Opciones': 'Colaborador (User) | Evaluador / Tutor OJT | Líder de Área / Supervisor | Administrador / Editor | Super Administrador',
+      'Formato / Opciones': 'Colaborador (User) | Evaluador / Tutor | Líder de Área / Supervisor | Administrador / Editor | Super Administrador',
       'Descripción': 'Nivel de permisos y accesos dentro del portal.'
     },
     {
@@ -372,7 +372,7 @@ export const normalizeUserRole = (rawRole: string): UserRole => {
   if (r.includes('super')) return 'Super Administrador';
   if (r.includes('admin') || r.includes('editor')) return 'Administrador / Editor';
   if (r.includes('lider') || r.includes('líder') || r.includes('supervisor') || r.includes('lead')) return 'Líder de Área / Supervisor';
-  if (r.includes('ojt') || r.includes('tutor') || r.includes('evaluador') || r.includes('coach') || r.includes('mentor') || r.includes('trainer')) return 'Evaluador / Tutor OJT';
+  if (r.includes('ojt') || r.includes('tutor') || r.includes('evaluador') || r.includes('coach') || r.includes('mentor') || r.includes('trainer')) return 'Evaluador / Tutor';
   return 'Colaborador (User)';
 };
 
@@ -1192,7 +1192,7 @@ export const exportSkillsGapReportToExcel = (
 };
 
 /**
- * Exporta el reporte completo de bitácoras de campo OJT y diagnósticos operativos a Excel (.xlsx)
+ * Exporta el reporte completo de bitácoras de campo y diagnósticos operativos a Excel (.xlsx)
  */
 export const exportOjtChecklistsToExcel = (
   checklists: OjtChecklist[],
@@ -1227,7 +1227,7 @@ export const exportOjtChecklistsToExcel = (
       'Cédula': p?.cedula || 'N/A',
       'Departamento': c.department || p?.department || 'Operaciones',
       'Supervisor Asignado': p?.supervisorName || 'N/A',
-      'Evaluador / Tutor OJT': c.evaluatorName,
+      'Evaluador / Tutor': c.evaluatorName,
       'Tipo de Observación': obsTypeLabel,
       'Puntaje de Campo (1-100)': Number(c.overallScore),
       'Diagnóstico Operativo': diagLabel,
@@ -1263,10 +1263,10 @@ export const exportOjtChecklistsToExcel = (
   const wsDetail = XLSX.utils.json_to_sheet(data);
   const wsSummary = XLSX.utils.json_to_sheet(summaryData);
 
-  XLSX.utils.book_append_sheet(wb, wsDetail, 'Bitácoras OJT Campo');
-  XLSX.utils.book_append_sheet(wb, wsSummary, 'Resumen Ejecutivo OJT');
+  XLSX.utils.book_append_sheet(wb, wsDetail, 'Bitácoras de Campo');
+  XLSX.utils.book_append_sheet(wb, wsSummary, 'Resumen Ejecutivo');
 
-  XLSX.writeFile(wb, `Reporte_Bitacoras_OJT_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  XLSX.writeFile(wb, `Reporte_Bitacoras_Campo_${new Date().toISOString().slice(0, 10)}.xlsx`);
 };
 
 /**
@@ -1306,7 +1306,7 @@ export const exportCalibrationsToExcel = (
 
 /**
  * Exporta el Libro Integral de Calificaciones de la Sesión para:
- * 1. Plantilla Insumo para Bitácoras de Campo OJT
+ * 1. Plantilla Insumo para Bitácoras de Campo
  * 2. Insumo para Mesas de Calibración (Aula vs Campo)
  * 3. Estadísticas & Métricas de la Sesión
  * 4. Calificaciones Detalladas
@@ -1382,7 +1382,7 @@ export const exportSessionGradesForOjtAndCalibration = (
   }
 
   // -------------------------------------------------------------
-  // HOJA 1: INSUMO PARA BITÁCORAS DE CAMPO OJT (Checklists 70-20-10)
+  // HOJA 1: INSUMO PARA BITÁCORAS DE CAMPO (Checklists 70-20-10)
   // -------------------------------------------------------------
   const ojtChecklistInputData = participantsInSession.map((item, idx) => {
     const g = item.grade;
@@ -1397,12 +1397,12 @@ export const exportSessionGradesForOjtAndCalibration = (
       'Departamento': item.department,
       'Capacitación Teórica': event.title,
       'Instructor de Aula': event.instructor,
-      'Tutor OJT Asignado': ojtTutorName,
+      'Tutor Asignado': ojtTutorName,
       'Nota Teoría Aula (% / Pts)': scoreText,
       'Estado Aula': academicStatusText,
       'Habilidades / Competencias a Auditar': (event.skillsEvaluated || []).join(', ') || 'Procedimiento estándar',
       'Debilidades Detectadas en Aula': (g?.detectedSkillGaps || []).join(', ') || 'Ninguna',
-      '[CAMPO] Fecha de Observación OJT': '',
+      '[CAMPO] Fecha de Observación': '',
       '[CAMPO] Tipo de Observación (Diario/Semanal/60D)': '',
       '[CAMPO] Protocolo Seguridad EPP (SÍ/NO)': '',
       '[CAMPO] First-Time Fix Sin Retrabajo (SÍ/NO)': '',
@@ -1427,7 +1427,7 @@ export const exportSessionGradesForOjtAndCalibration = (
       'Nombre Colaborador': item.name,
       'Departamento': item.department,
       'Instructor de Aula': event.instructor,
-      'Tutor OJT de Campo': ojtTutorName,
+      'Tutor de Campo': ojtTutorName,
       'Nota Aula (Teoría 100)': theoryScore > 0 ? theoryScore : 'Pendiente',
       'Nota Campo (Práctica 100)': '',
       'Dispersión / Varianza Gap (%)': '',
@@ -1465,14 +1465,14 @@ export const exportSessionGradesForOjtAndCalibration = (
     { 'Métrica / Indicador': 'Capacitación Evaluada', 'Valor': event.title, 'Detalle Operativo': `Categoría: ${event.category} • Modalidad: ${event.modality}` },
     { 'Métrica / Indicador': 'Empresa / Sede', 'Valor': compName, 'Detalle Operativo': event.location || 'Instalaciones corporativas' },
     { 'Métrica / Indicador': 'Instructor Docente (Aula)', 'Valor': event.instructor, 'Detalle Operativo': 'Responsable de la formación teórica' },
-    { 'Métrica / Indicador': 'Tutor / Evaluador OJT (Campo)', 'Valor': ojtTutorName, 'Detalle Operativo': 'Responsable del acompañamiento y bitácoras en puesto' },
+    { 'Métrica / Indicador': 'Tutor / Evaluador (Campo)', 'Valor': ojtTutorName, 'Detalle Operativo': 'Responsable del acompañamiento y bitácoras en puesto' },
     { 'Métrica / Indicador': 'Total Participantes Registrados', 'Valor': participantsInSession.length, 'Detalle Operativo': 'Inscritos en las fechas del evento' },
     { 'Métrica / Indicador': 'Colaboradores Calificados', 'Valor': totalGraded, 'Detalle Operativo': `${participantsInSession.length - totalGraded} pendientes de nota` },
     { 'Métrica / Indicador': 'Promedio General de la Sesión', 'Valor': `${avgScore} / 100`, 'Detalle Operativo': `Nota mínima de aprobación: ${event.passingScore || 70} pts` },
     { 'Métrica / Indicador': 'Tasa de Aprobación Teórica', 'Valor': `${passRate}%`, 'Detalle Operativo': `${passedCount} aprobados vs ${failedCount} reprobados` },
     { 'Métrica / Indicador': 'Colaboradores que Requieren Re-capacitación', 'Valor': retrainingCount, 'Detalle Operativo': 'Requerimiento señalado por el instructor' },
     { 'Métrica / Indicador': 'Competencias / Habilidades Evaluadas', 'Valor': (event.skillsEvaluated || []).join(', ') || 'Evaluación estándar', 'Detalle Operativo': 'Criterios de evaluación definidos en el programa' },
-    { 'Métrica / Indicador': 'Top Debilidades / Brechas Identificadas', 'Valor': topGapsSummary, 'Detalle Operativo': 'Focos de atención para el seguimiento OJT' },
+    { 'Métrica / Indicador': 'Top Debilidades / Brechas Identificadas', 'Valor': topGapsSummary, 'Detalle Operativo': 'Focos de atención para el seguimiento en campo' },
     { 'Métrica / Indicador': 'Fecha de Generación del Reporte', 'Valor': new Date().toLocaleString(), 'Detalle Operativo': 'Plataforma CapacitaHub Claro / GAES' }
   ];
 
@@ -1532,13 +1532,13 @@ export const exportSessionGradesForOjtAndCalibration = (
     { wch: 30 }, { wch: 18 }, { wch: 35 }, { wch: 24 }, { wch: 20 }
   ];
 
-  XLSX.utils.book_append_sheet(wb, wsOjt, 'Insumo Bitácoras OJT');
+  XLSX.utils.book_append_sheet(wb, wsOjt, 'Insumo Bitácoras de Campo');
   XLSX.utils.book_append_sheet(wb, wsCalib, 'Insumo Mesas Calibración');
   XLSX.utils.book_append_sheet(wb, wsStats, 'Estadísticas de Sesión');
   XLSX.utils.book_append_sheet(wb, wsDetail, 'Calificaciones Detalladas');
 
   const safeEventTitle = event.title.slice(0, 25).replace(/[^a-zA-Z0-9_-]/g, '_');
-  XLSX.writeFile(wb, `Reporte_OJT_Calibracion_${safeEventTitle}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  XLSX.writeFile(wb, `Reporte_Bitacoras_Calibracion_${safeEventTitle}_${new Date().toISOString().slice(0, 10)}.xlsx`);
 };
 
 /**
@@ -1654,7 +1654,7 @@ export const exportDncReportToExcel = (
       recomendacion = 'Se recomienda programar módulos propedéuticos y talleres de nivelación previa para fortalecer fundamentos.';
     } else if (item.level.includes('Universitario') || item.level.includes('Profesional')) {
       diagnostico = 'Alto desempeño técnico y velocidad de asimilación';
-      recomendacion = 'Perfil idóneo para cursos avanzados, certificaciones especializadas y liderazgo de proyectos OJT.';
+      recomendacion = 'Perfil idóneo para cursos avanzados, certificaciones especializadas y liderazgo de proyectos de mejora en campo.';
     }
 
     return {
@@ -1686,7 +1686,7 @@ export const exportDncReportToExcel = (
   ];
 
   // -----------------------------------------------------------------
-  // HOJA 4: DIRECTORIO DE ESTUDIANTES ACTIVOS & SINERGIA OJT
+  // HOJA 4: DIRECTORIO DE ESTUDIANTES ACTIVOS & SINERGIA FORMATIVA
   // -----------------------------------------------------------------
   const sheet4Data = activeStudents.map((s, idx) => ({
     'No.': idx + 1,
@@ -1701,7 +1701,7 @@ export const exportDncReportToExcel = (
     'Teléfono': s.phone || 'N/A',
     'Dirección': s.currentAddress || 'N/A',
     'Áreas de Interés Formativo': (s.trainingInterestAreas || []).join(', ') || 'General',
-    'Oportunidad Sinergia OJT (70-20-10)': `Alinear asignaciones de campo con sus estudios de ${s.currentStudyField || 'su carrera'}`
+    'Oportunidad Sinergia Formativa (70-20-10)': `Alinear asignaciones de campo con sus estudios de ${s.currentStudyField || 'su carrera'}`
   }));
 
   const wsStudents = XLSX.utils.json_to_sheet(sheet4Data);
@@ -1725,7 +1725,7 @@ export const exportDncReportToExcel = (
   XLSX.utils.book_append_sheet(wb, wsSummary, 'Resumen Ejecutivo DNC');
   XLSX.utils.book_append_sheet(wb, wsDncMatrix, 'Matriz DNC Demanda');
   XLSX.utils.book_append_sheet(wb, wsCorrelation, 'Correlación Rendimiento');
-  XLSX.utils.book_append_sheet(wb, wsStudents, 'Estudiantes Activos OJT');
+  XLSX.utils.book_append_sheet(wb, wsStudents, 'Estudiantes Activos');
 
   const fileName = `Informe_Ejecutivo_DNC_${dateToday}.xlsx`;
   XLSX.writeFile(wb, fileName);

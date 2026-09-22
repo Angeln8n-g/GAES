@@ -33,6 +33,8 @@ services:
       NODE_ENV: production
       PORT: 5000
       DATABASE_URL: postgresql://postgres:postgrespassword@postgres:5432/capacitahub_db
+      JWT_SECRET: ${JWT_SECRET:-gaes_super_secret_jwt_key_2026}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3020,http://127.0.0.1:3020}
     ports:
       - "127.0.0.1:3021:5000"
     volumes:

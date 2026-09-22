@@ -33,7 +33,7 @@ import {
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { TrainingEvent, UserAccount, Slot, Schedule, TrainingProgram, ParticipantGroup, Participant, Company, ExternalTraining, TechnicalAcademyHistoryRecord } from '../../types';
-import { formatDateLong, formatDateShort, formatCedula, getEventDurationMetrics } from '../../utils/formatters';
+import { formatDateLong, formatDateShort, formatCedula, getEventDurationMetrics, isSafeHttpUrl } from '../../utils/formatters';
 import { downloadIcsFile, getGoogleCalendarUrl } from '../../utils/icsUtils';
 import { FormalLetterModal, TrainingHistoryRecord } from '../history/FormalLetterModal';
 import { TechnicalPinCheckinModal } from './TechnicalPinCheckinModal';
@@ -1335,9 +1335,9 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                             </div>
                             <div className="flex items-center justify-between gap-1">
                               <p className="line-clamp-1 text-slate-900 font-extrabold text-xs">{rec.title}</p>
-                              {rec.credentialUrl && (
+                              {isSafeHttpUrl(rec.credentialUrl) && (
                                 <a
-                                  href={rec.credentialUrl}
+                                  href={rec.credentialUrl!}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="text-blue-600 hover:text-blue-800 text-[10px] font-bold shrink-0 inline-flex items-center gap-0.5"

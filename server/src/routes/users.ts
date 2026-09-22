@@ -2,8 +2,7 @@ import { Router, Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { pool } from "../db.js";
-
-const JWT_SECRET = process.env.JWT_SECRET || "gaes_super_secret_jwt_key_2026";
+import { JWT_SECRET } from "../middlewares/auth.js";
 
 export const usersRouter = Router();
 
@@ -164,11 +163,27 @@ usersRouter.get("/", async (req: Request, res: Response) => {
 
 // POST /api/users/bulk
 usersRouter.post("/bulk", async (req: Request, res: Response) => {
+  const reqUser = req.user;
+  const isSuperAdmin = reqUser?.role === "Super Administrador";
+  const isAdminEditor = reqUser?.role === "Administrador / Editor";
+
+  if (!isSuperAdmin && !isAdminEditor) {
+    return res.status(403).json({
+      error: "Acceso denegado: Se requieren permisos administrativos para importación o modificación masiva de usuarios."
+    });
+  }
+
   const client = await pool.connect();
   try {
     const { users } = req.body;
     if (!Array.isArray(users)) {
       return res.status(400).json({ error: "Formato inválido. Se espera una lista de usuarios." });
+    }
+
+    if (!isSuperAdmin && users.some(u => u && u.role === "Super Administrador")) {
+      return res.status(403).json({
+        error: "Acceso denegado: Sólo un Super Administrador puede asignar o importar usuarios con dicho rol."
+      });
     }
 
     await client.query("BEGIN");
@@ -342,6 +357,17 @@ usersRouter.post("/bulk", async (req: Request, res: Response) => {
 
 // PUT /api/users/:id
 usersRouter.put("/:id", async (req: Request, res: Response) => {
+  const reqUser = req.user;
+  const isSuperAdmin = reqUser?.role === "Super Administrador";
+  const isAdminEditor = reqUser?.role === "Administrador / Editor";
+  const isOwner = String(reqUser?.id) === String(req.params.id);
+
+  if (!isSuperAdmin && !isAdminEditor && !isOwner) {
+    return res.status(403).json({
+      error: "Acceso denegado: No tienes permiso para modificar este usuario."
+    });
+  }
+
   const client = await pool.connect();
   try {
     const { id } = req.params;
@@ -353,18 +379,51 @@ usersRouter.put("/:id", async (req: Request, res: Response) => {
     } = req.body;
 
     if (!name || !email) {
+      client.release();
       return res.status(400).json({ error: "Nombre y correo son obligatorios." });
+    }
+
+    // Consultar estado previo del usuario para capturar datos anteriores y validar permisos
+    const previousUserRes = await client.query(
+      "SELECT id, email, role, cedula, employment_status, is_active, company_id FROM users_simulated WHERE id = $1",
+      [id]
+    );
+
+    if (previousUserRes.rows.length === 0) {
+      client.release();
+      return res.status(404).json({ error: "Usuario no encontrado." });
+    }
+
+    const previousUser = previousUserRes.rows[0];
+
+    // Reglas de protección contra escalada de privilegios y edición no autorizada:
+    if (!isSuperAdmin) {
+      // Un no-SuperAdmin no puede modificar a un Super Administrador
+      if (previousUser.role === "Super Administrador") {
+        client.release();
+        return res.status(403).json({ error: "Acceso denegado: No tienes permiso para modificar a un Super Administrador." });
+      }
+      // Un no-SuperAdmin no puede asignar el rol de Super Administrador
+      if (role === "Super Administrador") {
+        client.release();
+        return res.status(403).json({ error: "Acceso denegado: Sólo un Super Administrador puede asignar dicho rol." });
+      }
+      // Un usuario común (no admin) no puede modificar su propio rol
+      if (!isAdminEditor && role && role !== previousUser.role) {
+        client.release();
+        return res.status(403).json({ error: "Acceso denegado: No tienes permiso para modificar tu rol." });
+      }
     }
 
     const cleanEmail = email.trim().toLowerCase();
     const cleanName = name.trim();
-    const cleanRole = role || "Colaborador (User)";
+    const cleanRole = (isSuperAdmin || isAdminEditor) ? (role || previousUser.role) : previousUser.role;
     const cleanCedula = cedula ? cedula.trim() : null;
     const cleanDept = department ? department.trim() : null;
-    const cleanCards = Array.isArray(assignedMemberCards) ? assignedMemberCards : null;
-    const cleanEmpStatus = employmentStatus || 'contratado';
-    const cleanIsActive = isActive !== undefined ? Boolean(isActive) : true;
-    const cleanCompanyId = companyId ? companyId.trim() : 'emp_kasino';
+    const cleanCards = (isSuperAdmin || isAdminEditor) ? (Array.isArray(assignedMemberCards) ? assignedMemberCards : null) : null;
+    const cleanEmpStatus = (isSuperAdmin || isAdminEditor) ? (employmentStatus || previousUser.employment_status || 'contratado') : (previousUser.employment_status || 'contratado');
+    const cleanIsActive = (isSuperAdmin || isAdminEditor) ? (isActive !== undefined ? Boolean(isActive) : true) : Boolean(previousUser.is_active);
+    const cleanCompanyId = (isSuperAdmin || isAdminEditor) ? (companyId ? companyId.trim() : 'emp_kasino') : (previousUser.company_id || 'emp_kasino');
     const cleanBirthDate = birthDate ? birthDate.trim() : null;
     const cleanEduLevel = educationLevel ? educationLevel.trim() : null;
     const cleanStudying = Boolean(isCurrentlyStudying);
@@ -378,41 +437,18 @@ usersRouter.put("/:id", async (req: Request, res: Response) => {
     const cleanCompleted = profileCompleted !== undefined ? Boolean(profileCompleted) : (Boolean(cleanEduLevel && cleanBirthDate));
 
     await client.query("BEGIN");
+    const oldEmail = previousUser.email ? previousUser.email.trim().toLowerCase() : null;
 
-    // Consultar estado previo del usuario para capturar email y cédula anteriores
-    const previousUserRes = await client.query(
-      "SELECT email, cedula FROM users_simulated WHERE id = $1",
-      [id]
-    );
-    const oldEmail = previousUserRes.rows[0]?.email ? previousUserRes.rows[0].email.trim().toLowerCase() : null;
-
-    let finalPasswordClause = "";
+    // Sólo Super Administrador puede sobrescribir contraseñas arbitrariamente en PUT /:id
+    const allowDirectPasswordChange = isSuperAdmin && password && password.trim();
     let finalParams: any[] = [];
+    let updateQuery = "";
 
-    if (password && password.trim()) {
+    if (allowDirectPasswordChange) {
       const trimmed = password.trim();
       const isAlreadyBcrypt = trimmed.startsWith("$2a$") || trimmed.startsWith("$2b$");
       const hashedPwd = isAlreadyBcrypt ? trimmed : bcrypt.hashSync(trimmed, 10);
-      finalPasswordClause = "password = $21,";
-      finalParams = [
-        cleanName, cleanEmail, cleanRole, cleanCedula, 
-        cleanDept, cleanCards, cleanEmpStatus, cleanIsActive, cleanCompanyId, 
-        cleanBirthDate, cleanEduLevel, cleanStudying, cleanStudyField, cleanInstName, 
-        cleanProfTitle, cleanAddress, cleanPhone, cleanGender, cleanInterests, cleanCompleted,
-        hashedPwd, id
-      ];
-    } else {
-      finalParams = [
-        cleanName, cleanEmail, cleanRole, cleanCedula, 
-        cleanDept, cleanCards, cleanEmpStatus, cleanIsActive, cleanCompanyId, 
-        cleanBirthDate, cleanEduLevel, cleanStudying, cleanStudyField, cleanInstName, 
-        cleanProfTitle, cleanAddress, cleanPhone, cleanGender, cleanInterests, cleanCompleted,
-        id
-      ];
-    }
-
-    const updateQuery = password && password.trim()
-      ? `UPDATE users_simulated 
+      updateQuery = `UPDATE users_simulated 
          SET name = $1, 
              email = $2, 
              role = $3, 
@@ -434,8 +470,16 @@ usersRouter.put("/:id", async (req: Request, res: Response) => {
              training_interest_areas = $19, 
              profile_completed = $20,
              password = $21
-         WHERE id = $22`
-      : `UPDATE users_simulated 
+         WHERE id = $22`;
+      finalParams = [
+        cleanName, cleanEmail, cleanRole, cleanCedula, 
+        cleanDept, cleanCards, cleanEmpStatus, cleanIsActive, cleanCompanyId, 
+        cleanBirthDate, cleanEduLevel, cleanStudying, cleanStudyField, cleanInstName, 
+        cleanProfTitle, cleanAddress, cleanPhone, cleanGender, cleanInterests, cleanCompleted,
+        hashedPwd, id
+      ];
+    } else {
+      updateQuery = `UPDATE users_simulated 
          SET name = $1, 
              email = $2, 
              role = $3, 
@@ -457,6 +501,14 @@ usersRouter.put("/:id", async (req: Request, res: Response) => {
              training_interest_areas = $19, 
              profile_completed = $20
          WHERE id = $21`;
+      finalParams = [
+        cleanName, cleanEmail, cleanRole, cleanCedula, 
+        cleanDept, cleanCards, cleanEmpStatus, cleanIsActive, cleanCompanyId, 
+        cleanBirthDate, cleanEduLevel, cleanStudying, cleanStudyField, cleanInstName, 
+        cleanProfTitle, cleanAddress, cleanPhone, cleanGender, cleanInterests, cleanCompleted,
+        id
+      ];
+    }
 
     await client.query(updateQuery, finalParams);
 
@@ -533,6 +585,17 @@ usersRouter.put("/:id", async (req: Request, res: Response) => {
 
 // PUT /api/users/:id/profile (Actualización directa de perfil de usuario)
 usersRouter.put("/:id/profile", async (req: Request, res: Response) => {
+  const reqUser = req.user;
+  const isSuperAdmin = reqUser?.role === "Super Administrador";
+  const isAdminEditor = reqUser?.role === "Administrador / Editor";
+  const isOwner = String(reqUser?.id) === String(req.params.id);
+
+  if (!isSuperAdmin && !isAdminEditor && !isOwner) {
+    return res.status(403).json({
+      error: "Acceso denegado: No tienes permiso para modificar el perfil de este usuario."
+    });
+  }
+
   const client = await pool.connect();
   try {
     const { id } = req.params;
@@ -648,20 +711,38 @@ usersRouter.put("/:id/password", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { currentPassword, newPassword } = req.body;
+    const reqUser = req.user;
 
-    if (!newPassword || !newPassword.trim()) {
-      return res.status(400).json({ error: "La nueva contraseña es requerida." });
+    if (!newPassword || typeof newPassword !== "string" || newPassword.trim().length < 6) {
+      return res.status(400).json({ error: "La nueva contraseña debe contener al menos 6 caracteres." });
     }
 
-    if (currentPassword) {
-      const userCheck = await pool.query("SELECT password FROM users_simulated WHERE id = $1", [id]);
-      if (userCheck.rows.length > 0) {
-        const dbPwd = userCheck.rows[0].password || "";
-        const isBcrypt = dbPwd.startsWith("$2a$") || dbPwd.startsWith("$2b$");
-        const isMatch = isBcrypt ? bcrypt.compareSync(currentPassword, dbPwd) : (dbPwd === currentPassword);
-        if (!isMatch) {
-          return res.status(401).json({ error: "La contraseña actual es incorrecta." });
-        }
+    const isSuperAdmin = reqUser?.role === "Super Administrador";
+    const isOwner = String(reqUser?.id) === String(id);
+
+    // Si no es el dueño de la cuenta ni un Super Administrador, denegar
+    if (!isOwner && !isSuperAdmin) {
+      return res.status(403).json({ error: "Acceso denegado: No tienes permiso para modificar la contraseña de otro usuario." });
+    }
+
+    const userCheck = await pool.query("SELECT id, email, password FROM users_simulated WHERE id = $1", [id]);
+    if (userCheck.rows.length === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado." });
+    }
+
+    const targetUser = userCheck.rows[0];
+
+    // Para el dueño de la cuenta (o no-SuperAdmin), exigir obligatoriamente currentPassword
+    if (isOwner || !isSuperAdmin) {
+      if (!currentPassword || typeof currentPassword !== "string" || !currentPassword.trim()) {
+        return res.status(400).json({ error: "Debe ingresar su contraseña actual." });
+      }
+
+      const dbPwd = targetUser.password || "";
+      const isBcrypt = dbPwd.startsWith("$2a$") || dbPwd.startsWith("$2b$");
+      const isMatch = isBcrypt ? bcrypt.compareSync(currentPassword, dbPwd) : (dbPwd === currentPassword);
+      if (!isMatch) {
+        return res.status(401).json({ error: "La contraseña actual es incorrecta." });
       }
     }
 
@@ -693,6 +774,21 @@ usersRouter.put("/:id/password", async (req: Request, res: Response) => {
 usersRouter.delete("/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const reqUser = req.user;
+
+    if (reqUser?.role !== "Super Administrador") {
+      return res.status(403).json({ error: "Acceso denegado: Sólo los Super Administradores pueden eliminar usuarios." });
+    }
+
+    if (String(reqUser.id) === String(id)) {
+      return res.status(400).json({ error: "No puedes eliminar tu propia cuenta de Super Administrador." });
+    }
+
+    const checkUser = await pool.query("SELECT id FROM users_simulated WHERE id = $1", [id]);
+    if (checkUser.rows.length === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado." });
+    }
+
     await pool.query("DELETE FROM users_simulated WHERE id = $1", [id]);
     const result = await pool.query(`
       SELECT 

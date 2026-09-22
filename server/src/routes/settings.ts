@@ -23,7 +23,7 @@ router.get('/', async (req: Request, res: Response) => {
   }
 });
 
-// PATCH /api/settings/ojt - Actualiza la configuración del Módulo OJT / Plan 90 Días
+// PATCH /api/settings/ojt - Actualiza la configuración del Módulo de Campo / Plan 90 Días
 router.patch('/ojt', async (req: Request, res: Response) => {
   try {
     const { enabled, enable_702010, enable_calibration, target_ttp_days, updated_by } = req.body;
@@ -46,7 +46,7 @@ router.patch('/ojt', async (req: Request, res: Response) => {
 
     await pool.query(
       `INSERT INTO system_settings (key, value, description, updated_at, updated_by)
-       VALUES ('ojt_plan_90d', $1, 'Control general del módulo de operaciones OJT y plan a 90 días', CURRENT_TIMESTAMP, $2)
+       VALUES ('ojt_plan_90d', $1, 'Control general del módulo de operaciones de campo y plan a 90 días', CURRENT_TIMESTAMP, $2)
        ON CONFLICT (key) DO UPDATE 
        SET value = $1, updated_at = CURRENT_TIMESTAMP, updated_by = $2`,
       [JSON.stringify(newValue), updated_by || 'Super Administrador']
@@ -54,11 +54,11 @@ router.patch('/ojt', async (req: Request, res: Response) => {
 
     res.json({
       success: true,
-      message: 'Configuración de módulo OJT actualizada correctamente.',
+      message: 'Configuración de módulo de campo actualizada correctamente.',
       ojt_plan_90d: newValue
     });
   } catch (err: any) {
-    console.error('Error al actualizar configuración OJT:', err);
+    console.error('Error al actualizar configuración de campo:', err);
     res.status(500).json({ error: 'Error al actualizar configuración.' });
   }
 });

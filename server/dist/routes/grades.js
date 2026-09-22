@@ -65,6 +65,11 @@ exports.gradesRouter.get('/', async (req, res) => {
 });
 // POST /api/grades (Guardar o actualizar calificación individual)
 exports.gradesRouter.post('/', async (req, res) => {
+    const reqUser = req.user;
+    const allowedRoles = ['Super Administrador', 'Administrador / Editor', 'Instructor / Evaluador', 'Líder de Área / Supervisor'];
+    if (!reqUser || !allowedRoles.includes(reqUser.role)) {
+        return res.status(403).json({ error: 'Acceso denegado: No tienes permisos para calificar participantes.' });
+    }
     const client = await db_js_1.pool.connect();
     try {
         const { id, eventId, participantCard, slotId, score, academicStatus, detectedSkillGaps, weaknessesNotes, strengthsNotes, needsRetraining, feedback, gradedBy, moduleGrades } = req.body;
@@ -173,6 +178,11 @@ exports.gradesRouter.post('/', async (req, res) => {
 });
 // POST /api/grades/bulk (Guardar lote de calificaciones para un evento)
 exports.gradesRouter.post('/bulk', async (req, res) => {
+    const reqUser = req.user;
+    const allowedRoles = ['Super Administrador', 'Administrador / Editor', 'Instructor / Evaluador', 'Líder de Área / Supervisor'];
+    if (!reqUser || !allowedRoles.includes(reqUser.role)) {
+        return res.status(403).json({ error: 'Acceso denegado: No tienes permisos para registrar calificaciones masivas.' });
+    }
     const client = await db_js_1.pool.connect();
     try {
         const { grades } = req.body;
@@ -275,6 +285,10 @@ exports.gradesRouter.post('/bulk', async (req, res) => {
 });
 // DELETE /api/grades/:id
 exports.gradesRouter.delete('/:id', async (req, res) => {
+    const reqUser = req.user;
+    if (!reqUser || !['Super Administrador', 'Administrador / Editor'].includes(reqUser.role)) {
+        return res.status(403).json({ error: 'Acceso denegado: Se requieren permisos administrativos para eliminar calificaciones.' });
+    }
     try {
         const { id } = req.params;
         await db_js_1.pool.query('DELETE FROM participant_grades WHERE id = $1', [id]);

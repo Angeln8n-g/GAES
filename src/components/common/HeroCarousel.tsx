@@ -24,8 +24,8 @@ const HERO_SLIDES: SlideItem[] = [
   {
     id: 2,
     title: "Técnicos de Campo & Redes de Última Milla",
-    subtitle: "Acompañamiento OJT continuo, instalación de soluciones Mesh, fibra óptica FTTH y protocolos First-Time Fix.",
-    tag: "Operaciones & Tutoría OJT",
+    subtitle: "Acompañamiento continuo, instalación de soluciones Mesh, fibra óptica FTTH y protocolos First-Time Fix.",
+    tag: "Operaciones & Tutoría",
     imageUrl: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1600&q=80",
     ctaText: "Ver Cursos de Redes",
     highlight: "Metodología 70-20-10"

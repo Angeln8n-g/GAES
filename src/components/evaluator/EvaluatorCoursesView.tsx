@@ -219,7 +219,7 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
               <span className="p-1 rounded-md bg-red-100/70 text-[#DA291C]">
                 <GraduationCap className="w-4 h-4" />
               </span>
-              <span>Portal de Facilitación & Tutoría OJT</span>
+              <span>Portal de Facilitación & Tutoría</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
               Cursos Asignados & Calificación Modular
@@ -342,7 +342,7 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
         </div>
       </div>
 
-      {/* Listado de Cursos Asignados (Academia Técnica + Eventos OJT) */}
+      {/* Listado de Cursos Asignados (Academia Técnica + Eventos de Formación) */}
       {filteredEvents.length > 0 || filteredTechnicalCohorts.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           
@@ -669,7 +669,7 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
             <p className="text-xs sm:text-sm text-slate-500">
               {searchQuery 
                 ? `No hay cursos asignados que coincidan con "${searchQuery}". Intenta ajustar el término de búsqueda.`
-                : 'Actualmente no tienes cursos o talleres asignados bajo tu usuario como Evaluador OJT o facilitador.'}
+                : 'Actualmente no tienes cursos o talleres asignados bajo tu usuario como Evaluador o facilitador.'}
             </p>
           </div>
         </div>
@@ -755,7 +755,7 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-500 font-semibold">Tutor OJT / Facilitador:</span>
+                    <span className="text-slate-500 font-semibold">Tutor / Facilitador:</span>
                     <span className="font-bold text-slate-800">
                       {courseToDeleteAssignment.ojtEvaluatorName || courseToDeleteAssignment.instructor || 'Por Asignar'}
                     </span>
@@ -791,7 +791,7 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
                 Selecciona cómo deseas proceder con la eliminación:
               </label>
 
-              {/* Opción 1: Desasignar Tutor OJT */}
+              {/* Opción 1: Desasignar Tutor */}
               <div
                 onClick={() => setDeleteAssignmentMode('unassign_evaluator')}
                 className={`p-3.5 rounded-2xl border transition-all cursor-pointer space-y-1 ${
@@ -803,14 +803,14 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 font-bold text-xs text-slate-900">
                     <CheckCircle2 className={`w-4 h-4 ${deleteAssignmentMode === 'unassign_evaluator' ? 'text-amber-600' : 'text-slate-400'}`} />
-                    <span>Desasignar Tutor / Evaluador OJT</span>
+                    <span>Desasignar Tutor / Evaluador</span>
                   </div>
                   <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
                     Recomendado
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-500 pl-6">
-                  Quita la asignación de tutoría de este curso. El evento permanece en el catálogo general y no se borran inscripciones ni asistencias, pero deja de figurar como curso asignado a este tutor OJT.
+                  Quita la asignación de tutoría de este curso. El evento permanece en el catálogo general y no se borran inscripciones ni asistencias, pero deja de figurar como curso asignado a este tutor.
                 </p>
               </div>
 
@@ -866,7 +866,7 @@ export const EvaluatorCoursesView: React.FC<EvaluatorCoursesViewProps> = ({
                       }
                       onShowToast(
                         'Asignación Eliminada',
-                        `Se ha retirado la tutoría OJT del curso "${courseToDeleteAssignment.title}".`,
+                        `Se ha retirado la tutoría del curso "${courseToDeleteAssignment.title}".`,
                         'success'
                       );
                     } else {

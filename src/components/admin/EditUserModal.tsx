@@ -254,12 +254,12 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
               <div className="relative">
                 <select
                   id="edit-user-role"
-                  value={role}
+                  value={role === 'Evaluador / Tutor OJT' ? 'Evaluador / Tutor' : role}
                   onChange={(e) => setRole(e.target.value as UserRole)}
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-[#DA291C] focus:bg-white font-bold cursor-pointer"
                 >
                   <option value="Colaborador (User)">Colaborador (User)</option>
-                  <option value="Evaluador / Tutor OJT">Evaluador / Tutor OJT</option>
+                  <option value="Evaluador / Tutor">Evaluador / Tutor</option>
                   <option value="Líder de Área / Supervisor">Líder de Área / Supervisor</option>
                   <option value="Administrador / Editor">Administrador / Editor</option>
                   {isSuperAdmin && (

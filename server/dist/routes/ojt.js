@@ -40,11 +40,11 @@ router.get('/checklists', async (req, res) => {
         res.json(result.rows);
     }
     catch (err) {
-        console.error('Error al obtener bitácoras OJT:', err);
-        res.status(500).json({ error: 'Error al consultar bitácoras OJT.' });
+        console.error('Error al obtener bitácoras de campo:', err);
+        res.status(500).json({ error: 'Error al consultar bitácoras de campo.' });
     }
 });
-// POST /api/ojt/checklists - Registra una nueva bitácora de campo OJT
+// POST /api/ojt/checklists - Registra una nueva bitácora de campo
 router.post('/checklists', async (req, res) => {
     try {
         const { id, companyId, participantCard, evaluatorUserId, evaluatorName, date, observationType, overallScore, operationalStatus, safetyProtocolPass, firstTimeFixPass, rubricEvaluation, weaknessesIdentified, immediateActionPlan, notes } = req.body;
@@ -79,7 +79,7 @@ router.post('/checklists', async (req, res) => {
             companyId || 'emp_kasino',
             participantCard,
             evaluatorUserId || 'usr_eval',
-            evaluatorName || 'Supervisor OJT',
+            evaluatorName || 'Supervisor de Campo',
             evaluationDate,
             observationType || 'daily_observation',
             score,
@@ -95,11 +95,11 @@ router.post('/checklists', async (req, res) => {
         res.status(201).json(result.rows[0]);
     }
     catch (err) {
-        console.error('Error al crear bitácora OJT:', err);
-        res.status(500).json({ error: 'Error al registrar bitácora OJT.' });
+        console.error('Error al crear bitácora de campo:', err);
+        res.status(500).json({ error: 'Error al registrar bitácora de campo.' });
     }
 });
-// DELETE /api/ojt/checklists/:id - Elimina una bitácora OJT
+// DELETE /api/ojt/checklists/:id - Elimina una bitácora
 router.delete('/checklists/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -107,7 +107,7 @@ router.delete('/checklists/:id', async (req, res) => {
         res.json({ success: true, message: 'Bitácora eliminada correctamente.' });
     }
     catch (err) {
-        console.error('Error al eliminar bitácora OJT:', err);
+        console.error('Error al eliminar bitácora de campo:', err);
         res.status(500).json({ error: 'Error al eliminar registro.' });
     }
 });
@@ -193,7 +193,7 @@ router.get('/metrics', async (req, res) => {
         const { companyId } = req.query;
         const filterComp = companyId && companyId !== 'all';
         const compParam = filterComp ? [companyId] : [];
-        // 1. Métricas OJT Checklists
+        // 1. Métricas Checklists de Campo
         const ojtStatsQuery = `
       SELECT 
         COUNT(*) AS total_checklists,
@@ -249,8 +249,8 @@ router.get('/metrics', async (req, res) => {
         });
     }
     catch (err) {
-        console.error('Error al calcular métricas OJT:', err);
-        res.status(500).json({ error: 'Error al calcular indicadores OJT.' });
+        console.error('Error al calcular métricas de campo:', err);
+        res.status(500).json({ error: 'Error al calcular indicadores de campo.' });
     }
 });
 exports.default = router;

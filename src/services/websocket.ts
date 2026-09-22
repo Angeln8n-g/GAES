@@ -11,14 +11,23 @@ class AttendanceWebSocketService {
   private isExplicitlyClosed = false;
 
   constructor() {
-    // Auto-conectar al instanciarse en entornos de navegador
-    if (typeof window !== 'undefined') {
-      this.connect();
+    // Auto-conectar al instanciarse en entornos de navegador solo si ya existe sesión autenticada
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      const token = localStorage.getItem('ch_token');
+      if (token) {
+        this.connect(token);
+      }
     }
   }
 
-  public connect(): void {
+  public connect(tokenOverride?: string): void {
     if (typeof window === 'undefined') return;
+
+    const token = tokenOverride || (typeof localStorage !== 'undefined' ? localStorage.getItem('ch_token') : null);
+    if (!token) {
+      return;
+    }
+
     if (this.socket && (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)) {
       return;
     }
@@ -26,7 +35,7 @@ class AttendanceWebSocketService {
     this.isExplicitlyClosed = false;
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.host;
-    const wsUrl = `${protocol}//${host}/ws`;
+    const wsUrl = `${protocol}//${host}/ws?token=${encodeURIComponent(token)}`;
 
     try {
       this.socket = new WebSocket(wsUrl);
@@ -67,6 +76,9 @@ class AttendanceWebSocketService {
 
   private scheduleReconnect(): void {
     if (this.isExplicitlyClosed) return;
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('ch_token') : null;
+    if (!token) return;
+
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       console.warn('Límite de reconexiones WebSocket alcanzado. Se reintentará en 60 segundos.');
       this.reconnectTimeout = setTimeout(() => {

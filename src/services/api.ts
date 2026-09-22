@@ -162,7 +162,7 @@ export const MOCK_EVENTS: TrainingEvent[] = [
     location: "Sala de Juntas B (Piso 3)",
     surveyUrl: "https://forms.office.com/r/react-ux-evaluation",
     ojtEvaluatorId: "usr_ojt",
-    ojtEvaluatorName: "Lic. Carlos Mendoza (Tutor OJT)",
+    ojtEvaluatorName: "Lic. Carlos Mendoza (Tutor)",
     ojtEvaluatorEmail: "tutor.ojt@empresa.com",
     modules: [
       { id: "mod_1", title: "Módulo 1: Fundamentos y Arquitectura UI", description: "Hooks avanzados, ciclo de vida y patrones de renderizado.", passingScore: 70, maxScore: 100, orderIndex: 1 },
@@ -309,7 +309,7 @@ export const MOCK_USERS: UserAccount[] = [
   { id: "usr_super", email: "superadmin@empresa.com", name: "Superusuario Principal", role: "Super Administrador", password: "admin", cedula: "402-2196163-1" },
   { id: "usr_1", email: "sofia.ceo@empresa.com", name: "Sofía Martínez", role: "Super Administrador", password: "123", cedula: "001-1928374-5" },
   { id: "usr_2", email: "admin.capacitacion@empresa.com", name: "Carlos Pérez", role: "Administrador / Editor", password: "123", cedula: "001-2837465-9" },
-  { id: "usr_ojt", email: "tutor.ojt@empresa.com", name: "Lic. Carlos Mendoza (Tutor OJT)", role: "Evaluador / Tutor OJT", password: "123", cedula: "001-9876543-1", department: "Operaciones" },
+  { id: "usr_ojt", email: "tutor.ojt@empresa.com", name: "Lic. Carlos Mendoza (Tutor)", role: "Evaluador / Tutor", password: "123", cedula: "001-9876543-1", department: "Operaciones" },
   { id: "usr_lead", email: "laura.lider@empresa.com", name: "Ing. Laura Gómez (Líder TI)", role: "Líder de Área / Supervisor", password: "123", cedula: "001-3847261-8", department: "Tecnología", assignedGroupIds: ["grp_ti"], assignedMemberCards: ["2010", "2012"] },
   { id: "usr_3", email: "juan.diez@empresa.com", name: "Juan Díez", role: "Colaborador (User)", password: "123", cedula: "031-1827364-0" },
   { id: "usr_4", email: "marta.perez@empresa.com", name: "Marta Pérez", role: "Colaborador (User)", password: "123", cedula: "223-8765432-1" }
@@ -382,6 +382,35 @@ export function getAuthHeaders(contentTypeJson: boolean = true): Record<string, 
     } catch (_) {}
   }
   return headers;
+}
+
+/**
+ * Helper para verificar respuestas 401 Unauthorized y limpiar la sesión caducada
+ */
+export function checkAuthError(res: Response): void {
+  if (res.status === 401) {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('ch_token');
+      localStorage.removeItem('ch_logged_user');
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('ch_auth_expired'));
+    }
+  }
+}
+
+/**
+ * Fetch wrapper que intercepta respuestas 401 y expira la sesión automáticamente
+ */
+export async function apiFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  const res = await fetch(input, init);
+  if (res.status === 401) {
+    const urlStr = typeof input === 'string' ? input : (input instanceof Request ? input.url : input.toString());
+    if (!urlStr.includes('/users/login')) {
+      checkAuthError(res);
+    }
+  }
+  return res;
 }
 
 // Inicializar almacenamiento local si no existe para el modo local
@@ -463,7 +492,9 @@ export const apiService = {
   async getEvents(companyId?: string): Promise<TrainingEvent[]> {
     if (isApiMode) {
       const query = companyId && companyId !== 'all' ? `?companyId=${encodeURIComponent(companyId)}` : '';
-      const res = await fetch(`${API_BASE_URL}/events${query}`);
+      const res = await apiFetch(`${API_BASE_URL}/events${query}`, {
+        headers: getAuthHeaders(false)
+      });
       if (!res.ok) throw new Error('Error al obtener eventos de Postgres');
       return res.json();
     } else {
@@ -479,7 +510,7 @@ export const apiService = {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/events/bulk`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(true),
         body: JSON.stringify({ events })
       });
       if (!res.ok) throw new Error('Error al importar eventos masivamente en Postgres');
@@ -492,7 +523,7 @@ export const apiService = {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/events`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(true),
         body: JSON.stringify(event)
       });
       if (!res.ok) throw new Error('Error al guardar evento en Postgres');
@@ -513,7 +544,8 @@ export const apiService = {
   async deleteEvent(eventId: string): Promise<TrainingEvent[]> {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/events/${eventId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getAuthHeaders(false)
       });
       if (!res.ok) throw new Error('Error al eliminar evento de Postgres');
       return this.getEvents();
@@ -534,7 +566,9 @@ export const apiService = {
       if (params?.companyId && params.companyId !== 'all') query.append('companyId', params.companyId);
       if (params?.needsRetraining) query.append('needsRetraining', 'true');
       
-      const res = await fetch(`${API_BASE_URL}/grades?${query.toString()}`);
+      const res = await fetch(`${API_BASE_URL}/grades?${query.toString()}`, {
+        headers: getAuthHeaders(false)
+      });
       if (!res.ok) throw new Error('Error al obtener calificaciones');
       return res.json();
     } else {
@@ -552,7 +586,7 @@ export const apiService = {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/grades`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(true),
         body: JSON.stringify(grade)
       });
       if (!res.ok) throw new Error('Error al guardar calificación');
@@ -590,7 +624,7 @@ export const apiService = {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/grades/bulk`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(true),
         body: JSON.stringify({ grades })
       });
       if (!res.ok) throw new Error('Error al guardar calificaciones masivamente');
@@ -606,7 +640,10 @@ export const apiService = {
 
   async deleteGrade(id: string): Promise<void> {
     if (isApiMode) {
-      const res = await fetch(`${API_BASE_URL}/grades/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE_URL}/grades/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(false)
+      });
       if (!res.ok) throw new Error('Error al eliminar calificación');
     } else {
       const grades: ParticipantGrade[] = safeJsonParse('ch_grades', []);
@@ -1219,7 +1256,7 @@ export const apiService = {
   async getUsers(companyId?: string): Promise<UserAccount[]> {
     if (isApiMode) {
       const query = companyId && companyId !== 'all' ? `?companyId=${encodeURIComponent(companyId)}` : '';
-      const res = await fetch(`${API_BASE_URL}/users${query}`, {
+      const res = await apiFetch(`${API_BASE_URL}/users${query}`, {
         headers: getAuthHeaders(false)
       });
       if (!res.ok) throw new Error('Error al obtener usuarios de la base de datos');
@@ -1246,14 +1283,17 @@ export const apiService = {
     }
   },
 
-  async changePassword(userId: string, newPassword: string): Promise<UserAccount[]> {
+  async changePassword(userId: string, newPassword: string, currentPassword?: string): Promise<UserAccount[]> {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/users/${userId}/password`, {
         method: 'PUT',
         headers: getAuthHeaders(true),
-        body: JSON.stringify({ newPassword })
+        body: JSON.stringify({ newPassword, currentPassword })
       });
-      if (!res.ok) throw new Error('Error al cambiar la contraseña en la base de datos');
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Error al cambiar la contraseña en la base de datos');
+      }
       return this.getUsers();
     } else {
       const users: UserAccount[] = safeJsonParse('ch_users', []);
@@ -1694,13 +1734,13 @@ export const apiService = {
         return await response.json();
       }
     } catch (e) {
-      console.warn('Fallo al actualizar settings de OJT en API:', e);
+      console.warn('Fallo al actualizar settings de campo en API:', e);
     }
     return { success: true, ojt_plan_90d: payload };
   },
 
   // ==========================================
-  // BITÁCORAS & CHECKLISTS OJT
+  // BITÁCORAS & CHECKLISTS DE CAMPO
   // ==========================================
   getOjtChecklists: async (companyId?: string): Promise<OjtChecklist[]> => {
     try {
@@ -1712,7 +1752,7 @@ export const apiService = {
         return await response.json();
       }
     } catch (e) {
-      console.warn('Fallo al obtener checklists OJT de API:', e);
+      console.warn('Fallo al obtener checklists de campo de API:', e);
     }
     return [];
   },
@@ -1725,7 +1765,7 @@ export const apiService = {
     });
     if (!response.ok) {
       const err = await response.json();
-      throw new Error(err.error || 'Error al guardar bitácora OJT');
+      throw new Error(err.error || 'Error al guardar bitácora de campo');
     }
     return await response.json();
   },
@@ -1736,7 +1776,7 @@ export const apiService = {
     });
     if (!response.ok) {
       const err = await response.json();
-      throw new Error(err.error || 'Error al eliminar bitácora OJT');
+      throw new Error(err.error || 'Error al eliminar bitácora de campo');
     }
   },
 
@@ -1781,7 +1821,7 @@ export const apiService = {
         return await response.json();
       }
     } catch (e) {
-      console.warn('Fallo al obtener métricas OJT de API:', e);
+      console.warn('Fallo al obtener métricas de campo de API:', e);
     }
     return {
       totalChecklists: 0,
@@ -1880,7 +1920,9 @@ export const apiService = {
 
   getTechnicalCourses: async (companyId?: string): Promise<TechnicalAcademyCourse[]> => {
     const qs = companyId ? `?companyId=${encodeURIComponent(companyId)}` : '';
-    const res = await fetch(`${API_BASE_URL}/technical-academy/courses${qs}`);
+    const res = await fetch(`${API_BASE_URL}/technical-academy/courses${qs}`, {
+      headers: getAuthHeaders(false)
+    });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error || 'Error al obtener cursos técnicos');
@@ -1914,7 +1956,9 @@ export const apiService = {
 
   getTechnicalCohorts: async (companyId?: string): Promise<TechnicalAcademyCohort[]> => {
     const qs = companyId ? `?companyId=${encodeURIComponent(companyId)}` : '';
-    const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts${qs}`);
+    const res = await apiFetch(`${API_BASE_URL}/technical-academy/cohorts${qs}`, {
+      headers: getAuthHeaders(false)
+    });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error || 'Error al obtener cohortes técnicas');
@@ -2156,7 +2200,9 @@ export const apiService = {
     if (email) params.append('email', email);
     if (companyId && companyId !== 'all') params.append('companyId', companyId);
     const qs = params.toString() ? `?${params.toString()}` : '';
-    const res = await fetch(`${API_BASE_URL}/technical-academy/history${qs}`);
+    const res = await apiFetch(`${API_BASE_URL}/technical-academy/history${qs}`, {
+      headers: getAuthHeaders(false)
+    });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error || 'Error al consultar historial de academia técnica');
@@ -2260,7 +2306,9 @@ export const apiService = {
   },
 
   getBackupDownloadUrl: (filename: string): string => {
-    return `${API_BASE_URL}/admin/backups/${encodeURIComponent(filename)}/download`;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('ch_token') : null;
+    const query = token ? `?token=${encodeURIComponent(token)}` : '';
+    return `${API_BASE_URL}/admin/backups/${encodeURIComponent(filename)}/download${query}`;
   }
 };
 

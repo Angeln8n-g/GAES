@@ -23,12 +23,41 @@ const externalTrainings_js_1 = require("./routes/externalTrainings.js");
 const technicalAcademy_js_1 = require("./routes/technicalAcademy.js");
 const backups_js_1 = require("./routes/backups.js");
 const backupService_js_1 = require("./services/backupService.js");
+const auth_js_1 = require("./middlewares/auth.js");
 const db_js_1 = require("./db.js");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5000;
+const configuredOrigins = (process.env.ALLOWED_ORIGINS || process.env.CORS_ORIGIN || '')
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+const defaultOrigins = [
+    'https://gaes.kasino21.com',
+    'http://gaes.kasino21.com',
+    'http://localhost:3020',
+    'http://127.0.0.1:3020',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000'
+];
+const allowedOrigins = configuredOrigins.length > 0 ? [...configuredOrigins, ...defaultOrigins] : defaultOrigins;
 // Middlewares
-app.use((0, cors_1.default)());
+app.use((0, cors_1.default)({
+    origin: (origin, callback) => {
+        if (!origin)
+            return callback(null, true);
+        if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+            return callback(null, true);
+        }
+        if (/^https?:\/\/(localhost|127\.0\.0\.1|gaes\.kasino21\.com)(:\d+)?$/.test(origin)) {
+            return callback(null, true);
+        }
+        return callback(new Error(`CORS bloqueado: origen ${origin} no autorizado.`));
+    },
+    credentials: true
+}));
 app.use(express_1.default.json());
 // Health Check
 app.get('/api/health', (_req, res) => {
@@ -38,24 +67,24 @@ app.get('/api/health', (_req, res) => {
         timestamp: new Date().toISOString()
     });
 });
-// Rutas de la API
+// Rutas de la API (Protección centralizada por token JWT)
 app.use('/api/companies', companies_js_1.companiesRouter);
 app.use('/api/settings', settings_js_1.default);
 app.use('/api/ojt', ojt_js_1.default);
-app.use('/api/events', events_js_1.eventsRouter);
-app.use('/api/grades', grades_js_1.gradesRouter);
+app.use('/api/events', auth_js_1.authenticateToken, events_js_1.eventsRouter);
+app.use('/api/grades', auth_js_1.authenticateToken, grades_js_1.gradesRouter);
 app.use('/api/participants', participants_js_1.participantsRouter);
 app.use('/api/registrations', registrations_js_1.registrationsRouter);
 app.use('/api/attendance', attendance_js_1.attendanceRouter);
-app.use('/api/users', users_js_1.usersRouter);
-app.use('/api/auth', users_js_1.usersRouter);
+app.use('/api/users', auth_js_1.authenticateToken, users_js_1.usersRouter);
+app.use('/api/auth', auth_js_1.authenticateToken, users_js_1.usersRouter);
 app.use('/api/feedback', feedback_js_1.feedbackRouter);
 app.use('/api/notifications', notifications_js_1.notificationsRouter);
 app.use('/api/groups', groups_js_1.groupsRouter);
 app.use('/api/programs', programs_js_1.programsRouter);
 app.use('/api/external-trainings', externalTrainings_js_1.externalTrainingsRouter);
-app.use('/api/technical-academy', technicalAcademy_js_1.technicalAcademyRouter);
-app.use('/api/admin', backups_js_1.adminBackupsRouter);
+app.use('/api/technical-academy', auth_js_1.authenticateToken, technicalAcademy_js_1.technicalAcademyRouter);
+app.use('/api/admin', auth_js_1.authenticateToken, backups_js_1.adminBackupsRouter);
 const http_1 = __importDefault(require("http"));
 const websocket_js_1 = require("./websocket.js");
 // Iniciar Servidor HTTP + WebSocket

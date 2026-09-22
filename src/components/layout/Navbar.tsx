@@ -74,7 +74,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   if (!currentUser) return null;
 
   const isSuperAdmin = currentUser.role === 'Super Administrador';
-  const isOjtUser = currentUser.role === 'Evaluador / Tutor OJT';
+  const isOjtUser = currentUser.role === 'Evaluador / Tutor' || currentUser.role === 'Evaluador / Tutor OJT';
   const isAdminOrSuper = isSuperAdmin || currentUser.role === 'Administrador / Editor';
   const isLeaderOrAdmin = isAdminOrSuper || currentUser.role === 'Líder de Área / Supervisor';
   const canAccessOjt = isSuperAdmin || isOjtUser;
@@ -97,7 +97,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     if (isOjtUser) {
       return (
         <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-purple-50 text-purple-700 border border-purple-200 flex items-center gap-1">
-          <Activity className="w-3 h-3 text-purple-600" /> Tutor OJT
+          <Activity className="w-3 h-3 text-purple-600" /> Tutor / Evaluador
         </span>
       );
     }
@@ -166,9 +166,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>Sistema en Línea</span>
             </div>
-            <span className="text-slate-400 hidden md:inline text-[11px]">
-              Centro de Aprendizaje & Acompañamiento OJT
-            </span>
           </div>
 
         </div>
@@ -293,7 +290,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }`}
                 >
                   <Activity className="w-4 h-4" />
-                  <span>Bitácoras & OJT</span>
+                  <span>Bitácoras de Campo</span>
                 </button>
               )}
 
@@ -698,7 +695,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <div className="flex items-center gap-3">
                   <Activity className="w-4 h-4" />
-                  <span>Bitácoras OJT & Mesas Calibración</span>
+                  <span>Bitácoras de Campo & Mesas de Calibración</span>
                 </div>
                 <ChevronRight className="w-4 h-4 opacity-70" />
               </button>

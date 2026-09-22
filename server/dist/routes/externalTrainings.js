@@ -8,6 +8,18 @@ const express_1 = require("express");
 const db_js_1 = require("../db.js");
 const crypto_1 = __importDefault(require("crypto"));
 exports.externalTrainingsRouter = (0, express_1.Router)();
+/**
+ * Validador estricto de URLs para mitigar XSS almacenado (Stored XSS).
+ * Sólo permite esquemas http:// y https://.
+ */
+function isValidHttpUrl(url) {
+    if (!url || typeof url !== 'string')
+        return false;
+    const trimmed = url.trim();
+    if (!trimmed)
+        return false;
+    return /^https?:\/\//i.test(trimmed);
+}
 // GET /api/external-trainings - Listar capacitaciones externas con filtros opcionales
 exports.externalTrainingsRouter.get('/', async (req, res) => {
     try {
@@ -161,7 +173,20 @@ exports.externalTrainingsRouter.post('/bulk', async (req, res) => {
             const programCategory = item.programCategory || 'Capacitacion_tecnologica_digital';
             const subprogram = item.subprogram || 'Desarrollo de software';
             const description = item.description || '';
-            const credentialUrl = item.credentialUrl || null;
+            let cleanCredentialUrl = null;
+            if (item.credentialUrl && typeof item.credentialUrl === 'string') {
+                const trimmedUrl = item.credentialUrl.trim();
+                if (trimmedUrl) {
+                    if (!isValidHttpUrl(trimmedUrl)) {
+                        await client.query('ROLLBACK');
+                        return res.status(400).json({
+                            error: `URL de credencial no válida (${trimmedUrl}). Sólo se permiten URLs seguras con protocolo http:// o https://.`
+                        });
+                    }
+                    cleanCredentialUrl = trimmedUrl;
+                }
+            }
+            const credentialUrl = cleanCredentialUrl;
             const certificateNumber = item.certificateNumber || null;
             const score = item.score !== undefined && item.score !== null && item.score !== '' ? Number(item.score) : null;
             const academicStatus = item.academicStatus || 'passed';
@@ -240,6 +265,18 @@ exports.externalTrainingsRouter.post('/', async (req, res) => {
         if (!title || !startDate || !endDate) {
             return res.status(400).json({ error: 'El título, fecha de inicio y fecha de fin son obligatorios.' });
         }
+        let cleanCredentialUrl = null;
+        if (credentialUrl && typeof credentialUrl === 'string') {
+            const trimmedUrl = credentialUrl.trim();
+            if (trimmedUrl) {
+                if (!isValidHttpUrl(trimmedUrl)) {
+                    return res.status(400).json({
+                        error: `URL de credencial no válida (${trimmedUrl}). Sólo se permiten URLs seguras con protocolo http:// o https://.`
+                    });
+                }
+                cleanCredentialUrl = trimmedUrl;
+            }
+        }
         // Unificar lista de participantes a los que aplica
         let cards = [];
         if (Array.isArray(participantCards) && participantCards.length > 0) {
@@ -284,7 +321,7 @@ exports.externalTrainingsRouter.post('/', async (req, res) => {
                 Number(totalHours) || 1,
                 supplier || 'Externo',
                 description || '',
-                credentialUrl || null,
+                cleanCredentialUrl,
                 certificateNumber || null,
                 score !== null && score !== undefined && score !== '' ? Number(score) : null,
                 academicStatus || 'passed',
@@ -356,13 +393,21 @@ exports.externalTrainingsRouter.put('/:id', async (req, res) => {
             updates.push(`supplier = $${paramIndex++}`);
             values.push(supplier);
         }
-        if (description !== undefined) {
-            updates.push(`description = $${paramIndex++}`);
-            values.push(description);
-        }
         if (credentialUrl !== undefined) {
+            let cleanCredentialUrl = null;
+            if (credentialUrl && typeof credentialUrl === 'string') {
+                const trimmedUrl = credentialUrl.trim();
+                if (trimmedUrl) {
+                    if (!isValidHttpUrl(trimmedUrl)) {
+                        return res.status(400).json({
+                            error: `URL de credencial no válida (${trimmedUrl}). Sólo se permiten URLs seguras con protocolo http:// o https://.`
+                        });
+                    }
+                    cleanCredentialUrl = trimmedUrl;
+                }
+            }
             updates.push(`credential_url = $${paramIndex++}`);
-            values.push(credentialUrl || null);
+            values.push(cleanCredentialUrl);
         }
         if (certificateNumber !== undefined) {
             updates.push(`certificate_number = $${paramIndex++}`);

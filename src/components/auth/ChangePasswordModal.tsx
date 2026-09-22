@@ -85,10 +85,10 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
     setIsLoading(true);
 
     try {
-      await apiService.changePassword(currentUser.id, newPassword);
-      const updatedUser = { ...currentUser, password: newPassword };
-      localStorage.setItem('ch_logged_user', JSON.stringify(updatedUser));
-      onSuccess(updatedUser, 'Tu contraseña ha sido actualizada exitosamente.');
+      await apiService.changePassword(currentUser.id, newPassword, currentPassword);
+      const { password: _, ...cleanUser } = currentUser;
+      localStorage.setItem('ch_logged_user', JSON.stringify(cleanUser));
+      onSuccess(cleanUser, 'Tu contraseña ha sido actualizada exitosamente.');
       onClose();
     } catch (err: any) {
       setError(err.message || 'Error al cambiar la contraseña.');

@@ -8,8 +8,7 @@ const websocket_js_1 = require("../websocket.js");
 exports.technicalAcademyRouter = (0, express_1.Router)();
 // Validador de permisos: sólo el Super Administrador puede crear, modificar o eliminar cursos y cohortes
 function checkAdminPermission(req, res) {
-    const role = (req.headers['x-user-role'] || req.body?.userRole);
-    if (role && role !== 'Super Administrador') {
+    if (!req.user || req.user.role !== 'Super Administrador') {
         res.status(403).json({
             error: 'Acceso denegado: sólo el Super Administrador tiene permiso para gestionar la Academia Técnica.'
         });
@@ -1084,20 +1083,20 @@ const handleSaveGrades = async (req, res) => {
             return res.status(404).json({ error: 'Cohorte no encontrada' });
         }
         const cohort = cohortRes.rows[0];
-        const role = (req.headers['x-user-role'] || req.body?.userRole);
-        const userId = ((req.headers['x-user-id'] || req.body?.userId) || '').trim();
-        const userEmail = ((req.headers['x-user-email'] || req.body?.userEmail) || '').toLowerCase().trim();
-        const userName = ((req.headers['x-user-name'] || req.body?.userName) || '').toLowerCase().trim();
+        const reqUser = req.user;
+        const isSuperAdmin = reqUser?.role === 'Super Administrador';
+        const userId = reqUser?.id ? String(reqUser.id).trim() : '';
+        const userEmail = reqUser?.email ? reqUser.email.toLowerCase().trim() : '';
+        const userName = reqUser?.name ? reqUser.name.toLowerCase().trim() : '';
         // Permisos: Super Administrador O facilitador asignado a la cohorte
-        const isSuperAdmin = role === 'Super Administrador' || !role;
-        const isCohortFacilitator = (cohort.facilitator_id && cohort.facilitator_id === userId) ||
+        const isCohortFacilitator = Boolean((cohort.facilitator_id && cohort.facilitator_id === userId) ||
             (cohort.facilitator_email && cohort.facilitator_email.toLowerCase().trim() === userEmail) ||
-            (cohort.facilitator_name && cohort.facilitator_name.toLowerCase().trim() === userName);
+            (cohort.facilitator_name && cohort.facilitator_name.toLowerCase().trim() === userName));
         if (!isSuperAdmin && !isCohortFacilitator) {
             await client.query('ROLLBACK');
             return res.status(403).json({ error: 'Acceso denegado: solo el facilitador asignado o el Super Administrador pueden asentar calificaciones.' });
         }
-        const evaluator = gradedBy || req.headers['x-user-name'] || cohort.facilitator_name || 'Facilitador Técnico';
+        const evaluator = reqUser?.name || gradedBy || cohort.facilitator_name || 'Facilitador Técnico';
         let updatedCount = 0;
         for (const g of grades) {
             const { participantCard, score, academicStatus, feedback } = g;

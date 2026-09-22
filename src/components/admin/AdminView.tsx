@@ -350,7 +350,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
               </button>
             )}
 
-            {settings?.ojt_plan_90d?.enabled !== false && (isSuperAdmin || currentUser?.role === 'Evaluador / Tutor OJT') && (
+            {settings?.ojt_plan_90d?.enabled !== false && (isSuperAdmin || currentUser?.role === 'Evaluador / Tutor' || currentUser?.role === 'Evaluador / Tutor OJT') && (
               <button
                 role="tab"
                 aria-selected={adminTab === 'ojt'}
@@ -362,7 +362,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
                 }`}
               >
                 <Activity className="w-4 h-4 shrink-0" />
-                <span>OJT & Campo</span>
+                <span>Acompañamiento & Campo</span>
                 <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-bold leading-none ${
                   adminTab === 'ojt' ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-600'
                 }`}>
@@ -566,7 +566,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
         />
       )}
 
-      {adminTab === 'ojt' && settings?.ojt_plan_90d?.enabled !== false && (isSuperAdmin || currentUser?.role === 'Evaluador / Tutor OJT') && (
+      {adminTab === 'ojt' && settings?.ojt_plan_90d?.enabled !== false && (isSuperAdmin || currentUser?.role === 'Evaluador / Tutor' || currentUser?.role === 'Evaluador / Tutor OJT') && (
         <OjtManager
           checklists={scopedChecklists}
           calibrations={scopedCalibrations}

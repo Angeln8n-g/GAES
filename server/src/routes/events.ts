@@ -231,6 +231,13 @@ eventsRouter.get('/', async (req: Request, res: Response) => {
 
 // POST /api/events (Crear o Actualizar)
 eventsRouter.post('/', async (req: Request, res: Response) => {
+  const reqUser = req.user;
+  if (!reqUser || !['Super Administrador', 'Administrador / Editor'].includes(reqUser.role)) {
+    return res.status(403).json({
+      error: 'Acceso denegado: Se requieren permisos administrativos para crear o modificar eventos.'
+    });
+  }
+
   const client = await pool.connect();
   try {
     const event = req.body;
@@ -370,6 +377,13 @@ eventsRouter.post('/', async (req: Request, res: Response) => {
 
 // DELETE /api/events/:id
 eventsRouter.delete('/:id', async (req: Request, res: Response) => {
+  const reqUser = req.user;
+  if (!reqUser || !['Super Administrador', 'Administrador / Editor'].includes(reqUser.role)) {
+    return res.status(403).json({
+      error: 'Acceso denegado: Se requieren permisos administrativos para eliminar eventos.'
+    });
+  }
+
   try {
     const { id } = req.params;
     await pool.query(`DELETE FROM events WHERE id = $1`, [id]);

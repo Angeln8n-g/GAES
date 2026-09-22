@@ -125,6 +125,7 @@ export const CohortFormModal: React.FC<CohortFormModalProps> = ({
     u.role === 'Super Administrador' || 
     u.role === 'Administrador / Editor' || 
     u.role === 'Líder de Área / Supervisor' || 
+    u.role === 'Evaluador / Tutor' ||
     u.role === 'Evaluador / Tutor OJT'
   );
 

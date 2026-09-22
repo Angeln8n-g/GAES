@@ -241,7 +241,7 @@ export const DemographicsOpportunitiesSection: React.FC<DemographicsOpportunitie
         category: 'Desarrollo de Carrera',
         title: `Alineación de Carrera: ${activeStudentsRate}% de la Fuerza Laboral está Estudiando`,
         description: `Existen ${activeStudents.length} colaboradores cursando activamente estudios técnicos o universitarios en áreas como: ${topStudyFields || 'tecnología y negocios'}.`,
-        recommendation: 'Diseñar planes de acompañamiento (Mentoring OJT) y alinear sus proyectos finales de titulación con mejoras reales a los procesos de la empresa para acelerar ascensos internos.',
+        recommendation: 'Diseñar planes de acompañamiento (Mentoring de Campo) y alinear sus proyectos finales de titulación con mejoras reales a los procesos de la empresa para acelerar ascensos internos.',
         impact: 'Estratégica',
         color: 'amber'
       });

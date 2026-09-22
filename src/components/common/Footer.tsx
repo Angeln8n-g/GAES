@@ -29,7 +29,7 @@ export const Footer: React.FC = () => {
 
             <div className="pt-2 flex items-center gap-2 text-[11px] text-emerald-400 font-semibold bg-emerald-950/40 border border-emerald-500/20 p-2.5 rounded-2xl">
               <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>Plataforma Oficial de Formación & Acompañamiento OJT</span>
+              <span>Plataforma Oficial de Formación & Acompañamiento</span>
             </div>
           </div>
 

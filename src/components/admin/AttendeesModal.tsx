@@ -470,9 +470,9 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                 </span>
               )}
               {event.ojtEvaluatorName && (
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1" title="Tutor / Evaluador OJT Responsable">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1" title="Tutor / Evaluador Responsable">
                   <UserCheck className="w-3 h-3 text-indigo-600" />
-                  <span>Tutor OJT: {event.ojtEvaluatorName}</span>
+                  <span>Tutor: {event.ojtEvaluatorName}</span>
                 </span>
               )}
             </div>
@@ -568,11 +568,11 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => exportSessionGradesForOjtAndCalibration(event, participants)}
-                    title="Descargar libro con 4 hojas: Insumo Bitácoras OJT, Mesas de Calibración, Estadísticas y Calificaciones"
+                    title="Descargar libro con 4 hojas: Insumo Bitácoras de Campo, Mesas de Calibración, Estadísticas y Calificaciones"
                     className="px-3 py-1.5 rounded-xl bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
                   >
                     <FileSpreadsheet className="w-3.5 h-3.5" />
-                    <span>Insumo OJT & Calibración (.xlsx)</span>
+                    <span>Insumo Bitácoras & Calibración (.xlsx)</span>
                   </button>
 
                   <button

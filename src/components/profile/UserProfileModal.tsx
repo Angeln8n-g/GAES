@@ -23,7 +23,7 @@ import {
   Building2
 } from 'lucide-react';
 import { UserAccount, Participant, EducationLevel, Gender, ExternalTraining } from '../../types';
-import { formatDateShort, formatCedula } from '../../utils/formatters';
+import { formatDateShort, formatCedula, isSafeHttpUrl } from '../../utils/formatters';
 import { getProgramShortName } from '../../constants/sustainabilityPrograms';
 import { AccessibleModal } from '../common/AccessibleModal';
 
@@ -763,16 +763,16 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                       )}
                     </div>
 
-                    {(t.credentialUrl || t.certificateNumber) && (
+                    {(isSafeHttpUrl(t.credentialUrl) || t.certificateNumber) && (
                       <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
                         {t.certificateNumber && (
                           <span className="text-slate-500 font-mono text-[10px]">
                             Folio: {t.certificateNumber}
                           </span>
                         )}
-                        {t.credentialUrl && (
+                        {isSafeHttpUrl(t.credentialUrl) && (
                           <a
-                            href={t.credentialUrl}
+                            href={t.credentialUrl!}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-600 hover:text-blue-800 font-bold inline-flex items-center gap-1 cursor-pointer ml-auto"

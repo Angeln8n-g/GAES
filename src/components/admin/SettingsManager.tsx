@@ -61,8 +61,8 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({
       onShowToast(
         'Configuración guardada',
         enabled 
-          ? 'Módulo de Operaciones OJT & Plan a 90 Días activado correctamente.'
-          : 'Módulo de Operaciones OJT desactivado. La plataforma operará en modo estándar.',
+          ? 'Módulo de Operaciones de Campo & Plan a 90 Días activado correctamente.'
+          : 'Módulo de Operaciones de Campo desactivado. La plataforma operará en modo estándar.',
         'success'
       );
     } catch (err: any) {
@@ -99,7 +99,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({
         </button>
       </div>
 
-      {/* Main Feature Flag Card: OJT & 90-Day Plan */}
+      {/* Main Feature Flag Card: Field Ops & 90-Day Plan */}
       <div className={`p-6 rounded-3xl border transition-all ${
         enabled 
           ? 'bg-white border-[#DA291C]/40 shadow-sm' 
@@ -114,7 +114,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2.5">
-                <h3 className="text-base font-black text-slate-900">Módulo de Operaciones OJT & Plan a 90 Días</h3>
+                <h3 className="text-base font-black text-slate-900">Módulo de Operaciones de Campo & Plan a 90 Días</h3>
                 <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wide uppercase ${
                   enabled 
                     ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
@@ -124,7 +124,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed">
-                Habilita el seguimiento en campo mediante <strong className="text-slate-800">Checklists Digitales OJT</strong>, cronogramas bajo el <strong className="text-slate-800">Modelo 70-20-10</strong>, <strong className="text-slate-800">Mesas de Calibración Ops-Capacitación</strong> y métricas de aceleración del <strong className="text-slate-800">Time to Productivity (TTP)</strong>.
+                Habilita el seguimiento en campo mediante <strong className="text-slate-800">Checklists Digitales de Campo</strong>, cronogramas bajo el <strong className="text-slate-800">Modelo 70-20-10</strong>, <strong className="text-slate-800">Mesas de Calibración Ops-Capacitación</strong> y métricas de aceleración del <strong className="text-slate-800">Time to Productivity (TTP)</strong>.
               </p>
             </div>
           </div>

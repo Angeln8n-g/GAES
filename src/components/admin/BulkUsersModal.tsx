@@ -436,7 +436,7 @@ export const BulkUsersModal: React.FC<BulkUsersModalProps> = ({
                       className="px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none"
                     >
                       <option value="Colaborador (User)">Colaborador (User)</option>
-                      <option value="Evaluador / Tutor OJT">Evaluador / Tutor OJT</option>
+                      <option value="Evaluador / Tutor">Evaluador / Tutor</option>
                       <option value="Líder de Área / Supervisor">Líder de Área / Supervisor</option>
                       <option value="Administrador / Editor">Administrador / Editor</option>
                       {isSuperAdmin && (

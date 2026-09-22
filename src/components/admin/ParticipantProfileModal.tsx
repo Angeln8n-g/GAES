@@ -31,6 +31,7 @@ import { Participant, UserAccount, TrainingEvent, TrainingProgram, Company, Part
 import { FormalLetterModal, TrainingHistoryRecord } from "../history/FormalLetterModal";
 import { getProgramShortName } from "../../constants/sustainabilityPrograms";
 import { AccessibleModal } from "../common/AccessibleModal";
+import { isSafeHttpUrl } from "../../utils/formatters";
 
 interface ParticipantProfileModalProps {
   participant: Participant | null;
@@ -672,9 +673,9 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                       <span className="px-2.5 py-1 rounded-xl bg-white border border-slate-200 text-slate-900 text-xs font-black shadow-2xs">
                         {ext.totalHours} hrs
                       </span>
-                      {ext.credentialUrl && (
+                      {isSafeHttpUrl(ext.credentialUrl) && (
                         <a
-                          href={ext.credentialUrl}
+                          href={ext.credentialUrl!}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:text-blue-800 p-1"

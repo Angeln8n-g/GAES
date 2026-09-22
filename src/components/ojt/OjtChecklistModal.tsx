@@ -108,7 +108,7 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
       companyId: selectedParticipant?.companyId || currentUser?.companyId || 'emp_kasino',
       participantCard,
       evaluatorUserId: currentUser?.id || 'usr_eval',
-      evaluatorName: currentUser?.name || 'Supervisor / OJT',
+      evaluatorName: currentUser?.name || 'Supervisor / Evaluador',
       date,
       observationType,
       overallScore,
@@ -125,14 +125,14 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
       setIsSubmitting(true);
       await onSave(payload);
       onShowToast(
-        isEditing ? 'Bitácora actualizada' : 'Bitácora OJT registrada',
+        isEditing ? 'Bitácora actualizada' : 'Bitácora registrada',
         `Evaluación para ${selectedParticipant?.name || participantCard} guardada con éxito (${overallScore}/100).`,
         'success'
       );
       onClose();
     } catch (err: any) {
       console.error(err);
-      onShowToast('Error al guardar', err.message || 'No se pudo registrar la bitácora OJT.', 'error');
+      onShowToast('Error al guardar', err.message || 'No se pudo registrar la bitácora.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -141,7 +141,7 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
   return (
     <AccessibleModal
       onClose={onClose}
-      ariaLabel={isEditing ? 'Editar Bitácora de Observación' : 'Nueva Bitácora y Checklist OJT'}
+      ariaLabel={isEditing ? 'Editar Bitácora de Observación' : 'Nueva Bitácora y Checklist'}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200"
     >
       <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
@@ -151,10 +151,10 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
           <div>
             <div className="flex items-center gap-2 text-xs font-bold text-[#DA291C] mb-0.5">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Acompañamiento en Campo (OJT)</span>
+              <span>Acompañamiento en Campo</span>
             </div>
             <h2 className="text-lg font-black text-slate-900">
-              {isEditing ? 'Editar Bitácora de Observación' : 'Nueva Bitácora & Checklist OJT'}
+              {isEditing ? 'Editar Bitácora de Observación' : 'Nueva Bitácora & Checklist'}
             </h2>
           </div>
           <button
@@ -212,7 +212,7 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
             </div>
           </div>
 
-          {/* Ficha Académica del Tutorado (Sinergia OJT) */}
+          {/* Ficha Académica del Tutorado (Sinergia Formativa) */}
           {selectedParticipant && (selectedParticipant.educationLevel || selectedParticipant.isCurrentlyStudying) && (
             <div className="p-3.5 bg-blue-50/80 border border-blue-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-2xs">
               <div className="flex items-center gap-2.5">
@@ -338,7 +338,7 @@ export const OjtChecklistModal: React.FC<OjtChecklistModalProps> = ({
               <p className="text-xs font-black">Diagnóstico Operativo Resultante</p>
               <p className="text-[11px] font-medium opacity-90">
                 {computedStatus === 'compliant' ? '🟢 Desempeño Conforme y Autónomo' :
-                 computedStatus === 'needs_coaching' ? '🟡 Requiere Coaching & Refuerzo OJT' :
+                 computedStatus === 'needs_coaching' ? '🟡 Requiere Coaching & Refuerzo' :
                  '🔴 Brecha Crítica (Pausar autonomía temporalmente)'}
               </p>
             </div>

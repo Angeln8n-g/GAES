@@ -9,7 +9,10 @@ const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const backupService_js_1 = require("../services/backupService.js");
 const migrator_js_1 = require("../migrator.js");
+const auth_js_1 = require("../middlewares/auth.js");
 exports.adminBackupsRouter = (0, express_1.Router)();
+// Exigir autenticación con rol de Super Administrador para todas las operaciones de respaldo y migraciones
+exports.adminBackupsRouter.use(auth_js_1.requireSuperAdmin);
 /**
  * GET /api/admin/backups
  * Lista todos los respaldos disponibles y sus metadatos
@@ -33,7 +36,7 @@ exports.adminBackupsRouter.get('/backups', async (_req, res) => {
  */
 exports.adminBackupsRouter.post('/backups', async (req, res) => {
     try {
-        const triggeredBy = req.body.triggeredBy || 'Super Administrador';
+        const triggeredBy = req.user?.email || req.user?.name || 'Super Administrador';
         const metadata = await (0, backupService_js_1.createDatabaseBackup)('manual_admin', triggeredBy);
         res.status(201).json({
             success: true,
@@ -98,7 +101,7 @@ exports.adminBackupsRouter.delete('/backups/:filename', async (req, res) => {
     try {
         const rawFilename = req.params.filename;
         const filename = path_1.default.basename(rawFilename);
-        const triggeredBy = req.body.triggeredBy || 'Super Administrador';
+        const triggeredBy = req.user?.email || req.user?.name || 'Super Administrador';
         await (0, backupService_js_1.deleteBackupFile)(filename, triggeredBy);
         res.json({
             success: true,
@@ -118,13 +121,14 @@ exports.adminBackupsRouter.post('/backups/:filename/restore', async (req, res) =
     try {
         const rawFilename = req.params.filename;
         const filename = path_1.default.basename(rawFilename);
-        const { confirm, triggeredBy } = req.body;
+        const { confirm } = req.body;
         if (confirm !== true) {
             return res.status(400).json({
                 error: 'Debe confirmar explícitamente la restauración enviando { confirm: true }.'
             });
         }
-        const result = await (0, backupService_js_1.restoreDatabaseBackup)(filename, triggeredBy || 'Super Administrador');
+        const triggeredBy = req.user?.email || req.user?.name || 'Super Administrador';
+        const result = await (0, backupService_js_1.restoreDatabaseBackup)(filename, triggeredBy);
         res.json({
             success: true,
             message: result.message,
