@@ -23,7 +23,8 @@ import {
   Wrench,
   Sun,
   Moon,
-  Monitor
+  Monitor,
+  Check
 } from 'lucide-react';
 import { UserAccount, TabView, Company } from '../../types';
 import { ThemePreference, getStoredThemePreference, setThemePreference } from '../../utils/theme';
@@ -65,6 +66,8 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [themePreference, setThemePrefState] = useState<ThemePreference>(() => getStoredThemePreference());
+  const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
+  const themeMenuRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     const handleThemeChangeExternal = (e: any) => {
@@ -75,6 +78,26 @@ export const Navbar: React.FC<NavbarProps> = ({
     window.addEventListener('ch_theme_changed', handleThemeChangeExternal);
     return () => window.removeEventListener('ch_theme_changed', handleThemeChangeExternal);
   }, []);
+
+  React.useEffect(() => {
+    if (!isThemeMenuOpen) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (themeMenuRef.current && !themeMenuRef.current.contains(event.target as Node)) {
+        setIsThemeMenuOpen(false);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsThemeMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isThemeMenuOpen]);
 
   const handleThemeChange = (pref: ThemePreference) => {
     setThemePreference(pref);
@@ -147,7 +170,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_25px_-5px_rgba(0,0,0,0.35)] transition-colors duration-200">
+    <header className="w-full sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_25px_-5px_rgba(0,0,0,0.35)] transition-colors duration-200">
       
       {/* Top Contact & Utility Bar (Executive Dark-Slate Bar) */}
       <div className="bg-gradient-to-r from-[#0F172A] via-[#1E293B] to-[#0F172A] border-b border-slate-800/80 py-1.5 px-4 sm:px-6 lg:px-8 text-[11px] text-slate-300">
@@ -421,19 +444,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             </button>
 
-            {/* User Profile Button (Desktop) */}
-            {onOpenUserProfile && (
-              <button
-                type="button"
-                onClick={onOpenUserProfile}
-                title="Mi Perfil & Ficha Académica"
-                aria-label="Mi Perfil & Ficha Académica"
-                className="hidden sm:flex p-2.5 min-w-[44px] min-h-[44px] items-center justify-center rounded-2xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0 focus-visible:ring-2 focus-visible:ring-claro"
-              >
-                <User className="w-4 h-4" />
-              </button>
-            )}
-
             {/* Quick QR Scanner Button (Desktop) */}
             {onOpenQrScanner && (
               <button
@@ -444,7 +454,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className="hidden sm:flex items-center justify-center gap-1.5 px-3 py-2 min-h-[44px] rounded-2xl bg-red-50 dark:bg-red-950/40 hover:bg-claro dark:hover:bg-claro text-claro dark:text-red-400 hover:text-white dark:hover:text-white border border-red-200 dark:border-red-900/60 hover:border-claro text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95 shrink-0 focus-visible:ring-2 focus-visible:ring-claro"
               >
                 <Camera className="w-4 h-4" />
-                <span className="hidden xl:inline">Escanear QR</span>
+                <span className="hidden 2xl:inline">Escanear QR</span>
               </button>
             )}
 
@@ -461,57 +471,93 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             )}
 
-            {/* Selector de Tema Accesible Claro / Sistema / Oscuro (Desktop) */}
-            <div 
-              className="hidden sm:inline-flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-inner shrink-0"
-              role="radiogroup"
-              aria-label="Selector de tema visual"
-            >
+            {/* Selector de Tema Accesible con Dropdown (Desktop) */}
+            <div className="relative hidden sm:block shrink-0" ref={themeMenuRef}>
               <button
                 type="button"
-                onClick={() => handleThemeChange('light')}
-                className={`p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center rounded-xl transition-all cursor-pointer ${
-                  themePreference === 'light'
-                    ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 shadow-xs font-bold'
-                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
-                title="Modo Claro"
-                aria-label="Activar Modo Claro"
-                aria-checked={themePreference === 'light'}
-                role="radio"
+                onClick={() => setIsThemeMenuOpen(prev => !prev)}
+                title={`Tema actual: ${themePreference === 'light' ? 'Modo Claro' : themePreference === 'dark' ? 'Modo Oscuro' : 'Tema del Sistema'} (Clic para cambiar)`}
+                aria-label="Cambiar tema visual"
+                aria-haspopup="true"
+                aria-expanded={isThemeMenuOpen}
+                className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-2xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all cursor-pointer shadow-xs active:scale-95 focus-visible:ring-2 focus-visible:ring-claro"
               >
-                <Sun className="w-4 h-4" />
+                {themePreference === 'light' && <Sun className="w-4 h-4 text-amber-500 transition-transform duration-200" />}
+                {themePreference === 'dark' && <Moon className="w-4 h-4 text-indigo-400 transition-transform duration-200" />}
+                {themePreference === 'system' && <Monitor className="w-4 h-4 text-[#DA291C] dark:text-red-400 transition-transform duration-200" />}
               </button>
-              <button
-                type="button"
-                onClick={() => handleThemeChange('system')}
-                className={`p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center rounded-xl transition-all cursor-pointer ${
-                  themePreference === 'system'
-                    ? 'bg-white dark:bg-slate-700 text-[#DA291C] dark:text-red-400 shadow-xs font-bold'
-                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
-                title="Modo Automático del Sistema"
-                aria-label="Sincronizar con tema del sistema operativo"
-                aria-checked={themePreference === 'system'}
-                role="radio"
-              >
-                <Monitor className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => handleThemeChange('dark')}
-                className={`p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center rounded-xl transition-all cursor-pointer ${
-                  themePreference === 'dark'
-                    ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-xs font-bold'
-                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
-                title="Modo Oscuro"
-                aria-label="Activar Modo Oscuro"
-                aria-checked={themePreference === 'dark'}
-                role="radio"
-              >
-                <Moon className="w-4 h-4" />
-              </button>
+
+              {isThemeMenuOpen && (
+                <div 
+                  className="absolute right-0 top-full mt-2 w-52 p-1.5 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 z-50 animate-in fade-in-50 zoom-in-95 duration-150 space-y-1"
+                  role="menu"
+                  aria-label="Opciones de tema visual"
+                >
+                  <div className="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-700/60 mb-1">
+                    Tema de Interfaz
+                  </div>
+
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      handleThemeChange('light');
+                      setIsThemeMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs rounded-xl transition-all cursor-pointer ${
+                      themePreference === 'light'
+                        ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-bold'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60 font-semibold'
+                    }`}
+                  >
+                    <div className="p-1 rounded-lg bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-300">
+                      <Sun className="w-3.5 h-3.5" />
+                    </div>
+                    <span>Modo Claro</span>
+                    {themePreference === 'light' && <Check className="w-4 h-4 ml-auto text-amber-600 dark:text-amber-400" />}
+                  </button>
+
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      handleThemeChange('system');
+                      setIsThemeMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs rounded-xl transition-all cursor-pointer ${
+                      themePreference === 'system'
+                        ? 'bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 font-bold'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60 font-semibold'
+                    }`}
+                  >
+                    <div className="p-1 rounded-lg bg-red-100 dark:bg-red-950/50 text-[#DA291C] dark:text-red-400">
+                      <Monitor className="w-3.5 h-3.5" />
+                    </div>
+                    <span>Tema del Sistema</span>
+                    {themePreference === 'system' && <Check className="w-4 h-4 ml-auto text-[#DA291C] dark:text-red-400" />}
+                  </button>
+
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      handleThemeChange('dark');
+                      setIsThemeMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs rounded-xl transition-all cursor-pointer ${
+                      themePreference === 'dark'
+                        ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-bold'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60 font-semibold'
+                    }`}
+                  >
+                    <div className="p-1 rounded-lg bg-indigo-100 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400">
+                      <Moon className="w-3.5 h-3.5" />
+                    </div>
+                    <span>Modo Oscuro</span>
+                    {themePreference === 'dark' && <Check className="w-4 h-4 ml-auto text-indigo-600 dark:text-indigo-400" />}
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Logout Button (Desktop) */}
