@@ -331,7 +331,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
         {/* Form Content - Ficha Sociodemográfica */}
         {activeTab === 'demographics' && (
-          <form onSubmit={handleSubmit} className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-6">
+          <form onSubmit={handleSubmit} className="p-5 sm:p-6 overflow-y-auto flex-1 min-h-0 space-y-6">
             
             {/* Identidad del Colaborador (solo lectura o confirmación) */}
             <div className="bg-slate-50 dark:bg-slate-850 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between flex-wrap gap-2 text-xs">
@@ -673,7 +673,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
         {/* Tab 2: Capacitaciones Externas */}
         {activeTab === 'trainings' && (
-          <div className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-4">
+          <div className="p-5 sm:p-6 overflow-y-auto flex-1 min-h-0 space-y-4">
             {/* Header del resumen externo */}
             <div className="bg-blue-50/60 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 p-4 rounded-2xl flex items-center justify-between flex-wrap gap-3">
               <div className="flex items-center gap-3">

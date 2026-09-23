@@ -249,7 +249,7 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
         }
       `}</style>
 
-      <div className="bg-slate-100 dark:bg-slate-950 rounded-3xl w-full max-w-7xl shadow-2xl border border-slate-300 dark:border-slate-800 flex flex-col max-h-[95vh] overflow-hidden my-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-slate-100 dark:bg-slate-950 rounded-3xl w-full max-w-7xl shadow-2xl border border-slate-300 dark:border-slate-800 flex flex-col max-h-[92vh] sm:max-h-[90vh] overflow-hidden my-auto" onClick={(e) => e.stopPropagation()}>
         
         {/* Modal Header */}
         <div className="bg-white dark:bg-slate-900 px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4 shrink-0">
@@ -301,10 +301,10 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
         </div>
 
         {/* Modal Main Body (Split View: Config vs Live Preview) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 overflow-y-auto flex-1 p-4 sm:p-6 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 overflow-y-auto flex-1 min-h-0 p-4 sm:p-6 gap-6">
           
           {/* COLUMNA IZQUIERDA: PANEL DE CONFIGURACIÓN & EDICIÓN (5 cols) */}
-          <div className="lg:col-span-5 space-y-5 bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-xs overflow-y-auto">
+          <div className="lg:col-span-5 space-y-5 bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-xs overflow-y-auto max-h-full">
             
             <div className="flex items-center gap-2 text-xs font-black text-[#DA291C] dark:text-red-400 uppercase tracking-wider pb-2 border-b border-slate-100 dark:border-slate-800">
               <SlidersHorizontal className="w-4 h-4" />
@@ -621,7 +621,7 @@ export const FormalLetterModal: React.FC<FormalLetterModalProps> = ({
           </div>
 
           {/* COLUMNA DERECHA: PREVISUALIZACIÓN DE DOCUMENTO OFICIAL CLARO (7 cols) */}
-          <div className="lg:col-span-7 flex justify-center items-start overflow-y-auto">
+          <div className="lg:col-span-7 flex justify-center items-start overflow-y-auto max-h-full pr-1">
             
             {/* Hoja de Documento Membretada (Imprimible) */}
             <div 

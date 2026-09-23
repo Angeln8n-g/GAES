@@ -636,7 +636,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
             TAB 1: ASISTENCIA Y CHECK-IN
             ========================================== */}
         {activeTab === 'attendance' && (
-          <div className="p-6 flex-1 overflow-y-auto space-y-4">
+          <div className="p-6 flex-1 min-h-0 overflow-y-auto space-y-4">
             
             {/* Search bar */}
             <div className="relative">
@@ -776,7 +776,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
             TAB 2: LIBRO DE CALIFICACIONES Y DEBILIDADES
             ========================================== */}
         {activeTab === 'grades' && (
-          <div className="p-6 flex-1 overflow-y-auto space-y-4">
+          <div className="p-6 flex-1 min-h-0 overflow-y-auto space-y-4">
             
             {/* KPI Summary Banner */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

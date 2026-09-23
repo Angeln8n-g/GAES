@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 export interface AccessibleModalProps {
   isOpen?: boolean;
@@ -44,13 +45,38 @@ export const getFocusableElements = (container: HTMLElement): HTMLElement[] => {
 };
 
 /**
+ * Gestor global y seguro de bloqueo de scroll para evitar bloqueos residuales con modales anidados
+ */
+let activeModalsCount = 0;
+let previousBodyOverflow = '';
+
+function lockBodyScroll() {
+  if (typeof document === 'undefined') return;
+  if (activeModalsCount === 0) {
+    previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+  }
+  activeModalsCount++;
+}
+
+function unlockBodyScroll() {
+  if (typeof document === 'undefined') return;
+  activeModalsCount = Math.max(0, activeModalsCount - 1);
+  if (activeModalsCount === 0) {
+    document.body.style.overflow = previousBodyOverflow;
+  }
+}
+
+/**
  * Contenedor Modal Accesible Universal para GAES.
  * Provee:
- * 1. Captura y ciclado de foco estricto (Focus Trap accesible WCAG 2.1 AA).
- * 2. Cierre accesible mediante tecla Escape con e.stopPropagation().
- * 3. Bloqueo de scroll en el elemento body mientras permanezca abierto.
- * 4. Atributos semánticos universales: role="dialog", aria-modal="true", aria-labelledby / aria-label.
- * 5. Restauración automática del foco al elemento desencadenador tras cerrar el modal.
+ * 1. Portal directo a document.body para evitar desfases causados por transformaciones de contenedores padre.
+ * 2. Captura y ciclado de foco estricto (Focus Trap accesible WCAG 2.1 AA).
+ * 3. Cierre accesible mediante tecla Escape con e.stopPropagation().
+ * 4. Bloqueo seguro de scroll en el elemento body con conteo de modales activos.
+ * 5. Soporte para scroll vertical independiente con `overflow-y-auto` y `my-auto` para evitar recortes.
+ * 6. Atributos semánticos universales: role="dialog", aria-modal="true", aria-labelledby / aria-label.
+ * 7. Restauración automática del foco al elemento desencadenador tras cerrar el modal.
  */
 export const AccessibleModal: React.FC<AccessibleModalProps> = ({
   isOpen = true,
@@ -59,7 +85,7 @@ export const AccessibleModal: React.FC<AccessibleModalProps> = ({
   ariaLabel,
   ariaLabelledBy,
   ariaDescribedBy,
-  className = 'fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-200',
+  className = '',
   role = 'dialog',
   closeOnEscape = true,
   closeOnBackdropClick = true,
@@ -67,23 +93,27 @@ export const AccessibleModal: React.FC<AccessibleModalProps> = ({
   preventScroll = true,
   id
 }) => {
-  if (!isOpen) return null;
-
+  const [mounted, setMounted] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
 
-  // 1. Bloquear desplazamiento del body mientras el diálogo esté activo
   useEffect(() => {
-    if (!preventScroll) return;
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  // 1. Bloquear desplazamiento del body mientras el diálogo esté activo con ref-count seguro
+  useEffect(() => {
+    if (!preventScroll || !isOpen) return;
+    lockBodyScroll();
     return () => {
-      document.body.style.overflow = originalOverflow;
+      unlockBodyScroll();
     };
-  }, [preventScroll]);
+  }, [preventScroll, isOpen]);
 
   // 2. Guardar elemento activo previo y enfocar primer elemento del modal
   useEffect(() => {
+    if (!isOpen) return;
     previouslyFocusedElementRef.current = document.activeElement as HTMLElement | null;
 
     const timer = setTimeout(() => {
@@ -120,12 +150,12 @@ export const AccessibleModal: React.FC<AccessibleModalProps> = ({
         }
       }
     };
-  }, [initialFocusRef]);
+  }, [isOpen, initialFocusRef]);
 
   // 3. Listener de teclado: Escape y Focus Trap (Tab / Shift+Tab)
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (!overlayRef.current) return;
+      if (!overlayRef.current || !isOpen) return;
 
       // Cierre con Escape
       if (e.key === 'Escape' && closeOnEscape) {
@@ -161,13 +191,14 @@ export const AccessibleModal: React.FC<AccessibleModalProps> = ({
         }
       }
     },
-    [closeOnEscape, onClose]
+    [isOpen, closeOnEscape, onClose]
   );
 
   useEffect(() => {
+    if (!isOpen) return;
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyDown]);
+  }, [isOpen, handleKeyDown]);
 
   // 4. Manejador de clic en el backdrop / overlay
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -176,7 +207,22 @@ export const AccessibleModal: React.FC<AccessibleModalProps> = ({
     }
   };
 
-  return (
+  if (!isOpen || !mounted || typeof document === 'undefined') return null;
+
+  // Auto-asegurar `my-auto` en el hijo principal para centrado vertical seguro sin recorte de scroll
+  const renderedChildren = React.Children.map(children, (child) => {
+    if (React.isValidElement<React.HTMLAttributes<HTMLElement>>(child)) {
+      const existingClass = child.props.className || '';
+      if (!existingClass.includes('my-auto')) {
+        return React.cloneElement(child, {
+          className: `${existingClass} my-auto`.trim()
+        });
+      }
+    }
+    return child;
+  });
+
+  return createPortal(
     <div
       ref={overlayRef}
       id={id}
@@ -187,9 +233,11 @@ export const AccessibleModal: React.FC<AccessibleModalProps> = ({
       aria-describedby={ariaDescribedBy}
       tabIndex={-1}
       onClick={handleOverlayClick}
-      className={`${className} outline-none`}
+      style={{ zIndex: 9999 }}
+      className={`fixed inset-0 overflow-y-auto bg-slate-900/75 dark:bg-slate-950/85 backdrop-blur-sm animate-in fade-in duration-200 flex justify-center items-center p-2 sm:p-4 md:p-6 outline-none ${className}`}
     >
-      {children}
-    </div>
+      {renderedChildren}
+    </div>,
+    document.body
   );
 };
