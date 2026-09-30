@@ -172,6 +172,12 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
     return list;
   }, [events, userAssociatedEmails]);
 
+  // Sesiones activas y futuras para la sección "Sesiones Agendadas".
+  // Si la fecha ya pasó (< todayStr), se excluye de aquí y se preserva en el Historial de Capacitaciones.
+  const activeRegistrations: UserRegistrationItem[] = useMemo(() => {
+    return userRegistrations.filter(r => r.schedule.date >= todayStr);
+  }, [userRegistrations, todayStr]);
+
   const handleConfirmCancel = async () => {
     if (!cancelingItem) return;
     try {
@@ -472,7 +478,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
           )}
 
           <div className="px-5 py-3 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-center sm:text-right">
-            <p className="text-2xl font-black text-[#DA291C] dark:text-red-400">{userRegistrations.length}</p>
+            <p className="text-2xl font-black text-[#DA291C] dark:text-red-400">{activeRegistrations.length}</p>
             <p className="text-[11px] text-slate-600 dark:text-slate-400 font-bold">Inscripciones Activas</p>
           </div>
         </div>
@@ -561,7 +567,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
             }`}
           >
             <CalendarIcon className="w-4 h-4" />
-            <span>Sesiones Activas & Rutas ({userRegistrations.filter(r => r.schedule.date >= todayStr).length})</span>
+            <span>Sesiones Activas & Rutas ({activeRegistrations.length})</span>
           </button>
 
           <button
@@ -934,13 +940,13 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">
-            Sesiones Agendadas ({userRegistrations.length})
+            Sesiones Agendadas ({activeRegistrations.length})
           </h2>
         </div>
 
-        {userRegistrations.length > 0 ? (
+        {activeRegistrations.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {userRegistrations.map((item, idx) => {
+            {activeRegistrations.map((item, idx) => {
               const { event, schedule, slot, hasAttended } = item;
 
               return (
@@ -1496,14 +1502,24 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
               </button>
             </div>
 
-            <div className="p-4 bg-white border border-slate-200 rounded-2xl inline-block shadow-inner">
-              <QRCodeSVG
-                value={`GAES-PASS:${selectedPassItem.event.id}:${selectedPassItem.schedule.date}:${selectedPassItem.slot.time}:${currentUser.email}`}
-                size={180}
-                level="H"
-                fgColor="#1E293B"
-              />
-            </div>
+            {selectedPassItem.schedule.date < todayStr ? (
+              <div className="p-5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 rounded-2xl text-center space-y-2">
+                <AlertTriangle className="w-8 h-8 text-rose-500 mx-auto" />
+                <p className="text-xs font-bold text-rose-700 dark:text-rose-300">Sesión Concluida</p>
+                <p className="text-[11px] text-rose-600 dark:text-rose-400">
+                  La fecha de este evento ({selectedPassItem.schedule.date}) ya ha finalizado. La asistencia no puede registrarse.
+                </p>
+              </div>
+            ) : (
+              <div className="p-4 bg-white border border-slate-200 rounded-2xl inline-block shadow-inner">
+                <QRCodeSVG
+                  value={`GAES-PASS:${selectedPassItem.event.id}:${selectedPassItem.schedule.date}:${selectedPassItem.slot.time}:${currentUser.email}`}
+                  size={180}
+                  level="H"
+                  fgColor="#1E293B"
+                />
+              </div>
+            )}
 
             <div>
               <h3 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">{selectedPassItem.event.title}</h3>

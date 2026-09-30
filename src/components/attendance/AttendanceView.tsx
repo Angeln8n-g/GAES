@@ -72,6 +72,13 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
   const schedule = event?.schedule.find(s => s.date === dateStr);
   const slot = schedule?.slots.find(s => s.time === timeStr);
 
+  const todayStr = React.useMemo(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }, []);
+
+  const isEventDatePast = Boolean(dateStr && dateStr < todayStr);
+
   const userEmailLower = currentUser?.email?.toLowerCase() || '';
   const isCheckedIn = Boolean(
     (slot?.checkInList || slot?.attendedList || []).some(e => e.toLowerCase() === userEmailLower)
@@ -91,6 +98,14 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
   // Auto Check-in o Check-out al cargar si el usuario está autenticado y viene de un código QR
   useEffect(() => {
     if (!currentUser || !event || !slot) return;
+
+    if (isEventDatePast) {
+      setStatusMessage({
+        type: 'error',
+        text: `La fecha de este curso (${dateStr}) ya concluyó. No es posible registrar asistencia para fechas pasadas.`
+      });
+      return;
+    }
 
     if (targetType === 'checkout') {
       if (isCheckedOut) return;
@@ -154,6 +169,13 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
   // Manejador para registrar salida directa con 1 clic
   const handlePerformCheckOut = async () => {
     if (!currentUser) return;
+    if (isEventDatePast) {
+      setStatusMessage({
+        type: 'error',
+        text: `La fecha de este curso (${dateStr}) ya concluyó. No es posible registrar asistencia para fechas pasadas.`
+      });
+      return;
+    }
     try {
       setIsProcessing(true);
       await onConfirmAttendance(eventId, dateStr, timeStr, currentUser.email, 'checkout');
@@ -176,6 +198,13 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
   const handlePinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!dailyPinInput.trim() || !currentUser) return;
+    if (isEventDatePast) {
+      setStatusMessage({
+        type: 'error',
+        text: `La fecha de este curso (${dateStr}) ya concluyó. No es posible registrar asistencia para fechas pasadas.`
+      });
+      return;
+    }
     try {
       setIsProcessing(true);
       setStatusMessage(null);
@@ -208,6 +237,13 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
   const handleManualCheckIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!manualCardInput.trim()) return;
+    if (isEventDatePast) {
+      setStatusMessage({
+        type: 'error',
+        text: `La fecha de este curso (${dateStr}) ya concluyó. No es posible registrar asistencia para fechas pasadas.`
+      });
+      return;
+    }
 
     try {
       setIsProcessing(true);
@@ -367,6 +403,19 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
                 </span>
               </div>
             </div>
+          ) : isEventDatePast ? (
+            /* CASO FECHA PASADA: NO ES POSIBLE REGISTRAR ASISTENCIA */
+            <div className="p-5 rounded-2xl bg-rose-50 dark:bg-rose-950/30 border-2 border-rose-300 dark:border-rose-800 text-center space-y-2">
+              <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-900/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto shadow-xs">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <h2 className="text-sm font-black text-rose-950 dark:text-rose-200">
+                Evento Concluido ({dateStr})
+              </h2>
+              <p className="text-xs text-rose-700 dark:text-rose-300 font-medium leading-relaxed">
+                La fecha programada para esta sesión ya concluyó. No es posible registrar asistencia para fechas pasadas.
+              </p>
+            </div>
           ) : isCheckedIn && !isCheckedOut ? (
             /* CASO 2: ASISTENCIA EN CURSO (Solo Entrada) */
             <div className="p-5 rounded-2xl bg-amber-50/80 dark:bg-amber-950/30 border-2 border-amber-300 dark:border-amber-700 space-y-3">
@@ -458,65 +507,67 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
             </div>
           )}
 
-          {/* Botón para abrir formulario de PIN diario de aula */}
-          <div className="pt-1">
-            <button
-              type="button"
-              onClick={() => setShowPinForm(!showPinForm)}
-              className="text-xs text-[#DA291C] dark:text-[#FF6659] hover:underline font-bold flex items-center gap-1 mx-auto cursor-pointer"
-            >
-              <KeyRound className="w-3.5 h-3.5" />
-              <span>{showPinForm ? 'Ocultar código PIN' : '¿Tienes un código PIN de aula? Ingrésalo aquí'}</span>
-            </button>
+          {/* Botón para abrir formulario de PIN diario de aula (deshabilitado si fecha ya concluyó) */}
+          {!isEventDatePast && (
+            <div className="pt-1">
+              <button
+                type="button"
+                onClick={() => setShowPinForm(!showPinForm)}
+                className="text-xs text-[#DA291C] dark:text-[#FF6659] hover:underline font-bold flex items-center gap-1 mx-auto cursor-pointer"
+              >
+                <KeyRound className="w-3.5 h-3.5" />
+                <span>{showPinForm ? 'Ocultar código PIN' : '¿Tienes un código PIN de aula? Ingrésalo aquí'}</span>
+              </button>
 
-            {showPinForm && (
-              <form onSubmit={handlePinSubmit} className="mt-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Validar con PIN Diario</span>
-                  <div className="flex items-center gap-2">
-                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="pinAction"
-                        checked={selectedActionType === 'checkin'}
-                        onChange={() => setSelectedActionType('checkin')}
-                        className="text-[#DA291C] dark:text-[#FF6659]"
-                      />
-                      <span>Entrada</span>
-                    </label>
-                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="pinAction"
-                        checked={selectedActionType === 'checkout'}
-                        onChange={() => setSelectedActionType('checkout')}
-                        className="text-[#DA291C] dark:text-[#FF6659]"
-                      />
-                      <span>Salida</span>
-                    </label>
+              {showPinForm && (
+                <form onSubmit={handlePinSubmit} className="mt-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Validar con PIN Diario</span>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="pinAction"
+                          checked={selectedActionType === 'checkin'}
+                          onChange={() => setSelectedActionType('checkin')}
+                          className="text-[#DA291C] dark:text-[#FF6659]"
+                        />
+                        <span>Entrada</span>
+                      </label>
+                      <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="pinAction"
+                          checked={selectedActionType === 'checkout'}
+                          onChange={() => setSelectedActionType('checkout')}
+                          className="text-[#DA291C] dark:text-[#FF6659]"
+                        />
+                        <span>Salida</span>
+                      </label>
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    maxLength={6}
-                    value={dailyPinInput}
-                    onChange={(e) => setDailyPinInput(e.target.value)}
-                    placeholder="PIN de 4 dígitos (ej: 8421)"
-                    className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-mono font-bold text-center tracking-wider text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] dark:focus:border-[#FF6659]"
-                  />
-                  <button
-                    type="submit"
-                    disabled={isProcessing || !dailyPinInput.trim()}
-                    className="px-4 py-2 bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 dark:hover:bg-slate-600 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
-                  >
-                    Validar
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      maxLength={6}
+                      value={dailyPinInput}
+                      onChange={(e) => setDailyPinInput(e.target.value)}
+                      placeholder="PIN de 4 dígitos (ej: 8421)"
+                      className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-mono font-bold text-center tracking-wider text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] dark:focus:border-[#FF6659]"
+                    />
+                    <button
+                      type="submit"
+                      disabled={isProcessing || !dailyPinInput.trim()}
+                      className="px-4 py-2 bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 dark:hover:bg-slate-600 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                    >
+                      Validar
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          )}
 
           {/* Encuesta Oficial TEC (Curso & Facilitador) */}
           {currentUser && (
@@ -589,64 +640,66 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({
             </div>
           )}
 
-          {/* Formulario de Asistencia Manual para Supervisores o Delegados */}
-          <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
-            <button
-              type="button"
-              onClick={() => setShowManualForm(!showManualForm)}
-              className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-bold flex items-center gap-1 mx-auto cursor-pointer"
-            >
-              <User className="w-3.5 h-3.5" />
-              <span>{showManualForm ? 'Ocultar registro de otro colaborador' : 'Registrar a otro colaborador'}</span>
-            </button>
+          {/* Formulario de Asistencia Manual para Supervisores o Delegados (deshabilitado si fecha ya concluyó) */}
+          {!isEventDatePast && (
+            <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => setShowManualForm(!showManualForm)}
+                className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-bold flex items-center gap-1 mx-auto cursor-pointer"
+              >
+                <User className="w-3.5 h-3.5" />
+                <span>{showManualForm ? 'Ocultar registro de otro colaborador' : 'Registrar a otro colaborador'}</span>
+              </button>
 
-            {showManualForm && (
-              <form onSubmit={handleManualCheckIn} className="mt-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Registro para otro colaborador</span>
-                  <div className="flex items-center gap-2">
-                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="manualAction"
-                        checked={selectedActionType === 'checkin'}
-                        onChange={() => setSelectedActionType('checkin')}
-                        className="text-[#DA291C] dark:text-[#FF6659]"
-                      />
-                      <span>Entrada</span>
-                    </label>
-                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="manualAction"
-                        checked={selectedActionType === 'checkout'}
-                        onChange={() => setSelectedActionType('checkout')}
-                        className="text-[#DA291C] dark:text-[#FF6659]"
-                      />
-                      <span>Salida</span>
-                    </label>
+              {showManualForm && (
+                <form onSubmit={handleManualCheckIn} className="mt-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Registro para otro colaborador</span>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="manualAction"
+                          checked={selectedActionType === 'checkin'}
+                          onChange={() => setSelectedActionType('checkin')}
+                          className="text-[#DA291C] dark:text-[#FF6659]"
+                        />
+                        <span>Entrada</span>
+                      </label>
+                      <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="manualAction"
+                          checked={selectedActionType === 'checkout'}
+                          onChange={() => setSelectedActionType('checkout')}
+                          className="text-[#DA291C] dark:text-[#FF6659]"
+                        />
+                        <span>Salida</span>
+                      </label>
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={manualCardInput}
-                    onChange={(e) => setManualCardInput(e.target.value)}
-                    placeholder="Tarjeta o correo del colaborador..."
-                    className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] dark:focus:border-[#FF6659]"
-                  />
-                  <button
-                    type="submit"
-                    disabled={isProcessing || !manualCardInput.trim()}
-                    className="px-4 py-2 bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 dark:hover:bg-slate-600 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
-                  >
-                    Confirmar
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={manualCardInput}
+                      onChange={(e) => setManualCardInput(e.target.value)}
+                      placeholder="Tarjeta o correo del colaborador..."
+                      className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] dark:focus:border-[#FF6659]"
+                    />
+                    <button
+                      type="submit"
+                      disabled={isProcessing || !manualCardInput.trim()}
+                      className="px-4 py-2 bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 dark:hover:bg-slate-600 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                    >
+                      Confirmar
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          )}
 
         </div>
 

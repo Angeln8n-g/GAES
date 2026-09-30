@@ -157,10 +157,18 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
     await stopScannerSafe();
     setDetectedSession(result);
 
+    const d = new Date();
+    const todayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const matchedDate = result.date || result.event?.schedule[0]?.date || '';
+
+    if (matchedDate && matchedDate < todayStr) {
+      setScannerError(`La fecha de este curso (${matchedDate}) ya concluyó. No es posible registrar asistencia para eventos cuya fecha ha pasado.`);
+      return;
+    }
+
     // Auto-confirmar asistencia (Entrada o Salida)
     try {
       setIsProcessingAttendance(true);
-      const matchedDate = result.date || result.event?.schedule[0]?.date || '';
       const matchedTime = result.time || result.event?.schedule[0]?.slots[0]?.time || '';
       const actionType = result.type || 'checkin';
 

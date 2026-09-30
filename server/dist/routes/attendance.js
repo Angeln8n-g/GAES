@@ -30,6 +30,14 @@ exports.attendanceRouter.post('/', async (req, res) => {
     const client = await db_js_1.pool.connect();
     try {
         await client.query('BEGIN');
+        // Validar que la fecha del evento no haya expirado (no se permite registrar asistencia para fechas pasadas)
+        const todayStr = new Date().toISOString().split('T')[0];
+        if (date < todayStr) {
+            await client.query('ROLLBACK');
+            return res.status(400).json({
+                message: `La fecha de este evento (${date}) ya ha pasado. No es posible registrar asistencia para capacitaciones concluidas.`
+            });
+        }
         // 1. Obtener slot ID y códigos del día
         const slotQuery = `
       SELECT sl.id, sl.capacity, sl.checkin_code, sl.checkout_code, e.title as event_title

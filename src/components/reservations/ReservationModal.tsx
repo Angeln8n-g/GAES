@@ -12,7 +12,7 @@ import {
   Lock
 } from 'lucide-react';
 import { TrainingEvent, UserAccount, Slot } from '../../types';
-import { formatDateLong, getEventDurationMetrics, calculateTimeDurationHours } from '../../utils/formatters';
+import { formatDateLong, formatDateShort, getEventDurationMetrics, calculateTimeDurationHours } from '../../utils/formatters';
 import { downloadIcsFile, getGoogleCalendarUrl } from '../../utils/icsUtils';
 import { AccessibleModal } from '../common/AccessibleModal';
 
@@ -66,6 +66,24 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     return null;
   }, [event, currentUser]);
 
+  // Verificar si el usuario actual ya está inscrito en cualquier horario de este evento
+  const existingEnrollment = useMemo(() => {
+    if (!emailInput.trim()) return null;
+    const cleanEmail = emailInput.trim().toLowerCase();
+    for (const sch of event.schedule) {
+      for (const sl of sch.slots) {
+        if ((sl.attendees || []).some(a => a.toLowerCase() === cleanEmail)) {
+          return {
+            date: sch.date,
+            time: sl.time,
+            endTime: sl.endTime
+          };
+        }
+      }
+    }
+    return null;
+  }, [event, emailInput]);
+
   const currentSchedule = event.schedule.find(s => s.date === selectedDate);
 
   const handleDateChange = (dateStr: string) => {
@@ -84,6 +102,11 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     e.preventDefault();
     setErrorMessage('');
 
+    if (existingEnrollment) {
+      setErrorMessage(`Ya te encuentras registrado en este entrenamiento (Fecha: ${formatDateShort(existingEnrollment.date)}, Horario: ${existingEnrollment.time}). No está permitido inscribirse en múltiples horarios para el mismo curso.`);
+      return;
+    }
+
     if (!selectedDate || !selectedSlot) {
       setErrorMessage('Por favor selecciona una fecha y horario.');
       return;
@@ -94,7 +117,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       return;
     }
 
-    // Verificar si ya está inscrito
+    // Verificar si ya está inscrito en este horario específico
     if (selectedSlot.attendees.map(a => a.toLowerCase()).includes(emailInput.trim().toLowerCase())) {
       setErrorMessage('Ya te encuentras inscrito en este horario.');
       return;
@@ -361,6 +384,19 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                 />
               </div>
 
+              {/* Existing Enrollment Alert */}
+              {existingEnrollment && (
+                <div role="alert" className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs space-y-1.5 animate-in fade-in duration-200">
+                  <div className="flex items-center gap-1.5 font-bold">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" aria-hidden="true" />
+                    <span>Inscripción activa en este curso</span>
+                  </div>
+                  <p className="leading-relaxed">
+                    Actualmente tienes un lugar reservado para el <strong>{formatDateLong(existingEnrollment.date)}</strong> a las <strong>{existingEnrollment.time}{existingEnrollment.endTime ? ` - ${existingEnrollment.endTime}` : ''}</strong>. No está permitido registrarse en múltiples horarios para el mismo entrenamiento.
+                  </p>
+                </div>
+              )}
+
               {/* Error Message */}
               {errorMessage && (
                 <div role="alert" aria-live="assertive" className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 flex items-center gap-2 text-rose-700 dark:text-rose-400 text-xs font-medium">
@@ -372,10 +408,14 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               {/* Submit CTA */}
               <button
                 type="submit"
-                disabled={isSubmitting || !selectedSlot || (selectedSlot && selectedSlot.registered >= selectedSlot.capacity)}
+                disabled={isSubmitting || Boolean(existingEnrollment) || !selectedSlot || (selectedSlot && selectedSlot.registered >= selectedSlot.capacity)}
                 className="w-full py-3.5 bg-[#DA291C] hover:bg-red-700 text-white text-xs font-bold rounded-2xl shadow-md shadow-red-500/25 flex items-center justify-center gap-2 disabled:opacity-50 transition-all cursor-pointer"
               >
-                {isSubmitting ? 'Confirmando reserva...' : 'Confirmar Mi Lugar'}
+                {existingEnrollment 
+                  ? 'Ya Estás Inscrito en Este Curso' 
+                  : isSubmitting 
+                  ? 'Confirmando reserva...' 
+                  : 'Confirmar Mi Lugar'}
               </button>
 
             </form>

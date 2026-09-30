@@ -417,6 +417,15 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
                               })()}
                             </div>
                           </div>
+                        ) : isPast ? (
+                          <div className="space-y-1.5 text-center">
+                            <div className="py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center justify-center gap-1.5">
+                              <span>Sesión Concluida (Asistencia no registrada)</span>
+                            </div>
+                            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+                              La fecha de esta capacitación ya concluyó. No es posible generar pase de acceso.
+                            </p>
+                          </div>
                         ) : (
                           <div className="space-y-2">
                             <button
@@ -488,14 +497,24 @@ export const AttendeeScheduleModal: React.FC<AttendeeScheduleModalProps> = ({
             </div>
 
             {/* QR Code Graphic */}
-            <div className="p-4 bg-white border-2 border-slate-200 rounded-2xl inline-block shadow-inner">
-              <QRCodeSVG 
-                value={`${window.location.origin}${window.location.pathname}?tab=attendance&event=${selectedPassSession.event.id}&date=${selectedPassSession.schedule.date}&time=${encodeURIComponent(selectedPassSession.slot.time)}&attendee=${encodeURIComponent(displayEmail || displayCedula || '')}`}
-                size={180}
-                level="H"
-                includeMargin={false}
-              />
-            </div>
+            {selectedPassSession.isPast ? (
+              <div className="p-5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 rounded-2xl text-center space-y-2">
+                <AlertCircle className="w-8 h-8 text-rose-500 mx-auto" />
+                <p className="text-xs font-bold text-rose-700 dark:text-rose-300">Sesión Concluida</p>
+                <p className="text-[11px] text-rose-600 dark:text-rose-400">
+                  La fecha de este curso ({selectedPassSession.schedule.date}) ya ha pasado. No es posible generar código QR de acceso.
+                </p>
+              </div>
+            ) : (
+              <div className="p-4 bg-white border-2 border-slate-200 rounded-2xl inline-block shadow-inner">
+                <QRCodeSVG 
+                  value={`${window.location.origin}${window.location.pathname}?tab=attendance&event=${selectedPassSession.event.id}&date=${selectedPassSession.schedule.date}&time=${encodeURIComponent(selectedPassSession.slot.time)}&attendee=${encodeURIComponent(displayEmail || displayCedula || '')}`}
+                  size={180}
+                  level="H"
+                  includeMargin={false}
+                />
+              </div>
+            )}
 
             <div>
               <h4 className="text-sm font-black text-slate-900 dark:text-white leading-snug">

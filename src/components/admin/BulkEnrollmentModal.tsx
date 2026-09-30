@@ -70,7 +70,16 @@ export const BulkEnrollmentModal: React.FC<BulkEnrollmentModalProps> = ({
   );
 
   const currentSlot = currentSchedule?.slots.find(s => s.time === selectedTime) || currentSchedule?.slots[0];
-  const alreadyEnrolledSet = new Set((currentSlot?.attendees || []).map(e => e.toLowerCase()));
+  const alreadyEnrolledSet = useMemo(() => {
+    const set = new Set<string>();
+    if (!currentEvent) return set;
+    (currentEvent.schedule || []).forEach(sch => {
+      (sch.slots || []).forEach(sl => {
+        (sl.attendees || []).forEach(att => set.add(att.toLowerCase()));
+      });
+    });
+    return set;
+  }, [currentEvent]);
 
   // Method Tab State
   const [activeTab, setActiveTab] = useState<MethodTab>('select');

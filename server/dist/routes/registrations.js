@@ -40,11 +40,18 @@ exports.registrationsRouter.post('/', async (req, res) => {
         else {
             participantCard = partRes.rows[0].card;
         }
-        // 3. Verificar si el usuario ya está inscrito en este slot
-        const existingReg = await client.query('SELECT id FROM registrations WHERE slot_id = $1 AND participant_card = $2', [slotId, participantCard]);
+        // 3. Verificar si el usuario ya está inscrito en cualquier horario o fecha de este entrenamiento
+        const existingReg = await client.query(`SELECT r.id, sch.date::text as reg_date, sl.time as reg_time 
+       FROM registrations r
+       JOIN event_slots sl ON r.slot_id = sl.id
+       JOIN event_schedules sch ON sl.schedule_id = sch.id
+       WHERE sch.event_id = $1 AND r.participant_card = $2`, [eventId, participantCard]);
         if (existingReg.rows.length > 0) {
+            const prior = existingReg.rows[0];
             await client.query('ROLLBACK');
-            return res.status(400).json({ message: 'Ya te encuentras registrado en este horario.' });
+            return res.status(400).json({
+                message: `Ya te encuentras registrado en este entrenamiento (Fecha: ${prior.reg_date}, Horario: ${prior.reg_time}). No está permitido registrarse en múltiples horarios para el mismo curso.`
+            });
         }
         // 4. Verificar cupo disponible
         const countRes = await client.query('SELECT COUNT(*)::int as total FROM registrations WHERE slot_id = $1', [slotId]);
@@ -112,8 +119,11 @@ exports.registrationsRouter.post('/bulk', async (req, res) => {
             else {
                 participantCard = partRes.rows[0].card;
             }
-            // Verificar si ya está inscrito
-            const existingReg = await client.query('SELECT id FROM registrations WHERE slot_id = $1 AND participant_card = $2', [slotId, participantCard]);
+            // Verificar si ya está inscrito en cualquier horario de este evento
+            const existingReg = await client.query(`SELECT r.id FROM registrations r
+         JOIN event_slots sl ON r.slot_id = sl.id
+         JOIN event_schedules sch ON sl.schedule_id = sch.id
+         WHERE sch.event_id = $1 AND r.participant_card = $2`, [eventId, participantCard]);
             if (existingReg.rows.length > 0) {
                 skippedAlreadyEnrolled.push(email);
                 continue;
@@ -191,14 +201,21 @@ exports.registrationsRouter.post('/assign', async (req, res) => {
             else {
                 participantCard = partRes.rows[0].card;
             }
-            // Verificar si ya está inscrito
-            const existingReg = await client.query('SELECT id, is_mandatory FROM registrations WHERE slot_id = $1 AND participant_card = $2', [slotId, participantCard]);
+            // Verificar si ya está inscrito en cualquier horario de este evento
+            const existingReg = await client.query(`SELECT r.id, r.slot_id, r.is_mandatory, sch.date::text as reg_date, sl.time as reg_time
+         FROM registrations r
+         JOIN event_slots sl ON r.slot_id = sl.id
+         JOIN event_schedules sch ON sl.schedule_id = sch.id
+         WHERE sch.event_id = $1 AND r.participant_card = $2`, [eventId, participantCard]);
             if (existingReg.rows.length > 0) {
-                // Actualizar datos de asignación si es necesario
-                if (effectiveMandatory && !existingReg.rows[0].is_mandatory) {
-                    await client.query(`UPDATE registrations 
-             SET is_mandatory = $1, assigned_by = $2, assignment_type = $3, assignment_notes = $4, assigned_at = CURRENT_TIMESTAMP
-             WHERE id = $5`, [true, effectiveAssignedBy, effectiveAssignmentType, notes || null, existingReg.rows[0].id]);
+                const existingRow = existingReg.rows[0];
+                // Si está en este mismo slot, actualizar datos de asignación si es necesario
+                if (existingRow.slot_id === slotId) {
+                    if (effectiveMandatory && !existingRow.is_mandatory) {
+                        await client.query(`UPDATE registrations 
+               SET is_mandatory = $1, assigned_by = $2, assignment_type = $3, assignment_notes = $4, assigned_at = CURRENT_TIMESTAMP
+               WHERE id = $5`, [true, effectiveAssignedBy, effectiveAssignmentType, notes || null, existingRow.id]);
+                    }
                 }
                 skippedAlreadyEnrolled.push(email);
                 continue;

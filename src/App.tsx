@@ -460,6 +460,20 @@ export function App() {
 
   // Handlers de Operaciones
   const handleConfirmReservation = async (eventId: string, date: string, time: string, email: string) => {
+    const targetEvt = events.find(e => e.id === eventId);
+    if (targetEvt) {
+      const cleanEmail = email.trim().toLowerCase();
+      const existing = targetEvt.schedule.flatMap(sch => 
+        (sch.slots || []).filter(sl => (sl.attendees || []).some(a => a.toLowerCase() === cleanEmail))
+          .map(sl => ({ date: sch.date, time: sl.time }))
+      )[0];
+
+      if (existing) {
+        showToast('Inscripción no permitida', `Ya te encuentras registrado en este entrenamiento para el ${existing.date} a las ${existing.time}.`, 'warning');
+        throw new Error('Ya te encuentras registrado en este curso.');
+      }
+    }
+
     const updated = await apiService.registerToEvent(eventId, date, time, email);
     setEvents(updated);
     showToast('Reserva exitosa', 'Tu lugar ha sido reservado con éxito.', 'success');

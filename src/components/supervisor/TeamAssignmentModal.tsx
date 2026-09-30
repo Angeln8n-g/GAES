@@ -105,6 +105,41 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
     return new Set(currentSlot.attendees.map(a => a.toLowerCase()));
   }, [currentSlot]);
 
+  // Mapa de inscritos en cualquier horario de este curso: email -> { date: string, time: string, isCurrentSlot: boolean }
+  const enrolledInEventMap = useMemo(() => {
+    const map = new Map<string, { date: string; time: string; isCurrentSlot: boolean }>();
+    if (!selectedEvent) return map;
+    for (const sch of selectedEvent.schedule || []) {
+      for (const slt of sch.slots || []) {
+        const isCurrent = sch.date === selectedDate && slt.time === selectedTime;
+        for (const att of slt.attendees || []) {
+          const lower = att.toLowerCase();
+          if (!map.has(lower) || isCurrent) {
+            map.set(lower, { date: sch.date, time: slt.time, isCurrentSlot: isCurrent });
+          }
+        }
+      }
+    }
+    return map;
+  }, [selectedEvent, selectedDate, selectedTime]);
+
+  // Si cambia el horario y algún colaborador seleccionado ya está en otro horario, deseleccionarlo
+  React.useEffect(() => {
+    setSelectedEmails(prev => {
+      let changed = false;
+      const next = new Set<string>();
+      prev.forEach(email => {
+        const otherInfo = enrolledInEventMap.get(email);
+        if (otherInfo && !otherInfo.isCurrentSlot) {
+          changed = true;
+        } else {
+          next.add(email);
+        }
+      });
+      return changed ? next : prev;
+    });
+  }, [enrolledInEventMap]);
+
   // Filtrar colaboradores del equipo por búsqueda
   const filteredParticipants = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
@@ -121,6 +156,15 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
   // Seleccionar / deseleccionar colaborador individual
   const toggleSelectEmail = (email: string) => {
     const clean = email.toLowerCase();
+    const otherInfo = enrolledInEventMap.get(clean);
+    if (otherInfo && !otherInfo.isCurrentSlot) {
+      onShowToast(
+        'Colaborador ya inscrito',
+        `Ya está matriculado en este curso el ${otherInfo.date} (${otherInfo.time}). No puede inscribirse en múltiples horarios.`,
+        'info'
+      );
+      return;
+    }
     const next = new Set(selectedEmails);
     if (next.has(clean)) {
       next.delete(clean);
@@ -130,15 +174,22 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
     setSelectedEmails(next);
   };
 
-  // Seleccionar todos los visibles
+  // Seleccionar todos los visibles elegibles
   const handleSelectAllVisible = () => {
-    const next = new Set(selectedEmails);
-    const allVisibleSelected = filteredParticipants.every(p => next.has(p.email.toLowerCase()));
+    const eligibleParticipants = filteredParticipants.filter(p => {
+      const otherInfo = enrolledInEventMap.get(p.email.toLowerCase());
+      return !otherInfo || otherInfo.isCurrentSlot;
+    });
 
-    if (allVisibleSelected) {
-      filteredParticipants.forEach(p => next.delete(p.email.toLowerCase()));
+    const next = new Set(selectedEmails);
+    const allEligibleSelected =
+      eligibleParticipants.length > 0 &&
+      eligibleParticipants.every(p => next.has(p.email.toLowerCase()));
+
+    if (allEligibleSelected) {
+      eligibleParticipants.forEach(p => next.delete(p.email.toLowerCase()));
     } else {
-      filteredParticipants.forEach(p => next.add(p.email.toLowerCase()));
+      eligibleParticipants.forEach(p => next.add(p.email.toLowerCase()));
     }
     setSelectedEmails(next);
   };
@@ -400,20 +451,28 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
                   const cleanEmail = p.email.toLowerCase();
                   const isChecked = selectedEmails.has(cleanEmail);
                   const isAlreadyInSlot = enrolledEmailsInSlot.has(cleanEmail);
+                  const otherSlotInfo = enrolledInEventMap.get(cleanEmail);
+                  const isEnrolledInOtherSlot = Boolean(otherSlotInfo && !otherSlotInfo.isCurrentSlot);
 
                   return (
                     <div
                       key={p.card}
-                      onClick={() => toggleSelectEmail(p.email)}
-                      className={`p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition-all ${
-                        isChecked
-                          ? 'bg-red-50/80 dark:bg-red-950/40 border-[#DA291C] text-slate-900 dark:text-white shadow-xs'
-                          : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
+                      onClick={() => !isEnrolledInOtherSlot && toggleSelectEmail(p.email)}
+                      className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition-all ${
+                        isEnrolledInOtherSlot
+                          ? 'opacity-60 bg-slate-100/60 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 cursor-not-allowed'
+                          : isChecked
+                          ? 'bg-red-50/80 dark:bg-red-950/40 border-[#DA291C] text-slate-900 dark:text-white shadow-xs cursor-pointer'
+                          : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600 cursor-pointer'
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <div className={`w-4 h-4 rounded-md border flex items-center justify-center transition-colors ${
-                          isChecked ? 'bg-[#DA291C] border-[#DA291C] text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
+                          isEnrolledInOtherSlot
+                            ? 'border-slate-300 dark:border-slate-600 bg-slate-200 dark:bg-slate-700'
+                            : isChecked
+                            ? 'bg-[#DA291C] border-[#DA291C] text-white'
+                            : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
                         }`}>
                           {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
                         </div>
@@ -430,11 +489,16 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
                         </div>
                       </div>
 
-                      {isAlreadyInSlot && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 whitespace-nowrap shrink-0">
+                      {isEnrolledInOtherSlot ? (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 whitespace-nowrap shrink-0 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" />
+                          Inscrito ({otherSlotInfo?.date} {otherSlotInfo?.time})
+                        </span>
+                      ) : isAlreadyInSlot ? (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 whitespace-nowrap shrink-0">
                           Ya en este horario
                         </span>
-                      )}
+                      ) : null}
                     </div>
                   );
                 })
