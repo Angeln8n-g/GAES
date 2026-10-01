@@ -541,6 +541,34 @@ export const apiService = {
     }
   },
 
+  async uploadEventMedia(file: File): Promise<{ url: string }> {
+    const base64Data = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    });
+
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/events/upload-image`, {
+        method: 'POST',
+        headers: getAuthHeaders(true),
+        body: JSON.stringify({
+          data: base64Data,
+          filename: file.name,
+          contentType: file.type
+        })
+      });
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || 'Error al subir la imagen en el servidor');
+      }
+      return await res.json();
+    } else {
+      return { url: base64Data };
+    }
+  },
+
   async deleteEvent(eventId: string): Promise<TrainingEvent[]> {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/events/${eventId}`, {

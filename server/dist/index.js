@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const path_1 = __importDefault(require("path"));
 const events_js_1 = require("./routes/events.js");
 const participants_js_1 = require("./routes/participants.js");
 const registrations_js_1 = require("./routes/registrations.js");
@@ -58,7 +59,10 @@ app.use((0, cors_1.default)({
     },
     credentials: true
 }));
-app.use(express_1.default.json());
+app.use(express_1.default.json({ limit: '25mb' }));
+app.use(express_1.default.urlencoded({ limit: '25mb', extended: true }));
+// Servir archivos estáticos subidos (imágenes y GIFs de eventos)
+app.use('/api/uploads', express_1.default.static(path_1.default.join(process.cwd(), 'uploads')));
 // Health Check
 app.get('/api/health', (_req, res) => {
     res.json({

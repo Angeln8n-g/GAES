@@ -39,6 +39,7 @@ services:
       - "127.0.0.1:3021:5000"
     volumes:
       - ./backups:/app/backups
+      - ./uploads:/app/uploads
 
   # 3. Aplicación Frontend (React + Vite + Nginx)
   frontend:

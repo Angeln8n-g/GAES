@@ -1,8 +1,14 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.eventsRouter = void 0;
 exports.fetchFullEvents = fetchFullEvents;
 const express_1 = require("express");
+const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
+const crypto_1 = __importDefault(require("crypto"));
 const db_js_1 = require("../db.js");
 const websocket_js_1 = require("../websocket.js");
 exports.eventsRouter = (0, express_1.Router)();
@@ -138,6 +144,8 @@ async function fetchFullEvents(companyId) {
             category: evt.category,
             instructor: evt.instructor,
             imageUrl: evt.image_url,
+            isBannerFeatured: Boolean(evt.is_banner_featured),
+            bannerImageUrl: evt.banner_image_url || null,
             status: evt.status,
             modality: evt.modality,
             location: evt.location,
@@ -215,9 +223,10 @@ exports.eventsRouter.post('/', async (req, res) => {
         company_id, evaluation_type, passing_score, skills_evaluated,
         ojt_evaluator_id, ojt_evaluator_name, ojt_evaluator_email, modules,
         start_date, end_date, start_time, end_time, company_ids, total_hours,
-        session_type, training_type, training_format, program_category, subprogram, supplier
+        session_type, training_type, training_format, program_category, subprogram, supplier,
+        is_banner_featured, banner_image_url
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35)
       ON CONFLICT (id) DO UPDATE SET
         title = EXCLUDED.title,
         description = EXCLUDED.description,
@@ -250,7 +259,9 @@ exports.eventsRouter.post('/', async (req, res) => {
         training_format = EXCLUDED.training_format,
         program_category = EXCLUDED.program_category,
         subprogram = EXCLUDED.subprogram,
-        supplier = EXCLUDED.supplier`, [
+        supplier = EXCLUDED.supplier,
+        is_banner_featured = EXCLUDED.is_banner_featured,
+        banner_image_url = EXCLUDED.banner_image_url`, [
             event.id,
             event.title,
             event.description,
@@ -283,7 +294,9 @@ exports.eventsRouter.post('/', async (req, res) => {
             event.trainingFormat || event.category || 'Taller',
             event.programCategory || 'Capacitacion_seguridad_salud_en_el_trabajo_y_sustentabilidad',
             event.subprogram || 'Sustentabilidad',
-            event.supplier || 'Claro'
+            event.supplier || 'Claro',
+            Boolean(event.isBannerFeatured),
+            event.bannerImageUrl || null
         ]);
         // 2. Insertar Schedules y Slots
         for (const sch of event.schedule || []) {
@@ -346,5 +359,79 @@ exports.eventsRouter.delete('/:id', async (req, res) => {
     catch (err) {
         console.error('Error al eliminar evento:', err);
         res.status(500).json({ error: 'Error al eliminar el evento', details: err.message });
+    }
+});
+// POST /api/events/upload-image (Subida de Imagen o GIF para Banner y Tarjeta)
+exports.eventsRouter.post('/upload-image', async (req, res) => {
+    const reqUser = req.user;
+    if (!reqUser || !['Super Administrador', 'Administrador / Editor'].includes(reqUser.role)) {
+        return res.status(403).json({
+            error: 'Acceso denegado: Se requieren permisos administrativos para subir imágenes.'
+        });
+    }
+    try {
+        const { data, filename, contentType } = req.body;
+        if (!data || typeof data !== 'string') {
+            return res.status(400).json({ error: 'Falta el contenido del archivo en base64.' });
+        }
+        // Extraer prefijo de Data URL y contenido base64
+        let mimeType = contentType;
+        let base64String = data;
+        if (data.startsWith('data:')) {
+            const match = data.match(/^data:([^;]+);base64,(.+)$/);
+            if (match) {
+                mimeType = match[1];
+                base64String = match[2];
+            }
+        }
+        const allowedMimeTypes = {
+            'image/jpeg': 'jpg',
+            'image/jpg': 'jpg',
+            'image/png': 'png',
+            'image/webp': 'webp',
+            'image/gif': 'gif'
+        };
+        let ext = mimeType && allowedMimeTypes[mimeType.toLowerCase()]
+            ? allowedMimeTypes[mimeType.toLowerCase()]
+            : (filename && filename.split('.').pop()?.toLowerCase()) || 'png';
+        if (!['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext)) {
+            return res.status(400).json({
+                error: `Formato no soportado (.${ext}). Solo se admiten imágenes JPG, PNG, WEBP o GIFs animados.`
+            });
+        }
+        const buffer = Buffer.from(base64String, 'base64');
+        const MAX_SIZE_BYTES = 20 * 1024 * 1024; // 20 MB
+        if (buffer.length > MAX_SIZE_BYTES) {
+            return res.status(400).json({
+                error: `El archivo supera el tamaño máximo permitido (20 MB). Peso actual: ${(buffer.length / (1024 * 1024)).toFixed(1)} MB.`
+            });
+        }
+        // Carpeta de almacenamiento en uploads/events
+        const uploadsDir = path_1.default.join(process.cwd(), 'uploads', 'events');
+        if (!fs_1.default.existsSync(uploadsDir)) {
+            fs_1.default.mkdirSync(uploadsDir, { recursive: true });
+        }
+        const randomSuffix = crypto_1.default.randomBytes(6).toString('hex');
+        const safeName = (filename ? path_1.default.parse(filename).name : 'media')
+            .replace(/[^a-zA-Z0-9_-]/g, '_')
+            .slice(0, 30);
+        const finalFilename = `event-${Date.now()}-${safeName}-${randomSuffix}.${ext}`;
+        const filePath = path_1.default.join(uploadsDir, finalFilename);
+        await fs_1.default.promises.writeFile(filePath, buffer);
+        const publicUrl = `/api/uploads/events/${finalFilename}`;
+        return res.status(201).json({
+            success: true,
+            url: publicUrl,
+            filename: finalFilename,
+            size: buffer.length,
+            mimeType: mimeType || `image/${ext}`
+        });
+    }
+    catch (err) {
+        console.error('Error al procesar subida de imagen/GIF:', err);
+        return res.status(500).json({
+            error: 'Error interno al guardar la imagen en el servidor',
+            details: err.message
+        });
     }
 });

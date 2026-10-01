@@ -216,6 +216,8 @@ export interface TrainingEvent {
   programCategory?: string;
   subprogram?: string;
   supplier?: string;
+  isBannerFeatured?: boolean;
+  bannerImageUrl?: string;
 }
 
 export interface ExternalTraining {

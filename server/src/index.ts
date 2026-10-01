@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import { eventsRouter } from './routes/events.js';
 import { participantsRouter } from './routes/participants.js';
 import { registrationsRouter } from './routes/registrations.js';
@@ -59,7 +60,11 @@ app.use(cors({
   },
   credentials: true
 }));
-app.use(express.json());
+app.use(express.json({ limit: '25mb' }));
+app.use(express.urlencoded({ limit: '25mb', extended: true }));
+
+// Servir archivos estáticos subidos (imágenes y GIFs de eventos)
+app.use('/api/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Health Check
 app.get('/api/health', (_req, res) => {

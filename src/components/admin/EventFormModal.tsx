@@ -31,8 +31,14 @@ import {
   RotateCcw,
   Info,
   Hourglass,
-  Leaf
+  Leaf,
+  Upload,
+  Image as ImageIcon,
+  Loader2,
+  Flame,
+  Eye
 } from 'lucide-react';
+import { apiService } from '../../services/api';
 import { TrainingEvent, Schedule, Slot, EventModality, EventStatus, Company, EvaluationType, UserAccount, EventModule } from '../../types';
 import { 
   formatDateLong, 
@@ -130,6 +136,58 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
   const [imageUrl, setImageUrl] = useState(initialEvent?.imageUrl || SAMPLE_IMAGES[0]);
   const [surveyUrl, setSurveyUrl] = useState(initialEvent?.surveyUrl || '');
   const [status, setStatus] = useState<EventStatus>(initialEvent?.status || 'active');
+
+  // Publicación en Banner Principal y Carga de Medios (Imágenes y GIFs)
+  const [isBannerFeatured, setIsBannerFeatured] = useState<boolean>(initialEvent?.isBannerFeatured || false);
+  const [bannerImageUrl, setBannerImageUrl] = useState<string>(initialEvent?.bannerImageUrl || '');
+  const [useCustomBannerImage, setUseCustomBannerImage] = useState<boolean>(
+    Boolean(initialEvent?.bannerImageUrl && initialEvent.bannerImageUrl !== initialEvent.imageUrl)
+  );
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isUploadingBannerImage, setIsUploadingBannerImage] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [imageInputMode, setImageInputMode] = useState<'upload' | 'url' | 'presets'>('upload');
+
+  const handleFileUpload = async (file: File, target: 'main' | 'banner') => {
+    if (!file) return;
+
+    if (file.size > 20 * 1024 * 1024) {
+      setUploadError(`El archivo supera el tamaño máximo permitido (20 MB). Tu archivo pesa ${(file.size / (1024 * 1024)).toFixed(1)} MB.`);
+      return;
+    }
+
+    const validMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const validExts = /\.(jpg|jpeg|png|webp|gif)$/i;
+    if (!validMimes.includes(file.type) && !validExts.test(file.name)) {
+      setUploadError('Formato de archivo no compatible. Por favor selecciona una imagen JPG, PNG, WEBP o un GIF animado.');
+      return;
+    }
+
+    setUploadError(null);
+    if (target === 'banner') {
+      setIsUploadingBannerImage(true);
+    } else {
+      setIsUploadingImage(true);
+    }
+
+    try {
+      const res = await apiService.uploadEventMedia(file);
+      if (target === 'banner') {
+        setBannerImageUrl(res.url);
+      } else {
+        setImageUrl(res.url);
+        if (!useCustomBannerImage) {
+          setBannerImageUrl(res.url);
+        }
+      }
+    } catch (err: any) {
+      console.error('Error al subir imagen o GIF:', err);
+      setUploadError(err.message || 'Error al subir el archivo al servidor.');
+    } finally {
+      setIsUploadingImage(false);
+      setIsUploadingBannerImage(false);
+    }
+  };
 
   // Clasificación Estratégica & Programa de Sustentabilidad
   const [sessionType, setSessionType] = useState<string>(initialEvent?.sessionType || 'Sincrónica');
@@ -559,6 +617,8 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
       programCategory,
       subprogram,
       supplier: supplier.trim() || 'Claro',
+      isBannerFeatured,
+      bannerImageUrl: useCustomBannerImage && bannerImageUrl ? bannerImageUrl.trim() : (imageUrl.trim() || undefined),
       feedbacks: initialEvent?.feedbacks || [],
       grades: initialEvent?.grades || []
     };
@@ -1033,32 +1093,298 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
               </div>
             </div>
 
-            <div>
-              <label htmlFor="event-form-image-url" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">URL de Imagen de Portada</label>
-              <input
-                id="event-form-image-url"
-                type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://images.unsplash.com/..."
-                className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] mb-2"
-              />
-              <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold whitespace-nowrap">Presets:</span>
-                {SAMPLE_IMAGES.map((img, i) => (
-                  <img
-                    key={i}
-                    src={img}
-                    alt={`Preset ${i}`}
-                    loading="lazy"
-                    decoding="async"
-                    onClick={() => setImageUrl(img)}
-                    className={`w-10 h-8 rounded-lg object-cover cursor-pointer border-2 transition-all ${
-                      imageUrl === img ? 'border-[#DA291C] scale-105 shadow-sm' : 'border-slate-200 dark:border-slate-700 opacity-70 hover:opacity-100'
+            {/* Imagen de Portada y Recursos Multimedia (GIFs / Imágenes) */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                  Imagen o GIF de Portada *
+                </label>
+                <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700 text-[11px] font-semibold">
+                  <button
+                    type="button"
+                    onClick={() => setImageInputMode('upload')}
+                    className={`px-2 py-1 rounded-md transition-all flex items-center gap-1 ${
+                      imageInputMode === 'upload'
+                        ? 'bg-white dark:bg-slate-700 text-[#DA291C] dark:text-red-400 shadow-sm font-bold'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                     }`}
-                  />
-                ))}
+                  >
+                    <Upload className="w-3 h-3" />
+                    Subir Archivo / GIF
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setImageInputMode('presets')}
+                    className={`px-2 py-1 rounded-md transition-all flex items-center gap-1 ${
+                      imageInputMode === 'presets'
+                        ? 'bg-white dark:bg-slate-700 text-[#DA291C] dark:text-red-400 shadow-sm font-bold'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                    }`}
+                  >
+                    <Sparkles className="w-3 h-3" />
+                    Presets
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setImageInputMode('url')}
+                    className={`px-2 py-1 rounded-md transition-all flex items-center gap-1 ${
+                      imageInputMode === 'url'
+                        ? 'bg-white dark:bg-slate-700 text-[#DA291C] dark:text-red-400 shadow-sm font-bold'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                    }`}
+                  >
+                    <LinkIcon className="w-3 h-3" />
+                    URL
+                  </button>
+                </div>
               </div>
+
+              {uploadError && (
+                <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 rounded-xl flex items-center gap-2 text-xs text-red-700 dark:text-red-300">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-red-500" />
+                  <span>{uploadError}</span>
+                </div>
+              )}
+
+              {imageInputMode === 'upload' && (
+                <div
+                  onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                      handleFileUpload(e.dataTransfer.files[0], 'main');
+                    }
+                  }}
+                  className="relative border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-[#DA291C] dark:hover:border-[#DA291C] rounded-2xl p-4 bg-slate-50/50 dark:bg-slate-800/40 transition-colors text-center cursor-pointer group"
+                  onClick={() => document.getElementById('event-main-file-input')?.click()}
+                >
+                  <input
+                    id="event-main-file-input"
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/gif"
+                    className="hidden"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        handleFileUpload(e.target.files[0], 'main');
+                      }
+                    }}
+                  />
+                  {isUploadingImage ? (
+                    <div className="py-4 flex flex-col items-center justify-center gap-2">
+                      <Loader2 className="w-8 h-8 text-[#DA291C] animate-spin" />
+                      <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">Subiendo y optimizando archivo...</p>
+                      <p className="text-[10px] text-slate-400">Por favor espera un momento</p>
+                    </div>
+                  ) : (
+                    <div className="py-2 flex flex-col items-center justify-center gap-1.5">
+                      <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-950/40 flex items-center justify-center text-[#DA291C] group-hover:scale-110 transition-transform">
+                        <Upload className="w-5 h-5" />
+                      </div>
+                      <p className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                        Arrastra o haz clic para subir imagen o <span className="text-[#DA291C] underline">GIF animado</span>
+                      </p>
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500">
+                        Formatos: PNG, JPG, WEBP, GIF animado (Máximo 20 MB)
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {imageInputMode === 'url' && (
+                <div>
+                  <input
+                    id="event-form-image-url"
+                    type="url"
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    placeholder="https://images.unsplash.com/... o enlace a un GIF animado"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
+                  />
+                </div>
+              )}
+
+              {imageInputMode === 'presets' && (
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                    {SAMPLE_IMAGES.map((img, i) => (
+                      <img
+                        key={i}
+                        src={img}
+                        alt={`Preset ${i}`}
+                        loading="lazy"
+                        decoding="async"
+                        onClick={() => setImageUrl(img)}
+                        className={`w-14 h-10 rounded-lg object-cover cursor-pointer border-2 transition-all shrink-0 ${
+                          imageUrl === img ? 'border-[#DA291C] scale-105 shadow-md ring-2 ring-red-400/30' : 'border-slate-200 dark:border-slate-700 opacity-70 hover:opacity-100'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-slate-400">Selecciona una imagen de plantilla corporativa.</p>
+                </div>
+              )}
+
+              {/* Vista previa de Portada */}
+              {imageUrl && (
+                <div className="p-3 bg-slate-100 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700/60 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="relative w-16 h-12 rounded-lg overflow-hidden shrink-0 border border-slate-300 dark:border-slate-700 bg-slate-900">
+                      <img
+                        src={imageUrl}
+                        alt="Vista previa"
+                        className="w-full h-full object-cover"
+                      />
+                      {imageUrl.toLowerCase().includes('.gif') && (
+                        <span className="absolute bottom-0.5 right-0.5 px-1 py-0.2 bg-[#DA291C] text-white text-[8px] font-black rounded uppercase tracking-wider">
+                          GIF
+                        </span>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                        Vista previa de Portada
+                      </p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate max-w-xs sm:max-w-sm">
+                        {imageUrl}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
+                      <Check className="w-3 h-3" /> Lista
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* SECCIÓN: Publicar en Banner Principal (Hero Carousel) */}
+            <div className="p-4 bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent dark:from-amber-950/30 dark:via-amber-900/10 border-2 border-amber-300 dark:border-amber-800/80 rounded-2xl space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-sm shrink-0">
+                    <Flame className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                        Publicar en Banner Principal
+                      </h4>
+                      <span className="px-1.5 py-0.5 bg-amber-500 text-amber-950 text-[10px] font-black rounded-md uppercase">
+                        Hero Carousel
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                      Destaca esta capacitación en el carrusel superior del catálogo con botón de inscripción en 1 clic.
+                    </p>
+                  </div>
+                </div>
+
+                <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={isBannerFeatured}
+                    onChange={(e) => setIsBannerFeatured(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-amber-500"></div>
+                </label>
+              </div>
+
+              {isBannerFeatured && (
+                <div className="pt-3 border-t border-amber-200/80 dark:border-amber-800/60 space-y-3 animate-in fade-in duration-200">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                      Imagen para el Banner Panorámico:
+                    </span>
+                    <label className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={useCustomBannerImage}
+                        onChange={(e) => setUseCustomBannerImage(e.target.checked)}
+                        className="rounded border-slate-300 text-[#DA291C] focus:ring-[#DA291C]"
+                      />
+                      <span className="text-[11px] font-medium">Usar imagen/GIF panorámico diferente a la portada</span>
+                    </label>
+                  </div>
+
+                  {useCustomBannerImage ? (
+                    <div className="space-y-2">
+                      <div
+                        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                            handleFileUpload(e.dataTransfer.files[0], 'banner');
+                          }
+                        }}
+                        className="border border-dashed border-amber-400 dark:border-amber-700 hover:border-amber-500 rounded-xl p-3 bg-white/70 dark:bg-slate-900/60 text-center cursor-pointer"
+                        onClick={() => document.getElementById('event-banner-file-input')?.click()}
+                      >
+                        <input
+                          id="event-banner-file-input"
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp,image/gif"
+                          className="hidden"
+                          onChange={(e) => {
+                            if (e.target.files && e.target.files[0]) {
+                              handleFileUpload(e.target.files[0], 'banner');
+                            }
+                          }}
+                        />
+                        {isUploadingBannerImage ? (
+                          <div className="py-2 flex items-center justify-center gap-2">
+                            <Loader2 className="w-4 h-4 text-amber-600 animate-spin" />
+                            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Subiendo banner...</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                            <Upload className="w-4 h-4 text-amber-600" />
+                            <span>Clic o arrastra para subir imagen panorámica o GIF (16:9)</span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="url"
+                          value={bannerImageUrl}
+                          onChange={(e) => setBannerImageUrl(e.target.value)}
+                          placeholder="O escribe aquí la URL directa del banner (JPG, PNG, GIF)..."
+                          className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-amber-500"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-2.5 bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/40 rounded-xl flex items-center gap-2 text-[11px] text-amber-800 dark:text-amber-300">
+                      <Sparkles className="w-4 h-4 shrink-0 text-amber-500" />
+                      <span>Se usará automáticamente la imagen/GIF de portada para el banner principal.</span>
+                    </div>
+                  )}
+
+                  {/* Vista previa del banner */}
+                  {(bannerImageUrl || imageUrl) && (
+                    <div className="relative rounded-xl overflow-hidden h-24 border border-amber-300/60 dark:border-amber-800 shadow-inner group">
+                      <img
+                        src={useCustomBannerImage && bannerImageUrl ? bannerImageUrl : imageUrl}
+                        alt="Banner Preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent flex items-end p-2.5">
+                        <div className="text-white">
+                          <span className="px-1.5 py-0.5 bg-amber-500 text-amber-950 font-black text-[9px] rounded uppercase tracking-wider inline-block mb-1">
+                            Vista previa en carrusel
+                          </span>
+                          <p className="text-xs font-bold line-clamp-1">{title || 'Título de la Capacitación'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 

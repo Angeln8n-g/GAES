@@ -63,7 +63,9 @@ CREATE TABLE events (
     ojt_evaluator_id VARCHAR(100),
     ojt_evaluator_name VARCHAR(255),
     ojt_evaluator_email VARCHAR(255),
-    modules JSONB DEFAULT '[]'
+    modules JSONB DEFAULT '[]',
+    is_banner_featured BOOLEAN DEFAULT FALSE,
+    banner_image_url TEXT DEFAULT NULL
 );
 
 -- 4. Tabla de Fechas del Evento (Schedules)

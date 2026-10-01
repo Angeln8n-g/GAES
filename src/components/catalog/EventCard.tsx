@@ -121,6 +121,13 @@ export const EventCard: React.FC<EventCardProps> = ({
                 {event.category}
               </span>
 
+              {event.isBannerFeatured && (
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 backdrop-blur-md shadow-md flex items-center gap-1 border border-amber-300">
+                  <Sparkles className="w-3 h-3 text-amber-950 fill-amber-950" />
+                  <span>En Banner</span>
+                </span>
+              )}
+
               {isPastEvent && (
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-slate-800 text-slate-200 backdrop-blur-md shadow-xs border border-slate-700">
                   Finalizado

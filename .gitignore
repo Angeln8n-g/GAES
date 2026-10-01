@@ -12,5 +12,7 @@ skills/
 .skills/
 backups/*
 !backups/.gitkeep
+uploads/*
+!uploads/**/.gitkeep
 *.sql.gz
 

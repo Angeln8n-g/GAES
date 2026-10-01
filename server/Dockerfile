@@ -20,8 +20,8 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 
 COPY --from=build /app/dist ./dist
-# Asegurar que los archivos de migraciones .sql estén disponibles en runtime
-RUN mkdir -p /app/dist/migrations /app/backups
+# Asegurar que los archivos de migraciones .sql y directorios de medios estén disponibles en runtime
+RUN mkdir -p /app/dist/migrations /app/backups /app/uploads/events
 COPY src/migrations /app/dist/migrations
 
 EXPOSE 5000

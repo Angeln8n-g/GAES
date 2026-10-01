@@ -231,10 +231,14 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
     <div id="maincontent" className="space-y-8 pb-20">
       
       {/* 1. Hero Carousel Institucional Claro */}
-      <HeroCarousel onExplore={() => {
-        const el = document.getElementById('catalog-search-section');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      }} />
+      <HeroCarousel 
+        events={events}
+        onOpenReservationModal={onOpenReservationModal}
+        onExplore={() => {
+          const el = document.getElementById('catalog-search-section');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }} 
+      />
 
       {/* 2. Live KPI Stats Ribbon (Modern Executive Strip) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">

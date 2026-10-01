@@ -1,19 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Sparkles, ArrowRight, CheckCircle2, Star } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  Sparkles, 
+  ArrowRight, 
+  CheckCircle2, 
+  Star, 
+  Flame, 
+  Calendar, 
+  Clock, 
+  MapPin, 
+  Video 
+} from 'lucide-react';
+import { TrainingEvent } from '../../types';
 
 interface SlideItem {
-  id: number;
+  id: string | number;
   title: string;
   subtitle: string;
   tag: string;
   imageUrl: string;
   ctaText: string;
   highlight: string;
+  event?: TrainingEvent;
+  isEvent?: boolean;
 }
 
 const HERO_SLIDES: SlideItem[] = [
   {
-    id: 1,
+    id: 'static-1',
     title: "Nuestra Gente & Excelencia Operativa",
     subtitle: "Formación integral para el desarrollo de competencias técnicas, liderazgo, cultura de calidad y servicio impecable en campo.",
     tag: "Cultura & Liderazgo Claro",
@@ -22,7 +37,7 @@ const HERO_SLIDES: SlideItem[] = [
     highlight: "100% Cobertura Nacional"
   },
   {
-    id: 2,
+    id: 'static-2',
     title: "Técnicos de Campo & Redes de Última Milla",
     subtitle: "Acompañamiento continuo, instalación de soluciones Mesh, fibra óptica FTTH y protocolos First-Time Fix.",
     tag: "Operaciones & Tutoría",
@@ -31,7 +46,7 @@ const HERO_SLIDES: SlideItem[] = [
     highlight: "Metodología 70-20-10"
   },
   {
-    id: 3,
+    id: 'static-3',
     title: "Prevención, Salud & Seguridad Ocupacional",
     subtitle: "Protocolos de tolerancia cero en EPP, mitigación de riesgos laborales y normativas corporativas vigentes.",
     tag: "Seguridad Industrial & Prevención",
@@ -40,7 +55,7 @@ const HERO_SLIDES: SlideItem[] = [
     highlight: "Cero Accidentes"
   },
   {
-    id: 4,
+    id: 'static-4',
     title: "Transformación Digital & Soluciones Avanzadas",
     subtitle: "Dominio de herramientas en la nube, sistemas de gestión inteligente y plataformas tecnológicas de última generación.",
     tag: "Innovación & Tecnología",
@@ -51,30 +66,66 @@ const HERO_SLIDES: SlideItem[] = [
 ];
 
 interface HeroCarouselProps {
+  events?: TrainingEvent[];
   onExplore?: () => void;
+  onOpenReservationModal?: (event: TrainingEvent) => void;
 }
 
-export const HeroCarousel: React.FC<HeroCarouselProps> = ({ onExplore }) => {
+export const HeroCarousel: React.FC<HeroCarouselProps> = ({ 
+  events = [], 
+  onExplore,
+  onOpenReservationModal 
+}) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+
+  // Transformar eventos destacados para el banner
+  const eventSlides: SlideItem[] = useMemo(() => {
+    return (events || [])
+      .filter(e => e.status === 'active' && Boolean(e.isBannerFeatured))
+      .map(evt => {
+        const nextDate = evt.schedule?.[0]?.date;
+        const highlightText = nextDate 
+          ? `${evt.modality} • ${nextDate}` 
+          : `${evt.modality} • ${evt.totalHours ? `${evt.totalHours} hrs` : 'Certificada'}`;
+
+        return {
+          id: `evt-${evt.id}`,
+          title: evt.title,
+          subtitle: evt.description || 'Participa en esta capacitación destacada y fortalece tus competencias profesionales.',
+          tag: `★ CAPACITACIÓN DESTACADA • ${evt.category.toUpperCase()}`,
+          imageUrl: evt.bannerImageUrl || evt.imageUrl,
+          ctaText: "Inscribirme / Reservar Cupo",
+          highlight: highlightText,
+          event: evt,
+          isEvent: true
+        };
+      });
+  }, [events]);
+
+  const allSlides = useMemo(() => {
+    return [...eventSlides, ...HERO_SLIDES];
+  }, [eventSlides]);
+
+  const safeCurrentIndex = currentSlide >= allSlides.length ? 0 : currentSlide;
 
   useEffect(() => {
     if (isPaused) return;
     const timer = setInterval(() => {
-      setCurrentSlide(prev => (prev + 1) % HERO_SLIDES.length);
+      setCurrentSlide(prev => (prev + 1) % allSlides.length);
     }, 6500);
     return () => clearInterval(timer);
-  }, [isPaused, currentSlide]);
+  }, [isPaused, allSlides.length]);
 
   const handlePrev = () => {
-    setCurrentSlide(prev => (prev === 0 ? HERO_SLIDES.length - 1 : prev - 1));
+    setCurrentSlide(prev => (prev === 0 ? allSlides.length - 1 : prev - 1));
   };
 
   const handleNext = () => {
-    setCurrentSlide(prev => (prev + 1) % HERO_SLIDES.length);
+    setCurrentSlide(prev => (prev + 1) % allSlides.length);
   };
 
-  const slide = HERO_SLIDES[currentSlide];
+  const slide = allSlides[safeCurrentIndex] || HERO_SLIDES[0];
 
   return (
     <div 
@@ -83,13 +134,13 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ onExplore }) => {
       className="relative w-full rounded-3xl overflow-hidden shadow-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-950 group select-none"
     >
       
-      {/* Background Image with Cinematic Gradient Overlays */}
+      {/* Background Image or Animated GIF with Cinematic Gradient Overlays */}
       <div className="relative h-[340px] sm:h-[400px] lg:h-[450px] w-full overflow-hidden">
-        {HERO_SLIDES.map((s, idx) => (
+        {allSlides.map((s, idx) => (
           <div
             key={s.id}
             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              idx === currentSlide ? 'opacity-100 z-10 scale-100' : 'opacity-0 z-0 scale-105 pointer-events-none'
+              idx === safeCurrentIndex ? 'opacity-100 z-10 scale-100' : 'opacity-0 z-0 scale-105 pointer-events-none'
             }`}
           >
             <img
@@ -112,15 +163,33 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ onExplore }) => {
         
         {/* Top Badges */}
         <div className="flex items-center gap-2 mb-3.5 flex-wrap">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#DA291C] to-red-600 text-white text-xs font-black shadow-lg shadow-red-500/40 backdrop-blur-md">
-            <Sparkles className="w-3.5 h-3.5 text-amber-200 animate-spin" style={{ animationDuration: '6s' }} />
-            <span>{slide.tag}</span>
-          </div>
+          {slide.isEvent ? (
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-[#DA291C] text-white text-xs font-black shadow-lg shadow-amber-500/30 backdrop-blur-md">
+              <Flame className="w-3.5 h-3.5 text-amber-200 fill-amber-200 animate-pulse" />
+              <span>{slide.tag}</span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#DA291C] to-red-600 text-white text-xs font-black shadow-lg shadow-red-500/40 backdrop-blur-md">
+              <Sparkles className="w-3.5 h-3.5 text-amber-200 animate-spin" style={{ animationDuration: '6s' }} />
+              <span>{slide.tag}</span>
+            </div>
+          )}
 
           <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 text-white/90 border border-white/20 text-xs font-semibold backdrop-blur-md">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
             <span>{slide.highlight}</span>
           </div>
+
+          {slide.isEvent && slide.event && (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/40 text-amber-300 border border-amber-400/30 text-xs font-bold backdrop-blur-md">
+              {slide.event.modality === 'Virtual' ? (
+                <Video className="w-3.5 h-3.5 text-blue-400" />
+              ) : (
+                <MapPin className="w-3.5 h-3.5 text-red-400" />
+              )}
+              <span>{slide.event.location || slide.event.modality}</span>
+            </div>
+          )}
         </div>
 
         {/* Title */}
@@ -136,17 +205,37 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ onExplore }) => {
         {/* CTA Buttons */}
         <div className="flex items-center gap-3.5 flex-wrap">
           <button
-            onClick={onExplore}
-            className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#DA291C] to-[#E02418] hover:from-red-600 hover:to-red-700 text-white text-xs sm:text-sm font-black shadow-xl shadow-red-600/35 flex items-center gap-2.5 hover:scale-105 active:scale-95 transition-all cursor-pointer ring-2 ring-red-400/30"
+            onClick={() => {
+              if (slide.isEvent && slide.event && onOpenReservationModal) {
+                onOpenReservationModal(slide.event);
+              } else if (onExplore) {
+                onExplore();
+              }
+            }}
+            className={`px-6 py-3 rounded-2xl text-white text-xs sm:text-sm font-black shadow-xl flex items-center gap-2.5 hover:scale-105 active:scale-95 transition-all cursor-pointer ring-2 ${
+              slide.isEvent
+                ? 'bg-gradient-to-r from-amber-500 via-[#DA291C] to-red-600 hover:from-amber-600 hover:to-red-700 shadow-amber-600/35 ring-amber-400/40'
+                : 'bg-gradient-to-r from-[#DA291C] to-[#E02418] hover:from-red-600 hover:to-red-700 shadow-red-600/35 ring-red-400/30'
+            }`}
           >
+            {slide.isEvent && <Flame className="w-4 h-4 text-amber-200 fill-amber-200" />}
             <span>{slide.ctaText}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
 
-          <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md text-xs text-slate-300 font-medium">
-            <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-            <span>Plataforma Oficial de Capacitación</span>
-          </div>
+          {slide.isEvent && slide.event?.instructor && (
+            <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md text-xs text-slate-300 font-medium">
+              <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+              <span>Instructor: <strong className="text-white">{slide.event.instructor}</strong></span>
+            </div>
+          )}
+
+          {!slide.isEvent && (
+            <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md text-xs text-slate-300 font-medium">
+              <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+              <span>Plataforma Oficial de Capacitación</span>
+            </div>
+          )}
         </div>
 
       </div>
@@ -170,7 +259,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ onExplore }) => {
 
       {/* Modern Slide Progress Indicators */}
       <div className="absolute bottom-5 left-6 sm:left-12 lg:left-16 z-30 flex items-center gap-2.5">
-        {HERO_SLIDES.map((s, idx) => (
+        {allSlides.map((s, idx) => (
           <button
             key={s.id}
             onClick={() => setCurrentSlide(idx)}
@@ -178,11 +267,13 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ onExplore }) => {
             aria-label={`Ir a diapositiva ${idx + 1}`}
           >
             <div className={`h-1.5 rounded-full transition-all duration-500 overflow-hidden ${
-              currentSlide === idx ? 'w-12 bg-white/30' : 'w-5 bg-white/20 group-hover/btn:bg-white/40'
+              safeCurrentIndex === idx ? 'w-12 bg-white/30' : 'w-5 bg-white/20 group-hover/btn:bg-white/40'
             }`}>
-              {currentSlide === idx && (
+              {safeCurrentIndex === idx && (
                 <div 
-                  className="h-full bg-gradient-to-r from-[#DA291C] to-red-400 rounded-full animate-progressPulse origin-left"
+                  className={`h-full rounded-full animate-progressPulse origin-left ${
+                    s.isEvent ? 'bg-gradient-to-r from-amber-400 to-[#DA291C]' : 'bg-gradient-to-r from-[#DA291C] to-red-400'
+                  }`}
                   style={{ animationDuration: '6.5s' }}
                 />
               )}
