@@ -64,6 +64,7 @@ interface MyRegistrationsViewProps {
   onCancelRegistration: (eventId: string, date: string, time: string, email: string) => Promise<void>;
   onExploreCatalog: () => void;
   onOpenReservationModal?: (event: TrainingEvent) => void;
+  onOpenVirtualRoom?: (event: TrainingEvent, schedule?: Schedule, slot?: Slot) => void;
   onOpenQrScanner?: () => void;
   onOpenTecEvaluation?: (event: TrainingEvent) => void;
   onOpenUserProfile?: () => void;
@@ -83,6 +84,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
   onCancelRegistration,
   onExploreCatalog,
   onOpenReservationModal,
+  onOpenVirtualRoom,
   onOpenQrScanner,
   onOpenTecEvaluation,
   onOpenUserProfile,
@@ -1064,15 +1066,28 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                       </a>
                     </div>
 
-                    {/* Pass QR & Cancel Action */}
+                    {/* Pass QR, Aula Virtual & Cancel Action */}
                     <div className="flex items-center justify-between gap-2 flex-wrap">
-                      <button
-                        onClick={() => setSelectedPassItem(item)}
-                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#DA291C] hover:bg-red-700 text-white text-xs font-bold transition-all shadow-sm"
-                      >
-                        <QrCode className="w-3.5 h-3.5" />
-                        Pase QR
-                      </button>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <button
+                          onClick={() => setSelectedPassItem(item)}
+                          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#DA291C] hover:bg-red-700 text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
+                        >
+                          <QrCode className="w-3.5 h-3.5" />
+                          Pase QR
+                        </button>
+
+                        {(event.modality === 'Virtual' || event.modality === 'Mixta' || event.meetingUrl) && onOpenVirtualRoom && (
+                          <button
+                            onClick={() => onOpenVirtualRoom(event, schedule, slot)}
+                            title="Ingresar al Aula Virtual y Sala de Proyección"
+                            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-black transition-all shadow-sm shadow-blue-500/20 cursor-pointer"
+                          >
+                            <Video className="w-3.5 h-3.5 animate-pulse text-blue-200" />
+                            <span>Aula Virtual</span>
+                          </button>
+                        )}
+                      </div>
 
                       {item.isMandatory ? (
                         <div 

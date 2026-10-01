@@ -65,7 +65,11 @@ CREATE TABLE events (
     ojt_evaluator_email VARCHAR(255),
     modules JSONB DEFAULT '[]',
     is_banner_featured BOOLEAN DEFAULT FALSE,
-    banner_image_url TEXT DEFAULT NULL
+    banner_image_url TEXT DEFAULT NULL,
+    meeting_platform VARCHAR(50) DEFAULT 'teams',
+    meeting_url TEXT DEFAULT NULL,
+    meeting_id VARCHAR(100) DEFAULT NULL,
+    meeting_password VARCHAR(100) DEFAULT NULL
 );
 
 -- 4. Tabla de Fechas del Evento (Schedules)

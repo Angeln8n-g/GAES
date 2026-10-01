@@ -39,7 +39,7 @@ import {
   Eye
 } from 'lucide-react';
 import { apiService } from '../../services/api';
-import { TrainingEvent, Schedule, Slot, EventModality, EventStatus, Company, EvaluationType, UserAccount, EventModule } from '../../types';
+import { TrainingEvent, Schedule, Slot, EventModality, EventStatus, Company, EvaluationType, UserAccount, EventModule, VirtualMeetingPlatform } from '../../types';
 import { 
   formatDateLong, 
   MONTH_NAMES_ES,
@@ -136,6 +136,38 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
   const [imageUrl, setImageUrl] = useState(initialEvent?.imageUrl || SAMPLE_IMAGES[0]);
   const [surveyUrl, setSurveyUrl] = useState(initialEvent?.surveyUrl || '');
   const [status, setStatus] = useState<EventStatus>(initialEvent?.status || 'active');
+
+  // Espacio Virtual (Reuniones Microsoft Teams / Zoom)
+  const [meetingPlatform, setMeetingPlatform] = useState<VirtualMeetingPlatform>(
+    initialEvent?.meetingPlatform || 
+    (initialEvent?.meetingUrl?.includes('zoom.us') || initialEvent?.location?.toLowerCase().includes('zoom') ? 'zoom' : 'teams')
+  );
+  const [meetingUrl, setMeetingUrl] = useState<string>(
+    initialEvent?.meetingUrl || 
+    (initialEvent?.modality === 'Virtual' && initialEvent?.location && initialEvent.location.startsWith('http') ? initialEvent.location : '')
+  );
+  const [meetingId, setMeetingId] = useState<string>(initialEvent?.meetingId || '');
+  const [meetingPassword, setMeetingPassword] = useState<string>(initialEvent?.meetingPassword || '');
+
+  const handleMeetingUrlChange = (val: string) => {
+    setMeetingUrl(val);
+    const lower = val.toLowerCase();
+    if (lower.includes('zoom.us')) {
+      setMeetingPlatform('zoom');
+      const match = val.match(/\/j\/(\d+)/);
+      if (match && match[1] && !meetingId) {
+        setMeetingId(match[1]);
+      }
+      const pwdMatch = val.match(/[?&]pwd=([^&]+)/);
+      if (pwdMatch && pwdMatch[1] && !meetingPassword) {
+        setMeetingPassword(pwdMatch[1]);
+      }
+    } else if (lower.includes('teams.microsoft.com') || lower.includes('teams.live.com')) {
+      setMeetingPlatform('teams');
+    } else if (lower.includes('meet.google.com')) {
+      setMeetingPlatform('meet');
+    }
+  };
 
   // Publicación en Banner Principal y Carga de Medios (Imágenes y GIFs)
   const [isBannerFeatured, setIsBannerFeatured] = useState<boolean>(initialEvent?.isBannerFeatured || false);
@@ -574,6 +606,11 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
       return;
     }
 
+    if ((modality === 'Virtual' || modality === 'Mixta') && !meetingUrl.trim()) {
+      setError('Para eventos con modalidad Virtual o Mixta es obligatorio ingresar el enlace de la reunión (Microsoft Teams o Zoom).');
+      return;
+    }
+
     const selectedOjtUser = users.find(u => u.id === ojtEvaluatorId);
 
     const finalCompanyId = companyScope === 'all' ? 'all' : (selectedCompanyIds[0] || 'all');
@@ -591,7 +628,13 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
       ojtEvaluatorName: selectedOjtUser?.name || initialEvent?.ojtEvaluatorName || undefined,
       ojtEvaluatorEmail: selectedOjtUser?.email || initialEvent?.ojtEvaluatorEmail || undefined,
       modality,
-      location: location.trim(),
+      location: modality === 'Virtual' 
+        ? (meetingPlatform === 'zoom' ? 'Zoom' : 'Microsoft Teams') 
+        : (location.trim() || 'Instalaciones Claro'),
+      meetingPlatform: (modality === 'Virtual' || modality === 'Mixta') ? meetingPlatform : undefined,
+      meetingUrl: (modality === 'Virtual' || modality === 'Mixta') ? (meetingUrl.trim() || undefined) : undefined,
+      meetingId: (modality === 'Virtual' || modality === 'Mixta') ? (meetingId.trim() || undefined) : undefined,
+      meetingPassword: (modality === 'Virtual' || modality === 'Mixta') ? (meetingPassword.trim() || undefined) : undefined,
       imageUrl: imageUrl.trim() || SAMPLE_IMAGES[0],
       surveyUrl: surveyUrl.trim() || undefined,
       status,
@@ -1065,18 +1108,169 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({
               </select>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="event-form-location" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Ubicación o Enlace</label>
-                <input
-                  id="event-form-location"
-                  type="text"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder={modality === 'Virtual' ? 'Enlace de Microsoft Teams' : 'Sala de Juntas B (Piso 3)'}
-                  className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
-                />
+            {/* Configuración de Ubicación Física / Sala Virtual según Modalidad */}
+            {(modality === 'Virtual' || modality === 'Mixta') && (
+              <div className="p-4 bg-gradient-to-br from-blue-50/80 via-indigo-50/40 to-transparent dark:from-blue-950/30 dark:via-indigo-950/20 border-2 border-blue-200 dark:border-blue-900/60 rounded-2xl space-y-3.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-sm">
+                      <Video className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                        Espacio de Capacitación Virtual (Teams / Zoom)
+                      </h4>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                        Define la plataforma donde se impartirá la reunión y se proyectará a los participantes.
+                      </p>
+                    </div>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-800 uppercase">
+                    Sala Virtual
+                  </span>
+                </div>
+
+                {/* Selector de Plataforma */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Plataforma de Videoconferencia *
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setMeetingPlatform('teams')}
+                      className={`p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all ${
+                        meetingPlatform === 'teams'
+                          ? 'bg-blue-600 text-white border-blue-600 shadow-md ring-2 ring-blue-400/30 font-bold'
+                          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-blue-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 text-xs font-extrabold">
+                        <span>Microsoft Teams</span>
+                      </div>
+                      <span className={`text-[10px] ${meetingPlatform === 'teams' ? 'text-blue-100' : 'text-slate-400'}`}>Recomendada</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setMeetingPlatform('zoom')}
+                      className={`p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all ${
+                        meetingPlatform === 'zoom'
+                          ? 'bg-sky-600 text-white border-sky-600 shadow-md ring-2 ring-sky-400/30 font-bold'
+                          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-sky-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 text-xs font-extrabold">
+                        <span>Zoom Meetings</span>
+                      </div>
+                      <span className={`text-[10px] ${meetingPlatform === 'zoom' ? 'text-sky-100' : 'text-slate-400'}`}>Web / App</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setMeetingPlatform('other')}
+                      className={`p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all ${
+                        meetingPlatform === 'other' || meetingPlatform === 'meet'
+                          ? 'bg-indigo-600 text-white border-indigo-600 shadow-md ring-2 ring-indigo-400/30 font-bold'
+                          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-indigo-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 text-xs font-extrabold">
+                        <span>Google Meet / Otra</span>
+                      </div>
+                      <span className={`text-[10px] ${meetingPlatform === 'other' || meetingPlatform === 'meet' ? 'text-indigo-100' : 'text-slate-400'}`}>Enlace Externo</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Input de Enlace de Reunión */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label htmlFor="event-form-meeting-url" className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                      Enlace Oficial de la Reunión ({meetingPlatform === 'zoom' ? 'Zoom' : meetingPlatform === 'teams' ? 'Teams' : 'Videollamada'}) *
+                    </label>
+                    <span className="text-[10px] text-slate-400">Pega el link y se auto-configurará</span>
+                  </div>
+                  <div className="relative">
+                    <input
+                      id="event-form-meeting-url"
+                      type="url"
+                      value={meetingUrl}
+                      onChange={(e) => handleMeetingUrlChange(e.target.value)}
+                      placeholder={
+                        meetingPlatform === 'zoom'
+                          ? 'https://zoom.us/j/1234567890?pwd=...'
+                          : meetingPlatform === 'teams'
+                          ? 'https://teams.microsoft.com/l/meetup-join/...'
+                          : 'https://meet.google.com/...'
+                      }
+                      className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-600 font-medium"
+                      required={modality === 'Virtual'}
+                    />
+                  </div>
+                </div>
+
+                {/* ID de Reunión y Contraseña Opcionales */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <label htmlFor="event-form-meeting-id" className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+                      ID de la Reunión (Opcional)
+                    </label>
+                    <input
+                      id="event-form-meeting-id"
+                      type="text"
+                      value={meetingId}
+                      onChange={(e) => setMeetingId(e.target.value)}
+                      placeholder="ej. 849 2039 1029"
+                      className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-600"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="event-form-meeting-pwd" className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+                      Código de Acceso / Contraseña (Opcional)
+                    </label>
+                    <input
+                      id="event-form-meeting-pwd"
+                      type="text"
+                      value={meetingPassword}
+                      onChange={(e) => setMeetingPassword(e.target.value)}
+                      placeholder="ej. Claro2026"
+                      className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-600"
+                    />
+                  </div>
+                </div>
               </div>
+            )}
+
+            {/* Ubicación Física y Enlace de Evaluación */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {modality !== 'Virtual' ? (
+                <div>
+                  <label htmlFor="event-form-location" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Ubicación Física *
+                  </label>
+                  <input
+                    id="event-form-location"
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="Sala de Juntas B (Piso 3, Torre Claro)"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C]"
+                    required={modality === 'Presencial'}
+                  />
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Modalidad y Espacio
+                  </label>
+                  <div className="px-3.5 py-2.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                    <Video className="w-4 h-4 text-blue-600 shrink-0" />
+                    <span>Transmisión 100% Virtual vía {meetingPlatform === 'zoom' ? 'Zoom' : 'Microsoft Teams'}</span>
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label htmlFor="event-form-survey-url" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">

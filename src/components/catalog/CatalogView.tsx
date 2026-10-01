@@ -33,6 +33,7 @@ interface CatalogViewProps {
   groups?: ParticipantGroup[];
   participants?: Participant[];
   onOpenReservationModal: (event: TrainingEvent) => void;
+  onOpenVirtualRoom?: (event: TrainingEvent) => void;
 }
 
 export const CatalogView: React.FC<CatalogViewProps> = ({
@@ -43,7 +44,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   programs = [],
   groups = [],
   participants = [],
-  onOpenReservationModal
+  onOpenReservationModal,
+  onOpenVirtualRoom
 }) => {
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [selectedModality, setSelectedModality] = useState<string>("Todos");
@@ -522,6 +524,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   companies={companies}
                   isRequiredInProgram={requiredEventIds.has(event.id)}
                   onOpenReservationModal={onOpenReservationModal}
+                  onOpenVirtualRoom={onOpenVirtualRoom}
                 />
               ))}
             </div>

@@ -5,7 +5,8 @@
 export type UserRole = 'Super Administrador' | 'Administrador / Editor' | 'Líder de Área / Supervisor' | 'Evaluador / Tutor' | 'Evaluador / Tutor OJT' | 'Colaborador (User)';
 
 export type EventStatus = 'active' | 'inactive';
-export type EventModality = 'Presencial' | 'Virtual' | 'Híbrida';
+export type EventModality = 'Presencial' | 'Virtual' | 'Híbrida' | 'Mixta';
+export type VirtualMeetingPlatform = 'teams' | 'zoom' | 'meet' | 'other';
 
 export interface RegistrationAttendeeDetail {
   email: string;
@@ -218,6 +219,10 @@ export interface TrainingEvent {
   supplier?: string;
   isBannerFeatured?: boolean;
   bannerImageUrl?: string;
+  meetingPlatform?: VirtualMeetingPlatform;
+  meetingUrl?: string;
+  meetingId?: string;
+  meetingPassword?: string;
 }
 
 export interface ExternalTraining {

@@ -181,6 +181,10 @@ export async function fetchFullEvents(companyId?: string) {
       status: evt.status,
       modality: evt.modality,
       location: evt.location,
+      meetingPlatform: evt.meeting_platform || (evt.modality === 'Virtual' ? 'teams' : 'teams'),
+      meetingUrl: evt.meeting_url || (evt.modality === 'Virtual' && evt.location && (evt.location.startsWith('http://') || evt.location.startsWith('https://')) ? evt.location : null),
+      meetingId: evt.meeting_id || null,
+      meetingPassword: evt.meeting_password || null,
       surveyUrl: evt.survey_url,
       companyId: evt.company_id || 'all',
       companyIds: Array.isArray(evt.company_ids) ? evt.company_ids : [],
@@ -262,9 +266,10 @@ eventsRouter.post('/', async (req: Request, res: Response) => {
         ojt_evaluator_id, ojt_evaluator_name, ojt_evaluator_email, modules,
         start_date, end_date, start_time, end_time, company_ids, total_hours,
         session_type, training_type, training_format, program_category, subprogram, supplier,
-        is_banner_featured, banner_image_url
+        is_banner_featured, banner_image_url,
+        meeting_platform, meeting_url, meeting_id, meeting_password
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39)
       ON CONFLICT (id) DO UPDATE SET
         title = EXCLUDED.title,
         description = EXCLUDED.description,
@@ -299,7 +304,11 @@ eventsRouter.post('/', async (req: Request, res: Response) => {
         subprogram = EXCLUDED.subprogram,
         supplier = EXCLUDED.supplier,
         is_banner_featured = EXCLUDED.is_banner_featured,
-        banner_image_url = EXCLUDED.banner_image_url`,
+        banner_image_url = EXCLUDED.banner_image_url,
+        meeting_platform = EXCLUDED.meeting_platform,
+        meeting_url = EXCLUDED.meeting_url,
+        meeting_id = EXCLUDED.meeting_id,
+        meeting_password = EXCLUDED.meeting_password`,
       [
         event.id,
         event.title,
@@ -312,7 +321,7 @@ eventsRouter.post('/', async (req: Request, res: Response) => {
         event.notificationSettings?.sendTeams ?? false,
         event.notificationSettings?.customMessage || '',
         event.modality || 'Presencial',
-        event.location || 'Instalaciones',
+        event.location || (event.modality === 'Virtual' ? (event.meetingPlatform === 'zoom' ? 'Zoom' : 'Microsoft Teams') : 'Instalaciones'),
         event.surveyUrl || null,
         effectiveCompanyId,
         event.evaluationType || 'attendance_only',
@@ -335,7 +344,11 @@ eventsRouter.post('/', async (req: Request, res: Response) => {
         event.subprogram || 'Sustentabilidad',
         event.supplier || 'Claro',
         Boolean(event.isBannerFeatured),
-        event.bannerImageUrl || null
+        event.bannerImageUrl || null,
+        event.meetingPlatform || 'teams',
+        event.meetingUrl || null,
+        event.meetingId || null,
+        event.meetingPassword || null
       ]
     );
 

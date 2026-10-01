@@ -37,6 +37,7 @@ interface EventsManagerProps {
   onOpenQrModal: (event: TrainingEvent) => void;
   onOpenBulkEnrollment?: (eventId?: string) => void;
   onMakeRecurrent?: (event: TrainingEvent) => void;
+  onOpenVirtualRoom?: (event: TrainingEvent) => void;
   onDeleteEvent: (eventId: string) => Promise<void>;
 }
 
@@ -52,6 +53,7 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
   onOpenQrModal,
   onOpenBulkEnrollment,
   onMakeRecurrent,
+  onOpenVirtualRoom,
   onDeleteEvent
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -286,6 +288,19 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
                     >
                       <RotateCw className="w-3.5 h-3.5 text-amber-400" />
                       <span className="hidden sm:inline">Volver Recurrente</span>
+                    </button>
+                  )}
+
+                  {(event.modality === 'Virtual' || event.modality === 'Mixta' || event.meetingUrl) && onOpenVirtualRoom && (
+                    <button
+                      type="button"
+                      onClick={() => onOpenVirtualRoom(event)}
+                      aria-label={`Abrir Sala Virtual / Proyectar: ${event.title}`}
+                      title="Abrir Sala Virtual / Proyectar Reunión de Teams o Zoom"
+                      className="px-2.5 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-bold shadow-xs"
+                    >
+                      <Video className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                      <span className="hidden xl:inline">Sala Virtual</span>
                     </button>
                   )}
 

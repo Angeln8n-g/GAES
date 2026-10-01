@@ -76,6 +76,7 @@ interface AdminViewProps {
     autoExpandCapacity?: boolean
   ) => Promise<{ events: TrainingEvent[]; enrolledCount: number; skippedAlreadyEnrolled: string[] }>;
   onMakeRecurrent?: (event: TrainingEvent) => void;
+  onOpenVirtualRoom?: (event: TrainingEvent) => void;
   technicalHistory?: TechnicalAcademyHistoryRecord[];
   onShowToast: (title: string, message: string, type: 'success' | 'error' | 'info') => void;
 }
@@ -117,6 +118,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
   onSendNotification,
   onBulkRegisterUsers,
   onMakeRecurrent,
+  onOpenVirtualRoom,
   onShowToast
 }) => {
   const [adminTab, setAdminTab] = useState<'events' | 'programs' | 'groups' | 'participants' | 'users' | 'companies' | 'ojt' | 'letters' | 'external-trainings' | 'settings' | 'backups'>('events');
@@ -484,6 +486,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
           onOpenQrModal={(evt) => setQrEvent(evt)}
           onOpenBulkEnrollment={(evtId) => handleOpenBulkEnrollment(evtId)}
           onMakeRecurrent={onMakeRecurrent}
+          onOpenVirtualRoom={onOpenVirtualRoom}
           onDeleteEvent={async (id) => {
             await onDeleteEvent(id);
             onShowToast('Capacitación eliminada', 'El evento ha sido removido del sistema.', 'info');

@@ -26,6 +26,7 @@ interface EventCardProps {
   companies?: Company[];
   isRequiredInProgram?: boolean;
   onOpenReservationModal: (event: TrainingEvent) => void;
+  onOpenVirtualRoom?: (event: TrainingEvent) => void;
 }
 
 export const EventCard: React.FC<EventCardProps> = ({
@@ -33,7 +34,8 @@ export const EventCard: React.FC<EventCardProps> = ({
   currentUser,
   companies = [],
   isRequiredInProgram = false,
-  onOpenReservationModal
+  onOpenReservationModal,
+  onOpenVirtualRoom
 }) => {
   // Calcular total de cupos y registros
   let totalCapacity = 0;
@@ -165,11 +167,21 @@ export const EventCard: React.FC<EventCardProps> = ({
 
             <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold backdrop-blur-md flex items-center gap-1 shadow-xs ${
               event.modality === 'Virtual'
-                ? 'bg-white/95 dark:bg-slate-900/90 text-cyan-700 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800/60'
+                ? event.meetingPlatform === 'zoom' || event.meetingUrl?.includes('zoom.us')
+                  ? 'bg-sky-50/95 dark:bg-sky-950/90 text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-sky-800'
+                  : 'bg-blue-50/95 dark:bg-blue-950/90 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-800'
                 : 'bg-white/95 dark:bg-slate-900/90 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60'
             }`}>
-              {event.modality === 'Virtual' ? <Video className="w-3 h-3 text-cyan-600" /> : <MapPin className="w-3 h-3 text-emerald-600" />}
-              <span>{event.modality}</span>
+              {event.modality === 'Virtual' ? (
+                <Video className={`w-3 h-3 ${event.meetingPlatform === 'zoom' ? 'text-sky-600' : 'text-blue-600'}`} />
+              ) : (
+                <MapPin className="w-3 h-3 text-emerald-600" />
+              )}
+              <span>
+                {event.modality === 'Virtual' 
+                  ? (event.meetingPlatform === 'zoom' || event.meetingUrl?.includes('zoom.us') ? 'Virtual (Zoom)' : 'Virtual (Teams)')
+                  : event.modality}
+              </span>
             </span>
           </div>
 

@@ -16,7 +16,9 @@ import {
   ExternalTraining,
   CreateExternalTrainingPayload,
   TechnicalAcademyHistoryRecord,
-  TechnicalAcademyCohort
+  TechnicalAcademyCohort,
+  Schedule,
+  Slot
 } from './types';
 import { Navbar } from './components/layout/Navbar';
 import { SuperAdminSidebar } from './components/layout/SuperAdminSidebar';
@@ -42,6 +44,7 @@ import { TecEvaluationModal } from './components/feedback/TecEvaluationModal';
 const QrScannerModal = React.lazy(() => import('./components/scanner/QrScannerModal').then(m => ({ default: m.QrScannerModal })));
 const CedulaScannerModal = React.lazy(() => import('./components/lobby/CedulaScannerModal').then(m => ({ default: m.CedulaScannerModal })));
 const AttendeeScheduleModal = React.lazy(() => import('./components/lobby/AttendeeScheduleModal').then(m => ({ default: m.AttendeeScheduleModal })));
+const VirtualClassroomModal = React.lazy(() => import('./components/virtual/VirtualClassroomModal').then(m => ({ default: m.VirtualClassroomModal })));
 import { findAttendeeByCedula, AttendeeLookupResult } from './utils/attendeeLookup';
 import { UserProfileModal } from './components/profile/UserProfileModal';
 import { attendanceWs } from './services/websocket';
@@ -138,6 +141,15 @@ export function App() {
   const [selectedEventForModal, setSelectedEventForModal] = useState<TrainingEvent | null>(null);
   const [selectedEventForTecModal, setSelectedEventForTecModal] = useState<TrainingEvent | null>(null);
   const [isQrScannerOpen, setIsQrScannerOpen] = useState<boolean>(false);
+  const [selectedVirtualRoom, setSelectedVirtualRoom] = useState<{
+    event: TrainingEvent;
+    schedule?: Schedule;
+    slot?: Slot;
+  } | null>(null);
+
+  const handleOpenVirtualRoom = (event: TrainingEvent, schedule?: Schedule, slot?: Slot) => {
+    setSelectedVirtualRoom({ event, schedule, slot });
+  };
 
   // Estados para Lobby de Recepción y Kiosco por Cédula
   const [isCedulaScannerOpen, setIsCedulaScannerOpen] = useState<boolean>(false);
@@ -889,6 +901,7 @@ export function App() {
             groups={groups}
             participants={participants}
             onOpenReservationModal={(event) => setSelectedEventForModal(event)}
+            onOpenVirtualRoom={(event) => handleOpenVirtualRoom(event)}
           />
         )}
 
@@ -907,6 +920,7 @@ export function App() {
             onCancelRegistration={handleCancelRegistration}
             onExploreCatalog={() => setCurrentTab('landing')}
             onOpenReservationModal={(event) => setSelectedEventForModal(event)}
+            onOpenVirtualRoom={handleOpenVirtualRoom}
             onOpenQrScanner={() => setIsQrScannerOpen(true)}
             onOpenTecEvaluation={(event) => setSelectedEventForTecModal(event)}
             onOpenUserProfile={() => {
@@ -979,6 +993,7 @@ export function App() {
               setEventToMakeRecurrent(evt);
               setCurrentTab('technical-academy');
             }}
+            onOpenVirtualRoom={(event) => handleOpenVirtualRoom(event)}
             onShowToast={showToast}
           />
         )}
@@ -1165,6 +1180,29 @@ export function App() {
           onSaveProfile={handleSaveProfile}
           onShowToast={showToast}
         />
+      )}
+
+      {/* Aula Virtual / Sala de Proyección de Reuniones Teams & Zoom */}
+      {selectedVirtualRoom && (
+        <React.Suspense fallback={null}>
+          <VirtualClassroomModal
+            event={selectedVirtualRoom.event}
+            schedule={selectedVirtualRoom.schedule}
+            slot={selectedVirtualRoom.slot}
+            currentUser={currentUser}
+            participant={participants.find(p => p.email.toLowerCase() === (currentUser?.email || '').toLowerCase()) || null}
+            onClose={() => setSelectedVirtualRoom(null)}
+            onAttendanceSuccess={async () => {
+              try {
+                const fresh = await apiService.getEvents();
+                setEvents(fresh);
+                showToast('Asistencia Registrada', 'Tu asistencia a la sesión virtual ha sido confirmada.', 'success');
+              } catch (e) {
+                console.error('Error refrescando eventos tras asistencia virtual:', e);
+              }
+            }}
+          />
+        </React.Suspense>
       )}
 
     </div>
