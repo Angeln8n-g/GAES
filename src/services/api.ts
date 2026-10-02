@@ -37,7 +37,11 @@ import {
   MigrationStatusRecord,
   Certificate,
   CertificateVerificationResponse,
-  GenerateCertificatesPayload
+  GenerateCertificatesPayload,
+  CourseSuggestion,
+  CourseWaitlistEntry,
+  UserWaitlistItem,
+  CreateCourseSuggestionPayload
 } from '../types';
 
 export const MOCK_COMPANIES: Company[] = [
@@ -2443,6 +2447,116 @@ export const apiService = {
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error || 'Error al eliminar certificado');
+    }
+  },
+
+  // --- MÉTODOS DE CURSOS A DEMANDA & LISTAS DE ESPERA ---
+  getCourseSuggestions: async (filters?: {
+    status?: string;
+    category?: string;
+    companyId?: string;
+    search?: string;
+  }): Promise<CourseSuggestion[]> => {
+    const params = new URLSearchParams();
+    if (filters?.status) params.append('status', filters.status);
+    if (filters?.category) params.append('category', filters.category);
+    if (filters?.companyId && filters.companyId !== 'all') params.append('companyId', filters.companyId);
+    if (filters?.search) params.append('search', filters.search);
+
+    const query = params.toString() ? `?${params.toString()}` : '';
+    const res = await fetch(`${API_BASE_URL}/course-suggestions${query}`, {
+      headers: getAuthHeaders(false)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al consultar sugerencias de cursos');
+    }
+    return await res.json();
+  },
+
+  createCourseSuggestion: async (payload: CreateCourseSuggestionPayload): Promise<{ success: boolean; message: string; suggestion: CourseSuggestion }> => {
+    const res = await fetch(`${API_BASE_URL}/course-suggestions`, {
+      method: 'POST',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al enviar sugerencia de curso');
+    }
+    return await res.json();
+  },
+
+  joinCourseWaitlist: async (suggestionId: string, payload?: { preferredSchedule?: string; notes?: string }): Promise<{ success: boolean; message: string; currentQuorum: number; minQuorum: number; status: string; isUserInWaitlist: boolean }> => {
+    const res = await fetch(`${API_BASE_URL}/course-suggestions/${encodeURIComponent(suggestionId)}/join-waitlist`, {
+      method: 'POST',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify(payload || {})
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al unirse a la lista de espera');
+    }
+    return await res.json();
+  },
+
+  leaveCourseWaitlist: async (suggestionId: string): Promise<{ success: boolean; message: string; currentQuorum: number; status: string; isUserInWaitlist: boolean }> => {
+    const res = await fetch(`${API_BASE_URL}/course-suggestions/${encodeURIComponent(suggestionId)}/leave-waitlist`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(false)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al salir de la lista de espera');
+    }
+    return await res.json();
+  },
+
+  getMyCourseWaitlists: async (): Promise<UserWaitlistItem[]> => {
+    const res = await fetch(`${API_BASE_URL}/course-suggestions/my-waitlist`, {
+      headers: getAuthHeaders(false)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al consultar mis listas de espera');
+    }
+    return await res.json();
+  },
+
+  updateCourseSuggestionStatus: async (suggestionId: string, status: string, adminNotes?: string): Promise<{ success: boolean; suggestion: CourseSuggestion }> => {
+    const res = await fetch(`${API_BASE_URL}/course-suggestions/${encodeURIComponent(suggestionId)}/status`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify({ status, adminNotes })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al actualizar estado');
+    }
+    return await res.json();
+  },
+
+  updateCourseSuggestionQuorum: async (suggestionId: string, minQuorum: number): Promise<{ success: boolean; suggestion: CourseSuggestion }> => {
+    const res = await fetch(`${API_BASE_URL}/course-suggestions/${encodeURIComponent(suggestionId)}/quorum`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify({ minQuorum })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al ajustar quórum');
+    }
+    return await res.json();
+  },
+
+  deleteCourseSuggestion: async (suggestionId: string): Promise<void> => {
+    const res = await fetch(`${API_BASE_URL}/course-suggestions/${encodeURIComponent(suggestionId)}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(false)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al eliminar sugerencia');
     }
   }
 };

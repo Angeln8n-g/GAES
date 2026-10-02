@@ -34,6 +34,7 @@ interface CatalogViewProps {
   participants?: Participant[];
   onOpenReservationModal: (event: TrainingEvent) => void;
   onOpenVirtualRoom?: (event: TrainingEvent) => void;
+  onNavigateToDemand?: () => void;
 }
 
 export const CatalogView: React.FC<CatalogViewProps> = ({
@@ -45,7 +46,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   groups = [],
   participants = [],
   onOpenReservationModal,
-  onOpenVirtualRoom
+  onOpenVirtualRoom,
+  onNavigateToDemand
 }) => {
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [selectedModality, setSelectedModality] = useState<string>("Todos");
@@ -396,6 +398,32 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Banner / Acceso Directo a Cursos a Demanda & Listas de Espera */}
+      {onNavigateToDemand && (
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-red-600 via-[#DA291C] to-red-800 p-6 sm:p-7 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-5 border border-red-500/30">
+          <div className="absolute -right-8 -bottom-8 w-44 h-44 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="space-y-1.5 max-w-2xl relative z-10 text-center md:text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-xs text-[11px] font-black tracking-wide">
+              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+              <span>¿BUSCAS UN CURSO QUE NO TIENE FECHA PROGRAMADA?</span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white">
+              Cursos a Demanda & Listas de Espera
+            </h3>
+            <p className="text-xs sm:text-sm text-red-100 font-medium leading-relaxed">
+              Propón nuevas temáticas o súmate a listas de espera con quórum dinámico. Cuando se alcance el número mínimo de participantes, se habilitará la fecha oficial.
+            </p>
+          </div>
+          <button
+            onClick={onNavigateToDemand}
+            className="px-6 py-3.5 rounded-2xl bg-white text-[#DA291C] hover:bg-red-50 hover:shadow-2xl text-xs sm:text-sm font-black shadow-lg transition-all flex items-center gap-2 shrink-0 cursor-pointer active:scale-95 group relative z-10"
+          >
+            <span>Ver Cursos a Demanda</span>
+            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </button>
+        </div>
+      )}
 
       {/* 5. Grid Principal: Filtros y Eventos + Calendario Perpetuo */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">

@@ -279,6 +279,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
 
               <button
+                onClick={() => handleNavClick('demand')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all whitespace-nowrap shrink-0 ${
+                  currentTab === 'demand'
+                    ? 'bg-gradient-to-r from-[#DA291C] to-[#E02418] text-white shadow-md shadow-red-500/25 font-bold scale-[1.02]'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 font-semibold'
+                }`}
+              >
+                <Sparkles className="w-4 h-4 text-amber-500" />
+                <span>Cursos a Demanda</span>
+              </button>
+
+              <button
                 onClick={() => handleNavClick('my-registrations')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all relative whitespace-nowrap shrink-0 ${
                   currentTab === 'my-registrations'
@@ -700,6 +712,21 @@ export const Navbar: React.FC<NavbarProps> = ({
               <div className="flex items-center gap-3">
                 <Grid className="w-4 h-4" />
                 <span>Catálogo de Capacitaciones</span>
+              </div>
+              <ChevronRight className="w-4 h-4 opacity-70" />
+            </button>
+
+            <button
+              onClick={() => handleNavClick('demand')}
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
+                currentTab === 'demand'
+                  ? 'bg-gradient-to-r from-[#DA291C] to-red-600 text-white shadow-md shadow-red-500/25'
+                  : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700/60'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-4 h-4 text-amber-500" />
+                <span>Cursos a Demanda & Sugerencias</span>
               </div>
               <ChevronRight className="w-4 h-4 opacity-70" />
             </button>

@@ -18,6 +18,7 @@ import ojtRouter from './routes/ojt.js';
 import { externalTrainingsRouter } from './routes/externalTrainings.js';
 import { technicalAcademyRouter } from './routes/technicalAcademy.js';
 import { certificatesRouter } from './routes/certificates.js';
+import { courseSuggestionsRouter } from './routes/courseSuggestions.js';
 import { adminBackupsRouter } from './routes/backups.js';
 import { initBackupScheduler } from './services/backupService.js';
 import { authenticateToken } from './middlewares/auth.js';
@@ -94,6 +95,7 @@ app.use('/api/programs', programsRouter);
 app.use('/api/external-trainings', externalTrainingsRouter);
 app.use('/api/technical-academy', authenticateToken, technicalAcademyRouter);
 app.use('/api/certificates', certificatesRouter);
+app.use('/api/course-suggestions', courseSuggestionsRouter);
 app.use('/api/admin', authenticateToken, adminBackupsRouter);
 
 import http from 'http';

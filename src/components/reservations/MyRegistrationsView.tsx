@@ -32,7 +32,7 @@ import {
   ArrowRightLeft
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import { TrainingEvent, UserAccount, Slot, Schedule, TrainingProgram, ParticipantGroup, Participant, Company, ExternalTraining, TechnicalAcademyHistoryRecord, Certificate } from '../../types';
+import { TrainingEvent, UserAccount, Slot, Schedule, TrainingProgram, ParticipantGroup, Participant, Company, ExternalTraining, TechnicalAcademyHistoryRecord, Certificate, UserWaitlistItem } from '../../types';
 import { apiService } from '../../services/api';
 import { formatDateLong, formatDateShort, formatCedula, getEventDurationMetrics, isSafeHttpUrl } from '../../utils/formatters';
 import { downloadIcsFile, getGoogleCalendarUrl } from '../../utils/icsUtils';
@@ -72,6 +72,7 @@ interface MyRegistrationsViewProps {
   onOpenTecEvaluation?: (event: TrainingEvent) => void;
   onOpenUserProfile?: () => void;
   onShowToast?: (title: string, message?: string, type?: 'success' | 'error' | 'warning' | 'info') => void;
+  onNavigateToDemand?: () => void;
 }
 
 export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
@@ -91,18 +92,54 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
   onOpenQrScanner,
   onOpenTecEvaluation,
   onOpenUserProfile,
-  onShowToast
+  onShowToast,
+  onNavigateToDemand
 }) => {
   const [cancelingItem, setCancelingItem] = useState<UserRegistrationItem | null>(null);
   const [selectedPassItem, setSelectedPassItem] = useState<UserRegistrationItem | null>(null);
   const [selectedPinTraining, setSelectedPinTraining] = useState<TechnicalAcademyHistoryRecord | null>(null);
   const [isProcessingCancel, setIsProcessingCancel] = useState(false);
 
-  // Sub-Pestañas: Sesiones Activas vs Histórico vs Certificados & Diplomas
-  const [currentSubTab, setCurrentSubTab] = useState<'active' | 'history' | 'certificates'>('active');
+  // Sub-Pestañas: Sesiones Activas vs Histórico vs Certificados & Diplomas vs Listas de Espera
+  const [currentSubTab, setCurrentSubTab] = useState<'active' | 'history' | 'certificates' | 'waitlist'>('active');
   const [myCertificates, setMyCertificates] = useState<Certificate[]>([]);
   const [viewingCertificate, setViewingCertificate] = useState<Certificate | null>(null);
   const [loadingCerts, setLoadingCerts] = useState<boolean>(false);
+  const [myWaitlists, setMyWaitlists] = useState<UserWaitlistItem[]>([]);
+  const [loadingWaitlists, setLoadingWaitlists] = useState<boolean>(false);
+  const [leavingWaitlistId, setLeavingWaitlistId] = useState<string | null>(null);
+
+  const loadMyWaitlists = async () => {
+    setLoadingWaitlists(true);
+    try {
+      const waitlists = await apiService.getMyCourseWaitlists();
+      setMyWaitlists(waitlists || []);
+    } catch (e) {
+      console.error('Error al cargar mis listas de espera:', e);
+    } finally {
+      setLoadingWaitlists(false);
+    }
+  };
+
+  React.useEffect(() => {
+    if (currentUser?.email || currentUser?.id) {
+      loadMyWaitlists();
+    }
+  }, [currentUser?.email, currentUser?.id]);
+
+  const handleLeaveWaitlist = async (suggestionId: string, title: string) => {
+    if (!confirm(`¿Estás seguro de que deseas salir de la lista de espera de "${title}"?`)) return;
+    setLeavingWaitlistId(suggestionId);
+    try {
+      await apiService.leaveCourseWaitlist(suggestionId);
+      if (onShowToast) onShowToast('Lista de Espera', `Has salido de la lista de espera para "${title}"`, 'info');
+      await loadMyWaitlists();
+    } catch (err: any) {
+      if (onShowToast) onShowToast('Error', err.response?.data?.error || 'No se pudo salir de la lista', 'error');
+    } finally {
+      setLeavingWaitlistId(null);
+    }
+  };
   const [isFormalLetterModalOpen, setIsFormalLetterModalOpen] = useState(false);
   const [selectedRecordsForLetter, setSelectedRecordsForLetter] = useState<TrainingHistoryRecord[] | null>(null);
 
@@ -618,6 +655,21 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
           >
             <Award className="w-4 h-4 text-amber-400" />
             <span>Mis Diplomas & Certificados ({myCertificates.length})</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setCurrentSubTab('waitlist');
+              loadMyWaitlists();
+            }}
+            className={`flex-1 sm:flex-initial px-5 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              currentSubTab === 'waitlist'
+                ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <Sparkles className="w-4 h-4 text-amber-500" />
+            <span>Listas de Espera ({myWaitlists.length})</span>
           </button>
         </div>
 
@@ -1658,6 +1710,196 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* PESTAÑA: MIS LISTAS DE ESPERA & SOLICITUDES A DEMANDA */}
+      {currentSubTab === 'waitlist' && (
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center space-x-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-red-600 via-amber-500 to-orange-400 p-0.5 shadow-md flex items-center justify-center">
+                  <div className="w-full h-full rounded-2xl bg-white dark:bg-slate-900 flex items-center justify-center">
+                    <Sparkles className="w-6 h-6 text-[#DA291C] dark:text-red-400" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                    Mis Listas de Espera & Cursos Solicitados
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Monitorea el progreso de quórum de los cursos y eventos a demanda en los que te has postulado.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded-xl font-bold border border-slate-200 dark:border-slate-700">
+                  Solicitudes Activas: <strong className="text-[#DA291C]">{myWaitlists.length}</strong>
+                </div>
+                {(onNavigateToDemand || onExploreCatalog) && (
+                  <button
+                    onClick={onNavigateToDemand || onExploreCatalog}
+                    className="px-4 py-2 bg-[#DA291C] hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <span>Explorar más cursos</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {loadingWaitlists ? (
+            <div className="py-20 text-center text-xs text-slate-500">
+              <div className="w-8 h-8 border-3 border-slate-200 border-t-[#DA291C] rounded-full animate-spin mx-auto mb-2" />
+              Cargando tus solicitudes en lista de espera...
+            </div>
+          ) : myWaitlists.length === 0 ? (
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center shadow-xs">
+              <div className="w-16 h-16 rounded-3xl bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 flex items-center justify-center mx-auto mb-3 border border-red-200 dark:border-red-900/50">
+                <Sparkles className="w-8 h-8" />
+              </div>
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                No tienes solicitudes en lista de espera
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto leading-relaxed">
+                ¿Te gustaría recibir una capacitación que actualmente no tiene fechas programadas? Propón nuevos temas o súmate a listas de espera existentes para impulsar su apertura.
+              </p>
+              {(onNavigateToDemand || onExploreCatalog) && (
+                <button
+                  onClick={onNavigateToDemand || onExploreCatalog}
+                  className="mt-5 px-5 py-2.5 bg-[#DA291C] hover:bg-red-700 text-white rounded-2xl text-xs font-black shadow-md shadow-red-500/25 transition-all inline-flex items-center gap-2 cursor-pointer"
+                >
+                  <Sparkles className="w-4 h-4 text-amber-300" />
+                  <span>Ver Cursos a Demanda & Sugerencias</span>
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {myWaitlists.map((item) => {
+                const quorumPct = Math.min(100, Math.round((item.currentQuorum / item.minQuorum) * 100));
+                const isQuorumReached = item.currentQuorum >= item.minQuorum || item.status === 'quorum_alcanzado' || item.status === 'programado';
+                const isScheduled = item.status === 'programado';
+
+                return (
+                  <div
+                    key={item.entryId}
+                    className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden"
+                  >
+                    <div className="space-y-4">
+                      {/* Top Badges */}
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                          {item.category}
+                        </span>
+                        
+                        <div className="flex items-center gap-1.5">
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-black bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border border-red-200 dark:border-red-900/50">
+                            #{item.userQueuePosition} en fila
+                          </span>
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            isScheduled
+                              ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+                              : isQuorumReached
+                              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                              : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                          }`}>
+                            {isScheduled
+                              ? 'Programado'
+                              : isQuorumReached
+                              ? 'Quórum Listo'
+                              : 'En Espera'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Course Title */}
+                      <div>
+                        <h4 className="text-sm font-black text-slate-900 dark:text-white line-clamp-2 leading-snug group-hover:text-[#DA291C] transition-colors">
+                          {item.title}
+                        </h4>
+                        <div className="flex items-center gap-3 mt-2 text-[11px] text-slate-500 dark:text-slate-400">
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3.5 h-3.5 text-slate-400" />
+                            <span>{item.targetHours} hrs estimadas</span>
+                          </span>
+                          <span>•</span>
+                          <span>{item.modality}</span>
+                        </div>
+                      </div>
+
+                      {/* Quorum Progress Bar */}
+                      <div className="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-3 border border-slate-100 dark:border-slate-700/60 space-y-2">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-slate-500 dark:text-slate-400 font-semibold">Progreso de Quórum:</span>
+                          <span className="font-black text-slate-900 dark:text-white">
+                            {item.currentQuorum} <span className="text-slate-400 font-normal">/ {item.minQuorum} requeridos</span>
+                          </span>
+                        </div>
+
+                        <div className="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full transition-all duration-500 rounded-full ${
+                              isScheduled
+                                ? 'bg-blue-600'
+                                : isQuorumReached
+                                ? 'bg-emerald-500'
+                                : 'bg-gradient-to-r from-amber-500 to-[#DA291C]'
+                            }`}
+                            style={{ width: `${quorumPct}%` }}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between text-[10px] text-slate-400">
+                          <span>Tu horario: <strong className="text-slate-700 dark:text-slate-300 font-bold">{item.preferredSchedule || 'Cualquiera'}</strong></span>
+                          <span>{quorumPct}% completado</span>
+                        </div>
+                      </div>
+
+                      {/* Scheduled Alert Notice */}
+                      {isScheduled && (
+                        <div className="p-3 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 rounded-2xl flex items-center justify-between gap-2">
+                          <div className="text-[11px] text-blue-800 dark:text-blue-300 font-bold leading-tight">
+                            🎉 ¡Curso oficial abierto! Ya puedes inscribirte formalmente.
+                          </div>
+                          <button
+                            onClick={onExploreCatalog}
+                            className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-black transition-all shrink-0 cursor-pointer"
+                          >
+                            Inscribirme
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Bottom Action Footer */}
+                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                      <span className="text-[10px] text-slate-400 truncate">
+                        Te uniste el {new Date(item.joinedAt).toLocaleDateString()}
+                      </span>
+
+                      <button
+                        onClick={() => handleLeaveWaitlist(item.suggestionId, item.title)}
+                        disabled={leavingWaitlistId === item.suggestionId}
+                        className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-600 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                        title="Salir de la lista de espera"
+                      >
+                        {leavingWaitlistId === item.suggestionId ? (
+                          <div className="w-3.5 h-3.5 border-2 border-slate-400 border-t-rose-500 rounded-full animate-spin" />
+                        ) : (
+                          <Trash2 className="w-3.5 h-3.5" />
+                        )}
+                        <span>Salir</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

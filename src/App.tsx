@@ -35,6 +35,7 @@ const TeamLeadView = React.lazy(() => import('./components/supervisor/TeamLeadVi
 const OjtManager = React.lazy(() => import('./components/ojt/OjtManager').then(m => ({ default: m.OjtManager })));
 const EvaluatorCoursesView = React.lazy(() => import('./components/evaluator/EvaluatorCoursesView').then(m => ({ default: m.EvaluatorCoursesView })));
 const TechnicalAcademyView = React.lazy(() => import('./components/technical-academy/TechnicalAcademyView').then(m => ({ default: m.TechnicalAcademyView })));
+const CourseDemandView = React.lazy(() => import('./components/demand/CourseDemandView').then(m => ({ default: m.CourseDemandView })));
 import { Toast } from './components/common/Toast';
 import { Footer } from './components/common/Footer';
 import { PwaInstallPrompt } from './components/common/PwaInstallPrompt';
@@ -925,6 +926,21 @@ export function App() {
             participants={participants}
             onOpenReservationModal={(event) => setSelectedEventForModal(event)}
             onOpenVirtualRoom={(event) => handleOpenVirtualRoom(event)}
+            onNavigateToDemand={() => setCurrentTab('demand')}
+          />
+        )}
+
+        {/* Tab Demand: Cursos a Demanda & Sugerencias con Quórum Dinámico */}
+        {currentTab === 'demand' && (
+          <CourseDemandView
+            currentUser={currentUser}
+            companies={companies}
+            selectedCompanyId={selectedCompanyId}
+            onShowToast={showToast}
+            onOpenCreateEventWithData={(prefilledData) => {
+              setCurrentTab('admin');
+              showToast('Programar Evento', `Crea el evento oficial para: ${prefilledData.title}`, 'info');
+            }}
           />
         )}
 
@@ -942,6 +958,7 @@ export function App() {
             onRefreshTechnicalHistory={handleRefreshTechnicalHistory}
             onCancelRegistration={handleCancelRegistration}
             onExploreCatalog={() => setCurrentTab('landing')}
+            onNavigateToDemand={() => setCurrentTab('demand')}
             onOpenReservationModal={(event) => setSelectedEventForModal(event)}
             onOpenVirtualRoom={handleOpenVirtualRoom}
             onOpenQrScanner={() => setIsQrScannerOpen(true)}

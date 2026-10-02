@@ -352,7 +352,7 @@ export interface ToastNotification {
   type: 'success' | 'error' | 'info' | 'warning';
 }
 
-export type TabView = 'landing' | 'my-registrations' | 'dashboard' | 'admin' | 'attendance' | 'team' | 'ojt' | 'evaluator-courses' | 'kiosk' | 'technical-academy';
+export type TabView = 'landing' | 'my-registrations' | 'demand' | 'dashboard' | 'admin' | 'attendance' | 'team' | 'ojt' | 'evaluator-courses' | 'kiosk' | 'technical-academy';
 
 // ==========================================
 // MÓDULO DE GRUPOS, CRONOGRAMAS Y CUMPLIMIENTO
@@ -822,4 +822,75 @@ export interface GenerateCertificatesPayload {
   certificateTitle?: string;
   instructorName?: string;
   instructorTitle?: string;
+}
+
+// ==========================================
+// TIPOS PARA CURSOS A DEMANDA Y LISTAS DE ESPERA
+// ==========================================
+
+export interface CourseWaitlistEntry {
+  id: string;
+  participantCard: string;
+  participantName: string;
+  participantEmail: string;
+  participantCedula?: string;
+  companyName?: string;
+  preferredSchedule?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface CourseSuggestion {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  modality: string;
+  targetHours: number;
+  minQuorum: number;
+  currentQuorum: number;
+  status: 'recolectando_quorum' | 'quorum_alcanzado' | 'programado' | 'en_evaluacion' | 'rechazado';
+  suggestedByCard?: string;
+  suggestedByName?: string;
+  suggestedByEmail?: string;
+  companyId?: string;
+  companyName?: string;
+  linkedEventId?: string | null;
+  adminNotes?: string | null;
+  tags?: string[];
+  isUserInWaitlist?: boolean;
+  waitlist?: CourseWaitlistEntry[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserWaitlistItem {
+  entryId: string;
+  suggestionId: string;
+  title: string;
+  description: string;
+  category: string;
+  modality: string;
+  targetHours: number;
+  minQuorum: number;
+  currentQuorum: number;
+  status: 'recolectando_quorum' | 'quorum_alcanzado' | 'programado' | 'en_evaluacion' | 'rechazado';
+  linkedEventId?: string | null;
+  userQueuePosition: number;
+  preferredSchedule?: string;
+  joinedAt: string;
+  createdAt: string;
+}
+
+export interface CreateCourseSuggestionPayload {
+  title: string;
+  description?: string;
+  category?: string;
+  modality?: string;
+  targetHours?: number;
+  minQuorum?: number;
+  companyId?: string;
+  tags?: string[];
+  preferredSchedule?: string;
+  notes?: string;
 }
