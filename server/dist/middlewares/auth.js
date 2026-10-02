@@ -20,8 +20,11 @@ if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
  * - Permite explícitamente rutas públicas de inicio de sesión (/login).
  */
 function authenticateToken(req, res, next) {
-    // Permitir endpoints públicos de autenticación (ej. /login o /auth/login)
-    if ((req.path === '/login' || req.path === '/auth/login') && req.method === 'POST') {
+    // Permitir endpoints públicos de autenticación (ej. /login o /reset-password)
+    const isPublicAuthRoute = (req.path === '/login' || req.path === '/auth/login' ||
+        req.path === '/reset-password' || req.path === '/auth/reset-password') &&
+        req.method === 'POST';
+    if (isPublicAuthRoute) {
         return next();
     }
     const authHeader = req.headers['authorization'];

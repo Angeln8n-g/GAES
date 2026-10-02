@@ -230,10 +230,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     setIsLoading(true);
 
     try {
-      const updatedUsers = await apiService.changePassword(targetUser.id, newPassword);
-      if (onUsersUpdated) {
-        onUsersUpdated(updatedUsers);
-      }
+      await apiService.resetPassword(targetUser.email, newPassword.trim());
       setEmail(targetUser.email);
       setPassword('');
       setViewMode('login');

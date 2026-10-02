@@ -47,33 +47,27 @@ export function registerServiceWorker() {
         };
       })
       .catch((error: any) => {
-        // AbortError ocurre normalmente si el usuario recarga la página, cambia de pestaña
-        // o navega rápidamente antes de que el navegador complete la inicialización del worker.
-        if (error?.name === 'AbortError') {
-          if (retryCount < maxRetries && !document.hidden) {
-            retryCount++;
-            setTimeout(performRegistration, 1500);
-          } else {
-            console.warn('[PWA] Registro de Service Worker cancelado por ciclo de vida de la página (AbortError).');
-          }
+        // AbortError y SecurityError son cancelaciones normales del ciclo de vida del navegador
+        // (ej. recarga de pestaña, modo incógnito estricto o intervención de optimización de imágenes de Edge).
+        // Se descartan silenciosamente para mantener la consola limpia.
+        if (error?.name === 'AbortError' || error?.name === 'SecurityError') {
           return;
         }
 
-        // SecurityError en contextos con almacenamiento de terceros bloqueado o modo privado estricto
-        if (error?.name === 'SecurityError') {
-          console.warn('[PWA] Service Worker deshabilitado por directivas de privacidad del navegador.');
-          return;
+        if (import.meta.env.DEV) {
+          console.debug('[PWA] Aviso al inicializar Service Worker:', error?.message || error);
         }
-
-        console.warn('[PWA] Aviso al inicializar Service Worker:', error?.message || error);
       });
   };
 
-  // Registrar según el estado de carga del documento
-  if (document.readyState === 'complete') {
-    performRegistration();
+  // Desacoplado de eventos de carga pesados; se ejecuta cuando el hilo principal esté ocioso
+  const win = window as any;
+  if (typeof win.requestIdleCallback === 'function') {
+    win.requestIdleCallback(performRegistration);
+  } else if (document.readyState === 'complete') {
+    setTimeout(performRegistration, 800);
   } else {
-    window.addEventListener('load', performRegistration, { once: true });
+    win.addEventListener('DOMContentLoaded', () => setTimeout(performRegistration, 500), { once: true });
   }
 }
 

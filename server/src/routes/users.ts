@@ -150,6 +150,78 @@ usersRouter.post("/login", async (req: Request, res: Response) => {
   }
 });
 
+// POST /api/users/reset-password (Recuperación y restablecimiento público de contraseña)
+usersRouter.post("/reset-password", async (req: Request, res: Response) => {
+  try {
+    const { identifier, email, newPassword } = req.body;
+    const loginId = (identifier || email || "").trim();
+
+    if (!loginId || !newPassword) {
+      return res.status(400).json({ error: "Debe ingresar su correo o cédula y su nueva contraseña." });
+    }
+
+    if (typeof newPassword !== "string" || newPassword.trim().length < 6) {
+      return res.status(400).json({ error: "La nueva contraseña debe contener al menos 6 caracteres." });
+    }
+
+    const cleanInput = loginId.toLowerCase();
+    const unformattedCedula = cleanInput.replace(/[^a-z0-9]/g, "");
+
+    // 1. Buscar en users_simulated
+    const query = `
+      SELECT id, email, name, role 
+      FROM users_simulated 
+      WHERE LOWER(email) = $1 
+         OR (cedula IS NOT NULL AND (LOWER(cedula) = $1 OR REGEXP_REPLACE(LOWER(cedula), '[^a-z0-9]', '', 'g') = $2))
+      LIMIT 1
+    `;
+    const result = await pool.query(query, [cleanInput, unformattedCedula]);
+
+    let targetUserId: string | null = null;
+    let targetEmail: string = cleanInput;
+
+    if (result.rows.length > 0) {
+      targetUserId = result.rows[0].id;
+      targetEmail = result.rows[0].email;
+    } else {
+      // 2. Verificar si existe en participants para crearlo en users_simulated
+      const partRes = await pool.query(`
+        SELECT card, name, email, cedula, department, company_id, employment_status, is_active
+        FROM participants
+        WHERE LOWER(email) = $1
+           OR (cedula IS NOT NULL AND (LOWER(cedula) = $1 OR REGEXP_REPLACE(LOWER(cedula), '[^a-z0-9]', '', 'g') = $2))
+        LIMIT 1
+      `, [cleanInput, unformattedCedula]);
+
+      if (partRes.rows.length > 0) {
+        const p = partRes.rows[0];
+        const newId = `usr_${Date.now()}`;
+        const newHash = bcrypt.hashSync(newPassword.trim(), 10);
+        await pool.query(`
+          INSERT INTO users_simulated (
+            id, email, name, role, password, cedula, department, company_id, employment_status, is_active, profile_completed
+          ) VALUES ($1, $2, $3, 'Colaborador (User)', $4, $5, $6, $7, $8, $9, false)
+        `, [newId, p.email, p.name, newHash, p.cedula, p.department, p.company_id || 'emp_kasino', p.employment_status || 'contratado', p.is_active ?? true]);
+        
+        return res.json({ success: true, message: "Contraseña actualizada exitosamente." });
+      }
+    }
+
+    if (!targetUserId) {
+      return res.status(404).json({ error: "No se encontró ningún usuario con ese correo o cédula." });
+    }
+
+    const hashed = bcrypt.hashSync(newPassword.trim(), 10);
+    await pool.query("UPDATE users_simulated SET password = $1 WHERE id = $2", [hashed, targetUserId]);
+    console.log(`[AUTH] Contraseña restablecida exitosamente para usuario ${targetEmail}.`);
+
+    res.json({ success: true, message: "Contraseña actualizada exitosamente. Ya puedes iniciar sesión." });
+  } catch (err: any) {
+    console.error("Error al restablecer contraseña:", err);
+    res.status(500).json({ error: "Error interno al restablecer la contraseña.", details: err.message });
+  }
+});
+
 // GET /api/users (PROTEGIDO: nunca expone hashes ni contraseñas)
 usersRouter.get("/", async (req: Request, res: Response) => {
   try {
@@ -773,7 +845,10 @@ usersRouter.put("/:id/password", async (req: Request, res: Response) => {
 
       const dbPwd = targetUser.password || "";
       const isBcrypt = dbPwd.startsWith("$2a$") || dbPwd.startsWith("$2b$");
-      const isMatch = isBcrypt ? bcrypt.compareSync(currentPassword, dbPwd) : (dbPwd === currentPassword);
+      const trimmedCurrent = currentPassword.trim();
+      const isMatch = isBcrypt 
+        ? (bcrypt.compareSync(currentPassword, dbPwd) || bcrypt.compareSync(trimmedCurrent, dbPwd))
+        : (dbPwd === currentPassword || dbPwd === trimmedCurrent);
       if (!isMatch) {
         return res.status(401).json({ error: "La contraseña actual es incorrecta." });
       }

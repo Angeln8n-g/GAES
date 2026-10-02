@@ -33,8 +33,13 @@ declare global {
  * - Permite explícitamente rutas públicas de inicio de sesión (/login).
  */
 export function authenticateToken(req: Request, res: Response, next: NextFunction) {
-  // Permitir endpoints públicos de autenticación (ej. /login o /auth/login)
-  if ((req.path === '/login' || req.path === '/auth/login') && req.method === 'POST') {
+  // Permitir endpoints públicos de autenticación (ej. /login o /reset-password)
+  const isPublicAuthRoute = 
+    (req.path === '/login' || req.path === '/auth/login' || 
+     req.path === '/reset-password' || req.path === '/auth/reset-password') && 
+    req.method === 'POST';
+
+  if (isPublicAuthRoute) {
     return next();
   }
 

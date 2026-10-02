@@ -1338,6 +1338,27 @@ export const apiService = {
     }
   },
 
+  async resetPassword(identifier: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+    if (isApiMode) {
+      const res = await fetch(`${API_BASE_URL}/users/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, newPassword })
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Error al restablecer la contraseña.');
+      }
+      return res.json();
+    } else {
+      const users: UserAccount[] = safeJsonParse('ch_users', []);
+      const cleanInput = identifier.trim().toLowerCase();
+      const updated = users.map(u => (u.email.toLowerCase() === cleanInput || u.id === identifier) ? { ...u, password: newPassword } : u);
+      localStorage.setItem('ch_users', JSON.stringify(updated));
+      return { success: true, message: 'Contraseña restablecida exitosamente.' };
+    }
+  },
+
   async updateUserProfile(userId: string, profileData: Partial<UserAccount>): Promise<{ user: UserAccount; participants: Participant[]; users: UserAccount[] }> {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/users/${userId}/profile`, {
