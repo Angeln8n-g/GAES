@@ -354,6 +354,28 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
     }
   };
 
+  // Emisión masiva de Diplomas Técnicos con QR para la cohorte seleccionada
+  const handleEmitCohortCertificates = async () => {
+    if (!selectedCohortId) return;
+    const currentCoh = cohorts.find(c => c.id === selectedCohortId);
+    const confirmMsg = `¿Deseas emitir los Diplomas de Acreditación Técnica con código QR para los alumnos de la cohorte "${currentCoh?.courseTitle || selectedCohortId}"?`;
+    if (!window.confirm(confirmMsg)) return;
+
+    try {
+      const res = await apiService.generateCertificates({
+        mode: 'cohort',
+        cohortId: selectedCohortId
+      });
+      if (onShowToast) {
+        onShowToast('Diplomas Emitidos', res.message || 'Se emitieron los certificados técnicos con éxito.', 'success');
+      }
+    } catch (err: any) {
+      if (onShowToast) {
+        onShowToast('Error al Emitir', err.message || 'Ocurrió un error al generar los diplomas.', 'error');
+      }
+    }
+  };
+
   // Duplicar cohorte (+7 días)
   const handleDuplicateCohort = async (cohortId: string) => {
     try {
@@ -924,6 +946,18 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                       </>
                     )}
                   </button>
+
+                  {isAdminOrSuper && (
+                    <button
+                      type="button"
+                      onClick={handleEmitCohortCertificates}
+                      className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-2 shadow-sm"
+                      title="Generar Diplomas de Acreditación con QR para esta cohorte"
+                    >
+                      <Award className="w-3.5 h-3.5" />
+                      <span>Emitir Diplomas QR</span>
+                    </button>
+                  )}
                 </div>
               </div>
 

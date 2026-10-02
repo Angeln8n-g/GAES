@@ -32,11 +32,14 @@ import {
   ArrowRightLeft
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import { TrainingEvent, UserAccount, Slot, Schedule, TrainingProgram, ParticipantGroup, Participant, Company, ExternalTraining, TechnicalAcademyHistoryRecord } from '../../types';
+import { TrainingEvent, UserAccount, Slot, Schedule, TrainingProgram, ParticipantGroup, Participant, Company, ExternalTraining, TechnicalAcademyHistoryRecord, Certificate } from '../../types';
+import { apiService } from '../../services/api';
 import { formatDateLong, formatDateShort, formatCedula, getEventDurationMetrics, isSafeHttpUrl } from '../../utils/formatters';
 import { downloadIcsFile, getGoogleCalendarUrl } from '../../utils/icsUtils';
 import { FormalLetterModal, TrainingHistoryRecord } from '../history/FormalLetterModal';
 import { TechnicalPinCheckinModal } from './TechnicalPinCheckinModal';
+import { CertificateViewModal } from '../certificates/CertificateViewModal';
+import { formatCertificateDate } from '../../utils/certificatePdfGenerator';
 
 interface UserRegistrationItem {
   event: TrainingEvent;
@@ -95,10 +98,31 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
   const [selectedPinTraining, setSelectedPinTraining] = useState<TechnicalAcademyHistoryRecord | null>(null);
   const [isProcessingCancel, setIsProcessingCancel] = useState(false);
 
-  // Sub-Pestañas: Sesiones Activas vs Histórico
-  const [currentSubTab, setCurrentSubTab] = useState<'active' | 'history'>('active');
+  // Sub-Pestañas: Sesiones Activas vs Histórico vs Certificados & Diplomas
+  const [currentSubTab, setCurrentSubTab] = useState<'active' | 'history' | 'certificates'>('active');
+  const [myCertificates, setMyCertificates] = useState<Certificate[]>([]);
+  const [viewingCertificate, setViewingCertificate] = useState<Certificate | null>(null);
+  const [loadingCerts, setLoadingCerts] = useState<boolean>(false);
   const [isFormalLetterModalOpen, setIsFormalLetterModalOpen] = useState(false);
   const [selectedRecordsForLetter, setSelectedRecordsForLetter] = useState<TrainingHistoryRecord[] | null>(null);
+
+  // Carga de certificados propios del participante autenticado
+  React.useEffect(() => {
+    let isMounted = true;
+    async function loadCerts() {
+      setLoadingCerts(true);
+      try {
+        const certs = await apiService.getMyCertificates();
+        if (isMounted) setMyCertificates(certs || []);
+      } catch (e) {
+        console.error('Error al cargar mis certificados:', e);
+      } finally {
+        if (isMounted) setLoadingCerts(false);
+      }
+    }
+    loadCerts();
+    return () => { isMounted = false; };
+  }, [currentUser?.email, currentUser?.id]);
 
   // Filtros del Histórico
   const [historyStatusFilter, setHistoryStatusFilter] = useState<'all' | 'attended' | 'upcoming' | 'missed'>('all');
@@ -581,7 +605,19 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
             }`}
           >
             <FileText className="w-4 h-4" />
-            <span>Histórico de Capacitaciones ({trainingHistoryRecords.length})</span>
+            <span>Histórico ({trainingHistoryRecords.length})</span>
+          </button>
+
+          <button
+            onClick={() => setCurrentSubTab('certificates')}
+            className={`flex-1 sm:flex-initial px-5 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              currentSubTab === 'certificates'
+                ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <Award className="w-4 h-4 text-amber-400" />
+            <span>Mis Diplomas & Certificados ({myCertificates.length})</span>
           </button>
         </div>
 
@@ -1382,19 +1418,37 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                                 </span>
                               )}
                             </div>
-                            <div className="flex items-center justify-between gap-1">
+                            <div className="flex items-center justify-between gap-1 flex-wrap">
                               <p className="line-clamp-1 text-slate-900 dark:text-white font-extrabold text-xs">{rec.title}</p>
-                              {isSafeHttpUrl(rec.credentialUrl) && (
-                                <a
-                                  href={rec.credentialUrl!}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-[10px] font-bold shrink-0 inline-flex items-center gap-0.5"
-                                  title="Ver certificado oficial externo"
-                                >
-                                  <ExternalLink className="w-3 h-3" /> Certificado
-                                </a>
-                              )}
+                              <div className="flex items-center gap-1 shrink-0">
+                                {(() => {
+                                  const matchingCert = myCertificates.find(c => 
+                                    (c.courseId && c.courseId === rec.id) || 
+                                    (c.courseName && c.courseName.toLowerCase() === rec.title.toLowerCase())
+                                  );
+                                  if (!matchingCert) return null;
+                                  return (
+                                    <button
+                                      onClick={() => setViewingCertificate(matchingCert)}
+                                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black bg-amber-500 hover:bg-amber-600 text-white shadow-2xs transition-colors"
+                                      title="Ver Diploma Oficial Claro Dominicana"
+                                    >
+                                      <Award className="w-3 h-3" /> Diploma QR
+                                    </button>
+                                  );
+                                })()}
+                                {isSafeHttpUrl(rec.credentialUrl) && (
+                                  <a
+                                    href={rec.credentialUrl!}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-[10px] font-bold shrink-0 inline-flex items-center gap-0.5"
+                                    title="Ver certificado oficial externo"
+                                  >
+                                    <ExternalLink className="w-3 h-3" /> Certificado
+                                  </a>
+                                )}
+                              </div>
                             </div>
                           </td>
                           <td className="py-4 px-4 text-slate-600 dark:text-slate-300">
@@ -1482,6 +1536,130 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
             </div>
           )}
 
+        </div>
+      )}
+
+      {/* PESTAÑA: MIS DIPLOMAS & CERTIFICACIONES */}
+      {currentSubTab === 'certificates' && (
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center space-x-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-linear-to-tr from-amber-600 via-amber-400 to-yellow-200 p-0.5 shadow-md flex items-center justify-center">
+                  <div className="w-full h-full rounded-2xl bg-white dark:bg-slate-900 flex items-center justify-center">
+                    <Award className="w-6 h-6 text-amber-500" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                    Mis Certificaciones y Diplomas Oficiales
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Acreditaciones formales expedidas por Claro Dominicana con código QR de verificación antifraude.
+                  </p>
+                </div>
+              </div>
+
+              <div className="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded-xl font-bold border border-slate-200 dark:border-slate-700">
+                Certificados Obtenidos: <strong className="text-[#DA291C]">{myCertificates.length}</strong>
+              </div>
+            </div>
+          </div>
+
+          {loadingCerts ? (
+            <div className="py-20 text-center text-xs text-slate-500">
+              <div className="w-8 h-8 border-3 border-slate-200 border-t-[#DA291C] rounded-full animate-spin mx-auto mb-2" />
+              Cargando tus diplomas oficiales...
+            </div>
+          ) : myCertificates.length === 0 ? (
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center shadow-xs">
+              <div className="w-16 h-16 rounded-3xl bg-amber-50 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center mx-auto mb-3 border border-amber-200 dark:border-amber-900/50">
+                <Award className="w-8 h-8" />
+              </div>
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                Aún no tienes diplomas o certificados emitidos
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
+                Tus certificados oficiales se generarán automáticamente cuando completes los eventos formativos y cursos de la Academia Técnica con asistencia aprobatoria.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {myCertificates.map((cert) => (
+                <div
+                  key={cert.id}
+                  className="bg-white dark:bg-slate-900 border-2 border-amber-500/30 hover:border-amber-500/60 rounded-3xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden"
+                >
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-linear-to-bl from-amber-400/10 via-red-500/5 to-transparent rounded-bl-full pointer-events-none" />
+
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60 inline-flex items-center space-x-1">
+                        <Award className="w-3 h-3 text-amber-600" />
+                        <span>Acreditación Claro</span>
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-400 font-bold">
+                        {cert.credentialId}
+                      </span>
+                    </div>
+
+                    <h4 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-[#DA291C] transition-colors line-clamp-2 mb-1.5">
+                      {cert.courseName}
+                    </h4>
+
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 line-clamp-1">
+                      {cert.title}
+                    </p>
+
+                    <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60 p-3 rounded-2xl mb-4 border border-slate-100 dark:border-slate-800">
+                      <div>
+                        <span className="text-[10px] text-slate-400 block uppercase font-bold">Duración</span>
+                        <span className="font-extrabold text-slate-800 dark:text-slate-200">{cert.durationHours} hrs</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 block uppercase font-bold">Modalidad</span>
+                        <span className="font-extrabold text-slate-800 dark:text-slate-200">{cert.modality}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 block uppercase font-bold">Emitido</span>
+                        <span className="font-bold text-slate-700 dark:text-slate-300">{formatCertificateDate(cert.issueDate)}</span>
+                      </div>
+                      {cert.score !== null && cert.score !== undefined && (
+                        <div>
+                          <span className="text-[10px] text-slate-400 block uppercase font-bold">Nota</span>
+                          <span className="font-extrabold text-emerald-600">{cert.score} / 100</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
+                    <button
+                      onClick={() => setViewingCertificate(cert)}
+                      className="flex-1 py-2.5 px-3 bg-[#DA291C] hover:bg-red-700 active:bg-red-800 text-white font-bold rounded-xl text-xs shadow-xs transition-colors flex items-center justify-center space-x-1.5"
+                    >
+                      <Award className="w-3.5 h-3.5" />
+                      <span>Ver Diploma</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        const url = cert.verificationUrl || `${window.location.origin}/?cert=${cert.credentialId}`;
+                        navigator.clipboard.writeText(url).then(() => {
+                          if (onShowToast) onShowToast('Enlace Copiado', 'Enlace público de verificación copiado al portapapeles.', 'success');
+                          else alert('Enlace copiado: ' + url);
+                        });
+                      }}
+                      title="Copiar enlace de validación QR"
+                      className="p-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 rounded-xl transition-colors"
+                    >
+                      <QrCode className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -1617,6 +1795,15 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
             }
           }}
           onShowToast={onShowToast || (() => {})}
+        />
+      )}
+
+      {/* Modal de Previsualización y Descarga de Diploma Oficial en PDF */}
+      {viewingCertificate && (
+        <CertificateViewModal
+          certificate={viewingCertificate}
+          isOpen={!!viewingCertificate}
+          onClose={() => setViewingCertificate(null)}
         />
       )}
 

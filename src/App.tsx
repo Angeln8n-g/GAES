@@ -45,6 +45,7 @@ const QrScannerModal = React.lazy(() => import('./components/scanner/QrScannerMo
 const CedulaScannerModal = React.lazy(() => import('./components/lobby/CedulaScannerModal').then(m => ({ default: m.CedulaScannerModal })));
 const AttendeeScheduleModal = React.lazy(() => import('./components/lobby/AttendeeScheduleModal').then(m => ({ default: m.AttendeeScheduleModal })));
 const VirtualClassroomModal = React.lazy(() => import('./components/virtual/VirtualClassroomModal').then(m => ({ default: m.VirtualClassroomModal })));
+const PublicCertificateVerification = React.lazy(() => import('./components/certificates/PublicCertificateVerification').then(m => ({ default: m.PublicCertificateVerification })));
 import { findAttendeeByCedula, AttendeeLookupResult } from './utils/attendeeLookup';
 import { UserProfileModal } from './components/profile/UserProfileModal';
 import { attendanceWs } from './services/websocket';
@@ -133,10 +134,17 @@ export function App() {
     return 'landing';
   });
 
-  // Parámetros de asistencia QR
+  // Parámetros de asistencia QR y Validación Pública de Certificados
   const [attendanceEventId, setAttendanceEventId] = useState<string | null>(null);
   const [attendanceDate, setAttendanceDate] = useState<string | null>(null);
   const [attendanceTime, setAttendanceTime] = useState<string | null>(null);
+  const [publicCertId, setPublicCertId] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('cert') || params.get('certificate') || null;
+    }
+    return null;
+  });
 
   const [selectedEventForModal, setSelectedEventForModal] = useState<TrainingEvent | null>(null);
   const [selectedEventForTecModal, setSelectedEventForTecModal] = useState<TrainingEvent | null>(null);
@@ -832,6 +840,21 @@ export function App() {
 
   const isSuperAdminUser = currentUser?.role === 'Super Administrador';
 
+  // Si se ingresó vía escaneo de Código QR de Certificado (?cert=CLARO-CERT-...)
+  if (publicCertId) {
+    return (
+      <React.Suspense fallback={<ViewLoadingFallback />}>
+        <PublicCertificateVerification
+          credentialId={publicCertId}
+          onClose={() => {
+            setPublicCertId(null);
+            window.history.replaceState({}, '', window.location.pathname);
+          }}
+        />
+      </React.Suspense>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[var(--bg-canvas)] text-[var(--text-primary)] flex flex-col selection:bg-[#DA291C] selection:text-white font-sans transition-colors duration-200">
       
@@ -965,6 +988,7 @@ export function App() {
             calibrations={calibrations}
             externalTrainings={externalTrainings}
             technicalHistory={technicalHistory}
+            technicalCohorts={technicalCohorts}
             selectedCompanyId={selectedCompanyId}
             onSelectCompanyScope={(cId) => setSelectedCompanyId(cId)}
             onSaveCompany={handleSaveCompany}

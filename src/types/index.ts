@@ -745,3 +745,81 @@ export interface MigrationStatusRecord {
   status: 'applied' | 'pending' | 'failed';
 }
 
+
+// ==========================================
+// TIPOS PARA CERTIFICADOS Y DIPLOMAS CON QR
+// ==========================================
+
+export interface Certificate {
+  id: string;
+  credentialId: string;
+  title: string;
+  certificateType: 'completion' | 'achievement' | 'attendance' | 'technical_accreditation' | 'ojt';
+  recipientName: string;
+  recipientCedula: string;
+  recipientEmail?: string;
+  recipientCompany?: string;
+  courseId?: string;
+  cohortId?: string;
+  courseName: string;
+  courseType: 'event' | 'technical_academy' | 'ojt' | 'external';
+  modality: string;
+  durationHours: number;
+  score?: number | null;
+  issueDate: string;
+  expirationDate?: string | null;
+  instructorName: string;
+  instructorTitle: string;
+  directorName: string;
+  verificationUrl: string;
+  status: 'active' | 'revoked';
+  revocationReason?: string | null;
+  metadata?: Record<string, any>;
+  issuedBy?: string;
+  createdAt: string;
+}
+
+export interface CertificateVerificationPublicData {
+  id?: string;
+  credentialId: string;
+  title: string;
+  certificateType: string;
+  recipientName: string;
+  recipientCedulaMasked: string;
+  recipientCompany: string;
+  courseId?: string;
+  cohortId?: string;
+  courseName: string;
+  courseType: string;
+  modality: string;
+  durationHours: number;
+  score?: number | null;
+  issueDate: string;
+  expirationDate?: string | null;
+  instructorName: string;
+  instructorTitle: string;
+  directorName: string;
+  verificationUrl: string;
+  metadata?: Record<string, any>;
+  createdAt: string;
+}
+
+export interface CertificateVerificationResponse {
+  isValid: boolean;
+  isRevoked?: boolean;
+  status?: string;
+  revocationReason?: string | null;
+  error?: string;
+  certificate?: CertificateVerificationPublicData;
+}
+
+export interface GenerateCertificatesPayload {
+  mode: 'event' | 'cohort' | 'single';
+  eventId?: string;
+  cohortId?: string;
+  singleCertificate?: Partial<Certificate>;
+  targetCards?: string[];
+  certificateTitle?: string;
+  instructorName?: string;
+  instructorTitle?: string;
+}

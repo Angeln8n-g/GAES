@@ -34,7 +34,10 @@ import {
   TechnicalCohortParticipantsResponse,
   DatabaseBackupRecord,
   DatabaseStats,
-  MigrationStatusRecord
+  MigrationStatusRecord,
+  Certificate,
+  CertificateVerificationResponse,
+  GenerateCertificatesPayload
 } from '../types';
 
 export const MOCK_COMPANIES: Company[] = [
@@ -2360,6 +2363,87 @@ export const apiService = {
     const token = typeof window !== 'undefined' ? localStorage.getItem('ch_token') : null;
     const query = token ? `?token=${encodeURIComponent(token)}` : '';
     return `${API_BASE_URL}/admin/backups/${encodeURIComponent(filename)}/download${query}`;
+  },
+
+  // --- MÉTODOS DE CERTIFICADOS Y DIPLOMAS CON QR ---
+  verifyCertificate: async (credentialId: string): Promise<CertificateVerificationResponse> => {
+    const res = await fetch(`${API_BASE_URL}/certificates/verify/${encodeURIComponent(credentialId)}`);
+    return await res.json();
+  },
+
+  getCertificates: async (filters?: {
+    search?: string;
+    courseId?: string;
+    cohortId?: string;
+    status?: string;
+    companyId?: string;
+    cedula?: string;
+  }): Promise<Certificate[]> => {
+    const params = new URLSearchParams();
+    if (filters?.search) params.append('search', filters.search);
+    if (filters?.courseId) params.append('courseId', filters.courseId);
+    if (filters?.cohortId) params.append('cohortId', filters.cohortId);
+    if (filters?.status) params.append('status', filters.status);
+    if (filters?.companyId && filters.companyId !== 'all') params.append('companyId', filters.companyId);
+    if (filters?.cedula) params.append('cedula', filters.cedula);
+
+    const query = params.toString() ? `?${params.toString()}` : '';
+    const res = await fetch(`${API_BASE_URL}/certificates${query}`, {
+      headers: getAuthHeaders(false)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al obtener certificados');
+    }
+    return await res.json();
+  },
+
+  getMyCertificates: async (): Promise<Certificate[]> => {
+    const res = await fetch(`${API_BASE_URL}/certificates/my`, {
+      headers: getAuthHeaders(false)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al obtener mis certificados');
+    }
+    return await res.json();
+  },
+
+  generateCertificates: async (payload: GenerateCertificatesPayload): Promise<{ success: boolean; message: string; certificates: Certificate[] }> => {
+    const res = await fetch(`${API_BASE_URL}/certificates/generate`, {
+      method: 'POST',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al generar certificados');
+    }
+    return await res.json();
+  },
+
+  revokeCertificate: async (id: string, reason: string): Promise<{ success: boolean; certificate: Certificate }> => {
+    const res = await fetch(`${API_BASE_URL}/certificates/${encodeURIComponent(id)}/revoke`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify({ reason })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al revocar certificado');
+    }
+    return await res.json();
+  },
+
+  deleteCertificate: async (id: string): Promise<void> => {
+    const res = await fetch(`${API_BASE_URL}/certificates/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(false)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al eliminar certificado');
+    }
   }
 };
 

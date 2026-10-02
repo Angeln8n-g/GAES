@@ -15,7 +15,7 @@ import {
   GraduationCap,
   Database
 } from 'lucide-react';
-import { TrainingEvent, Participant, UserAccount, ParticipantGroup, TrainingProgram, Company, SystemSettings, OjtChecklist, CalibrationSession, TechnicalAcademyHistoryRecord } from '../../types';
+import { TrainingEvent, Participant, UserAccount, ParticipantGroup, TrainingProgram, Company, SystemSettings, OjtChecklist, CalibrationSession, TechnicalAcademyHistoryRecord, TechnicalAcademyCohort } from '../../types';
 import { EventsManager } from './EventsManager';
 import { ParticipantsManager } from './ParticipantsManager';
 import { UsersManager } from './UsersManager';
@@ -26,6 +26,7 @@ import { SettingsManager } from './SettingsManager';
 import { DatabaseBackupManager } from './DatabaseBackupManager';
 import { FormalLettersManager } from './FormalLettersManager';
 import { ExternalTrainingsManager } from './ExternalTrainingsManager';
+import { CertificatesManager } from '../certificates/CertificatesManager';
 import { OjtManager } from '../ojt/OjtManager';
 import { EventFormModal } from './EventFormModal';
 import { AttendeesModal } from './AttendeesModal';
@@ -78,6 +79,7 @@ interface AdminViewProps {
   onMakeRecurrent?: (event: TrainingEvent) => void;
   onOpenVirtualRoom?: (event: TrainingEvent) => void;
   technicalHistory?: TechnicalAcademyHistoryRecord[];
+  technicalCohorts?: TechnicalAcademyCohort[];
   onShowToast: (title: string, message: string, type: 'success' | 'error' | 'info') => void;
 }
 
@@ -93,6 +95,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
   calibrations = [],
   externalTrainings = [],
   technicalHistory = [],
+  technicalCohorts = [],
   selectedCompanyId = 'all',
   currentUser,
   onSelectCompanyScope,
@@ -121,7 +124,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
   onOpenVirtualRoom,
   onShowToast
 }) => {
-  const [adminTab, setAdminTab] = useState<'events' | 'programs' | 'groups' | 'participants' | 'users' | 'companies' | 'ojt' | 'letters' | 'external-trainings' | 'settings' | 'backups'>('events');
+  const [adminTab, setAdminTab] = useState<'events' | 'programs' | 'groups' | 'participants' | 'users' | 'companies' | 'ojt' | 'letters' | 'external-trainings' | 'certificates' | 'settings' | 'backups'>('events');
 
   // Modals state
   const [isEventFormOpen, setIsEventFormOpen] = useState(false);
@@ -431,6 +434,22 @@ export const AdminView: React.FC<AdminViewProps> = ({
               </button>
             )}
 
+            {(isSuperAdmin || currentUser?.role === 'Administrador / Editor' || currentUser?.role === 'Evaluador / Tutor') && (
+              <button
+                role="tab"
+                aria-selected={adminTab === 'certificates'}
+                onClick={() => setAdminTab('certificates')}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-[#DA291C] focus-visible:outline-none cursor-pointer ${
+                  adminTab === 'certificates'
+                    ? 'bg-[#DA291C] text-white shadow-md shadow-red-500/25'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700'
+                }`}
+              >
+                <Award className={`w-4 h-4 shrink-0 ${adminTab === 'certificates' ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`} />
+                <span>Diplomas & Certificados QR</span>
+              </button>
+            )}
+
             {isSuperAdmin && (
               <button
                 role="tab"
@@ -607,6 +626,15 @@ export const AdminView: React.FC<AdminViewProps> = ({
           onSaveTraining={onSaveExternalTraining}
           onBulkSaveTrainings={onBulkSaveExternalTrainings}
           onDeleteTraining={onDeleteExternalTraining}
+          onShowToast={onShowToast}
+        />
+      )}
+
+      {adminTab === 'certificates' && (
+        <CertificatesManager
+          currentUser={currentUser}
+          events={scopedEvents}
+          technicalCohorts={technicalCohorts}
           onShowToast={onShowToast}
         />
       )}
