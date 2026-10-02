@@ -136,7 +136,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     setIsLoading(true);
 
     try {
-      const response = await apiService.login(email.trim(), password);
+      const response = await apiService.login(email.trim(), password.trim());
       if (response && response.user) {
         if (response.user.isActive === false || response.user.employmentStatus === 'inactivo') {
           setError('Tu cuenta se encuentra inactiva o desvinculada. Contacta al departamento de Recursos Humanos.');
@@ -451,6 +451,51 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               </button>
 
             </form>
+
+            {/* Acceso Rápido / Credenciales de Prueba */}
+            <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <details className="text-[11px] text-slate-500 dark:text-slate-400 group cursor-pointer">
+                <summary className="font-semibold text-slate-600 dark:text-slate-400 hover:text-[#DA291C] dark:hover:text-red-400 transition-colors list-none flex items-center justify-between">
+                  <span>¿Necesitas credenciales de prueba?</span>
+                  <span className="text-[10px] text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                </summary>
+                <div className="mt-2.5 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 space-y-2">
+                  <p className="text-[10px] text-slate-400">
+                    Contraseña estándar para cuentas de prueba: <strong className="text-slate-700 dark:text-slate-200 font-mono">123</strong>
+                  </p>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => { setEmail('angel_santana@gmail.com'); setPassword('123'); setError(''); }}
+                      className="px-2.5 py-1.5 text-[10px] font-bold rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-red-400 transition-all text-left truncate cursor-pointer"
+                    >
+                      👑 SuperAdmin
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setEmail('denny_montilla@gmail.com'); setPassword('123'); setError(''); }}
+                      className="px-2.5 py-1.5 text-[10px] font-bold rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-red-400 transition-all text-left truncate cursor-pointer"
+                    >
+                      🎓 Evaluador / Tutor
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setEmail('carlos.nuevo@empresa.com'); setPassword('123'); setError(''); }}
+                      className="px-2.5 py-1.5 text-[10px] font-bold rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-red-400 transition-all text-left truncate cursor-pointer"
+                    >
+                      👤 Colaborador
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setEmail('andres.salcedo@empresa.com'); setPassword('123'); setError(''); }}
+                      className="px-2.5 py-1.5 text-[10px] font-bold rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-red-400 transition-all text-left truncate cursor-pointer"
+                    >
+                      👥 Supervisor
+                    </button>
+                  </div>
+                </div>
+              </details>
+            </div>
 
             {/* Quick Button to Switch to Kiosk */}
             {onLookupCedula && onOpenCedulaScanner && (

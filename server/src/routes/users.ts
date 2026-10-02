@@ -45,17 +45,48 @@ usersRouter.post("/login", async (req: Request, res: Response) => {
         COALESCE(profile_completed, false) as "profileCompleted"
       FROM users_simulated 
       WHERE LOWER(email) = $1 
-         OR (cedula IS NOT NULL AND (LOWER(cedula) = $1 OR REPLACE(REPLACE(LOWER(cedula), '-', ''), ' ', '') = $2))
+         OR (cedula IS NOT NULL AND (LOWER(cedula) = $1 OR REGEXP_REPLACE(LOWER(cedula), '[^a-z0-9]', '', 'g') = $2))
       LIMIT 1
     `;
 
     const result = await pool.query(query, [cleanInput, unformattedCedula]);
+    let user = result.rows[0];
 
-    if (result.rows.length === 0) {
-      return res.status(401).json({ error: "Credenciales incorrectas. Verifique su correo/cédula o contraseña." });
+    // Si no se encuentra en users_simulated, verificar en participants
+    if (!user) {
+      const partQuery = `
+        SELECT card, name, email, cedula, department, company_id, employment_status, is_active
+        FROM participants
+        WHERE LOWER(email) = $1
+           OR (cedula IS NOT NULL AND (LOWER(cedula) = $1 OR REGEXP_REPLACE(LOWER(cedula), '[^a-z0-9]', '', 'g') = $2))
+        LIMIT 1
+      `;
+      const partRes = await pool.query(partQuery, [cleanInput, unformattedCedula]);
+      if (partRes.rows.length > 0) {
+        const p = partRes.rows[0];
+        const newId = `usr_${Date.now()}`;
+        const defaultHash = bcrypt.hashSync('123', 10);
+        const insertUser = await pool.query(`
+          INSERT INTO users_simulated (
+            id, email, name, role, password, cedula, department, company_id, employment_status, is_active, profile_completed
+          ) VALUES ($1, $2, $3, 'Colaborador (User)', $4, $5, $6, $7, $8, $9, false)
+          RETURNING 
+            id, email, name, role, password, cedula, department, 
+            COALESCE(employment_status, 'contratado') as "employmentStatus",
+            COALESCE(is_active, true) as "isActive",
+            COALESCE(company_id, 'emp_kasino') as "companyId",
+            COALESCE(profile_completed, false) as "profileCompleted"
+        `, [newId, p.email, p.name, defaultHash, p.cedula, p.department, p.company_id || 'emp_kasino', p.employment_status || 'contratado', p.is_active ?? true]);
+
+        if (insertUser.rows.length > 0) {
+          user = insertUser.rows[0];
+        }
+      }
     }
 
-    const user = result.rows[0];
+    if (!user) {
+      return res.status(401).json({ error: "Credenciales incorrectas. Verifique su correo/cédula o contraseña." });
+    }
 
     // Verificar si la cuenta está inactiva o desvinculada
     if (user.isActive === false || user.employmentStatus === "inactivo") {
@@ -64,20 +95,22 @@ usersRouter.post("/login", async (req: Request, res: Response) => {
       });
     }
 
-    // Comprobación de contraseña con soporte para migración transparente
+    // Comprobación de contraseña con soporte para migración transparente y tolerancia a espacios de teclados móviles
     const dbPassword = user.password || "";
     const isBcrypt = dbPassword.startsWith("$2a$") || dbPassword.startsWith("$2b$");
     let passwordValid = false;
+    const trimmedInputPassword = typeof password === 'string' ? password.trim() : '';
 
     if (isBcrypt) {
-      passwordValid = bcrypt.compareSync(password, dbPassword);
+      passwordValid = bcrypt.compareSync(password, dbPassword) || 
+                      (trimmedInputPassword !== password && bcrypt.compareSync(trimmedInputPassword, dbPassword));
     } else {
       // Contraseña legada en texto plano
-      passwordValid = (dbPassword === password);
+      passwordValid = (dbPassword === password || dbPassword === trimmedInputPassword);
       if (passwordValid) {
         // Auto-upgrade automático e inmediato a hash Bcrypt en la base de datos
         try {
-          const newHash = bcrypt.hashSync(password, 10);
+          const newHash = bcrypt.hashSync(trimmedInputPassword || password, 10);
           await pool.query("UPDATE users_simulated SET password = $1 WHERE id = $2", [newHash, user.id]);
           console.log(`[AUTH] Contraseña de usuario ${user.email} migrada exitosamente a Bcrypt.`);
         } catch (migErr) {

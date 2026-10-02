@@ -485,7 +485,7 @@ CREATE TABLE IF NOT EXISTS course_suggestions (
     min_quorum INTEGER DEFAULT 10,
     current_quorum INTEGER DEFAULT 0,
     status VARCHAR(50) DEFAULT 'recolectando_quorum',
-    suggested_by_card VARCHAR(20) REFERENCES participants(card) ON DELETE SET NULL,
+    suggested_by_card VARCHAR(100),
     suggested_by_name VARCHAR(255),
     suggested_by_email VARCHAR(255),
     company_id VARCHAR(100) DEFAULT 'all',
@@ -503,7 +503,7 @@ CREATE INDEX IF NOT EXISTS idx_suggestions_created ON course_suggestions(created
 CREATE TABLE IF NOT EXISTS course_waitlist_entries (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     suggestion_id UUID NOT NULL REFERENCES course_suggestions(id) ON DELETE CASCADE,
-    participant_card VARCHAR(20) NOT NULL REFERENCES participants(card) ON DELETE CASCADE,
+    participant_card VARCHAR(100) NOT NULL,
     participant_name VARCHAR(255) NOT NULL,
     participant_email VARCHAR(255) NOT NULL,
     participant_cedula VARCHAR(50),
