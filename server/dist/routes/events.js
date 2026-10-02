@@ -153,6 +153,8 @@ async function fetchFullEvents(companyId) {
             meetingUrl: evt.meeting_url || (evt.modality === 'Virtual' && evt.location && (evt.location.startsWith('http://') || evt.location.startsWith('https://')) ? evt.location : null),
             meetingId: evt.meeting_id || null,
             meetingPassword: evt.meeting_password || null,
+            moodleUrl: evt.moodle_url || null,
+            moodleCourseId: evt.moodle_course_id || null,
             surveyUrl: evt.survey_url,
             companyId: evt.company_id || 'all',
             companyIds: Array.isArray(evt.company_ids) ? evt.company_ids : [],
@@ -229,9 +231,10 @@ exports.eventsRouter.post('/', async (req, res) => {
         start_date, end_date, start_time, end_time, company_ids, total_hours,
         session_type, training_type, training_format, program_category, subprogram, supplier,
         is_banner_featured, banner_image_url,
-        meeting_platform, meeting_url, meeting_id, meeting_password
+        meeting_platform, meeting_url, meeting_id, meeting_password,
+        moodle_url, moodle_course_id
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $40, $41)
       ON CONFLICT (id) DO UPDATE SET
         title = EXCLUDED.title,
         description = EXCLUDED.description,
@@ -270,7 +273,9 @@ exports.eventsRouter.post('/', async (req, res) => {
         meeting_platform = EXCLUDED.meeting_platform,
         meeting_url = EXCLUDED.meeting_url,
         meeting_id = EXCLUDED.meeting_id,
-        meeting_password = EXCLUDED.meeting_password`, [
+        meeting_password = EXCLUDED.meeting_password,
+        moodle_url = EXCLUDED.moodle_url,
+        moodle_course_id = EXCLUDED.moodle_course_id`, [
             event.id,
             event.title,
             event.description,
@@ -309,7 +314,9 @@ exports.eventsRouter.post('/', async (req, res) => {
             event.meetingPlatform || 'teams',
             event.meetingUrl || null,
             event.meetingId || null,
-            event.meetingPassword || null
+            event.meetingPassword || null,
+            event.moodleUrl || null,
+            event.moodleCourseId || null
         ]);
         // 2. Insertar Schedules y Slots
         for (const sch of event.schedule || []) {

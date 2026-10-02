@@ -1971,6 +1971,29 @@ export const apiService = {
     return await res.json();
   },
 
+  linkTechnicalCourseMoodle: async (
+    courseId: string, 
+    moodleData: { 
+      moodleCourseId?: string | null; 
+      moodleCourseUrl?: string | null; 
+      moodleSectionName?: string | null; 
+      moodleExamUrl?: string | null; 
+      moodleCategory?: string; 
+      isMoodleLinked?: boolean; 
+    }
+  ): Promise<{ message: string; courseId: string; isMoodleLinked: boolean }> => {
+    const res = await fetch(`${API_BASE_URL}/technical-academy/courses/${encodeURIComponent(courseId)}/moodle-link`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify(moodleData)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al actualizar el vínculo con Moodle');
+    }
+    return await res.json();
+  },
+
   deleteTechnicalCourse: async (id: string): Promise<void> => {
     const res = await fetch(`${API_BASE_URL}/technical-academy/courses/${encodeURIComponent(id)}`, {
       method: 'DELETE',

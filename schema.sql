@@ -69,7 +69,9 @@ CREATE TABLE events (
     meeting_platform VARCHAR(50) DEFAULT 'teams',
     meeting_url TEXT DEFAULT NULL,
     meeting_id VARCHAR(100) DEFAULT NULL,
-    meeting_password VARCHAR(100) DEFAULT NULL
+    meeting_password VARCHAR(100) DEFAULT NULL,
+    moodle_url TEXT DEFAULT NULL,
+    moodle_course_id VARCHAR(50) DEFAULT NULL
 );
 
 -- 4. Tabla de Fechas del Evento (Schedules)
@@ -230,10 +232,17 @@ CREATE TABLE IF NOT EXISTS technical_academy_courses (
     location VARCHAR(255) DEFAULT 'Laboratorio Central de Planta Externa',
     company_id VARCHAR(100) DEFAULT 'emp_kasino',
     is_active BOOLEAN DEFAULT TRUE,
+    moodle_course_id VARCHAR(50) DEFAULT NULL,
+    moodle_course_url TEXT DEFAULT NULL,
+    moodle_section_name VARCHAR(255) DEFAULT NULL,
+    moodle_exam_url TEXT DEFAULT NULL,
+    moodle_category VARCHAR(100) DEFAULT 'Entrenamientos Técnicos',
+    is_moodle_linked BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_tac_courses_company ON technical_academy_courses(company_id);
 CREATE INDEX IF NOT EXISTS idx_tac_courses_event ON technical_academy_courses(event_id);
+CREATE INDEX IF NOT EXISTS idx_tac_courses_moodle ON technical_academy_courses(moodle_course_id);
 
 -- 18. Academia Técnica: Cohortes / Semanas de Capacitación
 CREATE TABLE IF NOT EXISTS technical_academy_cohorts (
@@ -256,6 +265,8 @@ CREATE TABLE IF NOT EXISTS technical_academy_cohorts (
     notes TEXT,
     daily_pin VARCHAR(10) DEFAULT '2026',
     company_id VARCHAR(100) DEFAULT 'emp_kasino',
+    moodle_course_url TEXT DEFAULT NULL,
+    moodle_section_name VARCHAR(255) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_tac_cohorts_course ON technical_academy_cohorts(course_id);

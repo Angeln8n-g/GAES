@@ -715,6 +715,20 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
 
                   {/* Acción de Registro de Asistencia */}
                   <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+                    {t.moodleCourseUrl && (
+                      <a
+                        href={t.moodleCourseUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full mb-2.5 py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-700 text-white text-xs font-black transition-all shadow-sm shadow-amber-500/20 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                        title="Abrir aula virtual de Moodle Claro para este entrenamiento"
+                      >
+                        <GraduationCap className="w-4 h-4 text-white" />
+                        <span>Acceder al Curso en Moodle Claro</span>
+                        <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+                      </a>
+                    )}
+
                     {attendedToday ? (
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-300 font-bold">
@@ -1086,6 +1100,20 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                             <Video className="w-3.5 h-3.5 animate-pulse text-blue-200" />
                             <span>Aula Virtual</span>
                           </button>
+                        )}
+
+                        {event.moodleUrl && (
+                          <a
+                            href={event.moodleUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Abrir curso en Moodle Claro"
+                            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-xs font-black transition-all shadow-sm shadow-orange-500/20 cursor-pointer"
+                          >
+                            <GraduationCap className="w-3.5 h-3.5 text-white" />
+                            <span>Moodle Claro</span>
+                            <ExternalLink className="w-3 h-3 opacity-80" />
+                          </a>
                         )}
                       </div>
 

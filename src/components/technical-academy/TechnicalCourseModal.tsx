@@ -6,13 +6,17 @@ import {
   MapPin, 
   Layers, 
   CheckCircle2, 
-  AlertCircle,
-  RotateCw,
-  Sparkles
+  AlertCircle, 
+  RotateCw, 
+  Sparkles,
+  GraduationCap,
+  ExternalLink,
+  Link2
 } from 'lucide-react';
 import { TechnicalAcademyCourse, Company, TrainingEvent } from '../../types';
 import { apiService } from '../../services/api';
 import { AccessibleModal } from '../common/AccessibleModal';
+import { CLARO_MOODLE_PRESETS, CLARO_MOODLE_BASE_URL } from '../../data/claroMoodleCatalog';
 
 interface TechnicalCourseModalProps {
   isOpen: boolean;
@@ -60,6 +64,15 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
   const [modality, setModality] = useState<string>(courseToEdit?.modality || initialEvent?.modality || 'Presencial (Taller Técnico)');
   const [location, setLocation] = useState<string>(courseToEdit?.location || initialEvent?.location || 'Laboratorio Técnico Nave 4');
   const [companyId, setCompanyId] = useState<string>(courseToEdit?.companyId || initialEvent?.companyId || 'emp_kasino');
+  
+  // Moodle E-Learning
+  const [selectedPresetId, setSelectedPresetId] = useState<string>('');
+  const [moodleCourseId, setMoodleCourseId] = useState<string>(courseToEdit?.moodleCourseId || '');
+  const [moodleCourseUrl, setMoodleCourseUrl] = useState<string>(courseToEdit?.moodleCourseUrl || '');
+  const [moodleSectionName, setMoodleSectionName] = useState<string>(courseToEdit?.moodleSectionName || '');
+  const [moodleExamUrl, setMoodleExamUrl] = useState<string>(courseToEdit?.moodleExamUrl || '');
+  const [moodleCategory, setMoodleCategory] = useState<string>(courseToEdit?.moodleCategory || 'Entrenamientos Técnicos');
+
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -75,6 +88,15 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
       setModality(courseToEdit.modality || 'Presencial (Taller Técnico)');
       setLocation(courseToEdit.location || '');
       setCompanyId(courseToEdit.companyId || 'emp_kasino');
+      setMoodleCourseId(courseToEdit.moodleCourseId || '');
+      setMoodleCourseUrl(courseToEdit.moodleCourseUrl || '');
+      setMoodleSectionName(courseToEdit.moodleSectionName || '');
+      setMoodleExamUrl(courseToEdit.moodleExamUrl || '');
+      setMoodleCategory(courseToEdit.moodleCategory || 'Entrenamientos Técnicos');
+
+      // Buscar si coincide con algún preset
+      const preset = CLARO_MOODLE_PRESETS.find(p => p.courseId === courseToEdit.moodleCourseId);
+      if (preset) setSelectedPresetId(preset.id);
     } else if (initialEvent) {
       setSelectedEventId(initialEvent.id);
       setTitle(initialEvent.title);
@@ -86,6 +108,21 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
     }
   }, [courseToEdit, initialEvent]);
 
+  // Manejador de cambio de Preset
+  const handlePresetSelect = (presetId: string) => {
+    setSelectedPresetId(presetId);
+    if (!presetId) return;
+    const preset = CLARO_MOODLE_PRESETS.find(p => p.id === presetId);
+    if (preset) {
+      setMoodleCourseId(preset.courseId);
+      setMoodleCourseUrl(preset.url);
+      setMoodleCategory(preset.category);
+      if (!moodleSectionName) {
+        setMoodleSectionName(`Módulo Virtual: ${preset.title}`);
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -94,6 +131,12 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
     try {
       if (!title.trim()) {
         throw new Error('El título del curso técnico es obligatorio.');
+      }
+
+      let courseUrl = moodleCourseUrl.trim();
+      const courseIdToSave = moodleCourseId.trim();
+      if (courseIdToSave && !courseUrl) {
+        courseUrl = `${CLARO_MOODLE_BASE_URL}/course/view.php?id=${courseIdToSave}`;
       }
 
       await apiService.saveTechnicalCourse({
@@ -107,7 +150,13 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
         durationDays: Number(durationDays) || 5,
         modality,
         location: location.trim(),
-        companyId
+        companyId,
+        moodleCourseId: courseIdToSave || null,
+        moodleCourseUrl: courseUrl || null,
+        moodleSectionName: moodleSectionName.trim() || null,
+        moodleExamUrl: moodleExamUrl.trim() || null,
+        moodleCategory: moodleCategory || 'Entrenamientos Técnicos',
+        isMoodleLinked: Boolean(courseUrl || courseIdToSave)
       });
 
       onSuccess();
@@ -335,6 +384,130 @@ export const TechnicalCourseModal: React.FC<TechnicalCourseModalProps> = ({
               placeholder="Competencias técnicas a desarrollar, protocolos de seguridad y herramientas..."
               className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 text-slate-800 dark:text-white bg-white dark:bg-slate-800 resize-none"
             />
+          </div>
+
+          {/* VINCULACIÓN CON MOODLE CLARO (E-LEARNING) */}
+          <div className="p-4 bg-amber-50/70 dark:bg-amber-950/20 rounded-2xl border border-amber-200 dark:border-amber-900/40 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-amber-500 text-white shadow-sm">
+                  <GraduationCap className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-black text-amber-900 dark:text-amber-200">
+                    Campus Moodle Claro (entrenamiento.claro.com.do)
+                  </h4>
+                  <p className="text-[10px] text-amber-700 dark:text-amber-400">
+                    Entrelaza este curso técnico con su aula virtual y evaluaciones en Moodle.
+                  </p>
+                </div>
+              </div>
+
+              {moodleCourseUrl && (
+                <a
+                  href={moodleCourseUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[11px] text-amber-600 dark:text-amber-400 hover:underline font-bold flex items-center gap-1"
+                >
+                  <span>Probar</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
+            </div>
+
+            {/* Selector de Presets de Claro */}
+            <div className="space-y-1">
+              <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                Seleccionar Curso Técnico Oficial de Moodle Claro:
+              </label>
+              <select
+                value={selectedPresetId}
+                onChange={(e) => handlePresetSelect(e.target.value)}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-amber-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30"
+              >
+                <option value="">-- Ingresar URL / ID Personalizado --</option>
+                {CLARO_MOODLE_PRESETS.map(preset => (
+                  <option key={preset.id} value={preset.id}>
+                    [ID #{preset.courseId}] {preset.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                  ID de Curso Moodle
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ej: 140, 190, 185"
+                  value={moodleCourseId}
+                  onChange={(e) => {
+                    setMoodleCourseId(e.target.value);
+                    if (e.target.value.trim() && !moodleCourseUrl) {
+                      setMoodleCourseUrl(`${CLARO_MOODLE_BASE_URL}/course/view.php?id=${e.target.value.trim()}`);
+                    }
+                  }}
+                  className="w-full px-3 py-1.5 text-xs font-mono rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                  Categoría Moodle
+                </label>
+                <input
+                  type="text"
+                  placeholder="Entrenamientos Técnicos"
+                  value={moodleCategory}
+                  onChange={(e) => setMoodleCategory(e.target.value)}
+                  className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                Enlace Oficial del Curso en Moodle (URL)
+              </label>
+              <input
+                type="url"
+                placeholder="https://entrenamiento.claro.com.do/course/view.php?id=..."
+                value={moodleCourseUrl}
+                onChange={(e) => setMoodleCourseUrl(e.target.value)}
+                className="w-full px-3 py-1.5 text-xs font-mono text-[11px] rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                  Nombre de Módulo / Sección
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ej: Módulo Virtual: Fibra Óptica"
+                  value={moodleSectionName}
+                  onChange={(e) => setMoodleSectionName(e.target.value)}
+                  className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                  Enlace de Examen / Cuestionario
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://entrenamiento.claro.com.do/mod/quiz/..."
+                  value={moodleExamUrl}
+                  onChange={(e) => setMoodleExamUrl(e.target.value)}
+                  className="w-full px-3 py-1.5 text-xs font-mono text-[11px] rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white"
+                />
+              </div>
+            </div>
           </div>
 
           {/* Footer Actions */}

@@ -223,6 +223,8 @@ export interface TrainingEvent {
   meetingUrl?: string;
   meetingId?: string;
   meetingPassword?: string;
+  moodleUrl?: string;
+  moodleCourseId?: string;
 }
 
 export interface ExternalTraining {
@@ -535,6 +537,12 @@ export interface TechnicalAcademyCourse {
   location: string;
   companyId: string;
   isActive: boolean;
+  moodleCourseId?: string | null;
+  moodleCourseUrl?: string | null;
+  moodleSectionName?: string | null;
+  moodleExamUrl?: string | null;
+  moodleCategory?: string;
+  isMoodleLinked?: boolean;
   createdAt?: string;
 }
 
@@ -563,6 +571,13 @@ export interface TechnicalAcademyCohort {
   notes?: string;
   dailyPin: string;
   companyId: string;
+  moodleCourseUrl?: string | null;
+  moodleSectionName?: string | null;
+  courseMoodleCourseId?: string | null;
+  courseMoodleCourseUrl?: string | null;
+  courseMoodleSectionName?: string | null;
+  courseMoodleExamUrl?: string | null;
+  isMoodleLinked?: boolean;
   createdAt?: string;
 }
 
@@ -602,6 +617,11 @@ export interface TechnicalAcademyHistoryRecord {
   cohortStatus?: string;
   enrollmentStatus?: string;
   status: string;
+  moodleCourseUrl?: string | null;
+  moodleCourseId?: string | null;
+  moodleSectionName?: string | null;
+  moodleExamUrl?: string | null;
+  isMoodleLinked?: boolean;
 }
 
 export interface TechnicalDailyAttendance {

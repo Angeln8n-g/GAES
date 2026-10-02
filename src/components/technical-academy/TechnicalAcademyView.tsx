@@ -27,7 +27,10 @@ import {
   RotateCw,
   Eye,
   CheckCheck,
-  Save
+  Save,
+  GraduationCap,
+  ExternalLink,
+  Link2
 } from 'lucide-react';
 import { 
   TechnicalAcademyCourse, 
@@ -48,6 +51,7 @@ import { ReassignCohortModal } from './ReassignCohortModal';
 import { TechnicalCourseModal } from './TechnicalCourseModal';
 import { TechnicalCohortEnrollmentModal } from './TechnicalCohortEnrollmentModal';
 import { TechnicalCrmAssignmentsView } from './TechnicalCrmAssignmentsView';
+import { TechnicalMoodleSection } from './TechnicalMoodleSection';
 
 interface TechnicalAcademyViewProps {
   currentUser: UserAccount | null;
@@ -78,8 +82,8 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
   const isAdminOrSuper = isSuperAdmin || isAdmin;
   const isFacilitator = !isAdminOrSuper;
 
-  // Tabs: attendance (Marcado Diario), cohorts (Planificador), courses (Catálogo), accreditation (Acreditación), crm (Control Asignaciones Super Admin)
-  const [activeTab, setActiveTab] = useState<'attendance' | 'cohorts' | 'courses' | 'accreditation' | 'crm'>('attendance');
+  // Tabs: attendance (Marcado Diario), cohorts (Planificador), courses (Catálogo), moodle (Campus Moodle), accreditation (Acreditación), crm (Control Asignaciones Super Admin)
+  const [activeTab, setActiveTab] = useState<'attendance' | 'cohorts' | 'courses' | 'moodle' | 'accreditation' | 'crm'>('attendance');
 
   // Estado principal
   const [courses, setCourses] = useState<TechnicalAcademyCourse[]>([]);
@@ -699,6 +703,19 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
 
           <button
             type="button"
+            onClick={() => setActiveTab('moodle')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'moodle'
+                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-sm ring-1 ring-amber-500/50'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <GraduationCap className={`w-4 h-4 ${activeTab === 'moodle' ? 'text-white' : 'text-amber-500'}`} />
+            <span>Campus Moodle Claro ({courses.filter(c => c.isMoodleLinked || c.moodleCourseUrl).length})</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setActiveTab('accreditation')}
             className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
               activeTab === 'accreditation'
@@ -806,6 +823,20 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                     <FileSpreadsheet className="w-3.5 h-3.5" />
                     <span>Exportar Excel</span>
                   </button>
+
+                  {activeCohort.moodleCourseUrl && (
+                    <a
+                      href={activeCohort.moodleCourseUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm shadow-orange-500/20"
+                      title="Abrir aula virtual de Moodle Claro para esta cohorte"
+                    >
+                      <GraduationCap className="w-3.5 h-3.5 text-white" />
+                      <span>Moodle Claro</span>
+                      <ExternalLink className="w-3 h-3 opacity-80" />
+                    </a>
+                  )}
                 </div>
               )}
             </div>
@@ -1204,6 +1235,24 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                           <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                           <span className="truncate">{coh.location || 'Laboratorio Técnico'}</span>
                         </div>
+
+                        {coh.moodleCourseUrl && (
+                          <div className="flex items-center justify-between p-2 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-900/40 text-[11px] text-amber-900 dark:text-amber-200">
+                            <span className="flex items-center gap-1.5 font-bold">
+                              <GraduationCap className="w-3.5 h-3.5 text-amber-600" />
+                              <span>Moodle {coh.courseMoodleCourseId ? `#${coh.courseMoodleCourseId}` : 'E-Learning'}</span>
+                            </span>
+                            <a
+                              href={coh.moodleCourseUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-amber-700 dark:text-amber-300 hover:underline font-bold flex items-center gap-0.5"
+                            >
+                              <span>Abrir</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -1346,19 +1395,49 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                 className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between"
               >
                 <div className="space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/60">
-                      {course.category}
-                    </span>
-                    {course.code && (
-                      <span className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">
-                        {course.code}
+                  <div className="flex items-center justify-between gap-1 flex-wrap">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/60">
+                        {course.category}
+                      </span>
+                      {course.code && (
+                        <span className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">
+                          {course.code}
+                        </span>
+                      )}
+                    </div>
+
+                    {course.isMoodleLinked || course.moodleCourseUrl ? (
+                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60 flex items-center gap-1">
+                        <GraduationCap className="w-3 h-3 text-amber-600" />
+                        Moodle #{course.moodleCourseId || 'Link'}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-slate-400 font-medium">
+                        Sin Moodle
                       </span>
                     )}
                   </div>
 
                   <h3 className="font-bold text-slate-900 dark:text-white text-sm">{course.title}</h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{course.description || 'Sin descripción detallada.'}</p>
+
+                  {course.moodleCourseUrl && (
+                    <div className="pt-1 flex items-center justify-between text-[11px]">
+                      <span className="text-slate-400 font-medium truncate max-w-[170px]">
+                        {course.moodleSectionName || 'E-Learning Moodle'}
+                      </span>
+                      <a
+                        href={course.moodleCourseUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-amber-600 dark:text-amber-400 hover:underline font-bold flex items-center gap-1 shrink-0"
+                      >
+                        <span>Abrir en Moodle</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  )}
 
                   <div className="pt-2 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-2 text-[11px] text-slate-600 dark:text-slate-400">
                     <div>
@@ -1441,6 +1520,19 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
             ))}
           </div>
         </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB: CAMPUS MOODLE CLARO (E-LEARNING TÉCNICO) */}
+      {/* ========================================================================= */}
+      {activeTab === 'moodle' && (
+        <TechnicalMoodleSection
+          courses={courses}
+          cohorts={cohorts}
+          isAdminOrSuper={isAdminOrSuper}
+          onRefreshData={fetchData}
+          onShowToast={onShowToast}
+        />
       )}
 
       {/* ========================================================================= */}

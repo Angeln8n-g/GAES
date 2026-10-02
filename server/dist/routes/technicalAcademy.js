@@ -44,6 +44,12 @@ exports.technicalAcademyRouter.get('/courses', async (req, res) => {
             location: r.location || '',
             companyId: r.company_id || 'emp_kasino',
             isActive: r.is_active,
+            moodleCourseId: r.moodle_course_id || null,
+            moodleCourseUrl: r.moodle_course_url || null,
+            moodleSectionName: r.moodle_section_name || null,
+            moodleExamUrl: r.moodle_exam_url || null,
+            moodleCategory: r.moodle_category || 'Entrenamientos Técnicos',
+            isMoodleLinked: Boolean(r.is_moodle_linked || r.moodle_course_url),
             createdAt: r.created_at
         }));
         res.json(courses);
@@ -58,7 +64,7 @@ exports.technicalAcademyRouter.post('/courses', async (req, res) => {
     if (!checkAdminPermission(req, res))
         return;
     try {
-        const { id, eventId, title, code, description, category, dailyHours, durationDays, modality, location, companyId } = req.body;
+        const { id, eventId, title, code, description, category, dailyHours, durationDays, modality, location, companyId, moodleCourseId, moodleCourseUrl, moodleSectionName, moodleExamUrl, moodleCategory, isMoodleLinked } = req.body;
         if (!title || !title.trim()) {
             return res.status(400).json({ error: 'El título del curso técnico es obligatorio.' });
         }
@@ -66,10 +72,14 @@ exports.technicalAcademyRouter.post('/courses', async (req, res) => {
         const targetCompanyId = companyId || 'emp_kasino';
         const numDailyHours = Number(dailyHours) || 4;
         const numDurationDays = Number(durationDays) || 5;
+        const effectiveIsLinked = isMoodleLinked !== undefined
+            ? Boolean(isMoodleLinked)
+            : Boolean(moodleCourseUrl || moodleCourseId);
         await db_js_1.pool.query(`
       INSERT INTO technical_academy_courses (
-        id, event_id, title, code, description, category, daily_hours, duration_days, modality, location, company_id, is_active
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, true)
+        id, event_id, title, code, description, category, daily_hours, duration_days, modality, location, company_id, 
+        moodle_course_id, moodle_course_url, moodle_section_name, moodle_exam_url, moodle_category, is_moodle_linked, is_active
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, true)
       ON CONFLICT (id) DO UPDATE SET
         event_id = COALESCE(EXCLUDED.event_id, technical_academy_courses.event_id),
         title = EXCLUDED.title,
@@ -81,6 +91,12 @@ exports.technicalAcademyRouter.post('/courses', async (req, res) => {
         modality = EXCLUDED.modality,
         location = EXCLUDED.location,
         company_id = EXCLUDED.company_id,
+        moodle_course_id = EXCLUDED.moodle_course_id,
+        moodle_course_url = EXCLUDED.moodle_course_url,
+        moodle_section_name = EXCLUDED.moodle_section_name,
+        moodle_exam_url = EXCLUDED.moodle_exam_url,
+        moodle_category = EXCLUDED.moodle_category,
+        is_moodle_linked = EXCLUDED.is_moodle_linked,
         is_active = true
     `, [
             courseId,
@@ -93,7 +109,13 @@ exports.technicalAcademyRouter.post('/courses', async (req, res) => {
             numDurationDays,
             modality || 'Presencial (Taller)',
             location || '',
-            targetCompanyId
+            targetCompanyId,
+            moodleCourseId || null,
+            moodleCourseUrl || null,
+            moodleSectionName || null,
+            moodleExamUrl || null,
+            moodleCategory || 'Entrenamientos Técnicos',
+            effectiveIsLinked
         ]);
         res.status(201).json({
             message: 'Curso técnico guardado exitosamente',
@@ -103,6 +125,39 @@ exports.technicalAcademyRouter.post('/courses', async (req, res) => {
     catch (err) {
         console.error('Error al guardar curso técnico:', err);
         res.status(500).json({ error: 'Error al guardar curso técnico', details: err.message });
+    }
+});
+// PATCH /api/technical-academy/courses/:id/moodle-link
+exports.technicalAcademyRouter.patch('/courses/:id/moodle-link', async (req, res) => {
+    if (!checkAdminPermission(req, res))
+        return;
+    try {
+        const { id } = req.params;
+        const { moodleCourseId, moodleCourseUrl, moodleSectionName, moodleExamUrl, moodleCategory, isMoodleLinked } = req.body;
+        const isLinked = isMoodleLinked !== undefined ? Boolean(isMoodleLinked) : Boolean(moodleCourseUrl || moodleCourseId);
+        await db_js_1.pool.query(`
+      UPDATE technical_academy_courses SET
+        moodle_course_id = $1,
+        moodle_course_url = $2,
+        moodle_section_name = $3,
+        moodle_exam_url = $4,
+        moodle_category = COALESCE($5, moodle_category),
+        is_moodle_linked = $6
+      WHERE id = $7
+    `, [
+            moodleCourseId || null,
+            moodleCourseUrl || null,
+            moodleSectionName || null,
+            moodleExamUrl || null,
+            moodleCategory || 'Entrenamientos Técnicos',
+            isLinked,
+            id
+        ]);
+        res.json({ message: 'Vínculo con Moodle actualizado correctamente', courseId: id, isMoodleLinked: isLinked });
+    }
+    catch (err) {
+        console.error('Error al actualizar vínculo con Moodle:', err);
+        res.status(500).json({ error: 'Error al actualizar vínculo con Moodle', details: err.message });
     }
 });
 // DELETE /api/technical-academy/courses/:id
@@ -133,6 +188,13 @@ async function fetchTechnicalCohorts(companyId) {
       cr.category as course_category,
       cr.daily_hours as course_daily_hours,
       cr.duration_days as course_duration_days,
+      c.moodle_course_url as cohort_moodle_course_url,
+      c.moodle_section_name as cohort_moodle_section_name,
+      cr.moodle_course_id as course_moodle_course_id,
+      cr.moodle_course_url as course_moodle_course_url,
+      cr.moodle_section_name as course_moodle_section_name,
+      cr.moodle_exam_url as course_moodle_exam_url,
+      cr.is_moodle_linked as course_is_moodle_linked,
       COUNT(DISTINCT e.participant_card) as enrolled_count
     FROM technical_academy_cohorts c
     JOIN technical_academy_courses cr ON c.course_id = cr.id
@@ -144,7 +206,9 @@ async function fetchTechnicalCohorts(companyId) {
         params.push(companyId);
     }
     query += `
-    GROUP BY c.id, c.event_id, cr.event_id, cr.title, cr.category, cr.daily_hours, cr.duration_days
+    GROUP BY c.id, c.event_id, cr.event_id, cr.title, cr.category, cr.daily_hours, cr.duration_days,
+             c.moodle_course_url, c.moodle_section_name, cr.moodle_course_id, cr.moodle_course_url,
+             cr.moodle_section_name, cr.moodle_exam_url, cr.is_moodle_linked
     ORDER BY c.start_date DESC
   `;
     const result = await db_js_1.pool.query(query, params);
@@ -173,6 +237,13 @@ async function fetchTechnicalCohorts(companyId) {
         notes: r.notes || '',
         dailyPin: r.daily_pin || '2026',
         companyId: r.company_id || 'emp_kasino',
+        moodleCourseUrl: r.cohort_moodle_course_url || r.course_moodle_course_url || null,
+        moodleSectionName: r.cohort_moodle_section_name || r.course_moodle_section_name || null,
+        courseMoodleCourseId: r.course_moodle_course_id || null,
+        courseMoodleCourseUrl: r.course_moodle_course_url || null,
+        courseMoodleSectionName: r.course_moodle_section_name || null,
+        courseMoodleExamUrl: r.course_moodle_exam_url || null,
+        isMoodleLinked: Boolean(r.course_is_moodle_linked || r.cohort_moodle_course_url || r.course_moodle_course_url),
         createdAt: r.created_at
     }));
 }
@@ -1194,6 +1265,11 @@ exports.technicalAcademyRouter.get('/history', async (req, res) => {
         e.feedback as "feedback",
         e.graded_by as "gradedBy",
         e.graded_at as "gradedAt",
+        COALESCE(c.moodle_course_url, tc.moodle_course_url) as "moodleCourseUrl",
+        tc.moodle_course_id as "moodleCourseId",
+        COALESCE(c.moodle_section_name, tc.moodle_section_name) as "moodleSectionName",
+        tc.moodle_exam_url as "moodleExamUrl",
+        tc.is_moodle_linked as "isMoodleLinked",
         COUNT(CASE WHEN a.status IN ('present', 'late') THEN 1 END) as "attendedDays",
         COUNT(CASE WHEN a.session_date = CURRENT_DATE AND a.status IN ('present', 'late') THEN 1 END) as "attendedToday",
         COUNT(DISTINCT a.session_date) as "markedDays",
@@ -1237,7 +1313,9 @@ exports.technicalAcademyRouter.get('/history', async (req, res) => {
                tc.title, tc.code, tc.category, tc.daily_hours, tc.duration_days, tc.modality, 
                c.location, c.facilitator_id, c.facilitator_name, c.facilitator_email, c.group_name, 
                c.start_date, c.end_date, c.daily_time, c.status, e.status, e.score, e.academic_status,
-               e.feedback, e.graded_by, e.graded_at
+               e.feedback, e.graded_by, e.graded_at,
+               c.moodle_course_url, tc.moodle_course_url, tc.moodle_course_id, c.moodle_section_name, 
+               tc.moodle_section_name, tc.moodle_exam_url, tc.is_moodle_linked
       ORDER BY c.end_date DESC, c.start_date DESC
     `;
         const result = await db_js_1.pool.query(query, params);
@@ -1288,7 +1366,12 @@ exports.technicalAcademyRouter.get('/history', async (req, res) => {
                 isRecurrent: true,
                 cohortStatus: r.cohortStatus || 'scheduled',
                 enrollmentStatus: r.enrollmentStatus || 'enrolled',
-                status: r.cohortStatus || 'scheduled'
+                status: r.cohortStatus || 'scheduled',
+                moodleCourseUrl: r.moodleCourseUrl || null,
+                moodleCourseId: r.moodleCourseId || null,
+                moodleSectionName: r.moodleSectionName || null,
+                moodleExamUrl: r.moodleExamUrl || null,
+                isMoodleLinked: Boolean(r.isMoodleLinked || r.moodleCourseUrl)
             };
         });
         res.json(history);
