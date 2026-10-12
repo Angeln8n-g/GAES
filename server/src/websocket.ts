@@ -11,7 +11,9 @@ export interface AttendanceWsMessage {
     | 'EVENTS_UPDATED'
     | 'TECHNICAL_ATTENDANCE_MARKED'
     | 'TECHNICAL_QR_CHECKIN'
-    | 'TECHNICAL_GRADES_UPDATED';
+    | 'TECHNICAL_GRADES_UPDATED'
+    | 'NOTIFICATION_RECEIVED'
+    | 'NOTIFICATION_READ_UPDATE';
   eventId?: string;
   date?: string;
   time?: string;
@@ -31,6 +33,7 @@ export interface AttendanceWsMessage {
   score?: number | null;
   academicStatus?: string;
   feedback?: string;
+  notification?: any;
 }
 
 interface ExtWebSocket extends WebSocket {
@@ -167,3 +170,102 @@ export function broadcastAttendanceEvent(message: AttendanceWsMessage) {
 export function getConnectedClientsCount(): number {
   return wss ? wss.clients.size : 0;
 }
+
+/**
+ * Emite una notificación en tiempo real a un usuario específico conectado por correo
+ */
+export function sendNotificationToUser(email: string, notification: any) {
+  if (!wss) return;
+
+  const targetEmail = email.toLowerCase().trim();
+  const payload = JSON.stringify({
+    type: 'NOTIFICATION_RECEIVED',
+    notification,
+    timestamp: new Date().toISOString()
+  });
+
+  wss.clients.forEach((client) => {
+    const extClient = client as ExtWebSocket;
+    if (extClient.readyState === WebSocket.OPEN && extClient.user?.email) {
+      if (extClient.user.email.toLowerCase().trim() === targetEmail) {
+        try {
+          extClient.send(payload);
+        } catch (err) {
+          console.error(`Error al emitir notificación WebSocket a ${email}:`, err);
+        }
+      }
+    }
+  });
+}
+
+/**
+ * Emite una notificación a todos los usuarios conectados con un rol determinado
+ */
+export function sendNotificationToRole(role: string, notification: any) {
+  if (!wss) return;
+
+  const payload = JSON.stringify({
+    type: 'NOTIFICATION_RECEIVED',
+    notification,
+    timestamp: new Date().toISOString()
+  });
+
+  wss.clients.forEach((client) => {
+    const extClient = client as ExtWebSocket;
+    if (extClient.readyState === WebSocket.OPEN && extClient.user?.role === role) {
+      try {
+        extClient.send(payload);
+      } catch (err) {
+        console.error(`Error al emitir notificación WebSocket a rol ${role}:`, err);
+      }
+    }
+  });
+}
+
+/**
+ * Emite una notificación a todos los usuarios conectados pertenecientes a una empresa
+ */
+export function sendNotificationToCompany(companyId: string, notification: any) {
+  if (!wss) return;
+
+  const payload = JSON.stringify({
+    type: 'NOTIFICATION_RECEIVED',
+    notification,
+    timestamp: new Date().toISOString()
+  });
+
+  wss.clients.forEach((client) => {
+    const extClient = client as ExtWebSocket;
+    if (extClient.readyState === WebSocket.OPEN && extClient.user?.companyId === companyId) {
+      try {
+        extClient.send(payload);
+      } catch (err) {
+        console.error(`Error al emitir notificación WebSocket a empresa ${companyId}:`, err);
+      }
+    }
+  });
+}
+
+/**
+ * Emite una notificación a todos los usuarios conectados (Broadcast)
+ */
+export function broadcastNotification(notification: any) {
+  if (!wss) return;
+
+  const payload = JSON.stringify({
+    type: 'NOTIFICATION_RECEIVED',
+    notification,
+    timestamp: new Date().toISOString()
+  });
+
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      try {
+        client.send(payload);
+      } catch (err) {
+        console.error('Error al emitir broadcast de notificación WebSocket:', err);
+      }
+    }
+  });
+}
+

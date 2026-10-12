@@ -43,7 +43,9 @@ export interface AttendanceWsEvent {
     | 'EVENTS_UPDATED'
     | 'TECHNICAL_ATTENDANCE_MARKED'
     | 'TECHNICAL_QR_CHECKIN'
-    | 'TECHNICAL_GRADES_UPDATED';
+    | 'TECHNICAL_GRADES_UPDATED'
+    | 'NOTIFICATION_RECEIVED'
+    | 'NOTIFICATION_READ_UPDATE';
   eventId?: string;
   date?: string;
   time?: string;
@@ -62,6 +64,7 @@ export interface AttendanceWsEvent {
   score?: number | null;
   academicStatus?: string;
   feedback?: string;
+  notification?: AppNotification;
 }
 
 export interface Slot {
@@ -225,6 +228,13 @@ export interface TrainingEvent {
   meetingPassword?: string;
   moodleUrl?: string;
   moodleCourseId?: string;
+  convocatoriaId?: string;
+  convocatoriaCode?: string;
+  convocatoriaStatus?: string;
+  convocatoriaSelectionMode?: 'direct' | 'review_required' | string;
+  convocatoriaAppStartDate?: string;
+  convocatoriaAppEndDate?: string;
+  isConvocatoria?: boolean;
 }
 
 export interface ExternalTraining {
@@ -352,7 +362,7 @@ export interface ToastNotification {
   type: 'success' | 'error' | 'info' | 'warning';
 }
 
-export type TabView = 'landing' | 'my-registrations' | 'demand' | 'dashboard' | 'admin' | 'attendance' | 'team' | 'ojt' | 'evaluator-courses' | 'kiosk' | 'technical-academy';
+export type TabView = 'landing' | 'my-registrations' | 'demand' | 'dashboard' | 'admin' | 'attendance' | 'team' | 'ojt' | 'evaluator-courses' | 'kiosk' | 'technical-academy' | 'convocatorias';
 
 // ==========================================
 // MÓDULO DE GRUPOS, CRONOGRAMAS Y CUMPLIMIENTO
@@ -578,6 +588,7 @@ export interface TechnicalAcademyCohort {
   courseMoodleSectionName?: string | null;
   courseMoodleExamUrl?: string | null;
   isMoodleLinked?: boolean;
+  companyQuotas?: TechnicalCohortCompanyQuota[];
   createdAt?: string;
 }
 
@@ -893,4 +904,214 @@ export interface CreateCourseSuggestionPayload {
   tags?: string[];
   preferredSchedule?: string;
   notes?: string;
+}
+
+// ==========================================
+// TIPOS PARA CUPOS POR EMPRESA EN ACADEMIA TÉCNICA
+// ==========================================
+
+export interface TechnicalCohortCompanyQuota {
+  id?: number;
+  cohortId?: string;
+  companyId: string;
+  companyName?: string;
+  allocatedQuota: number;
+  enrolledCount?: number;
+  availableQuota?: number;
+  notes?: string | null;
+}
+
+// ==========================================
+// TIPOS PARA GESTIÓN DE CONVOCATORIAS
+// ==========================================
+
+export type ConvocatoriaStatus = 'draft' | 'open' | 'closed' | 'in_progress' | 'completed' | 'cancelled';
+export type ConvocatoriaSelectionMode = 'direct' | 'review_required';
+export type ConvocatoriaApplicantType = 'self' | 'supervisor';
+export type ConvocatoriaApplicationStatus = 'pending' | 'approved' | 'rejected' | 'waitlist' | 'cancelled';
+
+export interface ConvocatoriaCompanyQuota {
+  id?: number;
+  convocatoriaId?: string;
+  companyId: string;
+  companyName?: string;
+  allocatedQuota: number;
+  totalApplications?: number;
+  approvedApplications?: number;
+  pendingApplications?: number;
+  availableQuota?: number;
+}
+
+export interface ConvocatoriaApplication {
+  id: string;
+  convocatoriaId: string;
+  convocatoriaCode?: string;
+  convocatoriaTitle?: string;
+  convocatoriaStatus?: ConvocatoriaStatus;
+  convocatoriaModality?: string;
+  convocatoriaLocation?: string;
+  applicationStartDate?: string;
+  applicationEndDate?: string;
+  trainingStartDate?: string | null;
+  trainingEndDate?: string | null;
+  courseTitle?: string | null;
+  courseCategory?: string | null;
+  participantCard: string;
+  participantName?: string;
+  participantEmail?: string;
+  participantCedula?: string;
+  participantDepartment?: string;
+  companyId: string;
+  companyName?: string;
+  applicantType: ConvocatoriaApplicantType;
+  nominatedById?: string | null;
+  nominatedByName?: string | null;
+  motivation?: string;
+  status: ConvocatoriaApplicationStatus;
+  reviewNotes?: string | null;
+  reviewedBy?: string | null;
+  reviewedAt?: string | null;
+  enrolledInCohort?: boolean;
+  createdAt: string;
+}
+
+export interface Convocatoria {
+  id: string;
+  code: string;
+  title: string;
+  description: string;
+  trainingType: 'technical_academy' | 'general_event';
+  courseId?: string | null;
+  courseTitle?: string | null;
+  courseCode?: string | null;
+  courseCategory?: string | null;
+  cohortId?: string | null;
+  cohortStartDate?: string | null;
+  cohortEndDate?: string | null;
+  cohortDailyTime?: string | null;
+  cohortLocation?: string | null;
+  cohortCapacity?: number | null;
+  eventId?: string | null;
+  eventTitle?: string | null;
+  bannerUrl?: string | null;
+  status: ConvocatoriaStatus;
+  applicationStartDate: string;
+  applicationEndDate: string;
+  trainingStartDate?: string | null;
+  trainingEndDate?: string | null;
+  modality: string;
+  location: string;
+  totalQuota: number;
+  selectionMode: ConvocatoriaSelectionMode;
+  targetAudience?: string;
+  prerequisites?: string;
+  allowSelfApplication: boolean;
+  allowSupervisorNomination: boolean;
+  companyIds?: string[];
+  createdBy?: string;
+  createdAt: string;
+  updatedAt?: string;
+  companyQuotas: ConvocatoriaCompanyQuota[];
+  stats?: {
+    totalApplications: number;
+    approvedApplications: number;
+    pendingApplications: number;
+    waitlistApplications: number;
+    occupancyPercentage: number;
+  };
+  userApplication?: {
+    applicationId: string;
+    status: ConvocatoriaApplicationStatus;
+    applicantType: ConvocatoriaApplicantType;
+    appliedAt: string;
+  } | null;
+}
+
+export interface CreateConvocatoriaPayload {
+  id?: string;
+  code?: string;
+  title: string;
+  description?: string;
+  trainingType?: 'technical_academy' | 'general_event';
+  courseId?: string | null;
+  cohortId?: string | null;
+  eventId?: string | null;
+  bannerUrl?: string | null;
+  status?: ConvocatoriaStatus;
+  applicationStartDate: string;
+  applicationEndDate: string;
+  trainingStartDate?: string | null;
+  trainingEndDate?: string | null;
+  modality?: string;
+  location?: string;
+  totalQuota: number;
+  selectionMode?: ConvocatoriaSelectionMode;
+  targetAudience?: string;
+  prerequisites?: string;
+  allowSelfApplication?: boolean;
+  allowSupervisorNomination?: boolean;
+  companyIds?: string[];
+  companyQuotas?: Array<{ companyId: string; allocatedQuota: number }>;
+}
+
+export interface ApplyConvocatoriaPayload {
+  participantCard?: string;
+  motivation?: string;
+}
+
+export interface BulkNominateConvocatoriaPayload {
+  participantCards: string[];
+  motivation?: string;
+}
+
+// ==========================================
+// TIPOS DEL SISTEMA DE NOTIFICACIONES 360°
+// ==========================================
+
+export type NotificationCategory = 'evento' | 'convocatoria' | 'cohorte' | 'certificado' | 'cumplimiento' | 'sistema';
+export type NotificationPriority = 'low' | 'normal' | 'high' | 'urgent';
+
+export interface AppNotification {
+  id: number;
+  recipientEmail?: string | null;
+  recipientRole?: string | null;
+  recipientCompanyId?: string | null;
+  title: string;
+  message: string;
+  category: NotificationCategory;
+  priority: NotificationPriority;
+  actionUrl?: string | null;
+  actionLabel?: string | null;
+  metadata?: Record<string, any>;
+  isRead: boolean;
+  readAt?: string | null;
+  createdAt: string;
+}
+
+export interface UserNotificationPreferences {
+  inAppEnabled: boolean;
+  pushEnabled: boolean;
+  emailEnabled: boolean;
+  trainingStartAlerts: boolean;
+  trainingAdvanceNoticeMinutes: number;
+  categories: Record<string, boolean>;
+}
+
+export interface PushSubscriptionData {
+  endpoint: string;
+  keys: {
+    p256dh: string;
+    auth: string;
+  };
+}
+
+export interface BroadcastNotificationPayload {
+  title: string;
+  message: string;
+  category?: NotificationCategory;
+  priority?: NotificationPriority;
+  targetRole?: string;
+  targetCompanyId?: string;
+  actionUrl?: string;
+  actionLabel?: string;
 }

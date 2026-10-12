@@ -25,7 +25,8 @@ import {
 import {
   TechnicalAcademyCohort,
   TechnicalCohortEnrolledParticipant,
-  Participant
+  Participant,
+  TechnicalCohortCompanyQuota
 } from '../../types';
 import { apiService } from '../../services/api';
 import {
@@ -80,6 +81,8 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
   const [quickAddCard, setQuickAddCard] = useState<string>('');
   const [isEnrollingSingle, setIsEnrollingSingle] = useState<boolean>(false);
   const [isRemovingCard, setIsRemovingCard] = useState<string | null>(null);
+  const [cohortQuotas, setCohortQuotas] = useState<TechnicalCohortCompanyQuota[]>(cohort?.companyQuotas || []);
+  const [bypassQuota, setBypassQuota] = useState<boolean>(false);
 
   // Tab 2: Carga Masiva Excel
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -111,8 +114,14 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
     setLoading(true);
     setErrorMsg(null);
     try {
-      const data = await apiService.getCohortParticipants(cohort.id);
+      const [data, quotas] = await Promise.all([
+        apiService.getCohortParticipants(cohort.id),
+        apiService.getCohortCompanyQuotas(cohort.id).catch(() => [])
+      ]);
       setEnrolledParticipants(data.participants || []);
+      if (Array.isArray(quotas) && quotas.length > 0) {
+        setCohortQuotas(quotas);
+      }
     } catch (err: any) {
       console.error('Error al cargar participantes matriculados:', err);
       setErrorMsg(err.message || 'Error al cargar la lista de participantes');
@@ -223,7 +232,8 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
 
     try {
       const res = await apiService.enrollCohortParticipants(cohort.id, {
-        identifiers: [quickAddCard.trim()]
+        identifiers: [quickAddCard.trim()],
+        bypassQuota
       });
 
       if (res.newlyEnrolled > 0) {
@@ -308,7 +318,8 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
 
     try {
       const res = await apiService.enrollCohortParticipants(cohort.id, {
-        participantCards: newCardsToEnroll
+        participantCards: newCardsToEnroll,
+        bypassQuota
       });
 
       // Si el archivo contenía calificaciones, guardarlas
@@ -418,7 +429,8 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
 
     try {
       const res = await apiService.enrollCohortParticipants(cohort.id, {
-        participantCards: cardsToEnroll
+        participantCards: cardsToEnroll,
+        bypassQuota
       });
 
       setSuccessMsg(`¡Éxito! Se han matriculado ${res.newlyEnrolled} participantes.`);
@@ -485,7 +497,8 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
     try {
       const cards = Array.from(selectedCatalogCards);
       const res = await apiService.enrollCohortParticipants(cohort.id, {
-        participantCards: cards
+        participantCards: cards,
+        bypassQuota
       });
 
       setSuccessMsg(`¡Éxito! ${res.newlyEnrolled} colaborador(es) matriculado(s) desde el padrón.`);
@@ -568,6 +581,59 @@ export const TechnicalCohortEnrollmentModal: React.FC<TechnicalCohortEnrollmentM
               </button>
             </div>
           </div>
+
+          {/* Barra de Cupos por Empresa */}
+          {cohortQuotas.length > 0 && (
+            <div className="mt-4 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80">
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <Building2 className="w-4 h-4 text-red-500" />
+                  <span>Disponibilidad de Cupos por Empresa en esta Cohorte:</span>
+                </div>
+                {isAdminOrSuper && (
+                  <label className="flex items-center gap-1.5 text-[11px] font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-lg border border-amber-200 dark:border-amber-800/50 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={bypassQuota}
+                      onChange={(e) => setBypassQuota(e.target.checked)}
+                      className="rounded text-red-600 focus:ring-red-500"
+                    />
+                    <span>Autorizar Sobrecupo (Ignorar límite)</span>
+                  </label>
+                )}
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                {cohortQuotas.map(q => {
+                  const enrolledCount = enrolledParticipants.filter(p => p.companyId === q.companyId).length;
+                  const isFull = enrolledCount >= q.allocatedQuota;
+                  return (
+                    <div
+                      key={q.companyId}
+                      className={`p-2 rounded-xl border flex flex-col justify-between transition-colors ${
+                        isFull
+                          ? 'bg-rose-50/80 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900/40 text-rose-800 dark:text-rose-300'
+                          : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 shadow-2xs'
+                      }`}
+                    >
+                      <div className="text-[11px] font-bold truncate" title={q.companyName || q.companyId}>
+                        {q.companyName || q.companyId}
+                      </div>
+                      <div className="flex items-center justify-between mt-1.5 text-[10px]">
+                        <span className="font-semibold">{enrolledCount} / {q.allocatedQuota}</span>
+                        <span className={`px-1.5 py-0.2 rounded font-black text-[9px] ${
+                          isFull
+                            ? 'bg-rose-200 dark:bg-rose-900/60 text-rose-900 dark:text-rose-200'
+                            : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400'
+                        }`}>
+                          {isFull ? 'Lleno' : `${Math.max(0, q.allocatedQuota - enrolledCount)} disp.`}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Barra de Pestañas */}
           <div className="flex items-center gap-2 mt-5 border-b border-slate-200 dark:border-slate-800 overflow-x-auto no-scrollbar">

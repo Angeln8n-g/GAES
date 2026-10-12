@@ -22,7 +22,7 @@ import { EventCard } from './EventCard';
 import { PerpetualCalendar } from './PerpetualCalendar';
 import { HeroCarousel } from '../common/HeroCarousel';
 
-const CATEGORIES = ["Todos", "Taller", "Curso", "Webinar", "Charla", "Cine Forum", "Evento"];
+const CATEGORIES = ["Todos", "Convocatoria", "Taller", "Curso", "Webinar", "Charla", "Cine Forum", "Evento"];
 
 interface CatalogViewProps {
   events: TrainingEvent[];
@@ -35,6 +35,7 @@ interface CatalogViewProps {
   onOpenReservationModal: (event: TrainingEvent) => void;
   onOpenVirtualRoom?: (event: TrainingEvent) => void;
   onNavigateToDemand?: () => void;
+  onOpenConvocatoriaApply?: (convocatoriaId: string, event: TrainingEvent) => void;
 }
 
 export const CatalogView: React.FC<CatalogViewProps> = ({
@@ -47,7 +48,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   participants = [],
   onOpenReservationModal,
   onOpenVirtualRoom,
-  onNavigateToDemand
+  onNavigateToDemand,
+  onOpenConvocatoriaApply
 }) => {
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [selectedModality, setSelectedModality] = useState<string>("Todos");
@@ -155,7 +157,11 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
     };
     CATEGORIES.forEach(cat => {
       if (cat !== "Todos") {
-        counts[cat] = baseEvents.filter(e => e.category === cat).length;
+        if (cat === "Convocatoria") {
+          counts[cat] = baseEvents.filter(e => e.category === 'Convocatoria' || e.isConvocatoria || e.trainingFormat === 'Convocatoria').length;
+        } else {
+          counts[cat] = baseEvents.filter(e => e.category === cat && !e.isConvocatoria).length;
+        }
       }
     });
     return counts;
@@ -183,8 +189,13 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
     }
 
     // Filtro por categoría
-    if (selectedCategory !== "Todos" && evt.category !== selectedCategory) {
-      return false;
+    if (selectedCategory !== "Todos") {
+      if (selectedCategory === "Convocatoria") {
+        const isConv = evt.category === "Convocatoria" || evt.isConvocatoria || evt.trainingFormat === "Convocatoria";
+        if (!isConv) return false;
+      } else {
+        if (evt.category !== selectedCategory) return false;
+      }
     }
 
     // Filtro por modalidad
@@ -314,7 +325,17 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
               return (
                 <div 
                   key={course.id}
-                  onClick={() => onOpenReservationModal(course)}
+                  onClick={() => {
+                    if (course.isConvocatoria || course.category === 'Convocatoria' || course.trainingFormat === 'Convocatoria' || course.convocatoriaId) {
+                      if (onOpenConvocatoriaApply) {
+                        onOpenConvocatoriaApply(course.convocatoriaId || course.id, course);
+                      } else {
+                        onOpenReservationModal(course);
+                      }
+                    } else {
+                      onOpenReservationModal(course);
+                    }
+                  }}
                   className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-3xl overflow-hidden hover:border-[#DA291C] dark:hover:border-red-500 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between"
                 >
                   <div className="relative h-36 w-full overflow-hidden bg-slate-100 dark:bg-slate-900">
@@ -442,10 +463,17 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   onClick={() => setSelectedCategory(cat)}
                   className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
                     isSelected
-                      ? 'bg-gradient-to-r from-[#DA291C] to-red-600 text-white shadow-md shadow-red-500/25 scale-[1.02]'
+                      ? cat === 'Convocatoria'
+                        ? 'bg-gradient-to-r from-red-600 via-[#DA291C] to-amber-600 text-white shadow-md shadow-red-500/25 scale-[1.02]'
+                        : 'bg-gradient-to-r from-[#DA291C] to-red-600 text-white shadow-md shadow-red-500/25 scale-[1.02]'
+                      : cat === 'Convocatoria'
+                      ? 'bg-amber-50/90 dark:bg-amber-950/40 border border-amber-300/80 dark:border-amber-900/50 text-amber-900 dark:text-amber-300 hover:border-amber-400'
                       : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
                   }`}
                 >
+                  {cat === 'Convocatoria' && (
+                    <Sparkles className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-200 fill-amber-200' : 'text-amber-500'}`} />
+                  )}
                   <span>{cat}</span>
                   <span className={`px-2 py-0.2 rounded-full text-[10px] font-black ${
                     isSelected ? 'bg-white dark:bg-slate-900 text-[#DA291C] dark:text-red-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
@@ -553,6 +581,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   isRequiredInProgram={requiredEventIds.has(event.id)}
                   onOpenReservationModal={onOpenReservationModal}
                   onOpenVirtualRoom={onOpenVirtualRoom}
+                  onOpenConvocatoriaApply={onOpenConvocatoriaApply}
                 />
               ))}
             </div>

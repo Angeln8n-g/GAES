@@ -30,7 +30,8 @@ import {
   Save,
   GraduationCap,
   ExternalLink,
-  Link2
+  Link2,
+  Building2
 } from 'lucide-react';
 import { 
   TechnicalAcademyCourse, 
@@ -52,6 +53,7 @@ import { TechnicalCourseModal } from './TechnicalCourseModal';
 import { TechnicalCohortEnrollmentModal } from './TechnicalCohortEnrollmentModal';
 import { TechnicalCrmAssignmentsView } from './TechnicalCrmAssignmentsView';
 import { TechnicalMoodleSection } from './TechnicalMoodleSection';
+import { ConvocatoriasAdminView } from '../convocatorias/ConvocatoriasAdminView';
 
 interface TechnicalAcademyViewProps {
   currentUser: UserAccount | null;
@@ -82,8 +84,8 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
   const isAdminOrSuper = isSuperAdmin || isAdmin;
   const isFacilitator = !isAdminOrSuper;
 
-  // Tabs: attendance (Marcado Diario), cohorts (Planificador), courses (Catálogo), moodle (Campus Moodle), accreditation (Acreditación), crm (Control Asignaciones Super Admin)
-  const [activeTab, setActiveTab] = useState<'attendance' | 'cohorts' | 'courses' | 'moodle' | 'accreditation' | 'crm'>('attendance');
+  // Tabs: attendance (Marcado Diario), cohorts (Planificador), courses (Catálogo), moodle (Campus Moodle), accreditation (Acreditación), crm (Control Asignaciones Super Admin), convocatorias (Convocatorias & Cupos)
+  const [activeTab, setActiveTab] = useState<'attendance' | 'cohorts' | 'courses' | 'moodle' | 'accreditation' | 'crm' | 'convocatorias'>('attendance');
 
   // Estado principal
   const [courses, setCourses] = useState<TechnicalAcademyCourse[]>([]);
@@ -710,6 +712,21 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
             </button>
           )}
 
+          {isAdminOrSuper && (
+            <button
+              type="button"
+              onClick={() => setActiveTab('convocatorias')}
+              className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
+                activeTab === 'convocatorias'
+                  ? 'bg-slate-900 dark:bg-slate-800 text-white shadow-sm ring-1 ring-amber-500/50'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+            >
+              <Sparkles className="w-4 h-4 text-amber-500" />
+              <span>Convocatorias & Cupos</span>
+            </button>
+          )}
+
           <button
             type="button"
             onClick={() => setActiveTab('courses')}
@@ -1287,6 +1304,39 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
                             </a>
                           </div>
                         )}
+
+                        {/* Distribución de Cupos por Empresa */}
+                        {coh.companyQuotas && coh.companyQuotas.length > 0 && (
+                          <div className="p-2.5 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200/70 dark:border-slate-700/70 space-y-1.5">
+                            <div className="flex items-center justify-between text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                              <span className="flex items-center gap-1.5">
+                                <Building2 className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                                <span>Cupos por Contratista</span>
+                              </span>
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
+                                {coh.companyQuotas.reduce((acc, q) => acc + (q.enrolledCount || 0), 0)}/{coh.companyQuotas.reduce((acc, q) => acc + q.allocatedQuota, 0)} cupos
+                              </span>
+                            </div>
+                            <div className="flex flex-wrap gap-1">
+                              {coh.companyQuotas.map(q => {
+                                const isFull = (q.enrolledCount || 0) >= q.allocatedQuota;
+                                return (
+                                  <span
+                                    key={q.companyId}
+                                    className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border ${
+                                      isFull
+                                        ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border-rose-200 dark:border-rose-900/40'
+                                        : 'bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                                    }`}
+                                  >
+                                    <span className="truncate max-w-[85px]">{q.companyName || q.companyId}:</span>
+                                    <span className="font-bold font-mono">{q.enrolledCount || 0}/{q.allocatedQuota}</span>
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -1812,6 +1862,24 @@ export const TechnicalAcademyView: React.FC<TechnicalAcademyViewProps> = ({
           companies={companies}
           onShowToast={onShowToast}
           onRefreshData={async () => {
+            await fetchData();
+            if (selectedCohortId) await fetchAttendance(selectedCohortId);
+          }}
+        />
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB 6: GESTIÓN DE CONVOCATORIAS & CUPOS POR EMPRESA                      */}
+      {/* ========================================================================= */}
+      {activeTab === 'convocatorias' && isAdminOrSuper && (
+        <ConvocatoriasAdminView
+          currentUser={currentUser}
+          courses={courses}
+          cohorts={cohorts}
+          companies={companies}
+          events={events}
+          onShowToast={onShowToast}
+          onRefreshTechnicalData={async () => {
             await fetchData();
             if (selectedCohortId) await fetchAttendance(selectedCohortId);
           }}

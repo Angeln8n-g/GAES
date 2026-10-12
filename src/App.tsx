@@ -18,7 +18,8 @@ import {
   TechnicalAcademyHistoryRecord,
   TechnicalAcademyCohort,
   Schedule,
-  Slot
+  Slot,
+  Convocatoria
 } from './types';
 import { Navbar } from './components/layout/Navbar';
 import { SuperAdminSidebar } from './components/layout/SuperAdminSidebar';
@@ -36,6 +37,9 @@ const OjtManager = React.lazy(() => import('./components/ojt/OjtManager').then(m
 const EvaluatorCoursesView = React.lazy(() => import('./components/evaluator/EvaluatorCoursesView').then(m => ({ default: m.EvaluatorCoursesView })));
 const TechnicalAcademyView = React.lazy(() => import('./components/technical-academy/TechnicalAcademyView').then(m => ({ default: m.TechnicalAcademyView })));
 const CourseDemandView = React.lazy(() => import('./components/demand/CourseDemandView').then(m => ({ default: m.CourseDemandView })));
+const ConvocatoriasAdminView = React.lazy(() => import('./components/convocatorias/ConvocatoriasAdminView').then(m => ({ default: m.ConvocatoriasAdminView })));
+const ConvocatoriasPortalView = React.lazy(() => import('./components/convocatorias/ConvocatoriasPortalView').then(m => ({ default: m.ConvocatoriasPortalView })));
+const ConvocatoriaApplyModal = React.lazy(() => import('./components/convocatorias/ConvocatoriaApplyModal').then(m => ({ default: m.ConvocatoriaApplyModal })));
 import { Toast } from './components/common/Toast';
 import { Footer } from './components/common/Footer';
 import { PwaInstallPrompt } from './components/common/PwaInstallPrompt';
@@ -149,6 +153,8 @@ export function App() {
 
   const [selectedEventForModal, setSelectedEventForModal] = useState<TrainingEvent | null>(null);
   const [selectedEventForTecModal, setSelectedEventForTecModal] = useState<TrainingEvent | null>(null);
+  const [selectedConvocatoriaForApply, setSelectedConvocatoriaForApply] = useState<Convocatoria | null>(null);
+  const [isConvocatoriaApplyOpen, setIsConvocatoriaApplyOpen] = useState<boolean>(false);
   const [isQrScannerOpen, setIsQrScannerOpen] = useState<boolean>(false);
   const [selectedVirtualRoom, setSelectedVirtualRoom] = useState<{
     event: TrainingEvent;
@@ -314,12 +320,65 @@ export function App() {
     return cleanup;
   }, []);
 
-  // Suscripción reactiva a eventos en tiempo real de asistencia vía WebSocket
+  // Registro de Service Worker para PWA y Notificaciones Push
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(err => {
+        console.warn('Error al registrar Service Worker:', err);
+      });
+
+      const handleSwMessage = (event: MessageEvent) => {
+        if (event.data?.type === 'NOTIFICATION_ACTION_CLICK') {
+          const url = event.data.url;
+          if (url) {
+            if (url.startsWith('http://') || url.startsWith('https://')) {
+              window.open(url, '_blank');
+            } else if (url.includes('convocatoria')) {
+              setCurrentTab('convocatorias');
+            } else if (url.includes('certificate')) {
+              setCurrentTab('my-registrations');
+            } else if (url.includes('technical') || url.includes('cohorte')) {
+              setCurrentTab('technical-academy');
+            } else if (url.includes('registrations')) {
+              setCurrentTab('my-registrations');
+            } else if (url.includes('catalog')) {
+              setCurrentTab('landing');
+            }
+          }
+        }
+      };
+
+      navigator.serviceWorker.addEventListener('message', handleSwMessage);
+      return () => {
+        navigator.serviceWorker.removeEventListener('message', handleSwMessage);
+      };
+    }
+  }, []);
+
+  // Suscripción reactiva a eventos en tiempo real de asistencia y notificaciones vía WebSocket
   useEffect(() => {
     attendanceWs.connect();
 
     const unsubscribe = attendanceWs.onAttendanceEvent((eventData) => {
-      console.log('App received WebSocket attendance event:', eventData);
+      console.log('App received WebSocket event:', eventData);
+
+      // Si es un evento de notificación recibido
+      if (eventData.type === 'NOTIFICATION_RECEIVED') {
+        window.dispatchEvent(new CustomEvent('gaes:new_notification', { detail: eventData.notification }));
+        if (eventData.notification) {
+          showToast(
+            eventData.notification.title || 'Nueva Notificación',
+            eventData.notification.message || '',
+            eventData.notification.priority === 'urgent' ? 'warning' : 'info'
+          );
+        }
+        return;
+      }
+
+      if (eventData.type === 'NOTIFICATION_READ_UPDATE') {
+        window.dispatchEvent(new CustomEvent('gaes:notification_read_update'));
+        return;
+      }
 
       // Refrescar automáticamente la lista de eventos desde el servidor
       apiService.getEvents().then(freshEvents => {
@@ -511,6 +570,25 @@ export function App() {
     const updated = await apiService.cancelRegistration(eventId, date, time, email, isSupervisorOrAdmin, force);
     setEvents(updated);
     showToast('Inscripción cancelada', 'El cupo ha sido liberado correctamente.', 'info');
+  };
+
+  const handleOpenConvocatoriaApply = async (convocatoriaId: string, _event?: TrainingEvent) => {
+    try {
+      let convId = convocatoriaId;
+      if (convId.startsWith('evt_conv_')) {
+        convId = 'conv_' + convId.replace('evt_conv_', '');
+      }
+      const res = await apiService.getConvocatoriaById(convId);
+      if (res?.convocatoria) {
+        setSelectedConvocatoriaForApply(res.convocatoria);
+        setIsConvocatoriaApplyOpen(true);
+      } else {
+        showToast('Aviso', 'No se encontró la información detallada de la convocatoria.', 'warning');
+      }
+    } catch (err: any) {
+      console.error('Error al abrir postulación a convocatoria:', err);
+      showToast('Error', err.message || 'No se pudo abrir la convocatoria', 'error');
+    }
   };
 
   const handleAssignTeamMembers = async (payload: any) => {
@@ -924,9 +1002,16 @@ export function App() {
             programs={programs}
             groups={groups}
             participants={participants}
-            onOpenReservationModal={(event) => setSelectedEventForModal(event)}
+            onOpenReservationModal={(event) => {
+              if (event.isConvocatoria || event.category === 'Convocatoria' || event.trainingFormat === 'Convocatoria' || event.convocatoriaId) {
+                handleOpenConvocatoriaApply(event.convocatoriaId || event.id, event);
+              } else {
+                setSelectedEventForModal(event);
+              }
+            }}
             onOpenVirtualRoom={(event) => handleOpenVirtualRoom(event)}
             onNavigateToDemand={() => setCurrentTab('demand')}
+            onOpenConvocatoriaApply={handleOpenConvocatoriaApply}
           />
         )}
 
@@ -1123,6 +1208,32 @@ export function App() {
           />
         )}
 
+        {/* Tab Convocatorias: Gestión de Convocatorias y Postulaciones de Formación */}
+        {currentTab === 'convocatorias' && (
+          (isSuperAdminUser || currentUser?.role === 'Administrador / Editor') ? (
+            <ConvocatoriasAdminView
+              currentUser={currentUser}
+              courses={[]}
+              cohorts={technicalCohorts}
+              companies={companies}
+              events={events}
+              onShowToast={showToast}
+              onRefreshTechnicalData={handleRefreshTechnicalCohorts}
+              onNavigateToCatalog={() => setCurrentTab('landing')}
+            />
+          ) : (
+            <ConvocatoriasPortalView
+              currentUser={currentUser}
+              companies={companies}
+              participants={scopedParticipants}
+              onShowToast={showToast}
+              onNavigateToCourse={() => {
+                setCurrentTab('landing');
+              }}
+            />
+          )
+        )}
+
         {/* Tab 6: Check-in de Asistencia Presencial por QR */}
         {currentTab === 'attendance' && attendanceEventId && attendanceDate && attendanceTime && (
           <AttendanceView
@@ -1156,6 +1267,32 @@ export function App() {
           onClose={() => setSelectedEventForModal(null)}
           onConfirmReservation={handleConfirmReservation}
         />
+      )}
+
+      {/* Modal de Postulación a Convocatoria Oficial Claro (Accesible desde Catálogo y Portal) */}
+      {isConvocatoriaApplyOpen && selectedConvocatoriaForApply && (
+        <React.Suspense fallback={null}>
+          <ConvocatoriaApplyModal
+            isOpen={isConvocatoriaApplyOpen}
+            onClose={() => {
+              setIsConvocatoriaApplyOpen(false);
+              setSelectedConvocatoriaForApply(null);
+            }}
+            convocatoria={selectedConvocatoriaForApply}
+            currentUser={currentUser}
+            participant={participants.find(p => p.email.toLowerCase() === (currentUser?.email || '').toLowerCase()) || null}
+            participants={scopedParticipants}
+            onSuccess={async () => {
+              showToast('¡Postulación Enviada!', 'Tu postulación o nominación a la convocatoria ha sido registrada satisfactoriamente.', 'success');
+              try {
+                const freshEvents = await apiService.getEvents();
+                setEvents(freshEvents);
+              } catch (e) {
+                console.error('Error al refrescar eventos:', e);
+              }
+            }}
+          />
+        </React.Suspense>
       )}
 
       {/* Global Toast Alert */}

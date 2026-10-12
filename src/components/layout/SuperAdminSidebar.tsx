@@ -64,7 +64,8 @@ export const SuperAdminSidebar: React.FC<SuperAdminSidebarProps> = ({
         { id: 'demand' as TabView, label: "Cursos a Demanda", icon: Sparkles, badge: null },
         { id: 'my-registrations' as TabView, label: "Mis Cursos & Rutas", icon: CalendarCheck2, badge: myRegistrationsCount > 0 ? myRegistrationsCount : null },
         { id: 'team' as TabView, label: "Mi Equipo de Trabajo", icon: UserCheck, badge: null },
-        { id: 'technical-academy' as TabView, label: "Academia Técnica", icon: Wrench, badge: null }
+        { id: 'technical-academy' as TabView, label: "Academia Técnica", icon: Wrench, badge: null },
+        { id: 'convocatorias' as TabView, label: "Convocatorias", icon: Sparkles, badge: null }
       ]
     },
     {

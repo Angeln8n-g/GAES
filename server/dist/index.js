@@ -24,6 +24,7 @@ const externalTrainings_js_1 = require("./routes/externalTrainings.js");
 const technicalAcademy_js_1 = require("./routes/technicalAcademy.js");
 const certificates_js_1 = require("./routes/certificates.js");
 const courseSuggestions_js_1 = require("./routes/courseSuggestions.js");
+const convocatorias_js_1 = require("./routes/convocatorias.js");
 const backups_js_1 = require("./routes/backups.js");
 const backupService_js_1 = require("./services/backupService.js");
 const auth_js_1 = require("./middlewares/auth.js");
@@ -92,9 +93,11 @@ app.use('/api/external-trainings', externalTrainings_js_1.externalTrainingsRoute
 app.use('/api/technical-academy', auth_js_1.authenticateToken, technicalAcademy_js_1.technicalAcademyRouter);
 app.use('/api/certificates', certificates_js_1.certificatesRouter);
 app.use('/api/course-suggestions', courseSuggestions_js_1.courseSuggestionsRouter);
+app.use('/api/convocatorias', convocatorias_js_1.convocatoriasRouter);
 app.use('/api/admin', auth_js_1.authenticateToken, backups_js_1.adminBackupsRouter);
 const http_1 = __importDefault(require("http"));
 const websocket_js_1 = require("./websocket.js");
+const trainingReminderScheduler_js_1 = require("./services/trainingReminderScheduler.js");
 // Iniciar Servidor HTTP + WebSocket
 const server = http_1.default.createServer(app);
 (0, websocket_js_1.initWebSocketServer)(server);
@@ -107,4 +110,5 @@ server.listen(PORT, async () => {
     console.log(`=========================================`);
     await (0, db_js_1.initDbMigrations)();
     (0, backupService_js_1.initBackupScheduler)();
+    trainingReminderScheduler_js_1.TrainingReminderScheduler.start();
 });

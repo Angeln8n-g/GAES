@@ -19,6 +19,7 @@ import { externalTrainingsRouter } from './routes/externalTrainings.js';
 import { technicalAcademyRouter } from './routes/technicalAcademy.js';
 import { certificatesRouter } from './routes/certificates.js';
 import { courseSuggestionsRouter } from './routes/courseSuggestions.js';
+import { convocatoriasRouter } from './routes/convocatorias.js';
 import { adminBackupsRouter } from './routes/backups.js';
 import { initBackupScheduler } from './services/backupService.js';
 import { authenticateToken } from './middlewares/auth.js';
@@ -96,10 +97,12 @@ app.use('/api/external-trainings', externalTrainingsRouter);
 app.use('/api/technical-academy', authenticateToken, technicalAcademyRouter);
 app.use('/api/certificates', certificatesRouter);
 app.use('/api/course-suggestions', courseSuggestionsRouter);
+app.use('/api/convocatorias', convocatoriasRouter);
 app.use('/api/admin', authenticateToken, adminBackupsRouter);
 
 import http from 'http';
 import { initWebSocketServer } from './websocket.js';
+import { TrainingReminderScheduler } from './services/trainingReminderScheduler.js';
 
 // Iniciar Servidor HTTP + WebSocket
 const server = http.createServer(app);
@@ -114,5 +117,6 @@ server.listen(PORT, async () => {
   console.log(`=========================================`);
   await initDbMigrations();
   initBackupScheduler();
+  TrainingReminderScheduler.start();
 });
 

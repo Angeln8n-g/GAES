@@ -18,7 +18,8 @@ import {
   RefreshCw,
   Clock3,
   UserCheck,
-  ShieldCheck
+  ShieldCheck,
+  Smartphone
 } from 'lucide-react';
 import { TechnicalAcademyCohort, TechnicalCohortAttendanceMatrix, UserAccount } from '../../types';
 import { apiService } from '../../services/api';
@@ -54,6 +55,7 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
   const [isSavingGrades, setIsSavingGrades] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isQrModalOpen, setIsQrModalOpen] = useState<boolean>(false);
+  const [isTriggeringAlert, setIsTriggeringAlert] = useState<boolean>(false);
 
   // Calificaciones editables
   const [gradesMap, setGradesMap] = useState<Record<string, {
@@ -92,6 +94,30 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
       onShowToast('Error', 'No se pudo cargar la asistencia de la cohorte', 'error');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleTriggerCohortPushAlert = async () => {
+    if (!matrix || !matrix.participants || matrix.participants.length === 0) {
+      onShowToast('Aviso', 'No hay participantes matriculados en esta cohorte para notificar.', 'warning');
+      return;
+    }
+    try {
+      setIsTriggeringAlert(true);
+      const emails = matrix.participants.map(p => p.email).filter(Boolean);
+      const res = await apiService.triggerTrainingAlert({
+        sessionId: `cohort_${cohort.id}_${selectedDate || cohort.startDate}`,
+        sessionTitle: cohort.courseTitle || 'Taller Técnico',
+        sessionTime: `${selectedDate || cohort.startDate} ${cohort.dailyTime}`,
+        locationOrModality: cohort.location,
+        meetingUrl: cohort.moodleCourseUrl || undefined,
+        recipientEmails: emails
+      });
+      onShowToast('Alerta Push Emitida', res.message, 'success');
+    } catch (err: any) {
+      onShowToast('Error', err.message || 'Error al emitir alerta de inicio de clase', 'error');
+    } finally {
+      setIsTriggeringAlert(false);
     }
   };
 
@@ -345,6 +371,18 @@ export const TechnicalCohortManagerModal: React.FC<TechnicalCohortManagerModalPr
           </div>
 
           <div className="flex items-center gap-2 self-end sm:self-center">
+            {/* Botón Alerta Push de Clase */}
+            <button
+              type="button"
+              onClick={handleTriggerCohortPushAlert}
+              disabled={isTriggeringAlert}
+              className="px-3.5 py-2 min-h-[44px] rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all shadow-md shadow-amber-600/25 flex items-center gap-1.5 cursor-pointer active:scale-95 shrink-0 focus-visible:ring-2 focus-visible:ring-white disabled:opacity-50"
+              title="Emitir alerta Push inmediata a los dispositivos de los alumnos para ingresar al taller ahora"
+            >
+              <Smartphone className="w-4 h-4" />
+              <span>{isTriggeringAlert ? 'Emitiendo...' : 'Alerta Push'}</span>
+            </button>
+
             {/* Botón Proyectar PIN */}
             <button
               type="button"

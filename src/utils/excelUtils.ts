@@ -15,7 +15,8 @@ import {
   ExternalTraining,
   CreateExternalTrainingPayload,
   TechnicalCohortAttendanceMatrix,
-  TechnicalCohortEnrolledParticipant
+  TechnicalCohortEnrolledParticipant,
+  Convocatoria
 } from '../types';
 import { formatDateLong, formatCedula, isValidCedula, formatDateShort } from './formatters';
 import {
@@ -801,7 +802,8 @@ export const exportFullExecutiveDashboardReportToExcel = (
   events: TrainingEvent[],
   participants: Participant[],
   groups: ParticipantGroup[],
-  programs: TrainingProgram[]
+  programs: TrainingProgram[],
+  convocatorias: Convocatoria[] = []
 ): void => {
   let totalCap = 0;
   let totalReg = 0;
@@ -852,7 +854,7 @@ export const exportFullExecutiveDashboardReportToExcel = (
   const estimatedTrainingHours = totalAtt * 2; // Estimado promedio 2 horas por curso
 
   // Hoja 1: Resumen Ejecutivo
-  const kpiData = [
+  const kpiData: any[] = [
     { 'Indicador / Métrica Clave': 'Total Oferta de Cupos', 'Valor': totalCap, 'Unidad / Detalle': 'Cupos disponibles' },
     { 'Indicador / Métrica Clave': 'Total Colaboradores Inscritos', 'Valor': totalReg, 'Unidad / Detalle': 'Reservas registradas' },
     { 'Indicador / Métrica Clave': 'Tasa de Ocupación Global', 'Valor': `${occupancyRate}%`, 'Unidad / Detalle': 'Inscritos / Capacidad' },
@@ -865,6 +867,24 @@ export const exportFullExecutiveDashboardReportToExcel = (
     { 'Indicador / Métrica Clave': 'Grupos / Áreas Definidas', 'Valor': groups.length, 'Unidad / Detalle': 'Cohortes activas' },
     { 'Indicador / Métrica Clave': 'Cronogramas Formativos Activos', 'Valor': programs.filter(p => p.status === 'active').length, 'Unidad / Detalle': 'Rutas vigentes' }
   ];
+
+  if (convocatorias && convocatorias.length > 0) {
+    const totalConvs = convocatorias.length;
+    const openConvs = convocatorias.filter(c => c.status === 'open').length;
+    const totalQuotaConvs = convocatorias.reduce((acc, c) => acc + (c.totalQuota || 0), 0);
+    const totalAppsConvs = convocatorias.reduce((acc, c) => acc + (c.stats?.totalApplications || 0), 0);
+    const approvedAppsConvs = convocatorias.reduce((acc, c) => acc + (c.stats?.approvedApplications || 0), 0);
+    const convOccupancy = totalQuotaConvs > 0 ? Math.round((approvedAppsConvs / totalQuotaConvs) * 100) : 0;
+
+    kpiData.push(
+      { 'Indicador / Métrica Clave': 'Convocatorias Oficiales Registradas', 'Valor': totalConvs, 'Unidad / Detalle': 'Total convocatorias' },
+      { 'Indicador / Métrica Clave': 'Convocatorias Abiertas (Catálogo)', 'Valor': openConvs, 'Unidad / Detalle': 'En postulación activa' },
+      { 'Indicador / Métrica Clave': 'Cupos Asignados a Contratistas', 'Valor': totalQuotaConvs, 'Unidad / Detalle': 'Plazas totales para empresas' },
+      { 'Indicador / Métrica Clave': 'Postulaciones Recibidas a Convocatorias', 'Valor': totalAppsConvs, 'Unidad / Detalle': 'Candidaturas enviadas' },
+      { 'Indicador / Métrica Clave': 'Postulaciones Admitidas en Convocatorias', 'Valor': approvedAppsConvs, 'Unidad / Detalle': 'Matriculados en cohortes' },
+      { 'Indicador / Métrica Clave': 'Tasa de Ocupación de Convocatorias', 'Valor': `${convOccupancy}%`, 'Unidad / Detalle': 'Admitidos / Cupos asignados' }
+    );
+  }
 
   // Hoja 2: Detalle por Capacitación
   const eventsDetailData = events.map((evt, idx) => {
@@ -937,6 +957,26 @@ export const exportFullExecutiveDashboardReportToExcel = (
 
   const wsInst = XLSX.utils.json_to_sheet(instructorsData);
   XLSX.utils.book_append_sheet(wb, wsInst, 'Desempeño Facilitadores');
+
+  // Hoja 5: Convocatorias si están disponibles
+  if (convocatorias && convocatorias.length > 0) {
+    const convSheetData = convocatorias.map((c, idx) => ({
+      'No.': idx + 1,
+      'Código': c.code,
+      'Título Convocatoria': c.title,
+      'Curso / Especialidad': c.courseTitle || 'N/A',
+      'Modalidad': c.modality,
+      'Estado': c.status === 'open' ? 'Abierta' : c.status === 'closed' ? 'Cerrada' : c.status === 'draft' ? 'Borrador' : c.status,
+      'Cupo Total': c.totalQuota,
+      'Postulaciones Totales': c.stats?.totalApplications || 0,
+      'Aprobadas': c.stats?.approvedApplications || 0,
+      'En Lista de Espera': c.stats?.waitlistApplications || 0,
+      '% Ocupación': `${c.totalQuota > 0 ? Math.round(((c.stats?.approvedApplications || 0) / c.totalQuota) * 100) : 0}%`,
+      'Período Postulación': `${c.applicationStartDate} al ${c.applicationEndDate}`
+    }));
+    const wsConv = XLSX.utils.json_to_sheet(convSheetData);
+    XLSX.utils.book_append_sheet(wb, wsConv, 'Convocatorias & Cupos');
+  }
 
   const fileName = `Informe_Ejecutivo_Capacitaciones_${new Date().toISOString().slice(0, 10)}.xlsx`;
   XLSX.writeFile(wb, fileName);
@@ -2848,4 +2888,112 @@ export const parseCohortParticipantsExcel = async (
     reader.readAsArrayBuffer(file);
   });
 };
+
+/**
+ * Exporta el Reporte Ejecutivo Oficial de Convocatorias y Cupos por Empresa
+ */
+export const exportConvocatoriasReportToExcel = (
+  convocatorias: Convocatoria[],
+  companies: Company[] = []
+): void => {
+  const wb = XLSX.utils.book_new();
+  const dateToday = new Date().toISOString().split('T')[0];
+
+  // 1. Resumen Ejecutivo
+  const totalConvs = convocatorias.length;
+  const openConvs = convocatorias.filter(c => c.status === 'open').length;
+  const totalQuotaAll = convocatorias.reduce((acc, c) => acc + (c.totalQuota || 0), 0);
+  const totalAppsAll = convocatorias.reduce((acc, c) => acc + (c.stats?.totalApplications || 0), 0);
+  const approvedAppsAll = convocatorias.reduce((acc, c) => acc + (c.stats?.approvedApplications || 0), 0);
+  const pendingAppsAll = convocatorias.reduce((acc, c) => acc + (c.stats?.pendingApplications || 0), 0);
+  const waitlistAppsAll = convocatorias.reduce((acc, c) => acc + (c.stats?.waitlistApplications || 0), 0);
+  const globalOccupancy = totalQuotaAll > 0 ? Math.round((approvedAppsAll / totalQuotaAll) * 100) : 0;
+  const globalApprovalRate = totalAppsAll > 0 ? Math.round((approvedAppsAll / totalAppsAll) * 100) : 0;
+
+  const summaryData = [
+    { 'Métrica / Indicador Clave': 'Total Convocatorias Registradas', 'Valor': totalConvs, 'Detalle': 'Histórico global' },
+    { 'Métrica / Indicador Clave': 'Convocatorias Abiertas (En Concurso)', 'Valor': openConvs, 'Detalle': 'Activas en catálogo' },
+    { 'Métrica / Indicador Clave': 'Cupos Totales Asignados a Contratistas', 'Valor': totalQuotaAll, 'Detalle': 'Plazas disponibles' },
+    { 'Métrica / Indicador Clave': 'Postulaciones Totales Recibidas', 'Valor': totalAppsAll, 'Detalle': 'Demanda total' },
+    { 'Métrica / Indicador Clave': 'Postulaciones Aprobadas (Matriculadas)', 'Valor': approvedAppsAll, 'Detalle': 'Admitidos en cohortes' },
+    { 'Métrica / Indicador Clave': 'Postulaciones Pendientes de Revisión', 'Valor': pendingAppsAll, 'Detalle': 'En proceso de dictamen' },
+    { 'Métrica / Indicador Clave': 'Colaboradores en Lista de Espera', 'Valor': waitlistAppsAll, 'Detalle': 'Excedentes calificados' },
+    { 'Métrica / Indicador Clave': 'Tasa de Ocupación de Cupos', 'Valor': `${globalOccupancy}%`, 'Detalle': 'Aprobados / Cupos' },
+    { 'Métrica / Indicador Clave': 'Tasa de Admisión / Aprobación', 'Valor': `${globalApprovalRate}%`, 'Detalle': 'Aprobados / Postulados' }
+  ];
+
+  const wsSummary = XLSX.utils.json_to_sheet(summaryData);
+  wsSummary['!cols'] = [{ wch: 45 }, { wch: 15 }, { wch: 35 }];
+  XLSX.utils.book_append_sheet(wb, wsSummary, 'Resumen Ejecutivo');
+
+  // 2. Detalle de Convocatorias
+  const convocatoriasData = convocatorias.map((c, idx) => {
+    const totalApps = c.stats?.totalApplications || 0;
+    const approvedApps = c.stats?.approvedApplications || 0;
+    const pendingApps = c.stats?.pendingApplications || 0;
+    const waitlistApps = c.stats?.waitlistApplications || 0;
+    const occupancy = c.totalQuota > 0 ? Math.round((approvedApps / c.totalQuota) * 100) : 0;
+
+    return {
+      'No.': idx + 1,
+      'Código Convocatoria': c.code,
+      'Título': c.title,
+      'Curso Oficial / Especialidad': c.courseTitle || 'N/A',
+      'Modalidad': c.modality,
+      'Ubicación / Sede': c.location || 'N/A',
+      'Estado': c.status === 'open' ? 'Abierta' : c.status === 'closed' ? 'Cerrada' : c.status === 'draft' ? 'Borrador' : c.status === 'in_progress' ? 'En Curso' : c.status,
+      'Cupo Global Ofrecido': c.totalQuota,
+      'Postulaciones Recibidas': totalApps,
+      'Postulaciones Aprobadas': approvedApps,
+      'Pendientes de Revisión': pendingApps,
+      'En Lista de Espera': waitlistApps,
+      '% Ocupación de Cupo': `${occupancy}%`,
+      'Apertura Postulación': c.applicationStartDate,
+      'Cierre Postulación': c.applicationEndDate,
+      'Inicio Entrenamiento': c.trainingStartDate || 'Por definir',
+      'Fin Entrenamiento': c.trainingEndDate || 'Por definir',
+      'Tipo de Selección': c.selectionMode === 'direct' ? 'Admisión Directa' : 'Revisión por Comité',
+      'Publicada en Catálogo': c.status === 'open' ? 'Sí (Evento Activo)' : 'No'
+    };
+  });
+
+  const wsConvs = XLSX.utils.json_to_sheet(convocatoriasData);
+  XLSX.utils.book_append_sheet(wb, wsConvs, 'Detalle Convocatorias');
+
+  // 3. Desglose de Cupos por Empresa / Contratista
+  const companyQuotasData: any[] = [];
+  let rowIdx = 1;
+  convocatorias.forEach(c => {
+    (c.companyQuotas || []).forEach(q => {
+      const compName = q.companyName || companies.find(comp => comp.id === q.companyId)?.name || q.companyId;
+      const approved = q.approvedApplications || 0;
+      const total = q.allocatedQuota || 0;
+      const available = q.availableQuota ?? Math.max(0, total - approved);
+      const occupancy = total > 0 ? Math.round((approved / total) * 100) : 0;
+
+      companyQuotasData.push({
+        'No.': rowIdx++,
+        'Código Convocatoria': c.code,
+        'Convocatoria': c.title,
+        'Empresa / Contratista': compName,
+        'Cupo Asignado': total,
+        'Postulaciones Totales': q.totalApplications || 0,
+        'Postulaciones Aprobadas': approved,
+        'Pendientes': q.pendingApplications || 0,
+        'Cupos Disponibles': available,
+        '% Ocupación Empresa': `${occupancy}%`,
+        'Estado Cupo': available <= 0 ? 'Cupo Completo (Lista de Espera)' : 'Cupos Libres'
+      });
+    });
+  });
+
+  if (companyQuotasData.length > 0) {
+    const wsQuotas = XLSX.utils.json_to_sheet(companyQuotasData);
+    XLSX.utils.book_append_sheet(wb, wsQuotas, 'Cupos por Empresa');
+  }
+
+  const fileName = `Reporte_Convocatorias_y_Cupos_${dateToday}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+};
+
 

@@ -22,7 +22,14 @@ import {
   Search,
   BookOpen,
   Activity,
-  Leaf
+  Leaf,
+  ChevronRight,
+  Send,
+  Inbox,
+  ArrowRight,
+  Eye,
+  TrendingUp,
+  Filter
 } from 'lucide-react';
 import { 
   TrainingEvent, 
@@ -34,7 +41,8 @@ import {
   ParticipantGrade,
   SystemSettings,
   OjtChecklist,
-  CalibrationSession
+  CalibrationSession,
+  Convocatoria
 } from '../../types';
 import { apiService } from '../../services/api';
 import { formatDateLong } from '../../utils/formatters';
@@ -46,7 +54,8 @@ import {
   exportInstructorsAndFeedbackReportToExcel, 
   exportGroupsToExcel,
   exportSkillsGapReportToExcel,
-  exportSustainabilityAndTrainingReportToExcel
+  exportSustainabilityAndTrainingReportToExcel,
+  exportConvocatoriasReportToExcel
 } from '../../utils/excelUtils';
 import { OjtTtpSection } from './OjtTtpSection';
 import { 
@@ -67,6 +76,7 @@ interface DashboardViewProps {
   currentUser?: UserAccount | null;
   companies?: Company[];
   selectedCompanyId?: string;
+  convocatorias?: Convocatoria[];
   onSelectCompanyScope?: (companyId: string) => void;
   onShowToast?: (title: string, message: string, type?: 'success' | 'error' | 'info') => void;
   onSaveEvent?: (event: TrainingEvent) => Promise<void>;
@@ -84,6 +94,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   currentUser,
   companies = [],
   selectedCompanyId = 'all',
+  convocatorias: initialConvocatorias = [],
   onSelectCompanyScope,
   onShowToast,
   onSaveEvent,
@@ -91,10 +102,113 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   checklists = [],
   calibrations = []
 }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'compliance' | 'instructors' | 'skills' | 'demographics' | 'sustainability' | 'reports' | 'ojt_ttp'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'convocatorias' | 'compliance' | 'instructors' | 'skills' | 'demographics' | 'sustainability' | 'reports' | 'ojt_ttp'>('overview');
+  const [convocatorias, setConvocatorias] = useState<Convocatoria[]>(initialConvocatorias);
+  const [isLoadingConvocatorias, setIsLoadingConvocatorias] = useState<boolean>(false);
+  const [convocatoriasSearchQuery, setConvocatoriasSearchQuery] = useState<string>('');
+  const [convocatoriasStatusFilter, setConvocatoriasStatusFilter] = useState<string>('all');
+  const [convocatoriasCompanyFilter, setConvocatoriasCompanyFilter] = useState<string>('all');
   const [selectedProgramId, setSelectedProgramId] = useState<string>(programs[0]?.id || '');
   const [skillsSearchQuery, setSkillsSearchQuery] = useState<string>('');
   const [selectedSurveyEventId, setSelectedSurveyEventId] = useState<string>('all');
+
+  // Carga automática y reactiva de Convocatorias en el Dashboard
+  React.useEffect(() => {
+    let isMounted = true;
+    const loadConvocatorias = async () => {
+      try {
+        setIsLoadingConvocatorias(true);
+        const data = await apiService.getConvocatorias({
+          companyId: selectedCompanyId !== 'all' ? selectedCompanyId : undefined
+        });
+        if (isMounted) {
+          setConvocatorias(data || []);
+        }
+      } catch (err) {
+        console.error('Error cargando convocatorias para dashboard:', err);
+      } finally {
+        if (isMounted) setIsLoadingConvocatorias(false);
+      }
+    };
+    loadConvocatorias();
+    return () => { isMounted = false; };
+  }, [selectedCompanyId]);
+
+  // Métricas Consolidadas de Convocatorias
+  const convocatoriasStats = useMemo(() => {
+    const total = convocatorias.length;
+    const open = convocatorias.filter(c => c.status === 'open').length;
+    const inProgress = convocatorias.filter(c => c.status === 'in_progress').length;
+    const closed = convocatorias.filter(c => c.status === 'closed' || c.status === 'completed').length;
+    const draft = convocatorias.filter(c => c.status === 'draft').length;
+
+    let totalQuota = 0;
+    let totalApps = 0;
+    let approvedApps = 0;
+    let pendingApps = 0;
+    let waitlistApps = 0;
+
+    const byCompanyMap: Record<string, {
+      companyId: string;
+      companyName: string;
+      allocatedQuota: number;
+      totalApplications: number;
+      approvedApplications: number;
+      pendingApplications: number;
+      waitlistApplications: number;
+      availableQuota: number;
+    }> = {};
+
+    convocatorias.forEach(c => {
+      totalQuota += c.totalQuota || 0;
+      totalApps += c.stats?.totalApplications || 0;
+      approvedApps += c.stats?.approvedApplications || 0;
+      pendingApps += c.stats?.pendingApplications || 0;
+      waitlistApps += c.stats?.waitlistApplications || 0;
+
+      (c.companyQuotas || []).forEach(q => {
+        if (!byCompanyMap[q.companyId]) {
+          const compObj = companies.find(comp => comp.id === q.companyId);
+          byCompanyMap[q.companyId] = {
+            companyId: q.companyId,
+            companyName: q.companyName || compObj?.name || q.companyId,
+            allocatedQuota: 0,
+            totalApplications: 0,
+            approvedApplications: 0,
+            pendingApplications: 0,
+            waitlistApplications: 0,
+            availableQuota: 0
+          };
+        }
+        byCompanyMap[q.companyId].allocatedQuota += q.allocatedQuota || 0;
+        byCompanyMap[q.companyId].totalApplications += q.totalApplications || 0;
+        byCompanyMap[q.companyId].approvedApplications += q.approvedApplications || 0;
+        byCompanyMap[q.companyId].pendingApplications += q.pendingApplications || 0;
+        byCompanyMap[q.companyId].availableQuota += q.availableQuota ?? Math.max(0, (q.allocatedQuota || 0) - (q.approvedApplications || 0));
+      });
+    });
+
+    const occupancyRate = totalQuota > 0 ? Math.round((approvedApps / totalQuota) * 100) : 0;
+    const approvalRate = totalApps > 0 ? Math.round((approvedApps / totalApps) * 100) : 0;
+    const demandRatio = totalQuota > 0 ? (totalApps / totalQuota).toFixed(1) : '0';
+
+    return {
+      total,
+      open,
+      inProgress,
+      closed,
+      draft,
+      totalQuota,
+      totalApps,
+      approvedApps,
+      pendingApps,
+      waitlistApps,
+      occupancyRate,
+      approvalRate,
+      demandRatio,
+      byCompany: Object.values(byCompanyMap)
+    };
+  }, [convocatorias, companies]);
 
   // Estado para Programación 1-Clic desde Oportunidades DNC
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
@@ -679,6 +793,25 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </button>
 
             <button
+              onClick={() => setActiveTab('convocatorias')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
+                activeTab === 'convocatorias'
+                  ? 'bg-gradient-to-r from-red-600 via-[#DA291C] to-amber-600 text-white shadow-md shadow-red-500/25'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700/70'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+              <span>Convocatorias & Cupos</span>
+              {convocatoriasStats.open > 0 && (
+                <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${
+                  activeTab === 'convocatorias' ? 'bg-white text-[#DA291C]' : 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
+                }`}>
+                  {convocatoriasStats.open}
+                </span>
+              )}
+            </button>
+
+            <button
               onClick={() => setActiveTab('compliance')}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
                 activeTab === 'compliance'
@@ -779,8 +912,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {activeTab === 'overview' && (
         <div className="space-y-8 animate-in fade-in duration-300">
           
-          {/* Top 5 KPI Cards (Light Theme) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {/* Top 6 KPI Cards (Light Theme) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
             
             {/* KPI 1: Cupos Totales */}
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm">
@@ -849,6 +982,56 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
             </div>
 
+            {/* KPI 6: Convocatorias & Cupos Corporativos */}
+            <div 
+              onClick={() => setActiveTab('convocatorias')}
+              className="bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-900/50 rounded-3xl p-5 shadow-sm hover:border-indigo-500 hover:shadow-md transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-indigo-700 dark:text-indigo-400">Convocatorias</span>
+                <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+              </div>
+              <p className="text-2xl sm:text-3xl font-black text-indigo-700 dark:text-indigo-400 mt-2">
+                {convocatoriasStats.open} <span className="text-sm font-semibold text-slate-400">/ {convocatoriasStats.total}</span>
+              </p>
+              <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                <span>{convocatoriasStats.totalApps} post. ({convocatoriasStats.occupancyRate}% cupos)</span>
+                <ChevronRight className="w-3.5 h-3.5 text-indigo-500 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </div>
+
+          </div>
+
+          {/* Executive Convocatorias Banner */}
+          <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-3xl p-5 sm:p-6 shadow-sm border border-indigo-700/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300 shrink-0">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-indigo-300">Gestión de Cupos & Postulaciones</span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                    {convocatoriasStats.open} Activa(s)
+                  </span>
+                </div>
+                <h3 className="text-base sm:text-lg font-black mt-0.5">
+                  {convocatoriasStats.approvedApps} cupos cubiertos de {convocatoriasStats.totalQuota} asignados corporativamente
+                </h3>
+                <p className="text-xs text-indigo-200 mt-0.5">
+                  {convocatoriasStats.pendingApps} postulaciones en revisión técnica • {convocatoriasStats.waitlistApps} en lista de espera priorizada
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setActiveTab('convocatorias')}
+              className="px-4 py-2.5 rounded-xl bg-white text-indigo-900 hover:bg-indigo-50 font-bold text-xs shadow-md transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+            >
+              <span>Ver Panel de Cupos & Contratistas</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
 
           {/* Grid: Category Breakdown & Modality Breakdown */}
@@ -940,8 +1123,456 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       )}
 
       {/* ==========================================
-          TAB 2: CUMPLIMIENTO & CRONOGRAMAS
+          TAB: CONVOCATORIAS & GESTIÓN DE CUPOS
           ========================================== */}
+      {activeTab === 'convocatorias' && (
+        <div className="space-y-8 animate-in fade-in duration-300">
+          
+          {/* Header Banner & Global Actions */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1 text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                <Sparkles className="w-4 h-4" />
+                <span>Academia Técnica & Gestión de Cupos por Contratista</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                Métricas de Convocatorias & Cupos por Empresa
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-2xl">
+                Supervisa la oferta de convocatorias, cuotas asignadas a contratistas, embudo de admisión técnica y eventos publicados en catálogo.
+              </p>
+            </div>
+
+            <button
+              onClick={() => {
+                exportConvocatoriasReportToExcel(convocatorias, companies);
+                handleToast('Reporte generado', 'Reporte Oficial de Convocatorias & Cupos descargado con éxito.', 'success');
+              }}
+              className="px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white text-xs font-bold rounded-2xl shadow-md shadow-indigo-600/20 transition-all flex items-center gap-2 cursor-pointer shrink-0"
+            >
+              <Download className="w-4 h-4" />
+              <span>Exportar Métricas Excel (.xlsx)</span>
+            </button>
+          </div>
+
+          {/* 4 Executive KPI Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            {/* KPI 1: Convocatorias */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Convocatorias Totales</span>
+                <div className="p-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400">
+                  <Calendar className="w-5 h-5" />
+                </div>
+              </div>
+              <p className="text-3xl font-black text-slate-900 dark:text-white mt-3">{convocatoriasStats.total}</p>
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 mt-2">
+                <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[10px] font-bold">
+                  {convocatoriasStats.open} abiertas
+                </span>
+                <span>• {convocatoriasStats.inProgress} en curso</span>
+                <span>• {convocatoriasStats.closed} cerradas</span>
+              </div>
+            </div>
+
+            {/* KPI 2: Cupos Asignados */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Ocupación de Cupos</span>
+                <div className="p-2.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+                  <Users className="w-5 h-5" />
+                </div>
+              </div>
+              <div className="flex items-baseline gap-2 mt-3">
+                <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400">{convocatoriasStats.approvedApps}</p>
+                <p className="text-sm font-bold text-slate-400">/ {convocatoriasStats.totalQuota} cupos</p>
+              </div>
+              <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden mt-3 border border-slate-200 dark:border-slate-700">
+                <div
+                  className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                  style={{ width: `${Math.min(convocatoriasStats.occupancyRate, 100)}%` }}
+                />
+              </div>
+              <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mt-2">
+                <span>{convocatoriasStats.occupancyRate}% cubierto</span>
+                <span className="font-bold text-slate-700 dark:text-slate-300">
+                  {Math.max(0, convocatoriasStats.totalQuota - convocatoriasStats.approvedApps)} disponibles
+                </span>
+              </div>
+            </div>
+
+            {/* KPI 3: Demanda de Postulaciones */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Postulaciones Recibidas</span>
+                <div className="p-2.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
+                  <Inbox className="w-5 h-5" />
+                </div>
+              </div>
+              <p className="text-3xl font-black text-amber-600 dark:text-amber-400 mt-3">{convocatoriasStats.totalApps}</p>
+              <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mt-2">
+                <span>Demanda: <strong className="text-slate-800 dark:text-slate-200">{convocatoriasStats.demandRatio}x</strong> por cupo</span>
+                <span className="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 text-[10px] font-bold">
+                  {convocatoriasStats.pendingApps} por evaluar
+                </span>
+              </div>
+            </div>
+
+            {/* KPI 4: Admisión y Lista de Espera */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Tasa de Admisión</span>
+                <div className="p-2.5 rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400">
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+              </div>
+              <p className="text-3xl font-black text-purple-600 dark:text-purple-400 mt-3">{convocatoriasStats.approvalRate}%</p>
+              <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mt-2">
+                <span>{convocatoriasStats.approvedApps} admitidos</span>
+                <span className="px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 text-[10px] font-bold">
+                  {convocatoriasStats.waitlistApps} en lista espera
+                </span>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Distribución y Aprovechamiento de Cupos por Empresa Contratista */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Building2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  Asignación y Aprovechamiento de Cupos por Contratista
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Monitoreo empresa por empresa del consumo de cuotas, postulaciones en revisión y disponibilidad de cupos.
+                </p>
+              </div>
+              <span className="text-xs font-bold px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 self-start sm:self-auto">
+                {convocatoriasStats.byCompany.length} empresas con cupos asignados
+              </span>
+            </div>
+
+            {convocatoriasStats.byCompany.length === 0 ? (
+              <div className="text-center py-10 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
+                <Building2 className="w-10 h-10 text-slate-400 mx-auto mb-2" />
+                <p className="text-sm font-bold text-slate-700 dark:text-slate-300">No hay cupos asignados a empresas</p>
+                <p className="text-xs text-slate-500 mt-1">Crea o edita una convocatoria y distribuye cupos entre tus empresas colaboradoras.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {convocatoriasStats.byCompany.map((comp) => {
+                  const occupancy = comp.allocatedQuota > 0 
+                    ? Math.round((comp.approvedApplications / comp.allocatedQuota) * 100) 
+                    : 0;
+                  const isFull = comp.approvedApplications >= comp.allocatedQuota && comp.allocatedQuota > 0;
+
+                  return (
+                    <div 
+                      key={comp.companyId}
+                      className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-4 hover:border-indigo-400 dark:hover:border-indigo-600 transition-colors"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <h4 className="text-sm font-extrabold text-slate-900 dark:text-white line-clamp-1">
+                            {comp.companyName}
+                          </h4>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">ID: {comp.companyId}</p>
+                        </div>
+                        {isFull ? (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800 shrink-0">
+                            Cupo Agotado
+                          </span>
+                        ) : occupancy > 0 ? (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 shrink-0">
+                            {occupancy}% Ocupado
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 shrink-0">
+                            Disponible
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Progress Bar */}
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-slate-600 dark:text-slate-400">Ocupación</span>
+                          <span className="font-extrabold text-slate-900 dark:text-white">
+                            {comp.approvedApplications} / {comp.allocatedQuota} cupos
+                          </span>
+                        </div>
+                        <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                          <div 
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              isFull ? 'bg-rose-500' : 'bg-indigo-600 dark:bg-indigo-500'
+                            }`}
+                            style={{ width: `${Math.min(occupancy, 100)}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Pill Metrics */}
+                      <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-200 dark:border-slate-700 text-center">
+                        <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                          <span className="block text-[10px] text-slate-500 dark:text-slate-400">Postuladas</span>
+                          <span className="text-xs font-black text-slate-900 dark:text-white">{comp.totalApplications}</span>
+                        </div>
+                        <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                          <span className="block text-[10px] text-amber-600 dark:text-amber-400">Pendientes</span>
+                          <span className="text-xs font-black text-amber-600 dark:text-amber-400">{comp.pendingApplications}</span>
+                        </div>
+                        <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                          <span className="block text-[10px] text-emerald-600 dark:text-emerald-400">Disponibles</span>
+                          <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">{comp.availableQuota}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Embudo de Selección y Admisión Técnica */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+            <div>
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                Embudo de Admisión y Selección Técnica
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Ruta del participante desde la recepción de su postulación hasta la matriculación en la cohorte.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
+              
+              {/* Funnel Step 1: Postuladas */}
+              <div className="p-5 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-900/40 space-y-2">
+                <div className="flex items-center justify-between text-xs font-bold text-indigo-900 dark:text-indigo-300">
+                  <span>1. Recibidas</span>
+                  <Inbox className="w-4 h-4 text-indigo-600" />
+                </div>
+                <p className="text-2xl font-black text-indigo-900 dark:text-indigo-200">{convocatoriasStats.totalApps}</p>
+                <div className="text-[11px] text-indigo-700 dark:text-indigo-400 font-semibold">
+                  100% Demanda Registrada
+                </div>
+              </div>
+
+              {/* Funnel Step 2: En Evaluación */}
+              <div className="p-5 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 space-y-2">
+                <div className="flex items-center justify-between text-xs font-bold text-amber-900 dark:text-amber-300">
+                  <span>2. En Evaluación</span>
+                  <Clock className="w-4 h-4 text-amber-600" />
+                </div>
+                <p className="text-2xl font-black text-amber-900 dark:text-amber-200">{convocatoriasStats.pendingApps}</p>
+                <div className="text-[11px] text-amber-700 dark:text-amber-400 font-semibold">
+                  {convocatoriasStats.totalApps > 0 
+                    ? Math.round((convocatoriasStats.pendingApps / convocatoriasStats.totalApps) * 100) 
+                    : 0}% en revisión técnica
+                </div>
+              </div>
+
+              {/* Funnel Step 3: Admitidos */}
+              <div className="p-5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 space-y-2">
+                <div className="flex items-center justify-between text-xs font-bold text-emerald-900 dark:text-emerald-300">
+                  <span>3. Admitidos</span>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                </div>
+                <p className="text-2xl font-black text-emerald-900 dark:text-emerald-200">{convocatoriasStats.approvedApps}</p>
+                <div className="text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold">
+                  {convocatoriasStats.totalApps > 0 
+                    ? Math.round((convocatoriasStats.approvedApps / convocatoriasStats.totalApps) * 100) 
+                    : 0}% tasa de aprobación
+                </div>
+              </div>
+
+              {/* Funnel Step 4: Lista de Espera */}
+              <div className="p-5 rounded-2xl bg-purple-50/60 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/40 space-y-2">
+                <div className="flex items-center justify-between text-xs font-bold text-purple-900 dark:text-purple-300">
+                  <span>4. Lista de Espera</span>
+                  <Users className="w-4 h-4 text-purple-600" />
+                </div>
+                <p className="text-2xl font-black text-purple-900 dark:text-purple-200">{convocatoriasStats.waitlistApps}</p>
+                <div className="text-[11px] text-purple-700 dark:text-purple-400 font-semibold">
+                  {convocatoriasStats.totalApps > 0 
+                    ? Math.round((convocatoriasStats.waitlistApps / convocatoriasStats.totalApps) * 100) 
+                    : 0}% en banco de talento
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* Matriz Detallada de Convocatorias Oficiales Registradas */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  Catálogo y Matriz de Convocatorias
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Lista maestra de convocatorias activas, su estado de cupos y publicación como evento en el catálogo general.
+                </p>
+              </div>
+
+              {/* Filtros */}
+              <div className="flex flex-wrap items-center gap-2.5">
+                {/* Search */}
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Buscar código, título..."
+                    value={convocatoriasSearchQuery}
+                    onChange={(e) => setConvocatoriasSearchQuery(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+
+                {/* Status Filter */}
+                <select
+                  value={convocatoriasStatusFilter}
+                  onChange={(e) => setConvocatoriasStatusFilter(e.target.value)}
+                  className="px-3 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:outline-none cursor-pointer"
+                >
+                  <option value="all">Todos los Estados</option>
+                  <option value="open">Abiertas</option>
+                  <option value="in_progress">En Curso</option>
+                  <option value="closed">Cerradas</option>
+                  <option value="draft">Borrador</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-2xl">
+              <table className="w-full text-left text-xs text-slate-600 dark:text-slate-400">
+                <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-900 dark:text-slate-200 font-extrabold uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-700">
+                  <tr>
+                    <th className="p-3.5">Código & Convocatoria</th>
+                    <th className="p-3.5">Fechas & Plazo</th>
+                    <th className="p-3.5 text-center">Estado</th>
+                    <th className="p-3.5 text-center">Catálogo de Eventos</th>
+                    <th className="p-3.5">Ocupación Cupos</th>
+                    <th className="p-3.5 text-center">Postulaciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                  {convocatorias
+                    .filter(c => {
+                      const q = convocatoriasSearchQuery.toLowerCase();
+                      const matchesSearch = !q || 
+                        c.code?.toLowerCase().includes(q) || 
+                        c.title?.toLowerCase().includes(q) ||
+                        c.courseTitle?.toLowerCase().includes(q);
+                      const matchesStatus = convocatoriasStatusFilter === 'all' || c.status === convocatoriasStatusFilter;
+                      return matchesSearch && matchesStatus;
+                    })
+                    .map((item) => {
+                      const totalQ = item.totalQuota || 0;
+                      const approved = item.stats?.approvedApplications || 0;
+                      const occupancy = totalQ > 0 ? Math.round((approved / totalQ) * 100) : 0;
+
+                      return (
+                        <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                          <td className="p-3.5">
+                            <span className="font-mono text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 mr-2">
+                              {item.code}
+                            </span>
+                            <span className="font-extrabold text-slate-900 dark:text-white">
+                              {item.title}
+                            </span>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+                              {item.courseTitle || 'Capacitación Técnica'} • {item.modality || 'Presencial'}
+                            </p>
+                          </td>
+                          <td className="p-3.5 whitespace-nowrap">
+                            <div className="font-medium text-slate-800 dark:text-slate-200">
+                              {formatDateLong(item.trainingStartDate || item.applicationStartDate)} - {formatDateLong(item.trainingEndDate || item.applicationEndDate)}
+                            </div>
+                            <div className="text-[10px] text-slate-500">
+                              Cierre postulación: {formatDateLong(item.applicationEndDate)}
+                            </div>
+                          </td>
+                          <td className="p-3.5 text-center whitespace-nowrap">
+                            {item.status === 'open' && (
+                              <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                                Abierta
+                              </span>
+                            )}
+                            {item.status === 'in_progress' && (
+                              <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+                                En Curso
+                              </span>
+                            )}
+                            {item.status === 'closed' && (
+                              <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                                Cerrada
+                              </span>
+                            )}
+                            {item.status === 'draft' && (
+                              <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                                Borrador
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-3.5 text-center whitespace-nowrap">
+                            {item.eventId ? (
+                              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800 inline-flex items-center gap-1">
+                                <CheckCircle2 className="w-3 h-3 text-teal-600" />
+                                Publicada en Catálogo
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">
+                                No Publicada
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-3.5 min-w-[140px]">
+                            <div className="flex justify-between text-[11px] font-bold mb-1">
+                              <span className="text-slate-800 dark:text-slate-200">{approved} / {totalQ} cupos</span>
+                              <span className="text-indigo-600 dark:text-indigo-400">{occupancy}%</span>
+                            </div>
+                            <div className="w-full h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                              <div
+                                className="h-full bg-indigo-600 dark:bg-indigo-500 rounded-full"
+                                style={{ width: `${Math.min(occupancy, 100)}%` }}
+                              />
+                            </div>
+                          </td>
+                          <td className="p-3.5 text-center whitespace-nowrap">
+                            <span className="font-extrabold text-slate-900 dark:text-white">
+                              {item.stats?.totalApplications || 0}
+                            </span>
+                            <span className="text-[10px] text-slate-500 block">
+                              {item.stats?.pendingApplications || 0} pend. • {item.stats?.waitlistApplications || 0} esp.
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+
+                  {convocatorias.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="p-8 text-center text-slate-500">
+                        No hay convocatorias registradas en el sistema.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+        </div>
+      )}
+
       {/* ==========================================
           TAB 2: CUMPLIMIENTO & CRONOGRAMAS
           ========================================== */}
@@ -1772,18 +2403,55 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <div>• Hoja 2: Detalle por Capacitación</div>
                   <div>• Hoja 3: Análisis por Categorías</div>
                   <div>• Hoja 4: Desempeño Facilitadores</div>
+                  <div>• Hoja 5: Convocatorias & Cupos por Contratista</div>
                 </div>
               </div>
 
               <button
                 onClick={() => {
-                  exportFullExecutiveDashboardReportToExcel(events, participants, groups, programs);
+                  exportFullExecutiveDashboardReportToExcel(events, participants, groups, programs, convocatorias);
                   handleToast('Reporte generado', 'Informe Ejecutivo Consolidado descargado.', 'success');
                 }}
                 className="mt-6 w-full py-2.5 bg-[#DA291C] hover:bg-red-700 text-white text-xs font-bold rounded-xl shadow-md shadow-red-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Download className="w-4 h-4" />
                 <span>Descargar Informe Consolidado</span>
+              </button>
+            </div>
+
+            {/* Report Convocatorias & Cupos por Empresa Contratista */}
+            <div className="bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-800/80 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-indigo-600 dark:hover:border-indigo-500 hover:shadow-md transition-all group bg-gradient-to-b from-indigo-50/30 to-white dark:from-indigo-950/20 dark:to-slate-900">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-2xl bg-indigo-100 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-700 dark:text-indigo-300">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800">
+                    Cupos & Convocatorias
+                  </span>
+                </div>
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-indigo-700 dark:group-hover:text-indigo-400 transition-colors">
+                  Reporte de Convocatorias & Cupos por Contratista
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                  Informe detallado con el inventario de convocatorias, cuotas corporativas asignadas, postulaciones recibidas, estado de admisión y lista de espera.
+                </p>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
+                  <div>• Hoja 1: Resumen Ejecutivo y Métricas Globales</div>
+                  <div>• Hoja 2: Detalle por Convocatoria y Fechas</div>
+                  <div>• Hoja 3: Desglose de Cupos por Empresa Contratista</div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  exportConvocatoriasReportToExcel(convocatorias, companies);
+                  handleToast('Reporte generado', 'Reporte de Convocatorias & Cupos descargado con éxito.', 'success');
+                }}
+                className="mt-6 w-full py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white text-xs font-bold rounded-xl shadow-md shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Download className="w-4 h-4" />
+                <span>Descargar Reporte Convocatorias (.xlsx)</span>
               </button>
             </div>
 

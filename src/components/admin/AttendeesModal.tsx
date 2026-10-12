@@ -27,7 +27,8 @@ import {
   QrCode,
   LogIn,
   LogOut,
-  Trash2
+  Trash2,
+  Smartphone
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { TrainingEvent, Participant, ParticipantGrade, AcademicStatus, EventModule, ParticipantModuleGrade } from '../../types';
@@ -82,6 +83,7 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
   const [liveToast, setLiveToast] = useState<string | null>(null);
   const [participantToUnassign, setParticipantToUnassign] = useState<any | null>(null);
   const [isUnassigning, setIsUnassigning] = useState<boolean>(false);
+  const [isTriggeringAlert, setIsTriggeringAlert] = useState<boolean>(false);
 
   // Escuchar eventos en vivo de WebSocket para asistencia
   useEffect(() => {
@@ -158,6 +160,30 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
   const checkOutList = currentSlot?.checkOutList || [];
   const completedAttendanceList = currentSlot?.completedAttendanceList || [];
   const attendanceDetails = currentSlot?.attendanceDetails || [];
+
+  const handleTriggerClassPushAlert = async () => {
+    if (!attendeesList || attendeesList.length === 0) {
+      alert('No hay participantes inscritos en este horario para notificar.');
+      return;
+    }
+    try {
+      setIsTriggeringAlert(true);
+      const res = await apiService.triggerTrainingAlert({
+        sessionId: `${event.id}_${selectedDate}_${selectedTime}`,
+        sessionTitle: event.title,
+        sessionTime: `${selectedDate} ${selectedTime}`,
+        locationOrModality: event.location,
+        meetingUrl: event.meetingUrl,
+        recipientEmails: attendeesList
+      });
+      setLiveToast(`🔔 ${res.message}`);
+      setTimeout(() => setLiveToast(null), 5000);
+    } catch (err: any) {
+      alert(err.message || 'Error al emitir alerta de clase');
+    } finally {
+      setIsTriggeringAlert(false);
+    }
+  };
 
   // Lista de todos los inscritos en el horario actual con datos de participante y asistencia detallada
   const currentSlotParticipants = useMemo(() => {
@@ -554,6 +580,17 @@ export const AttendeesModal: React.FC<AttendeesModalProps> = ({
                   >
                     <Tv className="w-3.5 h-3.5" />
                     <span>Proyectar QR en Sala</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleTriggerClassPushAlert}
+                    disabled={isTriggeringAlert}
+                    className="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer disabled:opacity-50"
+                    title="Emitir alerta Push inmediata a los dispositivos de todos los alumnos inscritos para que ingresen a la clase ahora"
+                  >
+                    <Smartphone className="w-3.5 h-3.5" />
+                    <span>{isTriggeringAlert ? 'Enviando Alerta...' : 'Alerta Push de Clase'}</span>
                   </button>
 
                   <button

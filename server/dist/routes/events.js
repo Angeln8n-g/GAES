@@ -16,13 +16,24 @@ exports.eventsRouter = (0, express_1.Router)();
  * Helper para formatear un evento completo desde PostgreSQL con sus relaciones
  */
 async function fetchFullEvents(companyId) {
-    let query = 'SELECT * FROM events';
+    let query = `
+    SELECT 
+      events.*,
+      c.id as convocatoria_id,
+      c.code as convocatoria_code,
+      c.status as convocatoria_status,
+      c.selection_mode as convocatoria_selection_mode,
+      to_char(c.application_start_date, 'YYYY-MM-DD') as convocatoria_app_start,
+      to_char(c.application_end_date, 'YYYY-MM-DD') as convocatoria_app_end
+    FROM events
+    LEFT JOIN convocatorias c ON c.event_id = events.id
+  `;
     const params = [];
     if (companyId && typeof companyId === 'string' && companyId !== 'all') {
-        query += ` WHERE (company_id = $1 OR company_id = 'all' OR company_id IS NULL OR $1 = ANY(company_ids))`;
+        query += ` WHERE (events.company_id = $1 OR events.company_id = 'all' OR events.company_id IS NULL OR $1 = ANY(events.company_ids))`;
         params.push(companyId);
     }
-    query += ' ORDER BY id ASC';
+    query += ' ORDER BY events.id ASC';
     const eventsResult = await db_js_1.pool.query(query, params);
     const events = [];
     for (const evt of eventsResult.rows) {
@@ -188,6 +199,13 @@ async function fetchFullEvents(companyId) {
             programCategory: evt.program_category || 'Capacitacion_seguridad_salud_en_el_trabajo_y_sustentabilidad',
             subprogram: evt.subprogram || 'Sustentabilidad',
             supplier: evt.supplier || 'Claro',
+            convocatoriaId: evt.convocatoria_id || undefined,
+            convocatoriaCode: evt.convocatoria_code || undefined,
+            convocatoriaStatus: evt.convocatoria_status || undefined,
+            convocatoriaSelectionMode: evt.convocatoria_selection_mode || undefined,
+            convocatoriaAppStartDate: evt.convocatoria_app_start || undefined,
+            convocatoriaAppEndDate: evt.convocatoria_app_end || undefined,
+            isConvocatoria: Boolean(evt.convocatoria_id || evt.category === 'Convocatoria' || evt.training_format === 'Convocatoria'),
             feedbacks: feedbacksResult.rows,
             grades: gradesResult.rows
         });

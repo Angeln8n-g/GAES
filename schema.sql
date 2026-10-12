@@ -517,3 +517,152 @@ CREATE TABLE IF NOT EXISTS course_waitlist_entries (
 CREATE INDEX IF NOT EXISTS idx_waitlist_suggestion ON course_waitlist_entries(suggestion_id);
 CREATE INDEX IF NOT EXISTS idx_waitlist_card ON course_waitlist_entries(participant_card);
 CREATE INDEX IF NOT EXISTS idx_waitlist_created ON course_waitlist_entries(created_at ASC);
+
+-- 24. Cupos por Empresa en Cohortes Técnicas
+CREATE TABLE IF NOT EXISTS technical_academy_cohort_quotas (
+    id SERIAL PRIMARY KEY,
+    cohort_id VARCHAR(100) NOT NULL REFERENCES technical_academy_cohorts(id) ON DELETE CASCADE,
+    company_id VARCHAR(100) NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    allocated_quota INTEGER NOT NULL CHECK (allocated_quota >= 0),
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (cohort_id, company_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_tac_cohort_quotas_cohort ON technical_academy_cohort_quotas(cohort_id);
+CREATE INDEX IF NOT EXISTS idx_tac_cohort_quotas_company ON technical_academy_cohort_quotas(company_id);
+
+-- 25. Convocatorias Oficiales de Capacitación y Cupos
+CREATE TABLE IF NOT EXISTS convocatorias (
+    id VARCHAR(100) PRIMARY KEY,
+    code VARCHAR(50) UNIQUE NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    training_type VARCHAR(50) DEFAULT 'technical_academy',
+    course_id VARCHAR(100) REFERENCES technical_academy_courses(id) ON DELETE SET NULL,
+    cohort_id VARCHAR(100) REFERENCES technical_academy_cohorts(id) ON DELETE SET NULL,
+    event_id VARCHAR(100) REFERENCES events(id) ON DELETE SET NULL,
+    banner_url TEXT,
+    status VARCHAR(50) NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'open', 'closed', 'in_progress', 'completed', 'cancelled')),
+    application_start_date DATE NOT NULL,
+    application_end_date DATE NOT NULL,
+    training_start_date DATE,
+    training_end_date DATE,
+    modality VARCHAR(50) DEFAULT 'Presencial (Taller)',
+    location VARCHAR(255),
+    total_quota INTEGER NOT NULL DEFAULT 20 CHECK (total_quota > 0),
+    selection_mode VARCHAR(50) DEFAULT 'review_required' CHECK (selection_mode IN ('direct', 'review_required')),
+    target_audience TEXT,
+    prerequisites TEXT,
+    allow_self_application BOOLEAN DEFAULT TRUE,
+    allow_supervisor_nomination BOOLEAN DEFAULT TRUE,
+    company_ids TEXT[] DEFAULT '{}',
+    created_by VARCHAR(100),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_convocatorias_status ON convocatorias(status);
+CREATE INDEX IF NOT EXISTS idx_convocatorias_course ON convocatorias(course_id);
+CREATE INDEX IF NOT EXISTS idx_convocatorias_cohort ON convocatorias(cohort_id);
+CREATE INDEX IF NOT EXISTS idx_convocatorias_dates ON convocatorias(application_start_date, application_end_date);
+
+CREATE TABLE IF NOT EXISTS convocatoria_company_quotas (
+    id SERIAL PRIMARY KEY,
+    convocatoria_id VARCHAR(100) NOT NULL REFERENCES convocatorias(id) ON DELETE CASCADE,
+    company_id VARCHAR(100) NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    allocated_quota INTEGER NOT NULL CHECK (allocated_quota >= 0),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (convocatoria_id, company_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_convocatoria_quotas_conv ON convocatoria_company_quotas(convocatoria_id);
+CREATE INDEX IF NOT EXISTS idx_convocatoria_quotas_comp ON convocatoria_company_quotas(company_id);
+
+CREATE TABLE IF NOT EXISTS convocatoria_applications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    convocatoria_id VARCHAR(100) NOT NULL REFERENCES convocatorias(id) ON DELETE CASCADE,
+    participant_card VARCHAR(20) NOT NULL REFERENCES participants(card) ON DELETE CASCADE,
+    company_id VARCHAR(100) NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    applicant_type VARCHAR(50) DEFAULT 'self' CHECK (applicant_type IN ('self', 'supervisor')),
+    nominated_by_id VARCHAR(100),
+    nominated_by_name VARCHAR(255),
+    motivation TEXT,
+    status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'waitlist', 'cancelled')),
+    review_notes TEXT,
+    reviewed_by VARCHAR(100),
+    reviewed_at TIMESTAMP WITH TIME ZONE,
+    enrolled_in_cohort BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (convocatoria_id, participant_card)
+);
+
+CREATE INDEX IF NOT EXISTS idx_conv_app_convocatoria ON convocatoria_applications(convocatoria_id);
+CREATE INDEX IF NOT EXISTS idx_conv_app_card ON convocatoria_applications(participant_card);
+CREATE INDEX IF NOT EXISTS idx_conv_app_company ON convocatoria_applications(company_id);
+CREATE INDEX IF NOT EXISTS idx_conv_app_status ON convocatoria_applications(status);
+
+-- 24. Sistema Integral de Notificaciones 360° y Web Push
+CREATE TABLE IF NOT EXISTS notifications (
+    id SERIAL PRIMARY KEY,
+    recipient_email VARCHAR(255),
+    recipient_user_id VARCHAR(50),
+    recipient_company_id VARCHAR(100),
+    recipient_role VARCHAR(50),
+    title VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    category VARCHAR(50) NOT NULL DEFAULT 'evento',
+    priority VARCHAR(20) NOT NULL DEFAULT 'normal',
+    action_url VARCHAR(255),
+    action_label VARCHAR(100),
+    metadata JSONB DEFAULT '{}'::jsonb,
+    is_read BOOLEAN NOT NULL DEFAULT FALSE,
+    read_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_notifications_recipient_email ON notifications(LOWER(recipient_email));
+CREATE INDEX IF NOT EXISTS idx_notifications_recipient_role ON notifications(recipient_role);
+CREATE INDEX IF NOT EXISTS idx_notifications_recipient_company ON notifications(recipient_company_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_is_read ON notifications(is_read);
+CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications(created_at DESC);
+
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+    id SERIAL PRIMARY KEY,
+    user_email VARCHAR(255) NOT NULL,
+    endpoint TEXT NOT NULL UNIQUE,
+    p256dh TEXT NOT NULL,
+    auth TEXT NOT NULL,
+    user_agent TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_push_sub_user_email ON push_subscriptions(LOWER(user_email));
+
+CREATE TABLE IF NOT EXISTS training_reminder_dispatches (
+    id SERIAL PRIMARY KEY,
+    session_type VARCHAR(50) NOT NULL,
+    session_id VARCHAR(100) NOT NULL,
+    slot_id INTEGER,
+    participant_email VARCHAR(255) NOT NULL,
+    dispatch_window VARCHAR(50) NOT NULL,
+    dispatched_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_session_participant_window UNIQUE (session_id, participant_email, dispatch_window)
+);
+
+CREATE INDEX IF NOT EXISTS idx_trd_lookup ON training_reminder_dispatches(session_id, participant_email);
+
+CREATE TABLE IF NOT EXISTS user_notification_preferences (
+    user_email VARCHAR(255) PRIMARY KEY,
+    in_app_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    push_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    email_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    training_start_alerts BOOLEAN NOT NULL DEFAULT TRUE,
+    training_advance_notice_minutes INTEGER NOT NULL DEFAULT 15,
+    categories JSONB NOT NULL DEFAULT '{"evento":true,"convocatoria":true,"cohorte":true,"certificado":true,"cumplimiento":true,"sistema":true}'::jsonb,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+

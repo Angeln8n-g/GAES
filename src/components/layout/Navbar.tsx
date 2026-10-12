@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { UserAccount, TabView, Company } from '../../types';
 import { ThemePreference, getStoredThemePreference, setThemePreference } from '../../utils/theme';
+import { NotificationBell } from '../notifications/NotificationBell';
 
 interface NavbarProps {
   currentUser: UserAccount | null;
@@ -163,6 +164,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       case 'ojt': return 'Bitácoras & Mesas de Calibración';
       case 'evaluator-courses': return 'Cursos Asignados';
       case 'technical-academy': return 'Academia Técnica (Capacitaciones Recurrentes)';
+      case 'convocatorias': return 'Convocatorias de Formación & Postulaciones';
       case 'dashboard': return 'Dashboard & Métricas';
       case 'admin': return 'Panel de Administración';
       default: return 'Portal de Formación';
@@ -376,6 +378,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               )}
 
+              <button
+                onClick={() => handleNavClick('convocatorias')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all whitespace-nowrap shrink-0 ${
+                  currentTab === 'convocatorias'
+                    ? 'bg-gradient-to-r from-[#DA291C] to-[#E02418] text-white shadow-md shadow-red-500/25 font-bold scale-[1.02]'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 font-semibold'
+                }`}
+              >
+                <Sparkles className="w-4 h-4 text-amber-500" />
+                <span>Convocatorias</span>
+              </button>
+
               {isAdminOrSuper && (
                 <button
                   onClick={() => handleNavClick('dashboard')}
@@ -482,6 +496,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <KeyRound className="w-4 h-4" />
               </button>
             )}
+
+            {/* Centro de Notificaciones & Alertas Push */}
+            <NotificationBell
+              user={currentUser}
+              onNavigate={setCurrentTab}
+              companies={companies}
+            />
 
             {/* Selector de Tema Accesible con Dropdown (Desktop) */}
             <div className="relative hidden sm:block shrink-0" ref={themeMenuRef}>
@@ -824,6 +845,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <ChevronRight className="w-4 h-4 opacity-70" />
               </button>
             )}
+
+            <button
+              onClick={() => handleNavClick('convocatorias')}
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
+                currentTab === 'convocatorias'
+                  ? 'bg-gradient-to-r from-[#DA291C] to-red-600 text-white shadow-md shadow-red-500/25'
+                  : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700/60'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-4 h-4 text-amber-500" />
+                <span>Convocatorias de Formación</span>
+              </div>
+              <ChevronRight className="w-4 h-4 opacity-70" />
+            </button>
 
             {isAdminOrSuper && (
               <button

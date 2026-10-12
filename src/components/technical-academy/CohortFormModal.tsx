@@ -11,7 +11,8 @@ import {
   CheckCircle2, 
   AlertCircle,
   RotateCw,
-  Sparkles
+  Sparkles,
+  Building2
 } from 'lucide-react';
 import { 
   TechnicalAcademyCohort, 
@@ -86,6 +87,7 @@ export const CohortFormModal: React.FC<CohortFormModalProps> = ({
   const [companyId, setCompanyId] = useState<string>(cohortToEdit?.companyId || 'emp_kasino');
   const [autoEnroll, setAutoEnroll] = useState<boolean>(true);
   const [notes, setNotes] = useState<string>(cohortToEdit?.notes || '');
+  const [cohortQuotas, setCohortQuotas] = useState<Record<string, number>>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -104,13 +106,57 @@ export const CohortFormModal: React.FC<CohortFormModalProps> = ({
       setDailyPin(cohortToEdit.dailyPin);
       setCompanyId(cohortToEdit.companyId);
       setNotes(cohortToEdit.notes || '');
+
+      // Cargar cupos por empresa
+      if (cohortToEdit.companyQuotas && cohortToEdit.companyQuotas.length > 0) {
+        const qMap: Record<string, number> = {};
+        cohortToEdit.companyQuotas.forEach(q => {
+          qMap[q.companyId] = q.allocatedQuota;
+        });
+        setCohortQuotas(qMap);
+      } else {
+        apiService.getCohortCompanyQuotas(cohortToEdit.id)
+          .then(qs => {
+            const qMap: Record<string, number> = {};
+            qs.forEach(q => {
+              qMap[q.companyId] = q.allocatedQuota;
+            });
+            setCohortQuotas(qMap);
+          })
+          .catch(() => {});
+      }
     } else {
       if (courses.length > 0 && !courseId) {
         setCourseId(courses[0].id);
         if (courses[0].location) setLocation(courses[0].location);
       }
+      const qMap: Record<string, number> = {};
+      companies.forEach(c => {
+        qMap[c.id] = 0;
+      });
+      setCohortQuotas(qMap);
     }
-  }, [cohortToEdit, courses]);
+  }, [cohortToEdit, courses, companies]);
+
+  const totalAllocatedQuotas = Object.values(cohortQuotas).reduce((acc, v) => acc + (Number(v) || 0), 0);
+
+  const handleDistributeEqually = () => {
+    if (companies.length === 0 || capacity <= 0) return;
+    const share = Math.floor(capacity / companies.length);
+    const remainder = capacity % companies.length;
+    const newQuotas: Record<string, number> = {};
+    companies.forEach((c, idx) => {
+      newQuotas[c.id] = share + (idx === 0 ? remainder : 0);
+    });
+    setCohortQuotas(newQuotas);
+  };
+
+  const handleQuotaChange = (cId: string, val: number) => {
+    setCohortQuotas(prev => ({
+      ...prev,
+      [cId]: Math.max(0, val)
+    }));
+  };
 
   // Cuando cambia el curso, sugerir su ubicación por defecto
   const handleCourseChange = (id: string) => {
@@ -184,6 +230,13 @@ export const CohortFormModal: React.FC<CohortFormModalProps> = ({
       const year = new Date(startDate).getFullYear();
       const selectedCourse = courses.find(c => c.id === courseId);
 
+      const formattedQuotas = Object.entries(cohortQuotas)
+        .filter(([_, q]) => Number(q) > 0)
+        .map(([comp, q]) => ({
+          companyId: comp,
+          allocatedQuota: Number(q)
+        }));
+
       await apiService.saveTechnicalCohort({
         id: cohortToEdit?.id,
         courseId,
@@ -203,8 +256,13 @@ export const CohortFormModal: React.FC<CohortFormModalProps> = ({
         dailyPin: dailyPin.trim() || '2026',
         companyId,
         notes,
-        autoEnrollGroupMembers: autoEnroll
+        autoEnrollGroupMembers: autoEnroll,
+        companyQuotas: formattedQuotas
       });
+
+      if (cohortToEdit?.id && formattedQuotas.length > 0) {
+        await apiService.updateCohortCompanyQuotas(cohortToEdit.id, formattedQuotas).catch(() => {});
+      }
 
       onSuccess();
       onClose();
@@ -452,6 +510,84 @@ export const CohortFormModal: React.FC<CohortFormModalProps> = ({
               />
             </div>
           </div>
+
+          {/* Distribución de Cupos por Empresa */}
+          {companies.length > 0 && (
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/80 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400">
+                    <Building2 className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-white">
+                      Distribución de Cupos por Empresa
+                    </h4>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                      Asigne el límite máximo de participantes permitidos para cada contratista / filial.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${
+                    totalAllocatedQuotas === capacity
+                      ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                      : totalAllocatedQuotas > capacity
+                      ? 'bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800'
+                      : 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                  }`}>
+                    {totalAllocatedQuotas} / {capacity} cupos asignados
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleDistributeEqually}
+                    className="text-[10px] font-bold text-red-600 dark:text-red-400 hover:text-red-700 bg-red-50 dark:bg-red-950/40 px-2.5 py-1 rounded-lg border border-red-200 dark:border-red-900/50 transition-colors cursor-pointer"
+                  >
+                    Equitativo
+                  </button>
+                </div>
+              </div>
+
+              {totalAllocatedQuotas > capacity && (
+                <div className="text-[11px] text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/40 p-2 rounded-xl flex items-center gap-1.5">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span>La suma de cupos asignados ({totalAllocatedQuotas}) supera la capacidad total de la cohorte ({capacity}).</span>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                {companies.map(comp => (
+                  <div
+                    key={comp.id}
+                    className="flex items-center justify-between p-2.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs"
+                  >
+                    <div className="flex items-center gap-2 min-w-0 pr-2">
+                      {comp.logoUrl ? (
+                        <img src={comp.logoUrl} alt={comp.name} className="w-5 h-5 rounded-md object-contain shrink-0" />
+                      ) : (
+                        <Building2 className="w-4 h-4 text-slate-400 shrink-0" />
+                      )}
+                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate" title={comp.name}>
+                        {comp.name}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className="text-[10px] text-slate-400 font-medium">Cupo:</span>
+                      <input
+                        type="number"
+                        min={0}
+                        max={capacity}
+                        value={cohortQuotas[comp.id] ?? 0}
+                        onChange={(e) => handleQuotaChange(comp.id, Number(e.target.value))}
+                        className="w-16 px-2 py-1 text-xs font-bold text-center rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-500"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Checkbox auto-enroll */}
           {groupId && !isEdit && (

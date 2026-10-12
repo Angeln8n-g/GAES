@@ -41,7 +41,17 @@ import {
   CourseSuggestion,
   CourseWaitlistEntry,
   UserWaitlistItem,
-  CreateCourseSuggestionPayload
+  CreateCourseSuggestionPayload,
+  TechnicalCohortCompanyQuota,
+  Convocatoria,
+  ConvocatoriaStatus,
+  ConvocatoriaApplication,
+  CreateConvocatoriaPayload,
+  ApplyConvocatoriaPayload,
+  BulkNominateConvocatoriaPayload,
+  AppNotification,
+  UserNotificationPreferences,
+  BroadcastNotificationPayload
 } from '../types';
 
 export const MOCK_COMPANIES: Company[] = [
@@ -2198,7 +2208,7 @@ export const apiService = {
 
   enrollCohortParticipants: async (
     cohortId: string,
-    payload: { participantCards?: string[]; identifiers?: string[] }
+    payload: { participantCards?: string[]; identifiers?: string[]; bypassQuota?: boolean }
   ): Promise<{ message: string; cohortId: string; newlyEnrolled: number; totalRequested: number }> => {
     const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/participants`, {
       method: 'POST',
@@ -2579,6 +2589,367 @@ export const apiService = {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error || 'Error al eliminar sugerencia');
     }
+  },
+
+  // ==========================================
+  // CUPOS POR EMPRESA EN COHORTES TÉCNICAS
+  // ==========================================
+
+  getCohortCompanyQuotas: async (cohortId: string): Promise<TechnicalCohortCompanyQuota[]> => {
+    const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/quotas`, {
+      headers: getAuthHeaders(false)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al obtener cupos por empresa');
+    }
+    return await res.json();
+  },
+
+  updateCohortCompanyQuotas: async (cohortId: string, quotas: Array<{ companyId: string; allocatedQuota: number; notes?: string }>): Promise<{ message: string }> => {
+    const res = await fetch(`${API_BASE_URL}/technical-academy/cohorts/${encodeURIComponent(cohortId)}/quotas`, {
+      method: 'PUT',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify({ quotas })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al actualizar cupos por empresa');
+    }
+    return await res.json();
+  },
+
+  // ==========================================
+  // GESTIÓN DE CONVOCATORIAS
+  // ==========================================
+
+  getConvocatorias: async (filters?: { status?: string; companyId?: string; trainingType?: string; search?: string }): Promise<Convocatoria[]> => {
+    const params = new URLSearchParams();
+    if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
+    if (filters?.companyId && filters.companyId !== 'all') params.append('companyId', filters.companyId);
+    if (filters?.trainingType && filters.trainingType !== 'all') params.append('trainingType', filters.trainingType);
+    if (filters?.search) params.append('search', filters.search);
+
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    const res = await fetch(`${API_BASE_URL}/convocatorias${qs}`, {
+      headers: getAuthHeaders(false)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al consultar convocatorias');
+    }
+    return await res.json();
+  },
+
+  getConvocatoriaById: async (id: string): Promise<{ convocatoria: Convocatoria; applications: ConvocatoriaApplication[]; userApplication: any }> => {
+    const res = await fetch(`${API_BASE_URL}/convocatorias/${encodeURIComponent(id)}`, {
+      headers: getAuthHeaders(false)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al consultar convocatoria');
+    }
+    return await res.json();
+  },
+
+  createConvocatoria: async (payload: CreateConvocatoriaPayload): Promise<{ message: string; id: string; code: string }> => {
+    const res = await fetch(`${API_BASE_URL}/convocatorias`, {
+      method: 'POST',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al crear convocatoria');
+    }
+    return await res.json();
+  },
+
+  updateConvocatoria: async (id: string, payload: Partial<CreateConvocatoriaPayload>): Promise<{ message: string; id: string }> => {
+    const res = await fetch(`${API_BASE_URL}/convocatorias/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al actualizar convocatoria');
+    }
+    return await res.json();
+  },
+
+  updateConvocatoriaStatus: async (id: string, status: ConvocatoriaStatus): Promise<{ message: string; status: ConvocatoriaStatus }> => {
+    const res = await fetch(`${API_BASE_URL}/convocatorias/${encodeURIComponent(id)}/status`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify({ status })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al actualizar estado de la convocatoria');
+    }
+    return await res.json();
+  },
+
+  deleteConvocatoria: async (id: string): Promise<{ message: string }> => {
+    const res = await fetch(`${API_BASE_URL}/convocatorias/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(false)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al eliminar convocatoria');
+    }
+    return await res.json();
+  },
+
+  applyToConvocatoria: async (id: string, payload: ApplyConvocatoriaPayload): Promise<{ message: string; applicationId: string; status: string }> => {
+    const res = await fetch(`${API_BASE_URL}/convocatorias/${encodeURIComponent(id)}/apply`, {
+      method: 'POST',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al postularse a la convocatoria');
+    }
+    return await res.json();
+  },
+
+  bulkNominateToConvocatoria: async (id: string, payload: BulkNominateConvocatoriaPayload): Promise<{ message: string; nominatedCount: number; results: any[] }> => {
+    const res = await fetch(`${API_BASE_URL}/convocatorias/${encodeURIComponent(id)}/bulk-nominate`, {
+      method: 'POST',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al nominar colaboradores');
+    }
+    return await res.json();
+  },
+
+  reviewConvocatoriaApplication: async (id: string, applicationId: string, payload: { status: string; reviewNotes?: string; bypassQuota?: boolean }): Promise<{ message: string; status: string; enrolledInCohort: boolean }> => {
+    const res = await fetch(`${API_BASE_URL}/convocatorias/${encodeURIComponent(id)}/applications/${encodeURIComponent(applicationId)}`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al revisar postulación');
+    }
+    return await res.json();
+  },
+
+  getMyConvocatoriaApplications: async (): Promise<ConvocatoriaApplication[]> => {
+    const res = await fetch(`${API_BASE_URL}/convocatorias/user/my-applications`, {
+      headers: getAuthHeaders(false)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al consultar mis postulaciones');
+    }
+    return await res.json();
+  },
+
+  // --- MÉTODOS DEL SISTEMA DE NOTIFICACIONES 360° Y WEB PUSH ---
+  getNotifications: async (options?: { unreadOnly?: boolean; category?: string; limit?: number; offset?: number }): Promise<{ notifications: AppNotification[]; unreadCount: number }> => {
+    const params = new URLSearchParams();
+    if (options?.unreadOnly) params.append('unreadOnly', 'true');
+    if (options?.category) params.append('category', options.category);
+    if (options?.limit) params.append('limit', String(options.limit));
+    if (options?.offset) params.append('offset', String(options.offset));
+
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    const res = await fetch(`${API_BASE_URL}/notifications${queryString}`, {
+      headers: getAuthHeaders(false)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al obtener notificaciones');
+    }
+    const data = await res.json();
+    const notifications: AppNotification[] = (data.notifications || []).map((row: any) => ({
+      id: row.id,
+      recipientEmail: row.recipient_email ?? row.recipientEmail,
+      recipientRole: row.recipient_role ?? row.recipientRole,
+      recipientCompanyId: row.recipient_company_id ?? row.recipientCompanyId,
+      title: row.title,
+      message: row.message,
+      category: row.category,
+      priority: row.priority,
+      actionUrl: row.action_url ?? row.actionUrl,
+      actionLabel: row.action_label ?? row.actionLabel,
+      metadata: row.metadata,
+      isRead: Boolean(row.is_read ?? row.isRead),
+      readAt: row.read_at ?? row.readAt,
+      createdAt: row.created_at ?? row.createdAt
+    }));
+    return { notifications, unreadCount: data.unreadCount || 0 };
+  },
+
+  getUnreadNotificationsCount: async (): Promise<{ unreadCount: number }> => {
+    const res = await fetch(`${API_BASE_URL}/notifications/unread-count`, {
+      headers: getAuthHeaders(false)
+    });
+    if (!res.ok) {
+      return { unreadCount: 0 };
+    }
+    return await res.json();
+  },
+
+  markNotificationAsRead: async (id: number): Promise<{ success: boolean; notification?: AppNotification }> => {
+    const res = await fetch(`${API_BASE_URL}/notifications/${id}/read`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(true)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al marcar notificación como leída');
+    }
+    return await res.json();
+  },
+
+  markAllNotificationsAsRead: async (): Promise<{ success: boolean; updatedCount: number }> => {
+    const res = await fetch(`${API_BASE_URL}/notifications/read-all`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(true)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al marcar todas las notificaciones como leídas');
+    }
+    return await res.json();
+  },
+
+  deleteNotification: async (id: number): Promise<{ success: boolean }> => {
+    const res = await fetch(`${API_BASE_URL}/notifications/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(false)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al eliminar notificación');
+    }
+    return await res.json();
+  },
+
+  getVapidPublicKey: async (): Promise<{ publicKey: string }> => {
+    const res = await fetch(`${API_BASE_URL}/notifications/push/vapid-public-key`);
+    if (!res.ok) {
+      throw new Error('Error al obtener la clave pública VAPID');
+    }
+    const data = await res.json();
+    return { publicKey: data.publicKey };
+  },
+
+  subscribePush: async (subscription: any): Promise<{ success: boolean; message: string }> => {
+    const res = await fetch(`${API_BASE_URL}/notifications/push/subscribe`, {
+      method: 'POST',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify({ subscription })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al registrar suscripción Push');
+    }
+    return await res.json();
+  },
+
+  unsubscribePush: async (endpoint: string): Promise<{ success: boolean }> => {
+    const res = await fetch(`${API_BASE_URL}/notifications/push/unsubscribe`, {
+      method: 'POST',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify({ endpoint })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al desuscribir de notificaciones Push');
+    }
+    return await res.json();
+  },
+
+  sendTestPush: async (): Promise<{ success: boolean; sentDevices: number; message: string }> => {
+    const res = await fetch(`${API_BASE_URL}/notifications/push/test`, {
+      method: 'POST',
+      headers: getAuthHeaders(true)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al enviar alerta Push de prueba');
+    }
+    return await res.json();
+  },
+
+  triggerTrainingAlert: async (payload: {
+    sessionId: string;
+    sessionTitle: string;
+    sessionTime: string;
+    locationOrModality?: string;
+    meetingUrl?: string;
+    recipientEmails: string[];
+  }): Promise<{ success: boolean; notifiedCount: number; message: string }> => {
+    const res = await fetch(`${API_BASE_URL}/notifications/push/trigger-training-alert`, {
+      method: 'POST',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al emitir alerta de clase');
+    }
+    return await res.json();
+  },
+
+  getNotificationPreferences: async (): Promise<UserNotificationPreferences> => {
+    const res = await fetch(`${API_BASE_URL}/notifications/preferences`, {
+      headers: getAuthHeaders(false)
+    });
+    if (!res.ok) {
+      return {
+        inAppEnabled: true,
+        pushEnabled: true,
+        emailEnabled: true,
+        trainingStartAlerts: true,
+        trainingAdvanceNoticeMinutes: 15,
+        categories: {
+          evento: true,
+          convocatoria: true,
+          cohorte: true,
+          certificado: true,
+          cumplimiento: true,
+          sistema: true
+        }
+      };
+    }
+    return await res.json();
+  },
+
+  saveNotificationPreferences: async (prefs: Partial<UserNotificationPreferences>): Promise<{ success: boolean; message: string }> => {
+    const res = await fetch(`${API_BASE_URL}/notifications/preferences`, {
+      method: 'PUT',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify(prefs)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al guardar preferencias de notificación');
+    }
+    return await res.json();
+  },
+
+  broadcastNotification: async (payload: BroadcastNotificationPayload): Promise<{ success: boolean; message: string }> => {
+    const res = await fetch(`${API_BASE_URL}/notifications/broadcast`, {
+      method: 'POST',
+      headers: getAuthHeaders(true),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al emitir comunicado');
+    }
+    return await res.json();
   }
 };
 

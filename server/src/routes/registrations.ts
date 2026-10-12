@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { pool } from '../db.js';
 import { fetchFullEvents } from './events.js';
+import { NotificationService } from '../services/notificationService.js';
 
 export const registrationsRouter = Router();
 
@@ -86,6 +87,18 @@ registrationsRouter.post('/', async (req: Request, res: Response) => {
     );
 
     await client.query('COMMIT');
+
+    // Trigger de notificación de inscripción confirmada
+    pool.query('SELECT title, modality, meeting_url FROM events WHERE id = $1', [eventId])
+      .then(evtRes => {
+        if (evtRes.rows.length > 0) {
+          const ev = evtRes.rows[0];
+          NotificationService.onTrainingEnrolled(email.trim(), ev.title, date, time, ev.modality, ev.meeting_url)
+            .catch(e => console.error('Error notificando inscripción:', e));
+        }
+      })
+      .catch(err => console.warn('Aviso buscando evento para notificación:', err));
+
     const fullEvents = await fetchFullEvents();
     res.json(fullEvents);
   } catch (err: any) {

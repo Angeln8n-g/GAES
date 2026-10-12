@@ -8,6 +8,7 @@ const express_1 = require("express");
 const crypto_1 = __importDefault(require("crypto"));
 const db_js_1 = require("../db.js");
 const auth_js_1 = require("../middlewares/auth.js");
+const notificationService_js_1 = require("../services/notificationService.js");
 exports.certificatesRouter = (0, express_1.Router)();
 // Helper para generar Credential IDs únicos y legibles: CLARO-CERT-2026-XXXXXX
 function generateCredentialId(prefix = 'CLARO-CERT') {
@@ -527,6 +528,10 @@ exports.certificatesRouter.post('/generate', auth_js_1.authenticateToken, async 
         }
         else {
             return res.status(400).json({ error: 'Modo de generación inválido o parámetros incompletos.' });
+        }
+        // Notificar a los destinatarios con diploma disponible
+        for (const cert of issuedCertificates) {
+            notificationService_js_1.NotificationService.onCertificateIssued(cert).catch(e => console.error('Error notificando certificado:', e));
         }
         return res.status(201).json({
             success: true,

@@ -4,6 +4,7 @@ exports.registrationsRouter = void 0;
 const express_1 = require("express");
 const db_js_1 = require("../db.js");
 const events_js_1 = require("./events.js");
+const notificationService_js_1 = require("../services/notificationService.js");
 exports.registrationsRouter = (0, express_1.Router)();
 // POST /api/registrations (Inscripción concurrente y atómica)
 exports.registrationsRouter.post('/', async (req, res) => {
@@ -63,6 +64,16 @@ exports.registrationsRouter.post('/', async (req, res) => {
         // 5. Insertar registro
         await client.query('INSERT INTO registrations (slot_id, participant_card) VALUES ($1, $2)', [slotId, participantCard]);
         await client.query('COMMIT');
+        // Trigger de notificación de inscripción confirmada
+        db_js_1.pool.query('SELECT title, modality, meeting_url FROM events WHERE id = $1', [eventId])
+            .then(evtRes => {
+            if (evtRes.rows.length > 0) {
+                const ev = evtRes.rows[0];
+                notificationService_js_1.NotificationService.onTrainingEnrolled(email.trim(), ev.title, date, time, ev.modality, ev.meeting_url)
+                    .catch(e => console.error('Error notificando inscripción:', e));
+            }
+        })
+            .catch(err => console.warn('Aviso buscando evento para notificación:', err));
         const fullEvents = await (0, events_js_1.fetchFullEvents)();
         res.json(fullEvents);
     }

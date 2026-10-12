@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import crypto from 'crypto';
 import { pool } from '../db.js';
 import { authenticateToken } from '../middlewares/auth.js';
+import { NotificationService } from '../services/notificationService.js';
 
 export const certificatesRouter = Router();
 
@@ -582,6 +583,11 @@ certificatesRouter.post('/generate', authenticateToken, async (req: Request, res
       issuedCertificates.push(insertRes.rows[0]);
     } else {
       return res.status(400).json({ error: 'Modo de generación inválido o parámetros incompletos.' });
+    }
+
+    // Notificar a los destinatarios con diploma disponible
+    for (const cert of issuedCertificates) {
+      NotificationService.onCertificateIssued(cert).catch(e => console.error('Error notificando certificado:', e));
     }
 
     return res.status(201).json({

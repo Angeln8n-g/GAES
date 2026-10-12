@@ -212,6 +212,42 @@ async function fetchTechnicalCohorts(companyId) {
     ORDER BY c.start_date DESC
   `;
     const result = await db_js_1.pool.query(query, params);
+    const cohortIds = result.rows.map(r => r.id);
+    let quotasByCohort = {};
+    if (cohortIds.length > 0) {
+        const qRes = await db_js_1.pool.query(`
+      SELECT 
+        q.cohort_id,
+        q.company_id,
+        q.allocated_quota,
+        q.notes,
+        c.name as company_name,
+        COALESCE(enr.cnt, 0)::integer as enrolled_count
+      FROM technical_academy_cohort_quotas q
+      JOIN companies c ON q.company_id = c.id
+      LEFT JOIN (
+        SELECT e.cohort_id, p.company_id, COUNT(*)::integer as cnt
+        FROM technical_academy_enrollments e
+        JOIN participants p ON e.participant_card = p.card
+        WHERE e.status != 'dropped'
+        GROUP BY e.cohort_id, p.company_id
+      ) enr ON enr.cohort_id = q.cohort_id AND enr.company_id = q.company_id
+      WHERE q.cohort_id = ANY($1)
+      ORDER BY c.name ASC
+    `, [cohortIds]);
+        for (const row of qRes.rows) {
+            if (!quotasByCohort[row.cohort_id])
+                quotasByCohort[row.cohort_id] = [];
+            quotasByCohort[row.cohort_id].push({
+                companyId: row.company_id,
+                companyName: row.company_name,
+                allocatedQuota: row.allocated_quota,
+                enrolledCount: row.enrolled_count,
+                availableQuota: Math.max(0, row.allocated_quota - row.enrolled_count),
+                notes: row.notes || null
+            });
+        }
+    }
     return result.rows.map(r => ({
         id: r.id,
         eventId: r.cohort_event_id || r.course_event_id || null,
@@ -244,6 +280,7 @@ async function fetchTechnicalCohorts(companyId) {
         courseMoodleSectionName: r.course_moodle_section_name || null,
         courseMoodleExamUrl: r.course_moodle_exam_url || null,
         isMoodleLinked: Boolean(r.course_is_moodle_linked || r.cohort_moodle_course_url || r.course_moodle_course_url),
+        companyQuotas: quotasByCohort[r.id] || [],
         createdAt: r.created_at
     }));
 }
@@ -266,7 +303,7 @@ exports.technicalAcademyRouter.post('/cohorts', async (req, res) => {
     const client = await db_js_1.pool.connect();
     try {
         await client.query('BEGIN');
-        const { id, eventId, courseId, groupId, groupName, facilitatorId, facilitatorName, facilitatorEmail, startDate, endDate, weekNumber, year, dailyTime, location, capacity, notes, dailyPin, companyId, autoEnrollGroupMembers = true, participantCards } = req.body;
+        const { id, eventId, courseId, groupId, groupName, facilitatorId, facilitatorName, facilitatorEmail, startDate, endDate, weekNumber, year, dailyTime, location, capacity, notes, dailyPin, companyId, autoEnrollGroupMembers = true, participantCards, companyQuotas } = req.body;
         if (!courseId || !startDate || !endDate) {
             await client.query('ROLLBACK');
             return res.status(400).json({ error: 'Curso, fecha de inicio y fecha de fin son obligatorios.' });
@@ -352,6 +389,21 @@ exports.technicalAcademyRouter.post('/cohorts', async (req, res) => {
                     if (insRes.rows.length > 0) {
                         enrolledCount++;
                     }
+                }
+            }
+        }
+        // Guardar cupos por empresa si se especificaron
+        if (Array.isArray(companyQuotas) && companyQuotas.length > 0) {
+            for (const cq of companyQuotas) {
+                if (cq.companyId && typeof cq.allocatedQuota === 'number') {
+                    await client.query(`
+            INSERT INTO technical_academy_cohort_quotas (cohort_id, company_id, allocated_quota, notes)
+            VALUES ($1, $2, $3, $4)
+            ON CONFLICT (cohort_id, company_id) DO UPDATE SET
+              allocated_quota = EXCLUDED.allocated_quota,
+              notes = EXCLUDED.notes,
+              updated_at = CURRENT_TIMESTAMP
+          `, [cohortId, cq.companyId, Math.max(0, cq.allocatedQuota), cq.notes || null]);
                 }
             }
         }
@@ -556,6 +608,87 @@ exports.technicalAcademyRouter.post('/cohorts/:id/duplicate', async (req, res) =
         client.release();
     }
 });
+// GET /api/technical-academy/cohorts/:id/quotas
+exports.technicalAcademyRouter.get('/cohorts/:id/quotas', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await db_js_1.pool.query(`
+      SELECT 
+        q.id,
+        q.cohort_id,
+        q.company_id,
+        q.allocated_quota,
+        q.notes,
+        c.name as company_name,
+        COALESCE(enr.cnt, 0)::integer as enrolled_count
+      FROM technical_academy_cohort_quotas q
+      JOIN companies c ON q.company_id = c.id
+      LEFT JOIN (
+        SELECT e.cohort_id, p.company_id, COUNT(*)::integer as cnt
+        FROM technical_academy_enrollments e
+        JOIN participants p ON e.participant_card = p.card
+        WHERE e.cohort_id = $1 AND e.status != 'dropped'
+        GROUP BY e.cohort_id, p.company_id
+      ) enr ON enr.cohort_id = q.cohort_id AND enr.company_id = q.company_id
+      WHERE q.cohort_id = $1
+      ORDER BY c.name ASC
+    `, [id]);
+        const quotas = result.rows.map(r => ({
+            id: r.id,
+            cohortId: r.cohort_id,
+            companyId: r.company_id,
+            companyName: r.company_name,
+            allocatedQuota: r.allocated_quota,
+            enrolledCount: r.enrolled_count,
+            availableQuota: Math.max(0, r.allocated_quota - r.enrolled_count),
+            notes: r.notes
+        }));
+        res.json(quotas);
+    }
+    catch (err) {
+        console.error('Error al obtener cupos por empresa de cohorte:', err);
+        res.status(500).json({ error: 'Error al consultar cupos por empresa', details: err.message });
+    }
+});
+// PUT & POST /api/technical-academy/cohorts/:id/quotas
+const handleUpdateCohortQuotas = async (req, res) => {
+    if (!checkAdminPermission(req, res))
+        return;
+    const client = await db_js_1.pool.connect();
+    try {
+        await client.query('BEGIN');
+        const { id } = req.params;
+        const { quotas } = req.body;
+        if (!Array.isArray(quotas)) {
+            await client.query('ROLLBACK');
+            return res.status(400).json({ error: 'Formato inválido: quotas debe ser un arreglo.' });
+        }
+        for (const q of quotas) {
+            if (q.companyId && q.allocatedQuota !== undefined) {
+                await client.query(`
+          INSERT INTO technical_academy_cohort_quotas (cohort_id, company_id, allocated_quota, notes)
+          VALUES ($1, $2, $3, $4)
+          ON CONFLICT (cohort_id, company_id) DO UPDATE SET
+            allocated_quota = EXCLUDED.allocated_quota,
+            notes = EXCLUDED.notes,
+            updated_at = CURRENT_TIMESTAMP
+        `, [id, q.companyId, Math.max(0, Number(q.allocatedQuota) || 0), q.notes || null]);
+            }
+        }
+        await client.query('COMMIT');
+        res.json({ message: 'Cupos por empresa actualizados exitosamente' });
+    }
+    catch (err) {
+        await client.query('ROLLBACK');
+        console.error('Error al actualizar cupos por empresa:', err);
+        res.status(500).json({ error: 'Error al actualizar cupos por empresa', details: err.message });
+    }
+    finally {
+        client.release();
+    }
+};
+exports.technicalAcademyRouter.put('/cohorts/:id/quotas', handleUpdateCohortQuotas);
+exports.technicalAcademyRouter.post('/cohorts/:id/quotas', handleUpdateCohortQuotas);
 // ==========================================
 // 2.1 GESTIÓN DE PARTICIPANTES POR COHORTE
 // ==========================================
@@ -688,7 +821,7 @@ exports.technicalAcademyRouter.post('/cohorts/:id/participants', async (req, res
     try {
         await client.query('BEGIN');
         const { id } = req.params;
-        const { participantCards, identifiers } = req.body;
+        const { participantCards, identifiers, bypassQuota = false } = req.body;
         const cohortRes = await client.query('SELECT * FROM technical_academy_cohorts WHERE id = $1', [id]);
         if (cohortRes.rows.length === 0) {
             await client.query('ROLLBACK');
@@ -711,6 +844,52 @@ exports.technicalAcademyRouter.post('/cohorts/:id/participants', async (req, res
         if (cardsToEnroll.length === 0) {
             await client.query('ROLLBACK');
             return res.status(400).json({ error: 'No se proporcionaron participantes válidos para enrolar.' });
+        }
+        // Validación de cupos por empresa (a menos que se indique bypassQuota)
+        if (!bypassQuota) {
+            const cohortQuotasRes = await client.query(`
+        SELECT q.company_id, q.allocated_quota, c.name as company_name
+        FROM technical_academy_cohort_quotas q
+        JOIN companies c ON q.company_id = c.id
+        WHERE q.cohort_id = $1
+      `, [id]);
+            if (cohortQuotasRes.rows.length > 0) {
+                // Consultar empresa de cada tarjeta a enrolar
+                const partsRes = await client.query(`
+          SELECT card, company_id FROM participants WHERE card = ANY($1)
+        `, [cardsToEnroll]);
+                const cardCompMap = new Map();
+                for (const p of partsRes.rows) {
+                    cardCompMap.set(p.card, p.company_id || 'emp_kasino');
+                }
+                // Conteo de tarjetas que se desean agregar por cada empresa
+                const incomingByComp = {};
+                for (const card of cardsToEnroll) {
+                    const cId = cardCompMap.get(card) || 'emp_kasino';
+                    incomingByComp[cId] = (incomingByComp[cId] || 0) + 1;
+                }
+                for (const cq of cohortQuotasRes.rows) {
+                    const compId = cq.company_id;
+                    const allocated = cq.allocated_quota;
+                    const incoming = incomingByComp[compId] || 0;
+                    if (incoming > 0) {
+                        // Conteo actual en la cohorte para esa empresa
+                        const currentRes = await client.query(`
+              SELECT COUNT(*)::int as cnt
+              FROM technical_academy_enrollments e
+              JOIN participants p ON e.participant_card = p.card
+              WHERE e.cohort_id = $1 AND p.company_id = $2 AND e.status != 'dropped'
+            `, [id, compId]);
+                        const currentEnrolled = currentRes.rows[0].cnt;
+                        if (currentEnrolled + incoming > allocated) {
+                            await client.query('ROLLBACK');
+                            return res.status(400).json({
+                                error: `El cupo asignado para la empresa "${cq.company_name}" (${allocated}) se excedería al agregar ${incoming} participante(s). Actualmente inscritos: ${currentEnrolled}/${allocated}.`
+                            });
+                        }
+                    }
+                }
+            }
         }
         let newlyEnrolled = 0;
         const enrolledCards = [];
