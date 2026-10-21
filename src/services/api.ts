@@ -51,7 +51,8 @@ import {
   BulkNominateConvocatoriaPayload,
   AppNotification,
   UserNotificationPreferences,
-  BroadcastNotificationPayload
+  BroadcastNotificationPayload,
+  KirkpatrickAnalytics
 } from '../types';
 
 export const MOCK_COMPANIES: Company[] = [
@@ -1214,19 +1215,21 @@ export const apiService = {
     }
   },
 
-  // --- MÉTODOS DE FEEDBACK / CALIFICACIÓN ---
-  async submitFeedback(feedback: EventFeedback): Promise<TrainingEvent[]> {
+  // --- MÉTODOS DE FEEDBACK / CALIFICACIÓN (KIRKPATRICK N1 & NPS) ---
+  async submitFeedback(feedback: EventFeedback): Promise<any> {
     if (isApiMode) {
       const res = await fetch(`${API_BASE_URL}/feedback`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(true),
         body: JSON.stringify(feedback)
       });
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.error || 'Error al enviar retroalimentación');
       }
-      return this.getEvents();
+      const data = await res.json();
+      const freshEvents = await this.getEvents().catch(() => []);
+      return { ...data, events: freshEvents };
     } else {
       const events: TrainingEvent[] = safeJsonParse('ch_events', []);
       const targetEvt = events.find(e => e.id === feedback.eventId);
@@ -1249,8 +1252,41 @@ export const apiService = {
         return evt;
       });
       localStorage.setItem('ch_events', JSON.stringify(updated));
-      return updated;
+      return { success: true, unlocked: true, events: updated };
     }
+  },
+
+  async getFeedbackStatus(params: { eventId?: string; cohortId?: string; email: string }): Promise<{ hasSubmitted: boolean; feedback: EventFeedback | null }> {
+    if (isApiMode) {
+      const q = new URLSearchParams();
+      if (params.eventId) q.append('eventId', params.eventId);
+      if (params.cohortId) q.append('cohortId', params.cohortId);
+      q.append('email', params.email);
+
+      const res = await fetch(`${API_BASE_URL}/feedback/status?${q.toString()}`, {
+        headers: getAuthHeaders(false)
+      });
+      if (!res.ok) {
+        return { hasSubmitted: false, feedback: null };
+      }
+      return await res.json();
+    } else {
+      const events: TrainingEvent[] = safeJsonParse('ch_events', []);
+      const targetEvt = events.find(e => e.id === params.eventId);
+      const fb = targetEvt?.feedbacks?.find(f => f.userEmail.toLowerCase() === params.email.toLowerCase()) || null;
+      return { hasSubmitted: !!fb, feedback: fb };
+    }
+  },
+
+  async getFeedbackStats(): Promise<KirkpatrickAnalytics> {
+    const res = await fetch(`${API_BASE_URL}/feedback/stats`, {
+      headers: getAuthHeaders(false)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error al obtener analítica Kirkpatrick');
+    }
+    return await res.json();
   },
 
   // --- MÉTODOS DE USUARIOS DE LA PLATAFORMA ---

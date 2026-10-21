@@ -960,7 +960,7 @@ export function App() {
       )}
 
       {/* Main Layout Container (Offset when SuperAdmin sidebar is active) */}
-      <div className={`flex-1 flex flex-col transition-all duration-300 ${
+      <div className={`flex-1 flex flex-col transition-all duration-300 min-w-0 max-w-full w-full ${
         isSuperAdminUser 
           ? (isSidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64') 
           : ''

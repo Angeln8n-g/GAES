@@ -104,17 +104,23 @@ export interface NotificationHistoryItem {
 }
 
 export interface EventFeedback {
-  id?: string;
-  eventId: string;
+  id?: string | number;
+  eventId?: string | null;
+  cohortId?: string | null;
+  trainingType?: 'event' | 'technical_academy';
   userEmail: string;
   userName?: string;
-  rating: number; // 1 to 5 (promedio general redondeado o ponderado)
+  rating: number; // 1 to 5 (promedio general)
+  npsScore?: number; // 0 to 10 (Net Promoter Score)
+  applicabilityScore?: number; // 1 to 5
+  strengthsComment?: string;
+  improvementsComment?: string;
   comment?: string;
   courseRatings?: Record<string, number>;
   facilitatorRatings?: Record<string, number>;
   courseScore?: number;
   facilitatorScore?: number;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export interface Company {
@@ -787,6 +793,7 @@ export interface Certificate {
   revocationReason?: string | null;
   metadata?: Record<string, any>;
   issuedBy?: string;
+  isEvaluationCompleted?: boolean;
   createdAt: string;
 }
 
@@ -812,6 +819,7 @@ export interface CertificateVerificationPublicData {
   directorName: string;
   verificationUrl: string;
   metadata?: Record<string, any>;
+  isEvaluationCompleted?: boolean;
   createdAt: string;
 }
 
@@ -1114,4 +1122,41 @@ export interface BroadcastNotificationPayload {
   targetCompanyId?: string;
   actionUrl?: string;
   actionLabel?: string;
+}
+
+// ==========================================
+// TIPOS PARA EVALUACIÓN KIRKPATRICK N1 & NPS
+// ==========================================
+
+export interface KirkpatrickAnalytics {
+  totalEvaluations: number;
+  totalNpsResponses: number;
+  npsIndex: number;
+  promotersCount: number;
+  passivesCount: number;
+  detractorsCount: number;
+  promotersPercentage: number;
+  passivesPercentage: number;
+  detractorsPercentage: number;
+  averageCourseScore: number;
+  averageFacilitatorScore: number;
+  averageApplicabilityScore: number;
+  averageGlobalRating: number;
+  topFacilitators: Array<{
+    name: string;
+    averageScore: number;
+    count: number;
+  }>;
+  recentFeedback: Array<{
+    id: number;
+    userName: string;
+    userEmail: string;
+    trainingTitle: string;
+    nps?: number;
+    rating: number;
+    strengths?: string;
+    improvements?: string;
+    comment?: string;
+    createdAt: string;
+  }>;
 }

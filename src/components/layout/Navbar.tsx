@@ -207,16 +207,16 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* Main Navbar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-20">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-20 gap-2 sm:gap-4 min-w-0">
           
           {/* Left section: Hamburger for SuperAdmin / Brand for standard */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 shrink-0">
             {isSuperAdmin && onOpenMobileSidebar && (
               <button
                 type="button"
                 onClick={onOpenMobileSidebar}
-                className="lg:hidden p-2.5 min-w-[44px] min-h-[44px] rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 flex items-center justify-center cursor-pointer shadow-xs active:scale-95 focus-visible:ring-2 focus-visible:ring-claro"
+                className="lg:hidden p-2 sm:p-2.5 min-w-[38px] sm:min-w-[44px] min-h-[38px] sm:min-h-[44px] rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 flex items-center justify-center cursor-pointer shadow-xs active:scale-95 focus-visible:ring-2 focus-visible:ring-claro"
                 title="Abrir Panel Lateral"
                 aria-label="Abrir panel lateral de navegación"
               >
@@ -227,19 +227,19 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Logo & Brand Identity */}
             <div 
               onClick={() => handleNavClick('landing')}
-              className="flex items-center gap-3 cursor-pointer group select-none shrink-0"
+              className="flex items-center gap-2 sm:gap-3 cursor-pointer group select-none min-w-0 shrink-0"
             >
               <div className="relative shrink-0">
-                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-[#DA291C] via-[#EA382D] to-orange-500 p-0.5 shadow-lg shadow-red-500/25 group-hover:scale-105 group-hover:shadow-red-500/40 transition-all flex items-center justify-center text-white ring-2 ring-red-100 dark:ring-red-950/60">
-                  <BookOpen className="w-5 h-5" />
+                <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-[#DA291C] via-[#EA382D] to-orange-500 p-0.5 shadow-lg shadow-red-500/25 group-hover:scale-105 group-hover:shadow-red-500/40 transition-all flex items-center justify-center text-white ring-2 ring-red-100 dark:ring-red-950/60">
+                  <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900 flex items-center justify-center">
-                  <Sparkles className="w-2 h-2 text-white" />
+                <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900 flex items-center justify-center">
+                  <Sparkles className="w-1.5 h-1.5 sm:w-2 sm:h-2 text-white" />
                 </div>
               </div>
-              <div className="shrink-0">
+              <div className="min-w-0">
                 <div className="flex items-center gap-1.5 whitespace-nowrap">
-                  <span className="text-sm sm:text-base lg:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                  <span className="text-xs sm:text-base lg:text-lg font-black text-slate-900 dark:text-white tracking-tight truncate max-w-[160px] sm:max-w-none">
                     Aprendizaje y <span className="text-[#DA291C] dark:text-[#FF6659]">Desarrollo</span>
                   </span>
                   <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-gradient-to-r from-[#DA291C] to-red-600 text-white shadow-xs tracking-wider shrink-0">
@@ -255,19 +255,19 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Breadcrumb section for SuperAdmin */}
           {isSuperAdmin ? (
-            <div className="hidden md:flex items-center gap-2 text-xs">
-              <span className="px-3 py-1 rounded-2xl bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border border-red-200/80 dark:border-red-900/60 font-black flex items-center gap-1.5 shadow-2xs">
+            <div className="hidden md:flex items-center gap-2 text-xs truncate">
+              <span className="px-3 py-1 rounded-2xl bg-red-50 dark:bg-red-950/40 text-[#DA291C] dark:text-red-400 border border-red-200/80 dark:border-red-900/60 font-black flex items-center gap-1.5 shadow-2xs shrink-0">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#DA291C] dark:text-red-400" />
                 <span>Panel Lateral SuperAdmin</span>
               </span>
               <span className="text-slate-300 dark:text-slate-600">/</span>
-              <span className="text-slate-700 dark:text-slate-300 font-bold">
+              <span className="text-slate-700 dark:text-slate-300 font-bold truncate">
                 {getSectionTitle()}
               </span>
             </div>
           ) : (
             /* Desktop Navigation Links (Segmented Pill Style for non-SuperAdmin users) */
-            <nav className="hidden lg:flex items-center gap-1 bg-slate-100/90 dark:bg-slate-800/90 p-1.5 rounded-2xl border border-slate-200/70 dark:border-slate-700/80 shadow-inner shrink-0">
+            <nav className="hidden xl:flex items-center gap-1 bg-slate-100/90 dark:bg-slate-800/90 p-1.5 rounded-2xl border border-slate-200/70 dark:border-slate-700/80 shadow-inner max-w-[45vw] 2xl:max-w-none overflow-x-auto no-scrollbar shrink-0">
               <button
                 onClick={() => handleNavClick('landing')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all whitespace-nowrap shrink-0 ${
@@ -421,11 +421,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
 
           {/* User Profile & Action Controls */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             
-            {/* Company Switcher for SuperAdmin */}
+            {/* Company Switcher for SuperAdmin (Desktop xl+) */}
             {isSuperAdmin && onSelectCompanyScope ? (
-              <div className="hidden sm:flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 px-2.5 xl:px-3 py-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs transition-colors shrink-0">
+              <div className="hidden xl:flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 px-2.5 xl:px-3 py-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs transition-colors shrink-0">
                 <Building2 className="w-4 h-4 text-[#DA291C] shrink-0" />
                 <select
                   value={selectedCompanyId}
@@ -444,7 +444,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               (() => {
                 const userComp = companies.find(c => c.id === (currentUser.companyId || 'emp_kasino'));
                 return (
-                  <div className="hidden sm:flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 px-2.5 xl:px-3 py-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 shrink-0">
+                  <div className="hidden 2xl:flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 px-2.5 xl:px-3 py-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 shrink-0">
                     <Building2 className="w-3.5 h-3.5 text-[#DA291C] shrink-0" />
                     <span className="truncate max-w-[120px] xl:max-w-[160px]">{userComp ? userComp.name : 'Claro Dominicana'}</span>
                   </div>
@@ -452,46 +452,58 @@ export const Navbar: React.FC<NavbarProps> = ({
               })()
             )}
 
-            {/* User Avatar Card Pill (Clickable to open profile) */}
+            {/* User Avatar - Compact version on sm -> lg */}
+            <button
+              onClick={onOpenUserProfile}
+              type="button"
+              title={`Ver mi perfil: ${currentUser.name}`}
+              className="hidden sm:flex xl:hidden p-1 rounded-2xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200/90 dark:border-slate-700 shadow-xs hover:border-[#DA291C] hover:bg-red-50/40 dark:hover:bg-slate-700/60 transition-all shrink-0 cursor-pointer items-center justify-center group"
+            >
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#DA291C] via-red-500 to-amber-500 flex items-center justify-center text-white font-black text-xs shadow-sm shrink-0 group-hover:scale-105 transition-transform">
+                {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
+              </div>
+            </button>
+
+            {/* User Avatar Card Pill (Full version on xl+) */}
             <button
               onClick={onOpenUserProfile}
               type="button"
               title="Ver y actualizar mi ficha de perfil"
-              className="hidden sm:flex items-center gap-2.5 pl-2 pr-3 py-1 rounded-2xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200/90 dark:border-slate-700 shadow-xs hover:border-[#DA291C] hover:bg-red-50/40 dark:hover:bg-slate-700/60 transition-all shrink-0 cursor-pointer text-left group"
+              className="hidden xl:flex items-center gap-2.5 pl-2 pr-3 py-1 rounded-2xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200/90 dark:border-slate-700 shadow-xs hover:border-[#DA291C] hover:bg-red-50/40 dark:hover:bg-slate-700/60 transition-all shrink-0 cursor-pointer text-left group"
             >
               <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#DA291C] via-red-500 to-amber-500 flex items-center justify-center text-white font-black text-xs shadow-sm shrink-0 group-hover:scale-105 transition-transform">
                 {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
               </div>
               <div className="text-left shrink-0">
-                <p className="text-xs font-bold text-slate-900 dark:text-white truncate max-w-[140px] xl:max-w-[200px] group-hover:text-[#DA291C] dark:group-hover:text-red-400 transition-colors">{currentUser.name}</p>
+                <p className="text-xs font-bold text-slate-900 dark:text-white truncate max-w-[120px] 2xl:max-w-[180px] group-hover:text-[#DA291C] dark:group-hover:text-red-400 transition-colors">{currentUser.name}</p>
                 <div className="flex items-center mt-0.5 whitespace-nowrap">
                   {getRoleBadge()}
                 </div>
               </div>
             </button>
 
-            {/* Quick QR Scanner Button (Desktop) */}
+            {/* Quick QR Scanner Button (Desktop xl+) */}
             {onOpenQrScanner && (
               <button
                 type="button"
                 onClick={onOpenQrScanner}
                 title="Escanear QR de Asistencia"
                 aria-label="Escanear QR de Asistencia"
-                className="hidden sm:flex items-center justify-center gap-1.5 px-3 py-2 min-h-[44px] rounded-2xl bg-red-50 dark:bg-red-950/40 hover:bg-claro dark:hover:bg-claro text-claro dark:text-red-400 hover:text-white dark:hover:text-white border border-red-200 dark:border-red-900/60 hover:border-claro text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95 shrink-0 focus-visible:ring-2 focus-visible:ring-claro"
+                className="hidden xl:flex items-center justify-center gap-1.5 px-2.5 py-1.5 2xl:px-3 2xl:py-2 min-h-[38px] rounded-2xl bg-red-50 dark:bg-red-950/40 hover:bg-claro dark:hover:bg-claro text-claro dark:text-red-400 hover:text-white dark:hover:text-white border border-red-200 dark:border-red-900/60 hover:border-claro text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95 shrink-0 focus-visible:ring-2 focus-visible:ring-claro"
               >
                 <Camera className="w-4 h-4" />
                 <span className="hidden 2xl:inline">Escanear QR</span>
               </button>
             )}
 
-            {/* Change Password Button (Desktop) */}
+            {/* Change Password Button (2xl screens only in top bar; always in drawer) */}
             {onOpenChangePassword && (
               <button
                 type="button"
                 onClick={onOpenChangePassword}
                 title="Cambiar Mi Contraseña"
                 aria-label="Cambiar Mi Contraseña"
-                className="hidden sm:flex p-2.5 min-w-[44px] min-h-[44px] items-center justify-center rounded-2xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0 focus-visible:ring-2 focus-visible:ring-claro"
+                className="hidden 2xl:flex p-2 min-w-[38px] min-h-[38px] items-center justify-center rounded-2xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0 focus-visible:ring-2 focus-visible:ring-claro"
               >
                 <KeyRound className="w-4 h-4" />
               </button>
@@ -513,7 +525,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 aria-label="Cambiar tema visual"
                 aria-haspopup="true"
                 aria-expanded={isThemeMenuOpen}
-                className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-2xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all cursor-pointer shadow-xs active:scale-95 focus-visible:ring-2 focus-visible:ring-claro"
+                className="p-2 sm:p-2.5 min-w-[38px] sm:min-w-[42px] min-h-[38px] sm:min-h-[42px] flex items-center justify-center rounded-2xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all cursor-pointer shadow-xs active:scale-95 focus-visible:ring-2 focus-visible:ring-claro"
               >
                 {themePreference === 'light' && <Sun className="w-4 h-4 text-amber-500 transition-transform duration-200" />}
                 {themePreference === 'dark' && <Moon className="w-4 h-4 text-indigo-400 transition-transform duration-200" />}
@@ -522,7 +534,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
               {isThemeMenuOpen && (
                 <div 
-                  className="absolute right-0 top-full mt-2 w-52 p-1.5 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 z-50 animate-in fade-in-50 zoom-in-95 duration-150 space-y-1"
+                  className="absolute right-0 top-full mt-2 w-52 max-w-[calc(100vw-1.5rem)] p-1.5 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 z-50 animate-in fade-in-50 zoom-in-95 duration-150 space-y-1"
                   role="menu"
                   aria-label="Opciones de tema visual"
                 >
@@ -593,26 +605,26 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </div>
 
-            {/* Logout Button (Desktop) */}
+            {/* Logout Button (Desktop xl+) */}
             <button
               type="button"
               onClick={onLogout}
               title="Cerrar Sesión"
               aria-label="Cerrar Sesión"
-              className="hidden sm:flex p-2.5 min-w-[44px] min-h-[44px] items-center justify-center rounded-2xl text-slate-600 dark:text-slate-400 hover:text-rose-700 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0 focus-visible:ring-2 focus-visible:ring-claro"
+              className="hidden xl:flex p-2 sm:p-2.5 min-w-[38px] sm:min-w-[42px] min-h-[38px] sm:min-h-[42px] items-center justify-center rounded-2xl text-slate-600 dark:text-slate-400 hover:text-rose-700 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0 focus-visible:ring-2 focus-visible:ring-claro"
             >
               <LogOut className="w-4 h-4" />
             </button>
 
-            {/* Hamburger Button for Mobile / Tablet (< lg) (when not superadmin) */}
+            {/* Hamburger Button for Mobile / Tablet / Laptop (< xl) (when not superadmin) */}
             {!isSuperAdmin && (
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 aria-label="Abrir menú de navegación móvil"
-                className="lg:hidden p-2.5 min-w-[44px] min-h-[44px] rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-all flex items-center justify-center cursor-pointer shadow-xs active:scale-95 shrink-0 focus-visible:ring-2 focus-visible:ring-claro"
+                className="xl:hidden p-2 sm:p-2.5 min-w-[38px] sm:min-w-[42px] min-h-[38px] sm:min-h-[42px] rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-all flex items-center justify-center cursor-pointer shadow-xs active:scale-95 shrink-0 focus-visible:ring-2 focus-visible:ring-claro"
               >
-                {isMobileMenuOpen ? <X className="w-6 h-6 text-claro" /> : <Menu className="w-6 h-6" />}
+                {isMobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6 text-claro" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
               </button>
             )}
 
@@ -623,7 +635,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Mobile Drawer / Overlay Dropdown Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border-b border-slate-200 dark:border-slate-800 shadow-2xl px-4 pt-3 pb-6 space-y-4 animate-in slide-in-from-top-3 duration-200">
+        <div className="xl:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border-b border-slate-200 dark:border-slate-800 shadow-2xl px-4 pt-3 pb-6 space-y-4 animate-in slide-in-from-top-3 duration-200 max-h-[calc(100vh-4.5rem)] overflow-y-auto">
           
           {/* User Profile Header in Mobile Drawer */}
           <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-3">

@@ -64,10 +64,18 @@ exports.certificatesRouter.get('/verify/:credentialId', async (req, res) => {
         verification_url,
         status,
         revocation_reason,
-        metadata,
-        created_at
-      FROM certificates
-      WHERE UPPER(credential_id) = UPPER($1)
+        c.metadata,
+        c.created_at,
+        EXISTS(
+          SELECT 1 FROM event_feedbacks ef
+          WHERE LOWER(ef.user_email) = LOWER(c.recipient_email)
+          AND (
+            (c.course_id IS NOT NULL AND ef.event_id = c.course_id)
+            OR (c.cohort_id IS NOT NULL AND ef.cohort_id = c.cohort_id)
+          )
+        ) as is_evaluation_completed
+      FROM certificates c
+      WHERE UPPER(c.credential_id) = UPPER($1)
       LIMIT 1;
     `;
         const result = await db_js_1.pool.query(query, [rawId]);
@@ -106,6 +114,7 @@ exports.certificatesRouter.get('/verify/:credentialId', async (req, res) => {
                 directorName: row.director_name,
                 verificationUrl: row.verification_url,
                 metadata: row.metadata,
+                isEvaluationCompleted: Boolean(row.is_evaluation_completed),
                 createdAt: row.created_at
             }
         });
@@ -141,9 +150,18 @@ exports.certificatesRouter.get('/my', auth_js_1.authenticateToken, async (req, r
             }
         }
         let query = `
-      SELECT * FROM certificates 
-      WHERE (LOWER(recipient_email) = LOWER($1) ${cedula ? 'OR recipient_cedula = $2' : ''})
-      ORDER BY issue_date DESC, created_at DESC;
+      SELECT c.*,
+             EXISTS(
+               SELECT 1 FROM event_feedbacks ef
+               WHERE LOWER(ef.user_email) = LOWER(c.recipient_email)
+               AND (
+                 (c.course_id IS NOT NULL AND ef.event_id = c.course_id)
+                 OR (c.cohort_id IS NOT NULL AND ef.cohort_id = c.cohort_id)
+               )
+             ) as is_evaluation_completed
+      FROM certificates c 
+      WHERE (LOWER(c.recipient_email) = LOWER($1) ${cedula ? 'OR c.recipient_cedula = $2' : ''})
+      ORDER BY c.issue_date DESC, c.created_at DESC;
     `;
         const params = [user.email];
         if (cedula)
@@ -175,6 +193,7 @@ exports.certificatesRouter.get('/my', auth_js_1.authenticateToken, async (req, r
             revocationReason: r.revocation_reason,
             metadata: r.metadata,
             issuedBy: r.issued_by,
+            isEvaluationCompleted: Boolean(r.is_evaluation_completed),
             createdAt: r.created_at
         }));
         return res.json(certs);

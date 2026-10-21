@@ -29,7 +29,8 @@ import {
   ArrowRight,
   Eye,
   TrendingUp,
-  Filter
+  Filter,
+  HeartHandshake
 } from 'lucide-react';
 import { 
   TrainingEvent, 
@@ -66,6 +67,7 @@ import {
 import { DemographicsOpportunitiesSection } from './DemographicsOpportunitiesSection';
 import { SustainabilityReportSection } from './SustainabilityReportSection';
 import { EventFormModal } from '../admin/EventFormModal';
+import { KirkpatrickNpsSection } from './KirkpatrickNpsSection';
 
 interface DashboardViewProps {
   events: TrainingEvent[];
@@ -111,6 +113,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [selectedProgramId, setSelectedProgramId] = useState<string>(programs[0]?.id || '');
   const [skillsSearchQuery, setSkillsSearchQuery] = useState<string>('');
   const [selectedSurveyEventId, setSelectedSurveyEventId] = useState<string>('all');
+  const [instructorsSubTab, setInstructorsSubTab] = useState<'kirkpatrick_nps' | 'tec_questions'>('kirkpatrick_nps');
 
   // Carga automática y reactiva de Convocatorias en el Dashboard
   React.useEffect(() => {
@@ -831,8 +834,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700/70'
               }`}
             >
-              <Award className="w-3.5 h-3.5" />
-              <span>Docencia & Encuestas</span>
+              <HeartHandshake className="w-3.5 h-3.5" />
+              <span>Kirkpatrick N1 & NPS</span>
             </button>
 
             <button
@@ -1730,13 +1733,45 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       )}
 
       {/* ==========================================
-          TAB 3: DESEMPEÑO DOCENTE & ENCUESTAS TEC
+          TAB 3: DESEMPEÑO DOCENTE, KIRKPATRICK N1 & NPS
           ========================================== */}
       {activeTab === 'instructors' && (
-        <div className="space-y-8 animate-in fade-in duration-300">
+        <div className="space-y-6 animate-in fade-in duration-300">
           
-          {/* Header & Course Filter Bar */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          {/* Sub-Navegación: Kirkpatrick N1 & NPS vs Matriz TEC */}
+          <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl w-fit">
+            <button
+              type="button"
+              onClick={() => setInstructorsSubTab('kirkpatrick_nps')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                instructorsSubTab === 'kirkpatrick_nps'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <HeartHandshake className="w-3.5 h-3.5 text-emerald-500" />
+              <span>Kirkpatrick Nivel 1 & NPS</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setInstructorsSubTab('tec_questions')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                instructorsSubTab === 'tec_questions'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <Award className="w-3.5 h-3.5 text-amber-500" />
+              <span>Desglose por Pregunta TEC</span>
+            </button>
+          </div>
+
+          {instructorsSubTab === 'kirkpatrick_nps' ? (
+            <KirkpatrickNpsSection onShowToast={onShowToast} />
+          ) : (
+            <div className="space-y-8 animate-in fade-in duration-300">
+              {/* Header & Course Filter Bar */}
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 text-xs font-bold text-[#DA291C] dark:text-red-400 mb-1">
                 <Sparkles className="w-4 h-4 text-[#DA291C] dark:text-red-400" />
@@ -2066,6 +2101,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
             </div>
           )}
 

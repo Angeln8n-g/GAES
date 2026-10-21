@@ -209,6 +209,14 @@
   --table-scroll-hint-text: #64748B;
 }
 
+/* Protección global contra desbordamiento horizontal de viewport */
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
 /* Estilos de scroll personalizados adaptados a tokens */
 .scrollbar-none::-webkit-scrollbar {
   display: none;

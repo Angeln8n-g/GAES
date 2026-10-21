@@ -16,7 +16,9 @@ import {
   CreateExternalTrainingPayload,
   TechnicalCohortAttendanceMatrix,
   TechnicalCohortEnrolledParticipant,
-  Convocatoria
+  Convocatoria,
+  CourseSuggestion,
+  CourseWaitlistEntry
 } from '../types';
 import { formatDateLong, formatCedula, isValidCedula, formatDateShort } from './formatters';
 import {
@@ -2995,5 +2997,61 @@ export const exportConvocatoriasReportToExcel = (
   const fileName = `Reporte_Convocatorias_y_Cupos_${dateToday}.xlsx`;
   XLSX.writeFile(wb, fileName);
 };
+
+/**
+ * Exporta la lista de espera de un curso a demanda a un archivo Excel (.xlsx)
+ */
+export const exportCourseWaitlistToExcel = (
+  suggestion: CourseSuggestion,
+  entries: CourseWaitlistEntry[]
+): void => {
+  const wb = XLSX.utils.book_new();
+  const dateToday = new Date().toISOString().split('T')[0];
+
+  // Hoja 1: Resumen y Ficha de la Demanda
+  const summaryData = [
+    { 'Propiedad': 'Título del Curso', 'Valor': suggestion.title },
+    { 'Propiedad': 'Categoría Formativa', 'Valor': suggestion.category },
+    { 'Propiedad': 'Modalidad Sugerida', 'Valor': suggestion.modality },
+    { 'Propiedad': 'Duración Estimada', 'Valor': `${suggestion.targetHours || 8} horas` },
+    { 'Propiedad': 'Quórum Mínimo Requerido', 'Valor': suggestion.minQuorum },
+    { 'Propiedad': 'Interesados Registrados', 'Valor': entries.length },
+    { 'Propiedad': '% Progreso de Quórum', 'Valor': `${Math.round((entries.length / (suggestion.minQuorum || 1)) * 100)}%` },
+    { 'Propiedad': 'Estado Actual', 'Valor': suggestion.status === 'quorum_alcanzado' ? 'Quórum Alcanzado (Listo para Agendar)' : suggestion.status === 'programado' ? 'Programado Oficialmente' : 'En Recolección de Quórum' },
+    { 'Propiedad': 'Sugerido por', 'Valor': suggestion.suggestedByName || 'Colaborador' },
+    { 'Propiedad': 'Empresa / Alcance', 'Valor': suggestion.companyName || 'Todas las Empresas (Claro)' },
+    { 'Propiedad': 'Descripción / Justificación', 'Valor': suggestion.description || 'Sin descripción' },
+    { 'Propiedad': 'Fecha de Solicitud', 'Valor': suggestion.createdAt ? new Date(suggestion.createdAt).toLocaleDateString() : '' },
+    { 'Propiedad': 'Fecha de Generación del Reporte', 'Valor': dateToday }
+  ];
+  const wsSummary = XLSX.utils.json_to_sheet(summaryData);
+  XLSX.utils.book_append_sheet(wb, wsSummary, 'Ficha Técnica');
+
+  // Hoja 2: Colaboradores Inscritos en Lista de Espera
+  const participantsData = entries.map((entry, idx) => ({
+    'No. Turno': idx + 1,
+    'Nombre del Colaborador': entry.participantName || 'Sin nombre',
+    'Correo Electrónico': entry.participantEmail || '',
+    'Carnet / ID': entry.participantCard || 'N/A',
+    'Cédula': entry.participantCedula || 'N/A',
+    'Empresa / Contratista': entry.companyName || 'Claro Dominicana',
+    'Horario Preferido': entry.preferredSchedule || 'Cualquiera',
+    'Observaciones / Justificación': entry.notes || 'Ninguna',
+    'Fecha de Inscripción': entry.createdAt ? new Date(entry.createdAt).toLocaleString() : ''
+  }));
+
+  const wsParticipants = XLSX.utils.json_to_sheet(participantsData);
+  XLSX.utils.book_append_sheet(wb, wsParticipants, 'Lista de Espera');
+
+  // Nombre de archivo sanitizado
+  const safeTitle = (suggestion.title || 'Curso')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9_-]/g, '_')
+    .substring(0, 35);
+  const fileName = `Lista_Espera_${safeTitle}_${dateToday}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+};
+
 
 

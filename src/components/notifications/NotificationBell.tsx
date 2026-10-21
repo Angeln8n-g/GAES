@@ -68,18 +68,25 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Cerrar al hacer click fuera
+  // Cerrar al hacer click fuera o presionar Escape
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setIsOpen(false);
       }
     };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen]);
 
@@ -298,60 +305,81 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
 
       {/* Popover Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 sm:w-[440px] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 z-50 overflow-hidden flex flex-col max-h-[85vh] animate-fadeIn">
-          {/* Header */}
-          <div className="px-4 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-850 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm">
-                Centro de Notificaciones
-              </h3>
-              {unreadCount > 0 && (
-                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400">
-                  {unreadCount} sin leer
-                </span>
-              )}
-            </div>
+        <>
+          {/* Backdrop para dispositivos móviles */}
+          <div 
+            className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[2px] sm:hidden"
+            onClick={() => setIsOpen(false)}
+            aria-hidden="true"
+          />
 
-            <div className="flex items-center gap-1">
-              {unreadCount > 0 && (
-                <button
-                  type="button"
-                  onClick={handleMarkAllAsRead}
-                  title="Marcar todas como leídas"
-                  className="p-1.5 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 rounded-lg transition-colors text-xs inline-flex items-center gap-1"
-                >
-                  <CheckCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                  <span className="hidden sm:inline text-[11px] font-medium">Leer todas</span>
-                </button>
-              )}
+          <div 
+            className="fixed inset-x-3 top-16 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 w-auto sm:w-[420px] max-w-[calc(100vw-1.5rem)] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-800 z-50 overflow-hidden flex flex-col max-h-[calc(100vh-5rem)] sm:max-h-[82vh] animate-in fade-in-50 zoom-in-95 duration-150"
+            role="region"
+            aria-label="Panel de notificaciones"
+          >
+            {/* Header */}
+            <div className="px-4 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-850 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm">
+                  Centro de Notificaciones
+                </h3>
+                {unreadCount > 0 && (
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400">
+                    {unreadCount} sin leer
+                  </span>
+                )}
+              </div>
 
-              {isSuperAdmin && (
+              <div className="flex items-center gap-1">
+                {unreadCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleMarkAllAsRead}
+                    title="Marcar todas como leídas"
+                    className="p-1.5 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 rounded-lg transition-colors text-xs inline-flex items-center gap-1 cursor-pointer"
+                  >
+                    <CheckCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <span className="hidden sm:inline text-[11px] font-medium">Leer todas</span>
+                  </button>
+                )}
+
+                {isSuperAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsOpen(false);
+                      setIsBroadcastOpen(true);
+                    }}
+                    title="Emitir Comunicado Masivo"
+                    className="p-1.5 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-lg transition-colors cursor-pointer"
+                  >
+                    <Megaphone className="w-4 h-4" />
+                  </button>
+                )}
+
                 <button
                   type="button"
                   onClick={() => {
                     setIsOpen(false);
-                    setIsBroadcastOpen(true);
+                    setIsPreferencesOpen(true);
                   }}
-                  title="Emitir Comunicado Masivo"
-                  className="p-1.5 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-lg transition-colors"
+                  title="Configurar Notificaciones"
+                  className="p-1.5 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
                 >
-                  <Megaphone className="w-4 h-4" />
+                  <Settings className="w-4 h-4" />
                 </button>
-              )}
 
-              <button
-                type="button"
-                onClick={() => {
-                  setIsOpen(false);
-                  setIsPreferencesOpen(true);
-                }}
-                title="Configurar Notificaciones"
-                className="p-1.5 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 rounded-lg transition-colors"
-              >
-                <Settings className="w-4 h-4" />
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                  title="Cerrar panel"
+                  className="sm:hidden p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer ml-1"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-          </div>
 
           {/* Banner de Estado Push */}
           {pushPermission !== 'granted' ? (
@@ -530,13 +558,13 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
                     </div>
 
                     {/* Acciones flotantes */}
-                    <div className="flex flex-col items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                    <div className="flex flex-col items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 opacity-90 hover:opacity-100 transition-opacity shrink-0">
                       {!item.isRead && (
                         <button
                           type="button"
                           onClick={(e) => handleMarkAsRead(item.id, e)}
                           title="Marcar como leída"
-                          className="p-1 rounded-md text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors"
+                          className="p-1 rounded-md text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <Check className="w-3.5 h-3.5" />
                         </button>
@@ -545,7 +573,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
                         type="button"
                         onClick={(e) => handleDelete(item.id, e)}
                         title="Eliminar notificación"
-                        className="p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors"
+                        className="p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -570,12 +598,13 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
                 setIsOpen(false);
                 setIsPreferencesOpen(true);
               }}
-              className="hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold inline-flex items-center gap-1"
+              className="hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold inline-flex items-center gap-1 cursor-pointer"
             >
               <span>Ajustes</span>
             </button>
           </div>
         </div>
+      </>
       )}
 
       {/* Modales */}

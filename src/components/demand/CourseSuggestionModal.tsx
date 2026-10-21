@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, 
   X, 
@@ -9,7 +9,14 @@ import {
   HelpCircle, 
   Layers,
   Calendar,
-  CheckCircle2
+  CheckCircle2,
+  Monitor,
+  Wrench,
+  Compass,
+  Sun,
+  Sunset,
+  CalendarDays,
+  Clock4
 } from 'lucide-react';
 import { apiService } from '../../services/api';
 import { Company, UserAccount, CourseSuggestion } from '../../types';
@@ -23,9 +30,31 @@ interface CourseSuggestionModalProps {
   onShowToast?: (title: string, message: string, type: 'success' | 'error' | 'info') => void;
 }
 
-const CATEGORIES = ["Curso", "Taller", "Webinar", "Charla", "Certificación Técnica", "Seguridad y Prevención"];
-const MODALITIES = ["Presencial (Taller)", "Virtual / Teams", "Híbrido", "En Terreno / Planta Externa"];
-const SCHEDULES = ["Cualquiera", "Horario Matutino (Mañana)", "Horario Vespertino (Tarde)", "Fines de Semana (Sábados)"];
+const CATEGORIES = [
+  "Curso", 
+  "Taller", 
+  "Webinar", 
+  "Charla", 
+  "Certificación Técnica", 
+  "Seguridad y Prevención"
+];
+
+const MODALITY_OPTIONS = [
+  { value: 'Presencial (Taller)', label: 'Presencial (Taller)', icon: Building2, desc: 'En aulas o laboratorios Claro' },
+  { value: 'Virtual / Teams', label: 'Virtual (Teams)', icon: Monitor, desc: 'Sesiones online sincrónicas' },
+  { value: 'Híbrido', label: 'Híbrido', icon: Compass, desc: 'Teoría remota + práctica física' },
+  { value: 'En Terreno / Planta Externa', label: 'En Terreno', icon: Wrench, desc: 'Postes, armarios o centrales' }
+];
+
+const SCHEDULE_OPTIONS = [
+  { value: 'Cualquiera', label: 'Cualquier Horario', icon: Clock4, desc: 'Flexible según disponibilidad' },
+  { value: 'Horario Matutino (Mañana)', label: 'Mañana (AM)', icon: Sun, desc: '8:00 AM - 12:00 PM' },
+  { value: 'Horario Vespertino (Tarde)', label: 'Tarde (PM)', icon: Sunset, desc: '1:00 PM - 5:00 PM' },
+  { value: 'Fines de Semana (Sábados)', label: 'Sábados', icon: CalendarDays, desc: 'Jornada intensiva fin de semana' }
+];
+
+const QUORUM_PRESETS = [5, 8, 10, 12, 15, 20];
+const DURATION_PRESETS = [4, 8, 16, 24, 40];
 
 export const CourseSuggestionModal: React.FC<CourseSuggestionModalProps> = ({
   isOpen,
@@ -45,6 +74,16 @@ export const CourseSuggestionModal: React.FC<CourseSuggestionModalProps> = ({
   const [selectedCompanyId, setSelectedCompanyId] = useState(currentUser?.companyId || 'all');
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Escuchar tecla Escape para cerrar
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -70,7 +109,7 @@ export const CourseSuggestionModal: React.FC<CourseSuggestionModalProps> = ({
       });
 
       if (onShowToast) {
-        onShowToast('¡Propuesta Registrada!', 'Tu solicitud de curso ha sido creada y te hemos inscrito en la lista de espera.', 'success');
+        onShowToast('¡Propuesta Registrada!', 'Tu solicitud de curso ha sido creada y te hemos inscrito en la posición #1 de la lista de espera.', 'success');
       }
       onSuggestionCreated(res.suggestion);
       onClose();
@@ -84,191 +123,309 @@ export const CourseSuggestionModal: React.FC<CourseSuggestionModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/75 backdrop-blur-sm overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-200 my-auto">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/75 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200 my-auto max-h-[92vh] flex flex-col">
         
-        {/* Cabecera */}
-        <div className="flex items-center justify-between px-6 py-5 bg-linear-to-r from-slate-900 via-slate-850 to-slate-900 text-white border-b border-slate-800">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#DA291C] flex items-center justify-center shadow-lg shadow-red-500/20">
+        {/* Cabecera Branded Claro */}
+        <div className="flex items-center justify-between px-6 py-5 bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 text-white border-b border-slate-800 shrink-0">
+          <div className="flex items-center space-x-3 min-w-0">
+            <div className="w-10 h-10 rounded-2xl bg-[#DA291C] flex items-center justify-center shadow-lg shadow-red-500/20 shrink-0">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
-            <div>
-              <h2 className="text-base font-extrabold tracking-tight text-white">
+            <div className="min-w-0">
+              <h2 className="text-base font-extrabold tracking-tight text-white truncate">
                 Proponer Nuevo Curso o Capacitación
               </h2>
-              <p className="text-xs text-slate-400">
-                Apertura a demanda y recolección de quórum de interesados
+              <p className="text-xs text-slate-400 truncate">
+                Apertura a demanda y recolección colaborativa de quórum
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+            title="Cerrar (Esc)"
+            className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors shrink-0 ml-2"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Formulario */}
-        <form onSubmit={handleSubmit} className="p-6 sm:p-7 space-y-5">
+        {/* Formulario Scrolleable */}
+        <form onSubmit={handleSubmit} className="p-6 sm:p-7 space-y-5 overflow-y-auto">
           
-          {/* Mensaje Explicativo */}
-          <div className="p-3.5 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-2xl text-xs text-slate-700 dark:text-slate-300 leading-relaxed flex items-start space-x-2.5">
+          {/* Mensaje Explicativo Claro */}
+          <div className="p-3.5 bg-red-50/70 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-2xl text-xs text-slate-700 dark:text-slate-300 leading-relaxed flex items-start space-x-2.5">
             <HelpCircle className="w-4 h-4 text-[#DA291C] shrink-0 mt-0.5" />
             <span>
-              Los cursos no recurrentes requieren una cantidad mínima de participantes interesados (quórum) para ser programados por la Dirección de Capacitación de Claro. <strong>Al enviar esta propuesta, quedarás inscrito automáticamente en la posición #1 de la lista de espera.</strong>
+              Los cursos a demanda se habilitan cuando alcanzan el <strong>quórum mínimo</strong> de colaboradores interesados. <strong>Al proponer este curso, quedarás inscrito automáticamente en la posición #1 de la lista de espera.</strong>
             </span>
           </div>
 
           {/* Título de la Capacitación */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
-              Título del Curso o Taller Sugerido *
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                Título del Curso o Taller Propuesto *
+              </label>
+              <span className="text-[10px] text-slate-400">
+                {title.length}/120 caracteres
+              </span>
+            </div>
             <input
               type="text"
               required
+              maxLength={120}
               placeholder="Ej. Configuración de Enlaces de Microondas y Radioenlaces Ceragon"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-[#DA291C] focus:outline-hidden text-slate-900 dark:text-white"
+              className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-[#DA291C] focus:outline-hidden text-slate-900 dark:text-white placeholder:text-slate-400 font-medium transition-all"
             />
           </div>
 
-          {/* Categoría y Modalidad */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
-                Categoría Formativa
-              </label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-slate-200"
-              >
-                {CATEGORIES.map(c => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
-                Modalidad Sugerida
-              </label>
-              <select
-                value={modality}
-                onChange={(e) => setModality(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-slate-200"
-              >
-                {MODALITIES.map(m => (
-                  <option key={m} value={m}>{m}</option>
-                ))}
-              </select>
+          {/* Categoría Formativa */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">
+              Categoría Formativa
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {CATEGORIES.map((cat) => (
+                <button
+                  type="button"
+                  key={cat}
+                  onClick={() => setCategory(cat)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    category === cat
+                      ? 'bg-[#DA291C] text-white shadow-sm shadow-red-500/30 ring-2 ring-red-500/30'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Horas Estimadas y Quórum Mínimo */}
+          {/* Modalidad Sugerida (Tarjetas Visuales) */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">
+              Modalidad Sugerida
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {MODALITY_OPTIONS.map((opt) => {
+                const IconComponent = opt.icon;
+                const isSelected = modality === opt.value;
+                return (
+                  <button
+                    type="button"
+                    key={opt.value}
+                    onClick={() => setModality(opt.value)}
+                    className={`p-3 rounded-2xl border text-left flex items-start space-x-3 transition-all cursor-pointer ${
+                      isSelected
+                        ? 'border-[#DA291C] bg-red-50/50 dark:bg-red-950/20 ring-1 ring-[#DA291C]'
+                        : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/50 hover:border-slate-300 dark:hover:border-slate-700'
+                    }`}
+                  >
+                    <div className={`p-2 rounded-xl shrink-0 ${
+                      isSelected 
+                        ? 'bg-[#DA291C] text-white' 
+                        : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                    }`}>
+                      <IconComponent className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className={`text-xs font-bold block ${
+                        isSelected ? 'text-[#DA291C] dark:text-red-400' : 'text-slate-800 dark:text-white'
+                      }`}>
+                        {opt.label}
+                      </span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">
+                        {opt.desc}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Duración y Quórum Mínimo con Presets */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
+            
+            {/* Duración Estimada */}
+            <div className="bg-slate-50 dark:bg-slate-800/50 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/60">
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
+                <Clock className="w-3.5 h-3.5 inline mr-1 text-[#DA291C]" />
                 Duración Estimada (Horas)
               </label>
-              <input
-                type="number"
-                min="1"
-                max="120"
-                value={targetHours}
-                onChange={(e) => setTargetHours(Math.max(1, parseInt(e.target.value) || 1))}
-                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white"
-              />
+              
+              <div className="flex items-center space-x-2 mb-2">
+                <input
+                  type="number"
+                  min="1"
+                  max="120"
+                  value={targetHours}
+                  onChange={(e) => setTargetHours(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="w-24 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white text-center"
+                />
+                <span className="text-xs text-slate-500 font-medium">horas académicas</span>
+              </div>
+
+              {/* Presets rápidos */}
+              <div className="flex flex-wrap gap-1.5">
+                {DURATION_PRESETS.map((hrs) => (
+                  <button
+                    type="button"
+                    key={hrs}
+                    onClick={() => setTargetHours(hrs)}
+                    className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                      targetHours === hrs
+                        ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
+                        : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                    }`}
+                  >
+                    {hrs}h
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div>
+            {/* Quórum Mínimo Requerido */}
+            <div className="bg-slate-50 dark:bg-slate-800/50 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/60">
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
-                Quórum Mínimo Sugerido
+                <Users className="w-3.5 h-3.5 inline mr-1 text-[#DA291C]" />
+                Quórum Mínimo para Abrir
               </label>
-              <input
-                type="number"
-                min="3"
-                max="50"
-                value={minQuorum}
-                onChange={(e) => setMinQuorum(Math.max(3, parseInt(e.target.value) || 3))}
-                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white"
-              />
-              <span className="text-[10px] text-slate-500 mt-1 block">
-                Colaboradores requeridos para abrir grupo (normalmente entre 8 y 15).
-              </span>
+              
+              <div className="flex items-center space-x-2 mb-2">
+                <input
+                  type="number"
+                  min="3"
+                  max="50"
+                  value={minQuorum}
+                  onChange={(e) => setMinQuorum(Math.max(3, parseInt(e.target.value) || 3))}
+                  className="w-24 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white text-center"
+                />
+                <span className="text-xs text-slate-500 font-medium">colaboradores</span>
+              </div>
+
+              {/* Presets rápidos */}
+              <div className="flex flex-wrap gap-1.5">
+                {QUORUM_PRESETS.map((q) => (
+                  <button
+                    type="button"
+                    key={q}
+                    onClick={() => setMinQuorum(q)}
+                    className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                      minQuorum === q
+                        ? 'bg-[#DA291C] text-white shadow-xs'
+                        : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                    }`}
+                  >
+                    {q} pers.
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Horario Preferido del Proponente */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
-                Tu Horario de Preferencia
-              </label>
-              <select
-                value={preferredSchedule}
-                onChange={(e) => setPreferredSchedule(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-slate-200"
-              >
-                {SCHEDULES.map(s => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
+          {/* Horario Preferido del Proponente (Pills Visuales) */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">
+              Tu Horario de Preferencia para Cursarlo
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {SCHEDULE_OPTIONS.map((opt) => {
+                const IconComponent = opt.icon;
+                const isSelected = preferredSchedule === opt.value;
+                return (
+                  <button
+                    type="button"
+                    key={opt.value}
+                    onClick={() => setPreferredSchedule(opt.value)}
+                    className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center ${
+                      isSelected
+                        ? 'border-[#DA291C] bg-red-50/70 dark:bg-red-950/30 text-[#DA291C] ring-1 ring-[#DA291C]'
+                        : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                    }`}
+                  >
+                    <IconComponent className="w-4 h-4 mb-1" />
+                    <span className="text-[11px] font-bold leading-tight">{opt.label}</span>
+                  </button>
+                );
+              })}
             </div>
+          </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
-                Empresa o Alcance
-              </label>
-              <select
-                value={selectedCompanyId}
-                onChange={(e) => setSelectedCompanyId(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-slate-200"
-              >
-                <option value="all">🏢 Todas las Empresas (Abierto)</option>
-                {companies.map(c => (
-                  <option key={c.id} value={c.id}>🏢 {c.name}</option>
-                ))}
-              </select>
-            </div>
+          {/* Empresa o Alcance */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
+              <Building2 className="w-3.5 h-3.5 inline mr-1 text-slate-400" />
+              Empresa / Alcance de la Convocatoria
+            </label>
+            <select
+              value={selectedCompanyId}
+              onChange={(e) => setSelectedCompanyId(e.target.value)}
+              className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-200"
+            >
+              <option value="all">🏢 Todas las Empresas (Abierto a Claro y Contratistas)</option>
+              {companies.map(c => (
+                <option key={c.id} value={c.id}>🏢 {c.name}</option>
+              ))}
+            </select>
           </div>
 
           {/* Descripción / Justificación */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
-              ¿Por qué es necesario este curso? (Justificación / Impacto)
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                ¿Por qué es necesario este curso? (Justificación / Impacto)
+              </label>
+              <span className="text-[10px] text-slate-400">
+                {description.length}/500
+              </span>
+            </div>
             <textarea
               rows={3}
+              maxLength={500}
               placeholder="Explica qué necesidad técnica o formativa resuelve este curso, qué equipos se usarán o cómo beneficiará las operaciones de campo..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-[#DA291C] focus:outline-hidden text-slate-900 dark:text-white"
+              className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-[#DA291C] focus:outline-hidden text-slate-900 dark:text-white placeholder:text-slate-400"
             />
           </div>
 
           {/* Botones de Acción */}
-          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end space-x-3">
+          <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end space-x-3 shrink-0">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors"
+              className="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors cursor-pointer"
             >
               Cancelar
             </button>
 
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="px-6 py-2.5 rounded-xl bg-[#DA291C] hover:bg-red-700 active:bg-red-800 text-white text-xs font-bold shadow-md shadow-red-500/25 transition-all disabled:opacity-50 inline-flex items-center space-x-2"
+              disabled={isSubmitting || !title.trim()}
+              className="px-6 py-2.5 rounded-xl bg-[#DA291C] hover:bg-red-700 active:bg-red-800 text-white text-xs font-bold shadow-md shadow-red-500/25 transition-all disabled:opacity-50 inline-flex items-center space-x-2 cursor-pointer"
             >
-              <Sparkles className="w-4 h-4" />
-              <span>{isSubmitting ? 'Registrando...' : 'Proponer Curso & Entrar a Lista de Espera'}</span>
+              {isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Registrando Propuesta...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  <span>Proponer Curso & Entrar a Lista de Espera</span>
+                </>
+              )}
             </button>
           </div>
 

@@ -124,13 +124,19 @@ CREATE TABLE attendance_logs (
     UNIQUE (slot_id, participant_card)
 );
 
--- 9. Evaluaciones y Feedback Rápido
+-- 9. Evaluaciones y Feedback Rápido (Modelo Kirkpatrick N1 & NPS)
 CREATE TABLE event_feedbacks (
     id SERIAL PRIMARY KEY,
-    event_id VARCHAR(100) NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    event_id VARCHAR(100) REFERENCES events(id) ON DELETE CASCADE,
+    cohort_id VARCHAR(100) REFERENCES technical_academy_cohorts(id) ON DELETE CASCADE,
+    training_type VARCHAR(50) DEFAULT 'event',
     user_email VARCHAR(255) NOT NULL,
     user_name VARCHAR(255),
     rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    nps_score INTEGER CHECK (nps_score >= 0 AND nps_score <= 10),
+    applicability_score NUMERIC(5,2),
+    strengths_comment TEXT,
+    improvements_comment TEXT,
     comment TEXT,
     course_ratings JSONB DEFAULT '{}',
     facilitator_ratings JSONB DEFAULT '{}',
