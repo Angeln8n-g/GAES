@@ -19,7 +19,7 @@ import {
   Send
 } from 'lucide-react';
 import { TrainingEvent, UserAccount, Company } from '../../types';
-import { formatDateShort, getEventDurationMetrics } from '../../utils/formatters';
+import { formatDateShort, getEventDurationMetrics, isEventFullyPast } from '../../utils/formatters';
 
 interface EventCardProps {
   event: TrainingEvent;
@@ -105,8 +105,8 @@ export const EventCard: React.FC<EventCardProps> = ({
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
   // Priorizar fechas vigentes y futuras
+  const isPastEvent = isEventFullyPast(event);
   const upcomingSchedules = event.schedule.filter(s => s.date >= todayStr);
-  const isPastEvent = event.schedule.length > 0 && upcomingSchedules.length === 0;
   const displaySchedules = upcomingSchedules.length > 0 
     ? upcomingSchedules.slice(0, 2) 
     : event.schedule.slice(0, 2);
@@ -143,7 +143,7 @@ export const EventCard: React.FC<EventCardProps> = ({
                 </span>
               )}
 
-              {event.isBannerFeatured && !isConvocatoria && (
+              {event.isBannerFeatured && !isConvocatoria && !isPastEvent && (
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 backdrop-blur-md shadow-md flex items-center gap-1 border border-amber-300">
                   <Sparkles className="w-3 h-3 text-amber-950 fill-amber-950" />
                   <span>En Banner</span>
@@ -375,7 +375,10 @@ export const EventCard: React.FC<EventCardProps> = ({
                 </>
               )
             ) : isPastEvent ? (
-              <span>Ver detalles</span>
+              <span className="inline-flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5 text-slate-400" />
+                <span>Finalizado (Ver detalles)</span>
+              </span>
             ) : isConvocatoria ? (
               <>
                 <Send className="w-3.5 h-3.5 text-amber-200" />

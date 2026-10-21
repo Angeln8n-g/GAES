@@ -50,6 +50,7 @@ import { exportComplianceReportToExcel, exportSkillsGapReportToExcel } from '../
 import { ComplianceReminderModal } from '../admin/ComplianceReminderModal';
 import { TeamAssignmentModal } from './TeamAssignmentModal';
 import { ParticipantProfileModal } from '../admin/ParticipantProfileModal';
+import { isSlotPast, isScheduleDatePast, isEventFullyPast, getTodayLocalDateString } from '../../utils/formatters';
 
 interface TeamLeadViewProps {
   currentUser: UserAccount;
@@ -1456,6 +1457,10 @@ export const TeamLeadView: React.FC<TeamLeadViewProps> = ({
                           {item.hasAttended ? (
                             <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50 flex items-center gap-1 w-max">
                               <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> Asistencia OK
+                            </span>
+                          ) : isSlotPast(item.schedule.date, item.slot.time, item.slot.endTime) ? (
+                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50 flex items-center gap-1 w-max" title="La sesión ha concluido y el colaborador no registró asistencia">
+                              <AlertTriangle className="w-3 h-3 text-amber-600 dark:text-amber-400" /> No Asistió / Concluido
                             </span>
                           ) : (
                             <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-cyan-50 dark:bg-cyan-950/40 text-cyan-700 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-900/50 flex items-center gap-1 w-max">

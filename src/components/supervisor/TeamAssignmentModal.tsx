@@ -17,7 +17,13 @@ import {
   Info
 } from 'lucide-react';
 import { TrainingEvent, Participant, UserAccount, Slot, ParticipantGroup } from '../../types';
-import { formatDateLong } from '../../utils/formatters';
+import { 
+  formatDateLong,
+  isEventFullyPast,
+  isScheduleDatePast,
+  isSlotPast,
+  getNextUpcomingScheduleDate
+} from '../../utils/formatters';
 import { AccessibleModal } from '../common/AccessibleModal';
 
 interface TeamAssignmentModalProps {
@@ -51,7 +57,8 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  const activeEvents = useMemo(() => events.filter(e => e.status === 'active'), [events]);
+  // Eventos activos que aún tienen vigencia temporal (no están 100% pasados)
+  const activeEvents = useMemo(() => events.filter(e => e.status === 'active' && !isEventFullyPast(e)), [events]);
 
   const [selectedEventId, setSelectedEventId] = useState<string>(activeEvents[0]?.id || '');
   const [selectedDate, setSelectedDate] = useState<string>('');
@@ -65,33 +72,38 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
   // Evento actualmente seleccionado
   const selectedEvent = useMemo(() => activeEvents.find(e => e.id === selectedEventId) || activeEvents[0], [activeEvents, selectedEventId]);
 
-  // Fechas disponibles para el evento
-  const availableSchedules = selectedEvent?.schedule || [];
+  // Fechas vigentes disponibles para el evento (excluye fechas pasadas)
+  const availableSchedules = useMemo(() => {
+    if (!selectedEvent) return [];
+    return (selectedEvent.schedule || []).filter(sch => !isScheduleDatePast(sch.date));
+  }, [selectedEvent]);
 
-  // Inicializar fecha seleccionada si cambia el evento o está vacía
+  // Horarios disponibles para la fecha seleccionada (excluyendo slots de hoy que ya concluyeron)
+  const availableSlots = useMemo(() => {
+    const currentSch = availableSchedules.find(s => s.date === selectedDate);
+    if (!currentSch) return [];
+    return currentSch.slots.filter(s => !isSlotPast(selectedDate, s.time, s.endTime));
+  }, [availableSchedules, selectedDate]);
+
+  // Inicializar fecha seleccionada y horario válido si cambia el evento o está vacía
   React.useEffect(() => {
     if (availableSchedules.length > 0) {
-      const firstDate = availableSchedules[0].date;
-      setSelectedDate(firstDate);
-      const firstSlot = availableSchedules[0].slots[0]?.time || '';
-      setSelectedTime(firstSlot);
+      const firstSch = availableSchedules[0];
+      setSelectedDate(firstSch.date);
+      const validSlots = firstSch.slots.filter(s => !isSlotPast(firstSch.date, s.time, s.endTime));
+      setSelectedTime(validSlots[0]?.time || '');
     } else {
       setSelectedDate('');
       setSelectedTime('');
     }
-  }, [selectedEventId]);
-
-  // Horarios disponibles para la fecha seleccionada
-  const availableSlots = useMemo(() => {
-    const currentSch = availableSchedules.find(s => s.date === selectedDate);
-    return currentSch?.slots || [];
-  }, [availableSchedules, selectedDate]);
+  }, [selectedEventId, availableSchedules]);
 
   // Manejar cambio de fecha
   const handleDateChange = (date: string) => {
     setSelectedDate(date);
     const sch = availableSchedules.find(s => s.date === date);
-    setSelectedTime(sch?.slots[0]?.time || '');
+    const validSlots = (sch?.slots || []).filter(s => !isSlotPast(date, s.time, s.endTime));
+    setSelectedTime(validSlots[0]?.time || '');
   };
 
   // Slot seleccionado actualmente
@@ -203,6 +215,21 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
       return;
     }
 
+    if (isEventFullyPast(selectedEvent)) {
+      onShowToast('Curso no disponible', 'El curso seleccionado ya ha finalizado todas sus fechas programadas.', 'error');
+      return;
+    }
+
+    if (isScheduleDatePast(selectedDate)) {
+      onShowToast('Fecha vencida', 'La fecha seleccionada ya ha transcurrido. Elige una fecha vigente.', 'error');
+      return;
+    }
+
+    if (currentSlot && isSlotPast(selectedDate, selectedTime, currentSlot.endTime)) {
+      onShowToast('Horario vencido', 'El horario seleccionado para el día de hoy ya ha concluido.', 'error');
+      return;
+    }
+
     if (selectedEmails.size === 0) {
       onShowToast('Sin destinatarios', 'Selecciona al menos un miembro del equipo para asignar.', 'error');
       return;
@@ -272,17 +299,24 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
               1. Selecciona la Capacitación / Curso
             </label>
-            <select
-              value={selectedEventId}
-              onChange={(e) => setSelectedEventId(e.target.value)}
-              className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C] transition-colors"
-            >
-              {activeEvents.map(evt => (
-                <option key={evt.id} value={evt.id}>
-                  {evt.title} — ({evt.category} | {evt.instructor})
-                </option>
-              ))}
-            </select>
+            {activeEvents.length === 0 ? (
+              <div className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-2xl text-xs text-amber-800 dark:text-amber-300 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
+                <span>No hay cursos o eventos activos con fechas vigentes para asignar al equipo.</span>
+              </div>
+            ) : (
+              <select
+                value={selectedEventId}
+                onChange={(e) => setSelectedEventId(e.target.value)}
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-[#DA291C] transition-colors"
+              >
+                {activeEvents.map(evt => (
+                  <option key={evt.id} value={evt.id}>
+                    {evt.title} — ({evt.category} | {evt.instructor})
+                  </option>
+                ))}
+              </select>
+            )}
 
             {selectedEvent && (
               <div className="p-3 bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center gap-3 text-xs text-slate-600 dark:text-slate-300">
@@ -359,7 +393,7 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
                 )}
               </div>
             ) : (
-              <p className="text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 p-3 rounded-xl border border-amber-200 dark:border-amber-900/60">No hay fechas u horarios programados para esta capacitación.</p>
+              <p className="text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 p-3 rounded-xl border border-amber-200 dark:border-amber-900/60">No hay fechas u horarios futuros vigentes disponibles para esta capacitación.</p>
             )}
           </div>
 
@@ -540,7 +574,7 @@ export const TeamAssignmentModal: React.FC<TeamAssignmentModalProps> = ({
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={isSubmitting || selectedEmails.size === 0}
+            disabled={isSubmitting || selectedEmails.size === 0 || !selectedDate || !selectedTime}
             className="flex-1 sm:flex-none px-6 py-2.5 rounded-2xl bg-[#DA291C] hover:bg-red-700 disabled:opacity-50 text-white text-xs font-extrabold flex items-center justify-center gap-2 shadow-md shadow-red-500/25 transition-all cursor-pointer"
           >
             {isSubmitting ? (

@@ -13,6 +13,7 @@ import {
   Video 
 } from 'lucide-react';
 import { TrainingEvent } from '../../types';
+import { isEventFullyPast, getNextUpcomingScheduleDate, formatDateShort } from '../../utils/formatters';
 
 interface SlideItem {
   id: string | number;
@@ -79,14 +80,15 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Transformar eventos destacados para el banner
+  // Transformar eventos destacados para el banner (solo eventos activos y vigentes en fecha)
   const eventSlides: SlideItem[] = useMemo(() => {
     return (events || [])
-      .filter(e => e.status === 'active' && Boolean(e.isBannerFeatured))
+      .filter(e => e.status === 'active' && Boolean(e.isBannerFeatured) && !isEventFullyPast(e))
       .map(evt => {
-        const nextDate = evt.schedule?.[0]?.date;
-        const highlightText = nextDate 
-          ? `${evt.modality} • ${nextDate}` 
+        const nextDateStr = getNextUpcomingScheduleDate(evt);
+        const formattedDate = nextDateStr ? formatDateShort(nextDateStr) : null;
+        const highlightText = formattedDate 
+          ? `${evt.modality} • Próx: ${formattedDate}` 
           : `${evt.modality} • ${evt.totalHours ? `${evt.totalHours} hrs` : 'Certificada'}`;
 
         return {

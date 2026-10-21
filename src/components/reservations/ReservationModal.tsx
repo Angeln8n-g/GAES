@@ -12,7 +12,17 @@ import {
   Lock
 } from 'lucide-react';
 import { TrainingEvent, UserAccount, Slot } from '../../types';
-import { formatDateLong, formatDateShort, getEventDurationMetrics, calculateTimeDurationHours } from '../../utils/formatters';
+import { 
+  formatDateLong, 
+  formatDateShort, 
+  getEventDurationMetrics, 
+  calculateTimeDurationHours,
+  isEventFullyPast,
+  isScheduleDatePast,
+  isSlotPast,
+  getNextUpcomingScheduleDate,
+  getTodayLocalDateString
+} from '../../utils/formatters';
 import { downloadIcsFile, getGoogleCalendarUrl } from '../../utils/icsUtils';
 import { AccessibleModal } from '../common/AccessibleModal';
 
@@ -31,9 +41,12 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 }) => {
   if (!event) return null;
 
-  const today = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-  const initialSchedule = event.schedule.find(s => s.date >= todayStr) || event.schedule[0];
+  const todayStr = getTodayLocalDateString();
+  const isEventClosed = isEventFullyPast(event);
+  const initialUpcomingDate = getNextUpcomingScheduleDate(event);
+  const initialSchedule = initialUpcomingDate 
+    ? event.schedule.find(s => s.date === initialUpcomingDate) || event.schedule[0]
+    : event.schedule[0];
 
   const [selectedDate, setSelectedDate] = useState<string>(initialSchedule?.date || '');
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(initialSchedule?.slots[0] || null);
@@ -87,6 +100,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   const currentSchedule = event.schedule.find(s => s.date === selectedDate);
 
   const handleDateChange = (dateStr: string) => {
+    if (isEventClosed || isScheduleDatePast(dateStr)) return;
     setSelectedDate(dateStr);
     const sch = event.schedule.find(s => s.date === dateStr);
     setSelectedSlot(sch?.slots[0] || null);
@@ -94,6 +108,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   };
 
   const handleSlotSelect = (slot: Slot) => {
+    if (isEventClosed || isSlotPast(selectedDate, slot.time, slot.endTime)) return;
     setSelectedSlot(slot);
     setErrorMessage('');
   };
@@ -102,6 +117,11 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     e.preventDefault();
     setErrorMessage('');
 
+    if (isEventClosed) {
+      setErrorMessage('Este entrenamiento ha concluido su ciclo programado y no admite nuevas inscripciones.');
+      return;
+    }
+
     if (existingEnrollment) {
       setErrorMessage(`Ya te encuentras registrado en este entrenamiento (Fecha: ${formatDateShort(existingEnrollment.date)}, Horario: ${existingEnrollment.time}). No está permitido inscribirse en múltiples horarios para el mismo curso.`);
       return;
@@ -109,6 +129,16 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
     if (!selectedDate || !selectedSlot) {
       setErrorMessage('Por favor selecciona una fecha y horario.');
+      return;
+    }
+
+    if (isScheduleDatePast(selectedDate)) {
+      setErrorMessage('La fecha seleccionada ya ha pasado. Por favor selecciona una fecha vigente.');
+      return;
+    }
+
+    if (isSlotPast(selectedDate, selectedSlot.time, selectedSlot.endTime)) {
+      setErrorMessage('El horario seleccionado ya ha concluido. Por favor selecciona un horario disponible.');
       return;
     }
 
@@ -222,6 +252,19 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
             /* Reservation Form Screen */
             <form onSubmit={handleReserve} className="space-y-5">
               
+              {/* Event closed notice if all schedules have finished */}
+              {isEventClosed && (
+                <div role="alert" className="p-4 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl flex items-start gap-3 text-xs text-slate-700 dark:text-slate-300 animate-in fade-in duration-200">
+                  <Lock className="w-5 h-5 text-slate-500 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-extrabold text-slate-900 dark:text-white text-sm">Inscripciones Cerradas</p>
+                    <p className="mt-1 leading-relaxed">
+                      Este entrenamiento ya concluyó su ciclo programado de fechas y no admite nuevas inscripciones. Puedes revisar los detalles y duración a modo de consulta.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Mandatory assignment notice */}
               {mandatoryAssignment && (
                 <div className="p-4 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 rounded-2xl flex items-start gap-3 text-xs text-rose-800 dark:text-rose-300">
@@ -273,20 +316,22 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                 <div role="group" aria-labelledby="reservation-date-label" className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {event.schedule.map(sch => {
                     const isSelected = selectedDate === sch.date;
-                    const isPast = sch.date < todayStr;
+                    const isPast = isScheduleDatePast(sch.date);
+                    const isDateDisabled = isPast || isEventClosed;
                     const totalSlots = sch.slots.length;
                     return (
                       <button
                         key={sch.date}
                         type="button"
+                        disabled={isDateDisabled}
                         aria-pressed={isSelected}
                         onClick={() => handleDateChange(sch.date)}
                         className={`p-3 rounded-2xl border text-left transition-all ${
                           isSelected
                             ? 'bg-red-50 dark:bg-red-950/40 border-[#DA291C] dark:border-rose-500 text-[#DA291C] dark:text-rose-400 font-bold ring-1 ring-[#DA291C] dark:ring-rose-500'
-                            : isPast
-                            ? 'bg-slate-100/70 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
-                            : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+                            : isDateDisabled
+                            ? 'bg-slate-100/70 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed opacity-60'
+                            : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer'
                         }`}
                       >
                         <div className="flex items-center justify-between gap-1">
@@ -298,7 +343,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                           )}
                           {isPast && (
                             <span className="px-1.5 py-0.2 rounded-md bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 text-[9px] font-bold">
-                              Pasada
+                              Finalizada
                             </span>
                           )}
                         </div>
@@ -320,21 +365,23 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                     {currentSchedule.slots.map((slot, idx) => {
                       const isSelected = selectedSlot?.time === slot.time;
                       const isFull = slot.registered >= slot.capacity;
+                      const isSlotExpired = isSlotPast(currentSchedule.date, slot.time, slot.endTime);
+                      const isSlotDisabled = isFull || isSlotExpired || isEventClosed;
                       const remaining = slot.capacity - slot.registered;
 
                       return (
                         <button
                           key={idx}
                           type="button"
-                          disabled={isFull}
+                          disabled={isSlotDisabled}
                           aria-pressed={isSelected}
                           onClick={() => handleSlotSelect(slot)}
                           className={`p-3 rounded-2xl border text-left transition-all ${
-                            isFull
-                              ? 'opacity-40 bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 cursor-not-allowed text-slate-400 dark:text-slate-500'
+                            isSlotDisabled
+                              ? 'opacity-50 bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 cursor-not-allowed text-slate-400 dark:text-slate-500'
                               : isSelected
                               ? 'bg-[#DA291C] text-white font-bold shadow-md shadow-red-500/25 ring-1 ring-red-400'
-                              : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+                              : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer'
                           }`}
                         >
                           <div className="flex items-center justify-between">
@@ -344,11 +391,15 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                             <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold ${
                               isFull
                                 ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400'
+                                : isSlotExpired
+                                ? 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+                                : isEventClosed
+                                ? 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
                                 : isSelected
                                 ? 'bg-white/20 text-white'
                                 : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
                             }`}>
-                              {isFull ? 'Agotado' : `${remaining} libres`}
+                              {isFull ? 'Agotado' : isSlotExpired ? 'Finalizado' : isEventClosed ? 'Cerrado' : `${remaining} libres`}
                             </span>
                           </div>
                           <div className="flex items-center justify-between text-[10px] mt-1">
@@ -376,10 +427,13 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                 <input
                   id="reservation-collaborator-email"
                   type="email"
+                  disabled={isEventClosed}
                   value={emailInput}
                   onChange={(e) => setEmailInput(e.target.value)}
                   placeholder="nombre.apellido@claro.com.do"
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] font-medium"
+                  className={`w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#DA291C] font-medium ${
+                    isEventClosed ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                   required
                 />
               </div>
@@ -408,10 +462,21 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               {/* Submit CTA */}
               <button
                 type="submit"
-                disabled={isSubmitting || Boolean(existingEnrollment) || !selectedSlot || (selectedSlot && selectedSlot.registered >= selectedSlot.capacity)}
+                disabled={
+                  isSubmitting || 
+                  isEventClosed || 
+                  Boolean(existingEnrollment) || 
+                  !selectedSlot || 
+                  (selectedSlot && (
+                    selectedSlot.registered >= selectedSlot.capacity || 
+                    isSlotPast(selectedDate, selectedSlot.time, selectedSlot.endTime)
+                  ))
+                }
                 className="w-full py-3.5 bg-[#DA291C] hover:bg-red-700 text-white text-xs font-bold rounded-2xl shadow-md shadow-red-500/25 flex items-center justify-center gap-2 disabled:opacity-50 transition-all cursor-pointer"
               >
-                {existingEnrollment 
+                {isEventClosed
+                  ? 'Inscripciones Finalizadas'
+                  : existingEnrollment 
                   ? 'Ya Estás Inscrito en Este Curso' 
                   : isSubmitting 
                   ? 'Confirmando reserva...' 

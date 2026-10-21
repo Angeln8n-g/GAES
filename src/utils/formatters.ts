@@ -212,3 +212,97 @@ export const getEventDurationMetrics = (event?: {
   };
 };
 
+/**
+ * Retorna la fecha local actual en formato estándar YYYY-MM-DD
+ */
+export const getTodayLocalDateString = (refDate: Date = new Date()): string => {
+  return `${refDate.getFullYear()}-${String(refDate.getMonth() + 1).padStart(2, '0')}-${String(refDate.getDate()).padStart(2, '0')}`;
+};
+
+/**
+ * Determina si una fecha (YYYY-MM-DD) es estrictamente anterior a hoy
+ */
+export const isScheduleDatePast = (dateStr: string, refDate: Date = new Date()): boolean => {
+  if (!dateStr) return true;
+  const todayStr = getTodayLocalDateString(refDate);
+  return dateStr < todayStr;
+};
+
+/**
+ * Determina si un slot específico (fecha + hora de inicio/fin) ya concluyó
+ */
+export const isSlotPast = (dateStr: string, timeStr: string, endTimeStr?: string, refDate: Date = new Date()): boolean => {
+  if (!dateStr) return true;
+  const todayStr = getTodayLocalDateString(refDate);
+  if (dateStr < todayStr) return true;
+  if (dateStr > todayStr) return false;
+
+  // Si es hoy, verificar si la hora de fin (o de inicio) ya pasó
+  const nowMinutes = refDate.getHours() * 60 + refDate.getMinutes();
+  
+  // Si timeStr viene como rango ("08:00 AM - 12:00 PM" o similar)
+  let targetTime = endTimeStr;
+  if (!targetTime && timeStr && timeStr.includes('-')) {
+    const parts = timeStr.split('-');
+    targetTime = parts[1]?.trim();
+  }
+  if (!targetTime) {
+    targetTime = timeStr;
+  }
+
+  const targetMinutes = parseTimeToMinutes(targetTime);
+  if (targetMinutes === null) return false;
+
+  return nowMinutes > targetMinutes;
+};
+
+/**
+ * Retorna si un evento completo ya finalizó (todas sus fechas y horarios están en el pasado)
+ */
+export const isEventFullyPast = (event: { schedule?: Array<{ date: string; slots?: Array<{ time: string; endTime?: string }> }> }, refDate: Date = new Date()): boolean => {
+  if (!event || !event.schedule || event.schedule.length === 0) return true;
+  const todayStr = getTodayLocalDateString(refDate);
+
+  // 1. Si hay alguna fecha estrictamente futura, el evento no ha finalizado
+  const hasFutureDate = event.schedule.some(s => s.date > todayStr);
+  if (hasFutureDate) return false;
+
+  // 2. Si hay fecha de hoy, verificar si queda algún slot disponible por hora
+  const todaySchedules = event.schedule.filter(s => s.date === todayStr);
+  if (todaySchedules.length > 0) {
+    for (const sch of todaySchedules) {
+      if (!sch.slots || sch.slots.length === 0) {
+        return false;
+      }
+      const hasUpcomingSlotToday = sch.slots.some(slot => !isSlotPast(sch.date, slot.time, slot.endTime, refDate));
+      if (hasUpcomingSlotToday) return false;
+    }
+  }
+
+  // Si todas las fechas son anteriores a hoy o los slots de hoy ya concluyeron
+  return true;
+};
+
+/**
+ * Obtiene la próxima fecha vigente más cercana de un evento (formato YYYY-MM-DD)
+ */
+export const getNextUpcomingScheduleDate = (event: { schedule?: Array<{ date: string; slots?: Array<{ time: string; endTime?: string }> }> }, refDate: Date = new Date()): string | null => {
+  if (!event || !event.schedule || event.schedule.length === 0) return null;
+  const todayStr = getTodayLocalDateString(refDate);
+
+  const validDates = event.schedule
+    .filter(s => {
+      if (s.date > todayStr) return true;
+      if (s.date === todayStr) {
+        if (!s.slots || s.slots.length === 0) return true;
+        return s.slots.some(slot => !isSlotPast(s.date, slot.time, slot.endTime, refDate));
+      }
+      return false;
+    })
+    .map(s => s.date)
+    .sort();
+
+  return validDates[0] || null;
+};
+
+

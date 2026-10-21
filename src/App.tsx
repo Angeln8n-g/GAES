@@ -55,6 +55,7 @@ import { findAttendeeByCedula, AttendeeLookupResult } from './utils/attendeeLook
 import { UserProfileModal } from './components/profile/UserProfileModal';
 import { attendanceWs } from './services/websocket';
 import { initThemeListener } from './utils/theme';
+import { isScheduleDatePast, isSlotPast } from './utils/formatters';
 
 // Helper seguro para obtener el usuario autenticado desde localStorage
 const getSafeStoredUser = (): UserAccount | null => {
@@ -542,6 +543,17 @@ export function App() {
   const handleConfirmReservation = async (eventId: string, date: string, time: string, email: string) => {
     const targetEvt = events.find(e => e.id === eventId);
     if (targetEvt) {
+      if (isScheduleDatePast(date)) {
+        showToast('Inscripción no permitida', 'No es posible inscribirse en una fecha que ya ha finalizado.', 'error');
+        throw new Error('No es posible inscribirse en una fecha pasada.');
+      }
+
+      const matchingSlot = targetEvt.schedule.find(s => s.date === date)?.slots?.find(sl => sl.time === time);
+      if (matchingSlot && isSlotPast(date, time, matchingSlot.endTime)) {
+        showToast('Inscripción no permitida', 'El horario seleccionado para el día de hoy ya ha concluido.', 'error');
+        throw new Error('No es posible inscribirse en un horario que ya ha concluido.');
+      }
+
       const cleanEmail = email.trim().toLowerCase();
       const existing = targetEvt.schedule.flatMap(sch => 
         (sch.slots || []).filter(sl => (sl.attendees || []).some(a => a.toLowerCase() === cleanEmail))

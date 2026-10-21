@@ -6,6 +6,24 @@ const db_js_1 = require("../db.js");
 const events_js_1 = require("./events.js");
 const notificationService_js_1 = require("../services/notificationService.js");
 exports.registrationsRouter = (0, express_1.Router)();
+/**
+ * Parsea una hora en formato "09:00 AM", "11:30 PM", "14:00", etc. a minutos desde medianoche
+ */
+function parseTimeToMinutes(timeStr) {
+    if (!timeStr)
+        return null;
+    const match = timeStr.trim().match(/^(\d{1,2}):(\d{2})(?:\s*(AM|PM))?$/i);
+    if (!match)
+        return null;
+    let h = parseInt(match[1], 10);
+    const m = parseInt(match[2], 10);
+    const period = match[3] ? match[3].toUpperCase() : null;
+    if (period === 'PM' && h < 12)
+        h += 12;
+    if (period === 'AM' && h === 12)
+        h = 0;
+    return h * 60 + m;
+}
 // POST /api/registrations (Inscripción concurrente y atómica)
 exports.registrationsRouter.post('/', async (req, res) => {
     const { eventId, date, time, email } = req.body;
@@ -17,7 +35,7 @@ exports.registrationsRouter.post('/', async (req, res) => {
         await client.query('BEGIN');
         // 1. Obtener y bloquear el slot para evitar condiciones de carrera (Race Conditions)
         const slotQuery = `
-      SELECT sl.id, sl.capacity 
+      SELECT sl.id, sl.capacity, sl.end_time 
       FROM event_slots sl
       JOIN event_schedules sch ON sl.schedule_id = sch.id
       WHERE sch.event_id = $1 AND sch.date = $2 AND sl.time = $3
@@ -30,6 +48,29 @@ exports.registrationsRouter.post('/', async (req, res) => {
         }
         const slotId = slotRes.rows[0].id;
         const capacity = slotRes.rows[0].capacity;
+        const endTime = slotRes.rows[0].end_time;
+        // 1.1 Validar que la fecha y horario no hayan finalizado
+        const now = new Date();
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        if (date < todayStr) {
+            await client.query('ROLLBACK');
+            return res.status(400).json({ message: 'No es posible inscribirse en una sesión o evento cuya fecha ya ha pasado.' });
+        }
+        if (date === todayStr) {
+            const nowMinutes = now.getHours() * 60 + now.getMinutes();
+            let targetTime = endTime;
+            if (!targetTime && time && time.includes('-')) {
+                targetTime = time.split('-')[1]?.trim();
+            }
+            if (!targetTime) {
+                targetTime = time;
+            }
+            const targetMinutes = parseTimeToMinutes(targetTime);
+            if (targetMinutes !== null && nowMinutes > targetMinutes) {
+                await client.query('ROLLBACK');
+                return res.status(400).json({ message: 'El horario seleccionado para el día de hoy ya ha finalizado.' });
+            }
+        }
         // 2. Obtener o crear participante en base al correo
         let partRes = await client.query('SELECT card FROM participants WHERE LOWER(email) = LOWER($1)', [email.trim()]);
         let participantCard = '';
@@ -88,13 +129,20 @@ exports.registrationsRouter.post('/', async (req, res) => {
 });
 // POST /api/registrations/bulk (Matriculación Masiva en Lote - Solo Super Admin)
 exports.registrationsRouter.post('/bulk', async (req, res) => {
-    const { eventId, date, time, emails, autoExpandCapacity } = req.body;
+    const { eventId, date, time, emails, autoExpandCapacity, allowPastDates } = req.body;
     if (!eventId || !date || !time || !Array.isArray(emails) || emails.length === 0) {
         return res.status(400).json({ message: 'Se requiere eventId, date, time y una lista no vacía de correos (emails).' });
     }
     const client = await db_js_1.pool.connect();
     try {
         await client.query('BEGIN');
+        // 0. Validación de fecha no vencida
+        const now = new Date();
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        if (!allowPastDates && date < todayStr) {
+            await client.query('ROLLBACK');
+            return res.status(400).json({ message: 'No es posible matricular en lote para una fecha que ya ha finalizado.' });
+        }
         // 1. Obtener y bloquear el slot
         const slotQuery = `
       SELECT sl.id, sl.capacity 

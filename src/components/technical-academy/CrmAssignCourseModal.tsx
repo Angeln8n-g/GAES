@@ -20,6 +20,7 @@ import {
 } from '../../types';
 import { apiService } from '../../services/api';
 import { AccessibleModal } from '../common/AccessibleModal';
+import { isScheduleDatePast, getTodayLocalDateString } from '../../utils/formatters';
 
 interface CrmAssignCourseModalProps {
   isOpen: boolean;
@@ -56,6 +57,8 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  const todayStr = useMemo(() => getTodayLocalDateString(), []);
+
   // Cohortes filtradas para el curso seleccionado
   const availableCohorts = useMemo(() => {
     if (!selectedCourseId) return [];
@@ -64,13 +67,15 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
       .sort((a, b) => b.startDate.localeCompare(a.startDate));
   }, [cohorts, selectedCourseId]);
 
-  // Si cambia el curso seleccionado, pre-seleccionar la primera cohorte activa o disponible
+  // Si cambia el curso seleccionado, pre-seleccionar la primera cohorte activa o programada vigente
   const handleCourseChange = (courseId: string) => {
     setSelectedCourseId(courseId);
     const cohs = cohorts.filter(c => c.courseId === courseId);
     if (cohs.length > 0) {
-      const activeOrScheduled = cohs.find(c => c.status === 'scheduled' || c.status === 'in_progress') || cohs[0];
-      setSelectedCohortId(activeOrScheduled.id);
+      const activeOrScheduled = cohs.find(c => 
+        (c.status === 'scheduled' || c.status === 'in_progress') && !isScheduleDatePast(c.endDate)
+      );
+      setSelectedCohortId(activeOrScheduled ? activeOrScheduled.id : '');
     } else {
       setSelectedCohortId('');
     }
@@ -79,8 +84,12 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
   // Inicialización de cohorte al abrir
   React.useEffect(() => {
     if (availableCohorts.length > 0 && !selectedCohortId) {
-      const activeOrScheduled = availableCohorts.find(c => c.status === 'scheduled' || c.status === 'in_progress') || availableCohorts[0];
-      setSelectedCohortId(activeOrScheduled.id);
+      const activeOrScheduled = availableCohorts.find(c => 
+        (c.status === 'scheduled' || c.status === 'in_progress') && !isScheduleDatePast(c.endDate)
+      );
+      if (activeOrScheduled) {
+        setSelectedCohortId(activeOrScheduled.id);
+      }
     }
   }, [availableCohorts, selectedCohortId]);
 
@@ -91,6 +100,11 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
     e.preventDefault();
     if (!selectedCohortId) {
       setErrorMsg('Debes seleccionar una cohorte disponible para realizar la asignación.');
+      return;
+    }
+
+    if (!selectedCohort || isScheduleDatePast(selectedCohort.endDate) || selectedCohort.status === 'completed') {
+      setErrorMsg('No es posible asignar participantes a una cohorte que ya ha concluido todas sus fechas.');
       return;
     }
 
@@ -273,18 +287,25 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
               <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
                 {availableCohorts.map(coh => {
                   const isSelected = selectedCohortId === coh.id;
+                  const isPast = isScheduleDatePast(coh.endDate) || coh.status === 'completed';
                   const isScheduled = coh.status === 'scheduled';
                   const isInProgress = coh.status === 'in_progress';
-                  const isCompleted = coh.status === 'completed';
+                  const isCompleted = coh.status === 'completed' || isPast;
 
                   return (
                     <div
                       key={coh.id}
-                      onClick={() => setSelectedCohortId(coh.id)}
-                      className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
-                        isSelected
-                          ? 'border-[#DA291C] bg-red-50/40 dark:bg-red-950/30 shadow-sm ring-1 ring-[#DA291C]'
-                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                      onClick={() => {
+                        if (!isPast) {
+                          setSelectedCohortId(coh.id);
+                        }
+                      }}
+                      className={`p-3.5 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
+                        isPast
+                          ? 'border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/40 opacity-60 cursor-not-allowed select-none'
+                          : isSelected
+                          ? 'border-[#DA291C] bg-red-50/40 dark:bg-red-950/30 shadow-sm ring-1 ring-[#DA291C] cursor-pointer'
+                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer'
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -299,15 +320,15 @@ export const CrmAssignCourseModal: React.FC<CrmAssignCourseModalProps> = ({
                               {coh.groupName || 'Cohorte General'}
                             </span>
                             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                              isInProgress 
+                              isPast
+                                ? 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                                : isInProgress 
                                 ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
                                 : isScheduled 
                                   ? 'bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300'
-                                  : isCompleted 
-                                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
-                                    : 'bg-red-100 dark:bg-red-950/60 text-red-800 dark:text-red-300'
+                                  : 'bg-red-100 dark:bg-red-950/60 text-red-800 dark:text-red-300'
                             }`}>
-                              {isInProgress ? 'En Curso' : isScheduled ? 'Programada' : isCompleted ? 'Concluida' : coh.status}
+                              {isPast ? 'Concluida (Bloqueada)' : isInProgress ? 'En Curso' : isScheduled ? 'Programada' : coh.status}
                             </span>
                           </div>
                           <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400">

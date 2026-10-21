@@ -22,7 +22,7 @@ import {
   Flame
 } from 'lucide-react';
 import { TrainingEvent, Company, Participant } from '../../types';
-import { formatDateShort } from '../../utils/formatters';
+import { formatDateShort, isEventFullyPast } from '../../utils/formatters';
 import { exportSessionGradesForOjtAndCalibration } from '../../utils/excelUtils';
 
 interface EventsManagerProps {
@@ -214,9 +214,13 @@ export const EventsManager: React.FC<EventsManagerProps> = ({
                         {event.category}
                       </span>
                       {event.isBannerFeatured && (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 border border-amber-300 flex items-center gap-1 shadow-xs">
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border flex items-center gap-1 shadow-xs ${
+                          isEventFullyPast(event)
+                            ? 'bg-slate-100 text-slate-500 border-slate-300 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
+                            : 'bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 border-amber-300'
+                        }`}>
                           <Flame className="w-2.5 h-2.5 text-amber-950 fill-amber-950" />
-                          <span>En Banner</span>
+                          <span>{isEventFullyPast(event) ? 'En Banner (Finalizado)' : 'En Banner'}</span>
                         </span>
                       )}
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 ${

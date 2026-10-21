@@ -34,7 +34,17 @@ import {
 import { QRCodeSVG } from 'qrcode.react';
 import { TrainingEvent, UserAccount, Slot, Schedule, TrainingProgram, ParticipantGroup, Participant, Company, ExternalTraining, TechnicalAcademyHistoryRecord, Certificate, UserWaitlistItem } from '../../types';
 import { apiService } from '../../services/api';
-import { formatDateLong, formatDateShort, formatCedula, getEventDurationMetrics, isSafeHttpUrl } from '../../utils/formatters';
+import { 
+  formatDateLong, 
+  formatDateShort, 
+  formatCedula, 
+  getEventDurationMetrics, 
+  isSafeHttpUrl,
+  isEventFullyPast,
+  isScheduleDatePast,
+  isSlotPast,
+  getNextUpcomingScheduleDate
+} from '../../utils/formatters';
 import { downloadIcsFile, getGoogleCalendarUrl } from '../../utils/icsUtils';
 import { FormalLetterModal, TrainingHistoryRecord } from '../history/FormalLetterModal';
 import { TechnicalPinCheckinModal } from './TechnicalPinCheckinModal';
@@ -270,10 +280,10 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
   }, [events, userAssociatedEmails]);
 
   // Sesiones activas y futuras para la sección "Sesiones Agendadas".
-  // Si la fecha ya pasó (< todayStr), se excluye de aquí y se preserva en el Historial de Capacitaciones.
+  // Si la fecha ya pasó o el horario de hoy ya concluyó, se excluye de aquí y se preserva en el Historial de Capacitaciones.
   const activeRegistrations: UserRegistrationItem[] = useMemo(() => {
-    return userRegistrations.filter(r => r.schedule.date >= todayStr);
-  }, [userRegistrations, todayStr]);
+    return userRegistrations.filter(r => !isSlotPast(r.schedule.date, r.slot.time, r.slot.endTime));
+  }, [userRegistrations]);
 
   const handleConfirmCancel = async () => {
     if (!cancelingItem) return;
@@ -438,9 +448,10 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
         sch.slots.some(sl => (sl.attendees || []).some(att => att.toLowerCase() === userEmail))
       );
       if (isEnrolled) return false;
-      // Que tenga al menos un horario futuro con cupo
+      // Que el evento no haya concluido por completo y tenga al menos un horario futuro disponible con cupo
+      if (isEventFullyPast(evt)) return false;
       const hasOpenSlot = evt.schedule.some(sch => 
-        sch.date >= todayStr && sch.slots.some(sl => sl.registered < sl.capacity)
+        !isScheduleDatePast(sch.date) && sch.slots.some(sl => !isSlotPast(sch.date, sl.time, sl.endTime) && sl.registered < sl.capacity)
       );
       return hasOpenSlot;
     });
@@ -611,7 +622,7 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
             {recommendedEvents.map(({ event, matchReason }) => {
               const nextSlot = event.schedule
                 .flatMap(s => s.slots.map(sl => ({ date: s.date, ...sl })))
-                .find(s => s.date >= todayStr && s.registered < s.capacity);
+                .find(s => !isScheduleDatePast(s.date) && !isSlotPast(s.date, s.time, s.endTime) && s.registered < s.capacity);
 
               return (
                 <div 
@@ -865,6 +876,11 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                           Revalidar (QR / PIN)
                         </button>
                       </div>
+                    ) : isScheduleDatePast(t.endDate) ? (
+                      <div className="w-full py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs font-bold flex items-center justify-center gap-2 select-none">
+                        <Lock className="w-4 h-4 text-slate-400" />
+                        <span>Entrenamiento Concluido (Asistencia Cerrada)</span>
+                      </div>
                     ) : (
                       <button
                         type="button"
@@ -925,13 +941,18 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                   if (item.isMandatory) completedMandatory++;
                 }
 
+                const isPast = targetEvent ? isEventFullyPast(targetEvent) : false;
+                const nextSchedule = targetEvent ? getNextUpcomingScheduleDate(targetEvent) : null;
+
                 return {
                   event: targetEvent,
                   isMandatory: item.isMandatory,
                   hasAttended,
                   isRegistered,
                   registeredDate,
-                  registeredTime
+                  registeredTime,
+                  isPast,
+                  nextSchedule
                 };
               });
 
@@ -998,8 +1019,10 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
                       {coursesProgress.map((cp, idx) => {
-                        const { event, isMandatory, hasAttended, isRegistered, registeredDate, registeredTime } = cp;
+                        const { event, isMandatory, hasAttended, isRegistered, registeredDate, registeredTime, isPast, nextSchedule } = cp;
                         if (!event) return null;
+
+                        const isRegisteredSlotPast = isRegistered && isScheduleDatePast(registeredDate);
 
                         return (
                           <div 
@@ -1008,7 +1031,11 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                               hasAttended 
                                 ? 'bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/60' 
                                 : isRegistered 
-                                ? 'bg-red-50/40 dark:bg-red-950/30 border-red-200 dark:border-red-900/50' 
+                                ? isRegisteredSlotPast
+                                  ? 'bg-amber-50/50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/50'
+                                  : 'bg-red-50/40 dark:bg-red-950/30 border-red-200 dark:border-red-900/50' 
+                                : isPast
+                                ? 'bg-slate-100/70 dark:bg-slate-900/60 border-slate-300 dark:border-slate-800 opacity-90'
                                 : 'bg-slate-50 dark:bg-slate-850 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
                             }`}
                           >
@@ -1027,8 +1054,18 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                                     <CheckCircle2 className="w-3.5 h-3.5" /> Completado
                                   </span>
                                 ) : isRegistered ? (
-                                  <span className="text-[11px] font-bold text-[#DA291C] dark:text-red-400 flex items-center gap-1">
-                                    <Clock className="w-3.5 h-3.5" /> Agendado
+                                  isRegisteredSlotPast ? (
+                                    <span className="text-[11px] font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1">
+                                      <AlertTriangle className="w-3.5 h-3.5" /> No Asistió
+                                    </span>
+                                  ) : (
+                                    <span className="text-[11px] font-bold text-[#DA291C] dark:text-red-400 flex items-center gap-1">
+                                      <Clock className="w-3.5 h-3.5" /> Agendado
+                                    </span>
+                                  )
+                                ) : isPast ? (
+                                  <span className="text-[11px] font-bold text-rose-700 dark:text-rose-400 flex items-center gap-1">
+                                    <AlertTriangle className="w-3.5 h-3.5" /> Fecha Vencida
                                   </span>
                                 ) : (
                                   <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
@@ -1043,6 +1080,11 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                               <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 mb-2">
                                 Facilitador: {event.instructor}
                               </p>
+                              {nextSchedule && !isPast && !isRegistered && (
+                                <p className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold mb-1">
+                                  Próxima fecha: {formatDateShort(nextSchedule)}
+                                </p>
+                              )}
                             </div>
 
                             {/* Action / Schedule Info */}
@@ -1052,10 +1094,20 @@ export const MyRegistrationsView: React.FC<MyRegistrationsViewProps> = ({
                                   <p>📅 {registeredDate}</p>
                                   <p>⏰ {registeredTime}</p>
                                 </div>
+                              ) : isPast ? (
+                                <button
+                                  type="button"
+                                  disabled
+                                  className="w-full py-1.5 px-3 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 text-[11px] font-bold flex items-center justify-center gap-1.5 cursor-not-allowed select-none border border-slate-300 dark:border-slate-700"
+                                  title="Este curso ha concluido todas sus fechas y horarios programados"
+                                >
+                                  <Lock className="w-3 h-3 text-slate-400" />
+                                  <span>Finalizado (Fecha Vencida)</span>
+                                </button>
                               ) : onOpenReservationModal ? (
                                 <button
                                   onClick={() => onOpenReservationModal(event)}
-                                  className="w-full py-1.5 px-3 rounded-xl bg-[#DA291C] hover:bg-red-700 text-white text-[11px] font-bold flex items-center justify-center gap-1 transition-all"
+                                  className="w-full py-1.5 px-3 rounded-xl bg-[#DA291C] hover:bg-red-700 text-white text-[11px] font-bold flex items-center justify-center gap-1 transition-all cursor-pointer shadow-sm active:scale-98"
                                 >
                                   <span>Inscribirme</span>
                                   <ChevronRight className="w-3 h-3" />
